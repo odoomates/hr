@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="hr_rule_overtime" model="hr.salary.rule">
+            <field name="name">Overtime</field>
+            <field name="sequence" eval="56"/>
+            <field name="code">OVERTIME</field>
+            <field name="category_id" ref="om_hr_payroll.ALW"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = bool(inputs.OVERTIME.amount)</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute"># the validated overtime of the Attendances app, filled in when the payslip is computed
+result = inputs.OVERTIME.amount</field>
+            <field name="input_ids" eval="[(0, 0, {'name': 'Overtime', 'code': 'OVERTIME'})]"/>
+            <field name="note">Pays the overtime validated in the Attendances app and not paid yet: hours x hourly
+wage x the salary rate of the time rule. Add the rule to the salary structures paying overtime.</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <function model="hr.salary.rule" name="_om_hr_overtime_add_to_base_structure"/>
+
+    </data>
+</odoo>
