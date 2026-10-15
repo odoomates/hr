@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- What every employee does for themselves, from any HR module: their loans, certificates, documents,
+         assets, appraisals, payslips. Light users of Odoo 20 see it too. -->
+    <menuitem id="menu_my_hr"
+              name="My HR"
+              groups="base.group_user"
+              sequence="184"/>
+
+</odoo>
