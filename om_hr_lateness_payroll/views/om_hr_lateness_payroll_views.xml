@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="om_hr_lateness_view_list_payroll" model="ir.ui.view">
+        <field name="name">om.hr.lateness.view.list.payroll</field>
+        <field name="model">om.hr.lateness</field>
+        <field name="inherit_id" ref="om_hr_lateness.om_hr_lateness_view_list"/>
+        <field name="arch" type="xml">
+            <field name="penalty" position="after">
+                <field name="currency_id" column_invisible="1"/>
+                <field name="penalty_amount" optional="show" sum="Total"/>
+                <field name="adjustment_id" optional="hide"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="om_hr_lateness_view_form_payroll" model="ir.ui.view">
+        <field name="name">om.hr.lateness.view.form.payroll</field>
+        <field name="model">om.hr.lateness</field>
+        <field name="inherit_id" ref="om_hr_lateness.om_hr_lateness_view_form"/>
+        <field name="arch" type="xml">
+            <field name="policy_line_id" position="after">
+                <field name="currency_id" invisible="1"/>
+                <field name="penalty_amount" invisible="not adjustment_id"/>
+                <field name="adjustment_id" invisible="not adjustment_id"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="om_hr_payroll_adjustment_view_form_lateness" model="ir.ui.view">
+        <field name="name">om.hr.payroll.adjustment.view.form.lateness</field>
+        <field name="model">om.hr.payroll.adjustment</field>
+        <field name="inherit_id" ref="om_hr_payroll_adjustment.om_hr_payroll_adjustment_view_form"/>
+        <field name="arch" type="xml">
+            <page name="lines" position="after">
+                <page string="Lateness" name="lateness" invisible="not om_lateness_ids">
+                    <field name="om_lateness_ids" readonly="1">
+                        <list>
+                            <field name="date"/>
+                            <field name="kind"/>
+                            <field name="minutes"/>
+                            <field name="occurrence" string="#"/>
+                            <field name="penalty"/>
+                            <field name="currency_id" column_invisible="1"/>
+                            <field name="penalty_amount" sum="Total"/>
+                        </list>
+                    </field>
+                </page>
+            </page>
+        </field>
+    </record>
+
+    <record id="om_hr_lateness_penalty_wizard_view_form" model="ir.ui.view">
+        <field name="name">om.hr.lateness.penalty.wizard.view.form</field>
+        <field name="model">om.hr.lateness.penalty.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Compute Lateness Penalties">
+                <div class="text-muted mb-3">
+                    The latenesses of the month are counted again, then their penalties become one Lateness adjustment
+                    per employee, taken by the payslip of the month. Computed again, the adjustments follow the
+                    latenesses, except those a confirmed payslip took already.
+                </div>
+                <group>
+                    <field name="month" widget="date" options="{'format': 'MMMM yyyy'}"/>
+                    <field name="employee_ids" widget="many2many_tags_avatar" placeholder="All the employees"/>
+                </group>
+                <footer>
+                    <button name="action_compute" string="Compute" type="object" class="btn-primary"/>
+                    <button string="Discard" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="om_hr_lateness_penalty_wizard_action" model="ir.actions.act_window">
+        <field name="name">Lateness Penalties</field>
+        <field name="res_model">om.hr.lateness.penalty.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="res_config_settings_view_form_om_lateness_payroll" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.om.lateness.payroll</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="om_hr_lateness.res_config_settings_view_form_om_lateness"/>
+        <field name="arch" type="xml">
+            <xpath expr="//setting[@id='om_lateness_policy_setting']" position="after">
+                <setting string="Lateness Penalties Every Month" company_dependent="1"
+                         help="On the 1st, the penalties of the month before become payroll adjustments. Otherwise, Payroll &gt; Adjustments &gt; Lateness Penalties. A penalty of minutes is not taken from a contract paid on attendances: its Attendance Adjustment takes the hours off already.">
+                    <field name="om_lateness_auto_penalties"/>
+                </setting>
+            </xpath>
+        </field>
+    </record>
+
+    <menuitem id="menu_om_hr_lateness_penalties"
+              action="om_hr_lateness_penalty_wizard_action"
+              parent="om_hr_payroll_adjustment.menu_om_hr_payroll_adjustments"
+              sequence="25"/>
+
+</odoo>
