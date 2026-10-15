@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="portal_my_hr" inherit_id="om_hr_portal.portal_my_hr" name="My HR: Appraisals">
+        <xpath expr="//div[@id='om_hr_cards']" position="inside">
+            <div class="col" style="order: 7;">
+                <t t-call="om_hr_portal.portal_my_hr_card" url="'/my/hr/appraisals'" icon="'star'"
+                   title.translate="Appraisals" text.translate="Your self assessment, your reviews and your goals"/>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="portal_my_appraisals" name="My Appraisals">
+        <t t-call="portal.portal_layout">
+            <h5>Appraisals</h5>
+            <div t-if="not appraisals" class="alert alert-info" role="status">No appraisal yet.</div>
+            <t t-else="" t-call="portal.portal_table">
+                <thead><tr><th>Appraisal</th><th>Deadline</th><th>Status</th><th>Rating</th></tr></thead>
+                <tbody>
+                    <tr t-foreach="appraisals" t-as="rec">
+                        <td><a t-attf-href="/my/hr/appraisals/#{rec.id}" t-out="rec.name"/></td>
+                        <td><span t-field="rec.date_deadline"/></td>
+                        <td><span t-attf-class="badge #{'text-bg-success' if rec.state in ('done',) else 'text-bg-danger' if rec.state in () else 'text-bg-info'}" t-field="rec.state"/></td>
+                        <td t-out="rec.rating_id.name if rec.state == 'done' else ''"/>
+                    </tr>
+                </tbody>
+            </t>
+            <h5 class="mt-4">Goals</h5>
+            <div t-if="not goals" class="alert alert-info" role="status">No goal yet.</div>
+            <div class="list-group">
+                <div class="list-group-item" t-foreach="goals" t-as="goal">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        <div>
+                            <div class="fw-semibold" t-out="goal.name"/>
+                            <div class="small text-muted">
+                                <t t-out="goal.target or ''"/>
+                                <t t-if="goal.date_deadline"> · due <span t-field="goal.date_deadline"/></t>
+                            </div>
+                        </div>
+                        <form t-attf-action="/my/hr/goals/#{goal.id}/progress" method="post" class="d-flex gap-2 align-items-center">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <input type="number" name="progress" min="0" max="100" class="form-control form-control-sm"
+                                   style="width: 5.5rem;" t-att-value="goal.progress" t-attf-aria-label="Progress of #{goal.name}"/>
+                            <span>%</span>
+                            <button type="submit" class="btn btn-sm btn-secondary">Update</button>
+                        </form>
+                    </div>
+                    <div class="progress mt-2" style="height: 6px;" role="progressbar" t-att-aria-valuenow="goal.progress"
+                         aria-valuemin="0" aria-valuemax="100" t-attf-aria-label="Progress of #{goal.name}">
+                        <div class="progress-bar" t-attf-style="width: #{goal.progress}%"/>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="portal_my_appraisal" name="My Appraisal">
+        <t t-call="portal.portal_layout">
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0" t-out="appraisal.name"/>
+                    <span class="badge text-bg-info" t-field="appraisal.state"/>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">Deadline: <span t-field="appraisal.date_deadline"/>
+                        <t t-if="appraisal.meeting_date"> · Meeting: <span t-field="appraisal.meeting_date"/></t></p>
+                </div>
+            </div>
+            <div class="card mb-3">
+                <div class="card-header"><h5 class="mb-0">My Self Assessment</h5></div>
+                <div class="card-body">
+                    <div t-if="saved" class="alert alert-success" role="status">Saved: submit it once it is complete.</div>
+                    <form t-if="appraisal.state == 'self'" t-attf-action="/my/hr/appraisals/#{appraisal.id}/save" method="post">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <textarea name="feedback" class="form-control mb-3" rows="14" aria-label="My self assessment"
+                                  t-out="self_text"/>
+                        <button type="submit" class="btn btn-secondary">Save</button>
+                        <button type="submit" name="submit" value="1" class="btn btn-primary"
+                                onclick="return confirm('Your manager will read it, and you will no longer change it. Submit?');">
+                            Submit to My Manager
+                        </button>
+                    </form>
+                    <div t-else="" style="white-space: pre-wrap;" t-out="self_text or 'Not filled in.'"/>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header"><h5 class="mb-0">My Manager's Review</h5></div>
+                <div class="card-body">
+                    <t t-if="manager_feedback">
+                        <p class="fw-bold">Rating: <t t-out="appraisal.rating_id.name or ''"/></p>
+                        <div t-out="manager_feedback"/>
+                    </t>
+                    <p t-else="" class="text-muted mb-0">Your manager's review shows here once the appraisal is done.</p>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>
