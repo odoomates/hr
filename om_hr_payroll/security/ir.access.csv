@@ -51,3 +51,7 @@ access_hr_salary_bracket_version_user,hr.salary.bracket.version.user,hr.salary.b
 access_hr_salary_bracket_version_manager,hr.salary.bracket.version.manager,hr.salary.bracket.version,om_hr_payroll.group_hr_payroll_manager,crud,
 access_hr_salary_bracket_line_user,hr.salary.bracket.line.user,hr.salary.bracket.line,om_hr_payroll.group_hr_payroll_user,r,
 access_hr_salary_bracket_line_manager,hr.salary.bracket.line.manager,hr.salary.bracket.line,om_hr_payroll.group_hr_payroll_manager,crud,
+access_hr_payslip_retro_officer,hr.payslip.retro.officer,hr.payslip.retro,om_hr_payroll.group_hr_payroll_user,crud,
+access_hr_payslip_own,hr.payslip.own,hr.payslip,base.group_user,r,"[('employee_id.user_id', '=', user.id), ('state', '=', 'done'), ('credit_note', '=', False)]"
+access_hr_payslip_line_own,hr.payslip.line.own,hr.payslip.line,base.group_user,r,"[('slip_id.employee_id.user_id', '=', user.id), ('slip_id.state', '=', 'done'), ('slip_id.credit_note', '=', False)]"
+access_hr_payslip_worked_days_own,hr.payslip.worked_days.own,hr.payslip.worked_days,base.group_user,r,"[('payslip_id.employee_id.user_id', '=', user.id), ('payslip_id.state', '=', 'done'), ('payslip_id.credit_note', '=', False)]"

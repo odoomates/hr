@@ -1,5 +1,6 @@
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
+from odoo.tools import float_round
 from odoo.tools.safe_eval import safe_eval
 
 
@@ -170,6 +171,29 @@ class HrSalaryRule(models.Model):
         help="Eventual third party involved in the salary payment of the employees.", tracking=True)
     input_ids = fields.One2many('hr.rule.input', 'input_id', string='Inputs', copy=True)
     note = fields.Text(string='Description')
+    rounding_method = fields.Selection([
+        ('none', 'No Rounding'),
+        ('half', 'Nearest'),
+        ('up', 'Up'),
+        ('down', 'Down'),
+    ], string='Rounding', default='none', required=True, tracking=True,
+        help="How the amount of the rule is rounded. Up and down are away from and towards zero, so a "
+             "deduction rounded up is a larger deduction.")
+    rounding_precision = fields.Float(string='Round To', default=1.0, tracking=True,
+        help="The amount is rounded to a multiple of this, e.g. 1.0 for whole amounts or 5.0.")
+
+    @api.constrains('rounding_method', 'rounding_precision')
+    def _check_rounding_precision(self):
+        if any(rule.rounding_method != 'none' and rule.rounding_precision <= 0 for rule in self):
+            raise ValidationError(_('The amount a salary rule is rounded to must be positive.'))
+
+    def _round(self, amount):
+        """ :return: the amount of the rule rounded as it is set to """
+        self.ensure_one()
+        if self.rounding_method == 'none':
+            return amount
+        method = {'half': 'HALF-UP', 'up': 'UP', 'down': 'DOWN'}[self.rounding_method]
+        return float_round(amount, precision_rounding=self.rounding_precision, rounding_method=method)
 
     @api.constrains('parent_rule_id')
     def _check_parent_rule_id(self):

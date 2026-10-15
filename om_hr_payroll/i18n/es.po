@@ -492,7 +492,6 @@ msgstr "Tipo de contrato"
 
 #. module: om_hr_payroll
 #: model:ir.actions.act_window,name:om_hr_payroll.action_hr_contract_type
-#: model:ir.ui.menu,name:om_hr_payroll.menu_contract_type
 msgid "Contract Types"
 msgstr "Tipos de contratos"
 

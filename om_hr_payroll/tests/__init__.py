@@ -3,3 +3,6 @@ from . import test_salary_component
 from . import test_leave_deduction
 from . import test_rule_parameter
 from . import test_year_to_date
+from . import test_payroll_engine
+from . import test_payslip_self
+from . import test_work_entries

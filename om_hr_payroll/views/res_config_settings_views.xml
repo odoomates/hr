@@ -11,6 +11,16 @@
                 <app string="Payroll"
                      name="om_hr_payroll"
                      groups="om_hr_payroll.group_hr_payroll_manager">
+                    <block title="Worked Days" name="om_payroll_worked_days">
+                        <setting id="om_payroll_worked_days_source" string="Worked Days From" company_dependent="1"
+                                 help="Work Entries follow the attendances of the contracts based on attendances; Working Schedule is the computation before version 2.2.0">
+                            <field name="om_payroll_worked_days_source" widget="radio"/>
+                        </setting>
+                        <setting id="om_payroll_month_days" string="Daily Wage" company_dependent="1"
+                                 help="The monthly wage divided by these days pays the unused time off, the overtime and the rules reading daily_wage or hourly_wage">
+                            <field name="om_payroll_month_days" class="o_light_label oe_inline"/> days per month
+                        </setting>
+                    </block>
                     <block title="Accounting">
                         <setting id="payroll_entries"
                                  string="Payroll Entries"

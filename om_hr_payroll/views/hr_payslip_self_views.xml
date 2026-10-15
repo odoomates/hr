@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="hr_payslip_view_list_self" model="ir.ui.view">
+        <field name="name">hr.payslip.list.self</field>
+        <field name="model">hr.payslip</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <list string="My Payslips" create="0" edit="0" delete="0">
+                <field name="number"/>
+                <field name="name"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <button name="action_om_download_own" type="object" icon="download" title="Download"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hr_payslip_view_form_self" model="ir.ui.view">
+        <field name="name">hr.payslip.form.self</field>
+        <field name="model">hr.payslip</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <form string="My Payslip" create="0" edit="0" delete="0">
+                <header>
+                    <button name="action_om_download_own" string="Download" type="object" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                        <field name="number" readonly="1"/>
+                    </div>
+                    <group>
+                        <group>
+                            <label for="date_from" string="Period"/>
+                            <div class="o_row">
+                                <field name="date_from" readonly="1"/> - <field name="date_to" readonly="1"/>
+                            </div>
+                        </group>
+                    </group>
+                    <field name="line_ids" readonly="1">
+                        <list>
+                            <field name="appears_on_payslip" column_invisible="1"/>
+                            <field name="name"/>
+                            <field name="quantity" optional="hide"/>
+                            <field name="total" sum="Total"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_payslip_action_self" model="ir.actions.act_window">
+        <field name="name">My Payslips</field>
+        <field name="res_model">hr.payslip</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('employee_id.user_id', '=', uid), ('state', '=', 'done'), ('credit_note', '=', False)]</field>
+        <field name="context">{'create': False}</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('hr_payslip_view_list_self')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('hr_payslip_view_form_self')})]"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No payslip yet</p>
+            <p>Your payslips show here once they are confirmed.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_my_hr_payslips"
+              action="hr_payslip_action_self"
+              parent="om_hr_base.menu_my_hr"
+              sequence="10"/>
+
+</odoo>

@@ -143,6 +143,8 @@
                                 invisible="state != 'draft' or not line_ids"/>
                         <button string="Confirm" name="action_payslip_done" type="object"
                                 invisible="state != 'draft' or line_ids"/>
+                        <button string="Retro Pay" name="%(action_hr_payslip_retro)d" type="action"
+                                context="{'default_payslip_id': id}" invisible="state != 'draft'"/>
                         <button string="Send by Email" name="action_send_email" type="object" class="btn-primary"
                                 invisible="state not in ('verify', 'done')"/>
                         <button string="Refund" name="refund_sheet"

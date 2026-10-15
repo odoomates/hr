@@ -361,6 +361,9 @@
                                     <field name="quantity"
                                            invisible="amount_select == 'code'"
                                            required="amount_select != 'code'"/>
+                                    <field name="rounding_method"/>
+                                    <field name="rounding_precision" invisible="rounding_method == 'none'"
+                                           required="rounding_method != 'none'"/>
                                 </group>
                             </group>
                             <div invisible="condition_select != 'python'">

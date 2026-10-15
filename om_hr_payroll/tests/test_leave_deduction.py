@@ -120,6 +120,17 @@ class TestLeaveDeduction(TransactionCase):
             'date_to': datetime(2026, 6, 9, 23, 59),
         })
         payslip = self._payslip()
-        worked = {line.code: line for line in payslip.worked_days_line_ids}
-        self.assertEqual(worked['GLOBAL'].paid_rate, 1.0, 'a closure without a time type is paid')
+        # from the working schedule the closure is a GLOBAL line; from the work entries, a line of the time type
+        # core Odoo gives it: either way it is paid
+        closure = payslip.worked_days_line_ids.filtered(lambda line: line.code != 'WORK100')
+        self.assertTrue(closure)
+        self.assertEqual(set(closure.mapped('paid_rate')), {1.0}, 'a closure is paid')
         self.assertEqual(self._totals(payslip)['UNPAID'], 0.0)
+
+    def test_whole_month_unpaid_nets_to_zero(self):
+        """ A category totalling exactly 0 stays 0: the whole month on unpaid leave pays nothing, not minus the
+            wage. """
+        self._take_leave(self._time_type('Unpaid Month', amount_rate=0.0), date(2026, 6, 1), date(2026, 6, 30))
+        totals = self._totals(self._payslip())
+        self.assertEqual(totals['UNPAID'], -4400.0)
+        self.assertEqual(totals['NET'], 0.0)

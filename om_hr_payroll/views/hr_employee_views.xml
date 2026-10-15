@@ -25,6 +25,13 @@
                     <field name="struct_id" readonly="0" class="oe_inline" nolabel="1"/>
                 </div>
             </xpath>
+            <xpath expr="//label[@for='wage']" position="before">
+                <field name="wage_type" groups="hr.group_hr_manager,om_hr_payroll.group_hr_payroll_user"/>
+            </xpath>
+            <xpath expr="//div[@name='wage']" position="after">
+                <field name="hourly_wage" invisible="wage_type != 'hourly'"
+                       groups="hr.group_hr_manager,om_hr_payroll.group_hr_payroll_user"/>
+            </xpath>
         </field>
     </record>
     <record id="om_hr_version_list_view" model="ir.ui.view">

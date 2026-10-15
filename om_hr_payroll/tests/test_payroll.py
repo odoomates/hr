@@ -76,6 +76,31 @@ class TestPayroll(TransactionCase):
             totals[line.code] = totals.get(line.code, 0.0) + line.total
         return totals
 
+    def test_child_structure_overrides_parent_rule(self):
+        """ A rule of a child structure overrides the rule of the same code of its parent, whatever the ids. """
+        Rule = self.env['hr.salary.rule']
+        basic_category = self.env.ref('om_hr_payroll.BASIC').id
+        # the child created first: a set of the ids would read it before its parent
+        child = self.env['hr.payroll.structure'].create({'name': 'Child', 'code': 'CHILD', 'parent_id': False})
+        parent = self.env['hr.payroll.structure'].create({
+            'name': 'Parent', 'code': 'PARENT', 'parent_id': False,
+            'rule_ids': [Command.set((Rule.create({
+                'name': 'Basic', 'code': 'BASIC', 'sequence': 1, 'category_id': basic_category,
+                'amount_select': 'code', 'amount_python_compute': 'result = contract.wage'}) | self.structure.rule_ids.filtered(
+                    lambda rule: rule.code in ('GROSS', 'NET'))).ids)]})
+        child.write({'parent_id': parent.id, 'rule_ids': [Command.set(Rule.create({
+            'name': 'Double Basic', 'code': 'BASIC', 'sequence': 1, 'category_id': basic_category,
+            'amount_select': 'code', 'amount_python_compute': 'result = contract.wage * 2'}).ids)]})
+        employee = self._create_employee('Child Structure', wage=1000.0, housing=0.0, struct_id=child.id)
+        payslip = self._new_payslip(employee)
+        payslip.compute_sheet()
+        self.assertEqual(self._totals(payslip)['BASIC'], 2000.0, 'the rule of the child')
+        payslip.struct_id = False
+        payslip.compute_sheet()
+        totals = self._totals(payslip)
+        self.assertEqual((totals['BASIC'], totals['NET']), (2000.0, 2000.0),
+                         'from the structure of the contract, its parent included')
+
     def test_employee_salary_structure(self):
         self.assertEqual(self.employee.current_version_id.struct_id, self.structure)
         self.assertEqual(self.employee.struct_id, self.structure)

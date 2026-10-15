@@ -1,5 +1,5 @@
 from odoo import api, fields, models, _
-from odoo.exceptions import UserError, ValidationError
+from odoo.exceptions import AccessError, UserError, ValidationError
 
 from .hr_rule_parameter import RuleParameters
 from .hr_salary_bracket import SalaryBrackets
@@ -11,6 +11,8 @@ from pytz import timezone
 
 # the worked days line holding the time the employee was due to work, the others being the time off
 WORKED_DAYS_CODE = 'WORK100'
+# the worked days line holding the time worked, for a contract based on attendances
+ATTENDED_CODE = 'ATTENDED'
 
 
 class YearToDate:
@@ -133,6 +135,28 @@ class HrPayslip(models.Model):
         if own:
             raise UserError(_('You cannot change the status of your own payslip %s: ask a payroll manager.',
                               ', '.join(own.mapped(lambda payslip: payslip.number or payslip.name or ''))))
+
+    @api.model
+    def _om_own_payslip(self, payslip_id):
+        """ :return: the confirmed payslip of that id when it belongs to the current user, else raise """
+        payslip = self.sudo().browse(int(payslip_id)).exists()
+        if not payslip or payslip.state != 'done' or payslip.credit_note \
+                or payslip.employee_id.user_id != self.env.user:
+            raise AccessError(_('This payslip is not yours.'))
+        return payslip
+
+    def _om_render_pdf(self):
+        """ :return: the PDF of the payslip and its file name, rendered as the super user: the report shows fields
+            of the employee only HR reads, e.g. the bank account. Check the payslip is the user's first. """
+        self.ensure_one()
+        pdf, _type = self.env['ir.actions.report'].sudo()._render_qweb_pdf(
+            'om_hr_payroll.action_report_payslip', res_ids=self.ids)
+        name = '%s.pdf' % (self.number or self.name or 'payslip').replace('/', '_')
+        return pdf, name
+
+    def action_om_download_own(self):
+        self.ensure_one()
+        return {'type': 'ir.actions.act_url', 'url': '/my/payslip/%s/pdf' % self.id, 'target': 'download'}
 
     def action_payslip_draft(self):
         self._check_own_payslip()
@@ -308,6 +332,149 @@ class HrPayslip(models.Model):
             return 0.0
         return work_entry_type.amount_rate
 
+    def _om_wage_rates(self, version):
+        """ :return: the daily and the hourly wage of the version, for the salary rules: the monthly wage divided by
+            the days per month of the company, then by the hours per day of the working schedule; the hourly wage
+            of an hourly contract. """
+        self.ensure_one()
+        days = version.company_id.om_payroll_month_days or 30.0
+        daily_wage = version.wage / days
+        calendar = version.resource_calendar_id or version.employee_id.resource_calendar_id
+        if version.wage_type == 'hourly':
+            hourly_wage = version.hourly_wage
+        else:
+            hourly_wage = daily_wage / calendar.hours_per_day if calendar.hours_per_day else 0.0
+        return {'daily_wage': daily_wage, 'hourly_wage': hourly_wage}
+
+    def _get_contract_end(self, version):
+        """ :return: the last day of the contract of `version` for this payslip, False when it is open-ended """
+        self.ensure_one()
+        return version.contract_date_end
+
+    def _get_prorata(self, version):
+        """ :return: the share of the pay period the contract of `version` covers, in working days of its calendar
+
+        A monthly pay is measured against the calendar month of the payslip, so that a contract ending on the 20th
+        pays the days worked out of the month. Other frequencies, and a monthly payslip spanning two months, are
+        measured against the period of the payslip. Only the contract dates count: a payslip ending before the end
+        of the month pays the whole wage of an employee under contract for all of it.
+        """
+        self.ensure_one()
+        calendar = version.resource_calendar_id or version.employee_id.resource_calendar_id
+        if not calendar:
+            return 1.0
+        if version.schedule_pay == 'monthly' and (self.date_from.year, self.date_from.month) == \
+                (self.date_to.year, self.date_to.month):
+            period_from, period_to = self.date_from + relativedelta(day=1), self.date_from + relativedelta(day=31)
+        else:
+            period_from, period_to = self.date_from, self.date_to
+        contract_end = self._get_contract_end(version)
+        covered_from = max(period_from, version.contract_date_start or period_from)
+        covered_to = min(period_to, contract_end or period_to)
+        if covered_from > covered_to:
+            return 0.0
+        if (covered_from, covered_to) == (period_from, period_to):
+            return 1.0
+
+        def working_days(date_from, date_to):
+            return version.employee_id._get_work_days_data(
+                datetime.combine(date_from, time.min), datetime.combine(date_to, time.max),
+                calendar=calendar, compute_leaves=False)['days']
+
+        period_days = working_days(period_from, period_to)
+        if not period_days:
+            return 1.0
+        return min(working_days(covered_from, covered_to) / period_days, 1.0)
+
+    @api.model
+    def _om_scheduled_time(self, version, calendar, date_from, date_to):
+        """ :return: the days and the hours the working schedule plans in the period, within the contract """
+        start = max(date_from, version.contract_date_start or date_from)
+        stop = min(date_to, version.contract_date_end or date_to)
+        if start > stop:
+            return 0.0, 0.0
+        data = version.employee_id._get_work_days_data(
+            datetime.combine(start, time.min), datetime.combine(stop, time.max), calendar=calendar,
+            compute_leaves=False)
+        return data['days'], data['hours']
+
+    @api.model
+    def _om_worked_days_from_work_entries(self, version, calendar, date_from, date_to):
+        """ :return: the worked days lines of the version from its work entries, the way core Odoo computes them:
+            the working schedule less the time off, or the validated attendances and the time off for a contract
+            based on attendances.
+
+            The lines keep the shape the salary rules know: WORK100 is the time the employee was due to work,
+            time off included, each time off has a negative line with its paid rate, and a contract based on
+            attendances gets an ATTENDED line with the time worked. Overtime is left out: the overtime rule pays it.
+        """
+        date_from, date_to = fields.Date.to_date(date_from), fields.Date.to_date(date_to)
+        # a payslip is computed with one version, but each version gives the work entries of its own days: take
+        # them from every version of the period, e.g. a contract amended in the middle of the month
+        versions = version.employee_id._get_versions_with_contract_overlap_with_period(date_from, date_to) or version
+        entries = versions.generate_work_entries(date_from, date_to)
+        overtime_types = self.env['hr.time.rule'].sudo().with_context(active_test=False).search([]).work_entry_type_id
+        out_of_contract = self.env.ref('hr_work_entry.generic_hr_work_entry_type_out_of_contract',
+                                       raise_if_not_found=False)
+        hours_per_day = calendar.hours_per_day
+
+        def days(hours, dates):
+            return hours / hours_per_day if hours_per_day else float(len(dates))
+
+        worked_hours, worked_dates, leaves = 0.0, set(), {}
+        for entry in entries:
+            entry_type = entry['work_entry_type_id']
+            if entry_type == out_of_contract or entry_type in overtime_types:
+                continue
+            if entry_type.count_as == 'absence':
+                leave = leaves.setdefault(entry_type, {'hours': 0.0, 'dates': set()})
+                leave['hours'] += entry['duration']
+                leave['dates'].add(entry['date'])
+            else:
+                worked_hours += entry['duration']
+                worked_dates.add(entry['date'])
+
+        lines = []
+        attendance_based = 'attendance_based' in version._fields and version.sudo().attendance_based
+        if attendance_based:
+            # the hours not due yet are not missing: a payslip computed during its period counts up to today
+            due_until = min(date_to, fields.Date.context_today(self))
+            scheduled_days, scheduled_hours = self._om_scheduled_time(version, calendar, date_from, due_until)
+        else:
+            leave_hours = sum(leave['hours'] for leave in leaves.values())
+            leave_dates = set().union(*(leave['dates'] for leave in leaves.values())) if leaves else set()
+            scheduled_hours = worked_hours + leave_hours
+            scheduled_days = days(scheduled_hours, worked_dates | leave_dates)
+        lines.append({
+            'name': _("Normal Working Days paid at 100%"),
+            'sequence': 1,
+            'code': WORKED_DAYS_CODE,
+            'number_of_days': scheduled_days,
+            'number_of_hours': scheduled_hours,
+            'version_id': version.id,
+        })
+        if attendance_based:
+            lines.append({
+                'name': _('Attended'),
+                'sequence': 2,
+                'code': ATTENDED_CODE,
+                'number_of_days': days(worked_hours, worked_dates),
+                'number_of_hours': worked_hours,
+                'version_id': version.id,
+            })
+        for entry_type, leave in leaves.items():
+            lines.append({
+                'name': entry_type.name,
+                'sequence': 5,
+                'code': entry_type.code or 'GLOBAL',
+                'number_of_days': -days(leave['hours'], leave['dates']),
+                'number_of_hours': -leave['hours'],
+                'version_id': version.id,
+                'work_entry_type_id': entry_type.id,
+                'paid_rate': self._get_paid_rate(entry_type),
+            })
+        return lines
+
     @api.model
     def get_worked_day_lines(self, versions, date_from, date_to):
         """
@@ -318,6 +485,9 @@ class HrPayslip(models.Model):
         for version in versions:
             calendar = version.resource_calendar_id or version.employee_id.resource_calendar_id
             if not calendar:
+                continue
+            if version.company_id.om_payroll_worked_days_source == 'work_entries' and version._get_tz():
+                res.extend(self._om_worked_days_from_work_entries(version, calendar, date_from, date_to))
                 continue
 
             day_from = datetime.combine(fields.Date.from_string(date_from), time.min)
@@ -398,8 +568,9 @@ class HrPayslip(models.Model):
         def _sum_salary_rule_category(localdict, category, amount):
             if category.parent_id:
                 localdict = _sum_salary_rule_category(localdict, category.parent_id, amount)
-            localdict['categories'].dict[category.code] = category.code in localdict['categories'].dict and \
-                                                          localdict['categories'].dict[category.code] + amount or amount
+            # a total of exactly 0 is a total: `x and x + amount or amount` would replace it with the amount
+            totals = localdict['categories'].dict
+            totals[category.code] = totals.get(category.code, 0.0) + amount
             return localdict
 
         class BrowsableObject(object):
@@ -481,6 +652,37 @@ class HrPayslip(models.Model):
                              for line in self.dict.values() if line.code != WORKED_DAYS_CODE)
                 return unpaid / scheduled
 
+            def scheduled_hours(self):
+                """ :return: the hours the employee was due to work in the period, time off included """
+                return sum(line.number_of_hours for line in self.dict.values() if line.code == WORKED_DAYS_CODE)
+
+            def attended_hours(self):
+                """ :return: the hours worked, for a contract based on attendances; 0 otherwise """
+                return sum(line.number_of_hours for line in self.dict.values() if line.code == ATTENDED_CODE)
+
+            def _time_off(self):
+                return [line for line in self.dict.values() if line.code not in (WORKED_DAYS_CODE, ATTENDED_CODE)]
+
+            def paid_hours(self):
+                """ :return: the hours paid: worked, plus the time off at its paid rate. Without attendances, the
+                    working schedule less the time off not paid. """
+                time_off = self._time_off()
+                if ATTENDED_CODE in self.dict:
+                    return self.attended_hours() + sum(-line.number_of_hours * line.paid_rate for line in time_off)
+                return self.scheduled_hours() - sum(-line.number_of_hours * (1.0 - line.paid_rate) for line in time_off)
+
+            def missing_hours(self):
+                """ :return: for a contract based on attendances, the hours due neither worked nor on time off """
+                if ATTENDED_CODE not in self.dict:
+                    return 0.0
+                leave_hours = sum(-line.number_of_hours for line in self._time_off())
+                return max(0.0, self.scheduled_hours() - self.attended_hours() - leave_hours)
+
+            def prorata(self):
+                """ :return: the share of the pay period the contract covers, 1.0 for a whole period """
+                # not getattr: a missing attribute reads as a worked days code, i.e. 0
+                return self.__dict__.get('_prorata', 1.0)
+
         class Payslips(BrowsableObject):
             """a class that will be used into the python code, mainly for usability purposes"""
 
@@ -527,9 +729,11 @@ class HrPayslip(models.Model):
         versions = self.env['hr.version'].browse(version_ids)
 
         if len(versions) == 1 and payslip.struct_id:
-            structure_ids = list(set(payslip.struct_id._get_parent_structure().ids))
+            structures = payslip.struct_id
         else:
-            structure_ids = versions.mapped('struct_id').ids or versions.mapped('employee_id.struct_id').ids
+            structures = versions.mapped('struct_id') or versions.mapped('employee_id.struct_id')
+        # parents first, so that a rule of a child structure overrides the rule of the same code of its parent
+        structure_ids = list(dict.fromkeys(structures._get_parent_structure().ids))
 
         rule_ids = self.env['hr.payroll.structure'].browse(structure_ids).get_all_rules()
         sorted_rule_ids = [id for id, sequence in sorted(rule_ids, key=lambda x: x[1])]
@@ -544,7 +748,9 @@ class HrPayslip(models.Model):
                 employee.id,
                 {line.code: line.amount for line in version.salary_component_ids if line.code},
                 self.env)
-            localdict = dict(baselocaldict, employee=employee, contract=version, components=components)
+            localdict = dict(baselocaldict, employee=employee, contract=version, components=components,
+                             **payslip._om_wage_rates(version))
+            worked_days._prorata = payslip._get_prorata(version)
 
             for rule in sorted_rules:
                 key = rule.code + '-' + str(version.id)
@@ -561,6 +767,10 @@ class HrPayslip(models.Model):
                     # set/overwrite the amount computed for this rule in the localdict
                     company = version.employee_id.company_id
                     tot_rule = company.currency_id.round(amount * qty * rate / 100.0)
+                    rounded = rule._round(tot_rule)
+                    if company.currency_id.compare_amounts(rounded, tot_rule):
+                        # the total of a line is quantity x amount x rate: hold the rounded total as its amount
+                        amount, qty, rate, tot_rule = rounded, 1.0, 100.0, rounded
                     localdict[rule.code] = tot_rule
                     rules_dict[rule.code] = rule
 

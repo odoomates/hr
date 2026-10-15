@@ -935,12 +935,6 @@ msgid "Employee"
 msgstr ""
 
 #. module: om_hr_payroll
-#: model:ir.model.fields,field_description:om_hr_payroll.field_hr_employee__type_id
-#: model:ir.model.fields,field_description:om_hr_payroll.field_hr_version__type_id
-msgid "Employee Category"
-msgstr ""
-
-#. module: om_hr_payroll
 #: model:ir.model,name:om_hr_payroll.model_hr_version
 msgid "Employee Contract"
 msgstr ""
@@ -949,17 +943,6 @@ msgstr ""
 #: model:ir.actions.act_window,name:om_hr_payroll.action_view_hr_payslip_form
 #: model:ir.ui.menu,name:om_hr_payroll.menu_department_tree
 msgid "Employee Payslips"
-msgstr ""
-
-#. module: om_hr_payroll
-#: model:ir.ui.menu,name:om_hr_payroll.menu_contract_type
-msgid "Employee Types"
-msgstr ""
-
-#. module: om_hr_payroll
-#: model:ir.model.fields,help:om_hr_payroll.field_hr_employee__type_id
-#: model:ir.model.fields,help:om_hr_payroll.field_hr_version__type_id
-msgid "Employee category"
 msgstr ""
 
 #. module: om_hr_payroll

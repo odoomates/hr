@@ -1,16 +1,21 @@
 {
     'name': 'Odoo 20 HR Payroll',
+    'version': '2.2.0',
     'category': 'Generic Modules/Human Resources',
-    'version': '2.1.1',
-    'sequence': 1,
+    'summary': 'Payroll for Odoo 20 Community: salary structures and rules, payslips, payslip batches and reports',
+    'description': 'Payroll for Odoo 20 Community. Salary structures built from salary rules (fixed, percentage or '
+                   'Python), salary components, rule parameters and salary brackets; payslips computed from the '
+                   'worked days and the time off, alone or in batches; retro pay, year to date totals, refunds, '
+                   'payslips sent by email, payslip reports and a payroll analysis. Employees read their own '
+                   'confirmed payslips in My HR. Part of Odoo Mates HR.',
     'author': 'Odoo Mates, Odoo SA',
-    'summary': 'Payroll For Odoo 20 Community Edition',
-    'live_test_url': 'https://www.youtube.com/watch?v=0kaHMTtn7oY',
-    'description': "Odoo 20 Payroll, Payroll Odoo 20, Odoo Community Payroll",
+    'maintainer': 'Odoo Mates',
+    'support': 'odoomates@gmail.com',
     'license': 'LGPL-3',
     'depends': [
         'mail',
         'hr_holidays',
+        'om_hr_base',
     ],
     'data': [
         'security/hr_payroll_security.xml',
@@ -19,12 +24,13 @@
         'data/hr_payroll_category.xml',
         'data/hr_payroll_data.xml',
         'wizard/hr_payroll_payslips_by_employees_views.xml',
-        'views/hr_contract_type_views.xml',
+        'wizard/hr_payslip_retro_views.xml',
         'views/hr_contract_views.xml',
         'views/hr_salary_component_views.xml',
         'views/hr_rule_parameter_views.xml',
         'views/hr_salary_rule_views.xml',
         'views/hr_payslip_views.xml',
+        'views/hr_payslip_self_views.xml',
         'views/hr_payslip_analysis_views.xml',
         'views/hr_employee_views.xml',
         'views/hr_payroll_report.xml',
@@ -39,5 +45,7 @@
         'demo/hr_payroll_demo.xml',
     ],
     'images': ['static/description/banner.gif'],
+    'sequence': 1,
+    'live_test_url': 'https://www.youtube.com/watch?v=0kaHMTtn7oY',
     'application': True,
 }

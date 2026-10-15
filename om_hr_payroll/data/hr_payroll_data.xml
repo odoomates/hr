@@ -41,6 +41,72 @@ payslip is the pay actually earned in the period.</field>
             <field name="company_id" eval="False"/>
         </record>
 
+        <record id="hr_rule_partial_period" model="hr.salary.rule">
+            <field name="name">Partial Period</field>
+            <field name="sequence" eval="2"/>
+            <field name="code">PARTIAL</field>
+            <field name="category_id" ref="om_hr_payroll.BASIC"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = worked_days.prorata() &lt; 1</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute"># the part of the period outside the contract, which is negative
+result = -contract.wage * (1 - worked_days.prorata())</field>
+            <field name="note">Takes off the wage of the working days of the pay period outside the contract: before
+the employee joined or after they left. A monthly wage is measured against the calendar month. The rule belongs to
+the Basic category, so that the gross of the payslip is the pay actually earned in the period.</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="hr_rule_attendance_adjustment" model="hr.salary.rule">
+            <field name="name">Attendance Adjustment</field>
+            <field name="sequence" eval="3"/>
+            <field name="code">ATTADJ</field>
+            <field name="category_id" ref="om_hr_payroll.BASIC"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = contract.wage_type == 'monthly' and worked_days.missing_hours() > 0 and worked_days.scheduled_hours() > 0</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute"># the hours due neither worked nor on time off, for a contract based on attendances
+result = -contract.wage * worked_days.missing_hours() / worked_days.scheduled_hours()</field>
+            <field name="note">For a fixed wage paid on attendances: takes off the wage of the hours the employee was due
+to work but neither worked nor took as time off. The time off is taken off by the Unpaid Time Off rule.</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="hr_rule_hourly" model="hr.salary.rule">
+            <field name="name">Hourly Pay</field>
+            <field name="sequence" eval="1"/>
+            <field name="code">HOURLY</field>
+            <field name="category_id" ref="om_hr_payroll.BASIC"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = contract.wage_type == 'hourly'</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute"># the hours worked, and the time off at its paid rate, times the hourly wage
+result = contract.hourly_wage * worked_days.paid_hours()</field>
+            <field name="note">For an hourly wage: pays the hours worked, or attended for a contract based on attendances,
+and the hours of time off at the paid rate of their time type. The overtime is paid by the Overtime rule.</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="hr_rule_retro" model="hr.salary.rule">
+            <field name="name">Retro Pay</field>
+            <field name="sequence" eval="55"/>
+            <field name="code">RETRO</field>
+            <field name="category_id" ref="om_hr_payroll.ALW"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = bool(inputs.RETRO.amount)</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = inputs.RETRO.amount</field>
+            <field name="note">Pays the difference the Retro Pay action of the payslip has found on the payslips
+already confirmed, e.g. after a raise dated back to a past month. It is negative for a cut.</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="hr_rule_retro_input" model="hr.rule.input">
+            <field name="name">Retro Pay</field>
+            <field name="code">RETRO</field>
+            <field name="input_id" ref="hr_rule_retro"/>
+        </record>
+
         <record id="hr_rule_allowances" model="hr.salary.rule">
             <field name="name">Allowances</field>
             <field name="sequence" eval="50"/>
@@ -108,8 +174,12 @@ category. The amounts are entered positive on the contract.</field>
             <field name="name">Base for new structures</field>
             <field name="rule_ids" eval="[(6, 0, [
                 ref('hr_rule_basic'),
+                ref('hr_rule_hourly'),
                 ref('hr_rule_unpaid_leave'),
+                ref('hr_rule_attendance_adjustment'),
+                ref('hr_rule_partial_period'),
                 ref('hr_rule_allowances'),
+                ref('hr_rule_retro'),
                 ref('hr_rule_deductions'),
                 ref('hr_rule_taxable'),
                 ref('hr_rule_net'),

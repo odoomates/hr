@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_hr_payslip_retro" model="ir.ui.view">
+        <field name="name">hr.payslip.retro.form</field>
+        <field name="model">hr.payslip.retro</field>
+        <field name="arch" type="xml">
+            <form string="Retro Pay">
+                <p class="text-muted">
+                    The confirmed payslips from this date are computed again with the contracts as they stand now.
+                    What they would have paid more, or less, in the Basic and Allowance categories is added to
+                    this payslip as the Retro Pay input.
+                </p>
+                <group>
+                    <field name="payslip_id" invisible="1"/>
+                    <field name="date_from"/>
+                </group>
+                <footer>
+                    <button string="Apply" name="action_apply" type="object" class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_hr_payslip_retro" model="ir.actions.act_window">
+        <field name="name">Retro Pay</field>
+        <field name="res_model">hr.payslip.retro</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_hr_payslip_retro"/>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

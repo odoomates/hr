@@ -2,6 +2,9 @@
 Odoo 20 HR Payroll
 ==================
 
+Part of `Odoo Mates HR <https://github.com/odoomates/hr>`_, the HR suite of Odoo Mates for Odoo 20
+Community.
+
 Payroll for Odoo 20 Community Edition: salary structures and rules, employee
 payslips, payslip batches and the payslip reports.
 
@@ -23,10 +26,11 @@ Features
   Housing or Transport, and set their amount on the employment version of each
   employee. A salary rule reads a component with ``components.HOUSING``, so the
   same module serves any country without a field per allowance.
-* Start from the rules the module installs: Basic Salary, Unpaid Time Off,
-  Allowances, Deductions, Gross and Net. Allowances pays every component of the
-  Allowance category and Deductions subtracts every component of the Deduction
-  category, so a new component is paid without writing a rule; give a component
+* Start from the rules the module installs in its base structure: Basic
+  Salary, Hourly Pay, Unpaid Time Off, Attendance Adjustment, Partial Period,
+  Allowances, Retro Pay, Deductions, Gross and Net. Allowances pays every
+  component of the Allowance category and Deductions subtracts every component
+  of the Deduction category, so a new component is paid without writing a rule; give a component
   its own rule when it has to appear on its own line of the payslip.
 * Take the time off that is not paid off the payslip automatically. How much of
   a time off is paid comes from its Time Type: nothing is taken off a time off
@@ -34,9 +38,32 @@ Features
   50%. A closing day of the company carries no time type and is paid. The rule
   belongs to the Basic category, so the gross of the payslip is what was really
   earned in the period, and the taxes computed on it are right.
+* Pay from the work entries of Odoo: the working schedule less the time off, or
+  the validated attendances and the time off for the contracts marked Attendance
+  Based. A contract based on attendances on a fixed wage loses the hours it was
+  due to work but neither worked nor took as time off (Attendance Adjustment).
+* Pay by the hour: a contract with an Hourly Wage is paid its hours worked, and
+  its time off at the paid rate of its time type, by the Hourly Pay rule. The
+  overtime stays paid by the overtime rule only.
+* One daily wage for the payroll: the monthly wage over the days per month you
+  set (30 by default, or e.g. 21.67), used by the unused time off, the overtime,
+  and the rules through ``daily_wage`` and ``hourly_wage``.
+* Pay the part of the period an employee joining or leaving was under contract.
+  The Partial Period rule takes off the wage of the working days outside the
+  contract; a monthly wage is measured against the calendar month, so a payslip
+  up to the last working day pays the days worked out of the whole month.
 * Write your own rules against the worked days with
-  ``worked_days.unpaid_ratio()``, the part of the period that is not paid, and
-  ``worked_days.scheduled_days()``, the days the employee was due to work.
+  ``worked_days.unpaid_ratio()``, the part of the period that is not paid,
+  ``worked_days.scheduled_days()``, the days the employee was due to work,
+  ``worked_days.scheduled_hours()``, ``worked_days.paid_hours()``,
+  ``worked_days.missing_hours()``, and
+  ``worked_days.prorata()``, the share of the period the contract covers.
+* Round the amount of a salary rule to the nearest, up or down, to a multiple
+  you choose, e.g. 1.0 for whole amounts or 5.0.
+* Pay a raise dated back to a past month with Retro Pay on a draft payslip: the
+  payslips confirmed since the date you give are computed again with the
+  contracts as they stand now, and what they would have paid more in the Basic
+  and Allowance categories is added to the payslip as the Retro Pay input.
 * Keep the rates, the thresholds and the ceilings out of the salary rules as
   rule parameters, each with its values by date. A rule reads one with
   ``parameters.SS_RATE``, and the value taken is the one of the period being
@@ -76,11 +103,19 @@ Features
   work email are named back to you instead of being skipped silently.
 * Print the PaySlip and the PaySlip Details PDF reports from a payslip, and the
   PaySlip Lines By Contribution Register report for a register over a period.
+* Analyse the payslip lines in Payroll > Reporting > Payroll Analysis (pivot,
+  graph and list), by employee, department, job position, salary rule category
+  or month; the lines of the refunds count negative. The Salary History button
+  of an employee opens the same analysis for that employee, month by month.
 * Record the third parties who collect or inject money on payslips as
   contribution registers, and read back the payslip lines that belong to them.
 * Refund a payslip: a credit note copy is created, computed and confirmed.
 * Number confirmed payslips from the Salary Slip sequence, and take the worked
   days and the leaves from the working schedule of the employee.
+* Employees see their own confirmed payslips in My HR > My Payslips and
+  download them as PDF, the light users of Odoo 20 included. Nobody reaches
+  another employee's payslip, nor a draft or a refund, through the screens, the
+  download links or the API.
 * Payroll officers work on payslips, payslip lines, inputs and worked days,
   while salary structures, salary rules, salary rule categories, rule inputs
   and contract advantage templates are read-only for them and managed by
@@ -112,6 +147,35 @@ Download the module and add it to your Odoo addons folder. Restart the server
 and log on to your Odoo server. Select the Apps menu and upgrade the module by
 clicking on the upgrade button.
 
+Since 2.2.0 the module depends on HR Base (om_hr_base): add both modules to the
+addons folder. Until the module is upgraded, the server skips it and the Payroll
+menu is missing; the upgrade installs HR Base.
+
+The upgrade to 2.2.0 fixes the total of a salary rule category reaching exactly 0
+on a payslip: it was replaced by the last amount added, e.g. a whole month of
+unpaid time off paid minus the wage instead of nothing.
+
+The upgrade to 2.2.0 fixes the rules of a structure and of its parents: a rule
+of a child structure now always overrides the rule of the same code of its
+parent, where the database ids used to decide, and a payslip without a structure
+of its own, or computed over several contract versions, no longer leaves out the
+rules of the parent structures.
+
+The upgrade to 2.2.0 keeps the worked days of your companies computed from the
+working schedule, as before. To pay from the work entries, e.g. the contracts
+based on attendances, choose Work Entries in Payroll > Configuration > Settings
+> Worked Days, and add the Hourly Pay and Attendance Adjustment rules to your
+structures.
+
+The upgrade to 2.2.0 lets the employees read their own confirmed payslips in
+My HR > My Payslips: their other payslips, the drafts and the refunds stay
+hidden.
+
+The upgrade to 2.2.0 adds the Partial Period and Retro Pay rules without adding
+them to your salary structures, so the payslips stay as they were. Add them to
+the structures that should use them: without Partial Period, a payslip of an
+employee joining or leaving during the period pays the whole wage.
+
 Configuration
 =============
 
@@ -138,21 +202,23 @@ Usage
 * For one employee, go to Payroll > Employee Payslips, create a payslip, choose
   the employee and the period, click Compute Sheet, then confirm it.
 * For a group of employees, go to Payroll > Payslips Batches, create a batch
-  for the period, use Generate Payslips to pick the employees, then Mark As
+  for the period, use Generate Payslips to pick the employees, then Mark as
   Done once the payslips are right.
 * Print the payslip from the Print menu of the payslip, or send it to the
-  employee with Send E-Mail on a payslip, or Send Payslips by Email on a batch.
+  employee with Send by Email on a payslip, or Send Payslips by Email on a batch.
+* To pay a raise dated back to a past month, open a draft payslip, click Retro
+  Pay and give the date from which the confirmed payslips are computed again.
 
-Credits
+Dependencies
+============
+
+* Discuss (``mail``)
+* Time Off (``hr_holidays``)
+* HR Base (``om_hr_base``)
+
+Support
 =======
 
-Contributors
-------------
+Odoo Mates, odoomates@gmail.com
 
-* Odoo Mates <odoomates@gmail.com>
-
-
-Author & Maintainer
--------------------
-
-This module is maintained by the Odoo Mates
+Contributors: Odoo Mates <odoomates@gmail.com>, Odoo SA.
