@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="portal_my_hr" inherit_id="om_hr_portal.portal_my_hr" name="My HR: Loans">
+        <xpath expr="//div[@id='om_hr_cards']" position="inside">
+            <div class="col" style="order: 3;">
+                <t t-call="om_hr_portal.portal_my_hr_card" url="'/my/hr/loans'" icon="'account_balance'"
+                   title.translate="Loans" text.translate="Ask for a loan or a salary advance, and follow its repayment"/>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="portal_my_loans" name="My Loans">
+        <t t-call="portal.portal_layout">
+            <div class="card mb-4">
+                <div class="card-header"><h5 class="mb-0">Ask for a Loan</h5></div>
+                <div class="card-body">
+                    <div t-if="error" class="alert alert-danger" role="alert" t-out="error"/>
+                    <form action="/my/hr/loans/new" method="post" class="row g-3">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <div class="col-md-4">
+                            <label class="form-label" for="om_loan_type">Type</label>
+                            <select class="form-select" id="om_loan_type" name="type_id" required="required">
+                                <option value="">Choose...</option>
+                                <option t-foreach="loan_types" t-as="loan_type" t-att-value="loan_type.id"
+                                        t-att-selected="str(loan_type.id) == form.get('type_id')" t-out="loan_type.name"/>
+                            </select>
+                        </div>
+                        <div class="col-6 col-md-2">
+                            <label class="form-label" for="om_loan_amount">Amount</label>
+                            <input type="number" step="0.01" min="0" class="form-control" id="om_loan_amount" name="amount"
+                                   required="required" t-att-value="form.get('amount')"/>
+                        </div>
+                        <div class="col-6 col-md-2">
+                            <label class="form-label" for="om_loan_count">Installments</label>
+                            <input type="number" min="1" class="form-control" id="om_loan_count" name="installment_count"
+                                   t-att-value="form.get('installment_count') or 1"/>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="om_loan_start">First Installment</label>
+                            <input type="month" class="form-control" id="om_loan_start" name="date_start" t-att-value="form.get('date_start')"/>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" for="om_loan_reason">What is it for?</label>
+                            <textarea class="form-control" id="om_loan_reason" name="reason" rows="2" t-out="form.get('reason')"/>
+                        </div>
+                        <div class="col-12"><button type="submit" class="btn btn-primary">Send the Request</button></div>
+                    </form>
+                </div>
+            </div>
+            <t t-if="loans" t-call="portal.portal_table">
+                <thead><tr><th>Loan</th><th>Type</th><th>Asked On</th><th class="text-end">Amount</th><th class="text-end">Still Due</th><th>Status</th></tr></thead>
+                <tbody>
+                    <tr t-foreach="loans" t-as="rec">
+                        <td><a t-attf-href="/my/hr/loans/#{rec.id}" t-out="rec.name"/></td>
+                        <td t-out="rec.type_id.name"/>
+                        <td><span t-field="rec.date"/></td>
+                        <td class="text-end"><span t-field="rec.amount"/></td>
+                        <td class="text-end"><span t-field="rec.amount_residual"/></td>
+                        <td><span t-attf-class="badge #{'text-bg-success' if rec.state in ('running', 'paid') else 'text-bg-danger' if rec.state in ('refused', 'cancel') else 'text-bg-info'}" t-field="rec.state"/></td>
+                    </tr>
+                </tbody>
+            </t>
+        </t>
+    </template>
+
+    <template id="portal_my_loan" name="My Loan">
+        <t t-call="portal.portal_layout">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0"><t t-out="loan.name"/> <small class="text-muted" t-out="loan.type_id.name"/></h4>
+                    <span class="badge text-bg-info" t-field="loan.state"/>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-3">Amount</dt><dd class="col-sm-9"><span t-field="loan.amount"/></dd>
+                        <dt class="col-sm-3">Still Due</dt><dd class="col-sm-9"><span t-field="loan.amount_residual"/></dd>
+                        <dt t-if="loan.state == 'to_approve'" class="col-sm-3">Waiting For</dt>
+                        <dd t-if="loan.state == 'to_approve'" class="col-sm-9" t-out="loan.approval_step"/>
+                    </dl>
+                    <table t-if="loan.line_ids" class="table table-sm">
+                        <thead><tr><th>Month</th><th class="text-end">Installment</th><th>Status</th></tr></thead>
+                        <tbody>
+                            <tr t-foreach="loan.line_ids" t-as="line">
+                                <td t-out="line.date.strftime('%B %Y')"/>
+                                <td class="text-end"><span t-field="line.amount"/></td>
+                                <td><span t-field="line.state"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>
