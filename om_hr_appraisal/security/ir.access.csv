@@ -1,0 +1,16 @@
+id,name,model_id,group_id/id,operation,domain
+access_om_hr_appraisal_own,om.hr.appraisal.own,om.hr.appraisal,base.group_user,ru,"['|', '|', ('employee_id.user_id', '=', user.id), ('manager_id.user_id', '=', user.id), '&', ('manager_id.user_id', '=', False), ('employee_id.version_id.hr_responsible_id', '=', user.id)]"
+access_om_hr_appraisal_manager_create,om.hr.appraisal.manager.create,om.hr.appraisal,base.group_user,c,"[('manager_id.user_id', '=', user.id)]"
+access_om_hr_appraisal_hr,om.hr.appraisal.hr,om.hr.appraisal,hr.group_hr_user,crud,
+om_hr_appraisal_company_rule,Appraisals: multi-company,om.hr.appraisal,,crud,"[('company_id', 'in', company_ids)]"
+access_om_hr_appraisal_goal_own,om.hr.appraisal.goal.own,om.hr.appraisal.goal,base.group_user,ru,"['|', ('employee_id.user_id', '=', user.id), ('employee_id.parent_id.user_id', '=', user.id)]"
+access_om_hr_appraisal_goal_manager,om.hr.appraisal.goal.manager,om.hr.appraisal.goal,base.group_user,cd,"[('employee_id.parent_id.user_id', '=', user.id)]"
+access_om_hr_appraisal_goal_hr,om.hr.appraisal.goal.hr,om.hr.appraisal.goal,hr.group_hr_user,crud,
+om_hr_appraisal_goal_company_rule,Goals: multi-company,om.hr.appraisal.goal,,crud,"[('company_id', 'in', company_ids)]"
+access_om_hr_appraisal_cycle_hr,om.hr.appraisal.cycle.hr,om.hr.appraisal.cycle,hr.group_hr_user,crud,
+om_hr_appraisal_cycle_company_rule,Appraisal cycles: multi-company,om.hr.appraisal.cycle,,crud,"[('company_id', 'in', company_ids)]"
+access_om_hr_appraisal_template_user,om.hr.appraisal.template.user,om.hr.appraisal.template,base.group_user,r,
+access_om_hr_appraisal_template_manager,om.hr.appraisal.template.manager,om.hr.appraisal.template,hr.group_hr_manager,crud,
+access_om_hr_appraisal_rating_user,om.hr.appraisal.rating.user,om.hr.appraisal.rating,base.group_user,r,
+access_om_hr_appraisal_rating_manager,om.hr.appraisal.rating.manager,om.hr.appraisal.rating,hr.group_hr_manager,crud,
+access_om_hr_appraisal_version_hr,om.hr.appraisal.version.hr,om.hr.appraisal.version,hr.group_hr_user,crud,

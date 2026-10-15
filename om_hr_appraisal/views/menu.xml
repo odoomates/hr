@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_om_hr_appraisals"
+              name="Appraisals"
+              parent="hr.menu_hr_root"
+              sequence="83"/>
+
+    <menuitem id="menu_om_hr_appraisal_my"
+              action="om_hr_appraisal_action_my"
+              parent="om_hr_base.menu_my_hr"
+              sequence="70"/>
+
+    <menuitem id="menu_om_hr_appraisal_team"
+              action="om_hr_appraisal_action_team"
+              parent="menu_om_hr_appraisals"
+              sequence="20"/>
+
+    <menuitem id="menu_om_hr_appraisal_all"
+              action="om_hr_appraisal_action"
+              parent="menu_om_hr_appraisals"
+              sequence="30"
+              groups="hr.group_hr_user"/>
+
+    <menuitem id="menu_om_hr_appraisal_cycle"
+              action="om_hr_appraisal_cycle_action"
+              parent="menu_om_hr_appraisals"
+              sequence="40"
+              groups="hr.group_hr_user"/>
+
+    <menuitem id="menu_om_hr_appraisal_goal"
+              action="om_hr_appraisal_goal_action"
+              parent="om_hr_base.menu_my_hr"
+              sequence="75"/>
+
+    <menuitem id="menu_om_hr_appraisal_configuration"
+              name="Appraisals"
+              parent="hr.menu_human_resources_configuration"
+              sequence="40"
+              groups="hr.group_hr_manager"/>
+
+    <menuitem id="menu_om_hr_appraisal_template"
+              action="om_hr_appraisal_template_action"
+              parent="menu_om_hr_appraisal_configuration"
+              sequence="10"/>
+
+    <menuitem id="menu_om_hr_appraisal_rating"
+              action="om_hr_appraisal_rating_action"
+              parent="menu_om_hr_appraisal_configuration"
+              sequence="20"/>
+
+</odoo>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="om_hr_appraisal_version_view_form" model="ir.ui.view">
+        <field name="name">om.hr.appraisal.version.view.form</field>
+        <field name="model">om.hr.appraisal.version</field>
+        <field name="arch" type="xml">
+            <form string="New Contract Version">
+                <p class="text-muted">
+                    A new version of the contract of the employee starts on this date. The employee then opens on
+                    it: change the wage, the job or the department there, as for any change of contract.
+                </p>
+                <group>
+                    <field name="appraisal_id" invisible="1"/>
+                    <field name="employee_id"/>
+                    <field name="date_version"/>
+                </group>
+                <footer>
+                    <button string="Create and Open" name="action_create" type="object" class="btn-primary"
+                            data-hotkey="q"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

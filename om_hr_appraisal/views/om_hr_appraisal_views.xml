@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="om_hr_appraisal_view_form" model="ir.ui.view">
+        <field name="name">om.hr.appraisal.view.form</field>
+        <field name="model">om.hr.appraisal</field>
+        <field name="arch" type="xml">
+            <form string="Appraisal">
+                <header>
+                    <button name="action_start" string="Start" type="object" class="btn-primary"
+                            invisible="state != 'new' or not (is_hr or is_manager)"/>
+                    <button name="action_submit_self" string="Submit My Assessment" type="object" class="btn-primary"
+                            invisible="state != 'self' or not (is_employee or is_hr)"
+                            confirm="Your manager will read your assessment, and you will no longer change it. Submit?"/>
+                    <button name="action_done" string="Mark as Done" type="object" class="btn-primary"
+                            invisible="state != 'review' or not (is_manager or is_hr)"
+                            confirm="The employee will read your review. Close the appraisal?"/>
+                    <button name="action_back_to_self" string="Back to Employee" type="object"
+                            invisible="state != 'review' or not (is_manager or is_hr)"/>
+                    <button name="action_new_contract_version" string="New Contract Version" type="object"
+                            class="btn-primary" invisible="state != 'done'" groups="hr.group_hr_user"/>
+                    <button name="action_reset" string="Reset" type="object" invisible="state != 'cancel'"
+                            groups="hr.group_hr_user"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state in ('done', 'cancel') or not (is_hr or (is_manager and state == 'new'))"/>
+                    <field name="state" widget="statusbar" statusbar_visible="new,self,review,done"/>
+                </header>
+                <sheet>
+                    <field name="is_employee" invisible="1"/>
+                    <field name="is_manager" invisible="1"/>
+                    <field name="is_hr" invisible="1"/>
+                    <field name="can_edit_employee_feedback" invisible="1"/>
+                    <field name="can_edit_manager_feedback" invisible="1"/>
+                    <field name="employee_feedback_hidden" invisible="1"/>
+                    <field name="manager_feedback_hidden" invisible="1"/>
+                    <widget name="web_ribbon" title="Done" bg_color="text-bg-success" invisible="state != 'done'"/>
+                    <widget name="web_ribbon" title="Cancelled" bg_color="text-bg-danger" invisible="state != 'cancel'"/>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="employee_id" widget="many2one_avatar_employee" readonly="state != 'new' or not is_hr"/>
+                            <field name="manager_id" widget="many2one_avatar_employee" readonly="state != 'new' or not is_hr"/>
+                            <field name="department_id"/>
+                            <field name="kind" readonly="state != 'new' or not is_hr"/>
+                            <field name="cycle_id" invisible="not cycle_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="date_deadline" readonly="state == 'done' or not (is_hr or is_manager)"/>
+                            <field name="meeting_date" readonly="state == 'done' or not (is_hr or is_manager)"/>
+                            <field name="rating_id" invisible="state not in ('review', 'done') or (state == 'review' and not (is_manager or is_hr))"
+                                   readonly="state != 'review'" options="{'no_create': True, 'no_open': True}"/>
+                            <field name="date_done" invisible="not date_done"/>
+                            <field name="template_id" readonly="state != 'new'" groups="hr.group_hr_user"
+                                   options="{'no_create': True}"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Employee's Feedback" name="employee_feedback">
+                            <div class="alert alert-info" role="status" invisible="not employee_feedback_hidden">
+                                The employee's self assessment shows here once they submit it.
+                            </div>
+                            <field name="employee_feedback" invisible="employee_feedback_hidden"
+                                   readonly="not can_edit_employee_feedback" class="oe-bordered-editor"/>
+                        </page>
+                        <page string="Manager's Feedback" name="manager_feedback">
+                            <div class="alert alert-info" role="status" invisible="not manager_feedback_hidden">
+                                Your manager's review shows here once the appraisal is done.
+                            </div>
+                            <field name="manager_feedback" invisible="manager_feedback_hidden"
+                                   readonly="not can_edit_manager_feedback" class="oe-bordered-editor"/>
+                        </page>
+                        <page string="Goals" name="goals">
+                            <field name="goal_ids" context="{'default_employee_id': employee_id}"
+                                   readonly="state in ('done', 'cancel') or not (is_hr or is_manager)">
+                                <list editable="bottom">
+                                    <field name="employee_id" column_invisible="1"/>
+                                    <field name="name"/>
+                                    <field name="target" optional="show"/>
+                                    <field name="date_deadline"/>
+                                    <field name="progress" widget="progressbar"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="om_hr_appraisal_view_kanban" model="ir.ui.view">
+        <field name="name">om.hr.appraisal.view.kanban</field>
+        <field name="model">om.hr.appraisal</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" quick_create="false" group_create="false" group_delete="false"
+                    group_edit="false" records_draggable="false" sample="1">
+                <field name="state"/>
+                <field name="date_deadline"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex align-items-center gap-2">
+                            <field name="employee_id" widget="many2one_avatar_employee" class="fw-bold"/>
+                        </div>
+                        <field name="department_id" class="text-muted small"/>
+                        <div class="d-flex align-items-center gap-2 mt-2">
+                            <field name="kind" widget="badge" decoration-warning="kind == 'probation'"/>
+                            <field name="rating_id" widget="badge" decoration-success="1"/>
+                            <span class="flex-grow-1"/>
+                            <field name="date_deadline" widget="remaining_days" invisible="state in ('done', 'cancel')"/>
+                            <field name="activity_ids" widget="kanban_activity"/>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="om_hr_appraisal_view_list" model="ir.ui.view">
+        <field name="name">om.hr.appraisal.view.list</field>
+        <field name="model">om.hr.appraisal</field>
+        <field name="arch" type="xml">
+            <list string="Appraisals" decoration-muted="state == 'cancel'">
+                <field name="employee_id" widget="many2one_avatar_employee"/>
+                <field name="manager_id" widget="many2one_avatar_employee" optional="show"/>
+                <field name="department_id" optional="show"/>
+                <field name="kind" optional="show"/>
+                <field name="cycle_id" optional="hide"/>
+                <field name="date_deadline" widget="remaining_days" invisible="state in ('done', 'cancel')"/>
+                <field name="date_done" optional="show"/>
+                <field name="rating_id" optional="show"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="state" widget="badge" decoration-info="state in ('self', 'review')"
+                       decoration-success="state == 'done'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="om_hr_appraisal_view_search" model="ir.ui.view">
+        <field name="name">om.hr.appraisal.view.search</field>
+        <field name="model">om.hr.appraisal</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <field name="manager_id"/>
+                <field name="department_id"/>
+                <field name="cycle_id"/>
+                <filter name="mine" string="My Appraisals" domain="[('employee_id.user_id', '=', uid)]"/>
+                <filter name="my_team" string="My Team" domain="[('manager_id.user_id', '=', uid)]"/>
+                <separator/>
+                <filter name="open" string="Open" domain="[('state', 'in', ('new', 'self', 'review'))]"/>
+                <filter name="probation" string="Probation Reviews" domain="[('kind', '=', 'probation')]"/>
+                <filter name="late" string="Late"
+                        domain="[('state', 'in', ('new', 'self', 'review')), ('date_deadline', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="done" string="Done" domain="[('state', '=', 'done')]"/>
+                <group>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_employee" string="Employee" context="{'group_by': 'employee_id'}"/>
+                    <filter name="group_department" string="Department" context="{'group_by': 'department_id'}"/>
+                    <filter name="group_rating" string="Rating" context="{'group_by': 'rating_id'}"/>
+                    <filter name="group_cycle" string="Cycle" context="{'group_by': 'cycle_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="om_hr_appraisal_action_my" model="ir.actions.act_window">
+        <field name="name">My Appraisals</field>
+        <field name="res_model">om.hr.appraisal</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="domain">[('employee_id.user_id', '=', uid)]</field>
+        <field name="context">{'create': False}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No appraisal yet</p>
+            <p>When your appraisal starts, you fill in your self assessment here, then your manager reviews it.</p>
+        </field>
+    </record>
+
+    <record id="om_hr_appraisal_action_team" model="ir.actions.act_window">
+        <field name="name">My Team</field>
+        <field name="res_model">om.hr.appraisal</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('manager_id.user_id', '=', uid)]</field>
+        <field name="context">{'search_default_open': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No appraisal of your team</p>
+            <p>The appraisals of the employees you manage show here, for you to review.</p>
+        </field>
+    </record>
+
+    <record id="om_hr_appraisal_action" model="ir.actions.act_window">
+        <field name="name">Appraisals</field>
+        <field name="res_model">om.hr.appraisal</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{'search_default_open': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Appraise an employee</p>
+            <p>The employee assesses themselves, then their manager reviews and rates them. Probation reviews
+                and regular appraisals are also created on their own, per the settings.</p>
+        </field>
+    </record>
+
+</odoo>

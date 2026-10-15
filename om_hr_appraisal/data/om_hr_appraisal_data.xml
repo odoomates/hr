@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="rating_needs_improvement" model="om.hr.appraisal.rating">
+            <field name="name">Needs Improvement</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="rating_meets" model="om.hr.appraisal.rating">
+            <field name="name">Meets Expectations</field>
+            <field name="sequence">20</field>
+        </record>
+        <record id="rating_exceeds" model="om.hr.appraisal.rating">
+            <field name="name">Exceeds Expectations</field>
+            <field name="sequence">30</field>
+        </record>
+        <record id="rating_outstanding" model="om.hr.appraisal.rating">
+            <field name="name">Outstanding</field>
+            <field name="sequence">40</field>
+        </record>
+
+        <record id="template_default" model="om.hr.appraisal.template">
+            <field name="name">Default</field>
+            <field name="sequence">100</field>
+            <field name="employee_feedback" type="html">
+<div>
+    <h3>My work</h3>
+    <p>What went well in this period? What am I proud of?</p>
+    <p><br/></p>
+    <h3>What could be better</h3>
+    <p>What held me back, and what would help me?</p>
+    <p><br/></p>
+    <h3>Next period</h3>
+    <p>What would I like to achieve or learn?</p>
+    <p><br/></p>
+</div>
+            </field>
+            <field name="manager_feedback" type="html">
+<div>
+    <h3>Achievements</h3>
+    <p>What did the employee achieve in this period?</p>
+    <p><br/></p>
+    <h3>Areas to improve</h3>
+    <p>What should the employee work on, and how will you support them?</p>
+    <p><br/></p>
+    <h3>Recommendation</h3>
+    <p>Raise, promotion, training, or nothing for now?</p>
+    <p><br/></p>
+</div>
+            </field>
+        </record>
+
+    </data>
+
+    <record id="ir_cron_plan_appraisals" model="ir.cron">
+        <field name="name">Appraisals: plan the probation reviews and the appraisals due</field>
+        <field name="model_id" ref="model_om_hr_appraisal"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_plan_appraisals()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+    </record>
+
+</odoo>

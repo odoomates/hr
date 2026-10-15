@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="om_hr_appraisal_goal_view_form" model="ir.ui.view">
+        <field name="name">om.hr.appraisal.goal.view.form</field>
+        <field name="model">om.hr.appraisal.goal</field>
+        <field name="arch" type="xml">
+            <form string="Goal">
+                <sheet>
+                    <widget name="web_ribbon" title="Reached" bg_color="text-bg-success" invisible="not is_done"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Learn the new payroll rules"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="employee_id" widget="many2one_avatar_employee"/>
+                            <field name="manager_id" widget="many2one_avatar_employee"/>
+                            <field name="appraisal_id"/>
+                        </group>
+                        <group>
+                            <field name="target"/>
+                            <field name="date_deadline"/>
+                            <field name="progress" widget="progressbar" options="{'editable': true}"/>
+                            <field name="is_done" invisible="1"/>
+                        </group>
+                    </group>
+                    <field name="description" placeholder="Describe the goal"/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="om_hr_appraisal_goal_view_list" model="ir.ui.view">
+        <field name="name">om.hr.appraisal.goal.view.list</field>
+        <field name="model">om.hr.appraisal.goal</field>
+        <field name="arch" type="xml">
+            <list string="Goals" decoration-success="is_done">
+                <field name="employee_id" widget="many2one_avatar_employee"/>
+                <field name="name"/>
+                <field name="target" optional="show"/>
+                <field name="date_deadline" widget="remaining_days" invisible="is_done"/>
+                <field name="progress" widget="progressbar"/>
+                <field name="is_done" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="om_hr_appraisal_goal_view_search" model="ir.ui.view">
+        <field name="name">om.hr.appraisal.goal.view.search</field>
+        <field name="model">om.hr.appraisal.goal</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="employee_id"/>
+                <filter name="mine" string="My Goals" domain="[('employee_id.user_id', '=', uid)]"/>
+                <filter name="my_team" string="My Team" domain="[('employee_id.parent_id.user_id', '=', uid)]"/>
+                <separator/>
+                <filter name="open" string="In Progress" domain="[('is_done', '=', False)]"/>
+                <filter name="reached" string="Reached" domain="[('is_done', '=', True)]"/>
+                <group>
+                    <filter name="group_employee" string="Employee" context="{'group_by': 'employee_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="om_hr_appraisal_goal_action" model="ir.actions.act_window">
+        <field name="name">Goals</field>
+        <field name="res_model">om.hr.appraisal.goal</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_open': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Set a goal</p>
+            <p>What an employee aims at until the next appraisal; they update its progress themselves.</p>
+        </field>
+    </record>
+
+</odoo>
