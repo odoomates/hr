@@ -23,6 +23,10 @@ DEMO_ACCOUNTS = {
 DEMO_RULE_ACCOUNTS = [
     ('om_hr_payroll.hr_rule_basic', 'account_debit', 'expense'),
     ('om_hr_payroll.hr_rule_unpaid_leave', 'account_debit', 'expense'),
+    ('om_hr_payroll.hr_rule_hourly', 'account_debit', 'expense'),
+    ('om_hr_payroll.hr_rule_partial_period', 'account_debit', 'expense'),
+    ('om_hr_payroll.hr_rule_attendance_adjustment', 'account_debit', 'expense'),
+    ('om_hr_payroll.hr_rule_retro', 'account_debit', 'expense'),
     ('om_hr_payroll.hr_rule_allowances', 'account_debit', 'expense'),
     ('om_hr_payroll.hr_rule_bonus', 'account_debit', 'expense'),
     ('om_hr_payroll.hr_rule_union_dues', 'account_debit', 'other'),
