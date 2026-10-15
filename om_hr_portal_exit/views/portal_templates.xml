@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="portal_my_hr" inherit_id="om_hr_portal.portal_my_hr" name="My HR: Resignation">
+        <xpath expr="//div[@id='om_hr_cards']" position="inside">
+            <div class="col" style="order: 9;">
+                <t t-call="om_hr_portal.portal_my_hr_card" url="'/my/hr/resignation'" icon="'logout'"
+                   title.translate="Resignation" text.translate="Hand in your resignation and follow your exit"/>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="portal_my_exit" name="My Resignation">
+        <t t-call="portal.portal_layout">
+            <div t-if="open_exit" class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0" t-out="open_exit.name"/>
+                    <span class="badge text-bg-info" t-field="open_exit.state"/>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Notice Given On</dt><dd class="col-sm-8"><span t-field="open_exit.date_notice"/></dd>
+                        <dt class="col-sm-4">Last Working Day</dt><dd class="col-sm-8"><span t-field="open_exit.last_working_day"/></dd>
+                        <dt t-if="open_exit.state == 'to_approve'" class="col-sm-4">Waiting For</dt>
+                        <dd t-if="open_exit.state == 'to_approve'" class="col-sm-8" t-out="open_exit.approval_step"/>
+                    </dl>
+                    <t t-if="open_exit.clearance_ids">
+                        <h6 class="mt-3">Clearance</h6>
+                        <ul class="list-unstyled mb-0">
+                            <li t-foreach="open_exit.clearance_ids" t-as="line">
+                                <i t-attf-class="oi #{'text-success' if line.state != 'pending' else 'text-muted'}"
+                                   t-att-data-icon="'check_circle' if line.state != 'pending' else 'radio_button_unchecked'"
+                                   t-att-title="line.state"/>
+                                <t t-out="line.name"/>
+                            </li>
+                        </ul>
+                    </t>
+                </div>
+            </div>
+            <div t-else="" class="card">
+                <div class="card-header"><h5 class="mb-0">Hand In My Resignation</h5></div>
+                <div class="card-body">
+                    <div t-if="error" class="alert alert-danger" role="alert" t-out="error"/>
+                    <form action="/my/hr/resignation/new" method="post" class="row g-3">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <div class="col-md-4">
+                            <label class="form-label" for="om_exit_date">Notice Given On</label>
+                            <input type="date" class="form-control" id="om_exit_date" name="date_notice"
+                                   t-att-value="form.get('date_notice')"/>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" for="om_exit_note">Why you leave (optional)</label>
+                            <textarea class="form-control" id="om_exit_note" name="note" rows="3" t-out="form.get('note')"/>
+                        </div>
+                        <div class="col-12 form-check ms-2">
+                            <input class="form-check-input" type="checkbox" name="confirm" value="1" id="om_exit_confirm"/>
+                            <label class="form-check-label" for="om_exit_confirm">I confirm I resign from the company.</label>
+                        </div>
+                        <div class="col-12"><button type="submit" class="btn btn-danger">Hand In My Resignation</button></div>
+                    </form>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>
