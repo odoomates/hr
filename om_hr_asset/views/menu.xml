@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_om_hr_assets"
+              name="Assets"
+              parent="hr.menu_hr_root"
+              sequence="87"/>
+
+    <menuitem id="menu_om_hr_asset_my"
+              action="om_hr_asset_assignment_action_my"
+              parent="om_hr_base.menu_my_hr"
+              sequence="60"/>
+
+    <menuitem id="menu_om_hr_asset_all"
+              action="om_hr_asset_action"
+              parent="menu_om_hr_assets"
+              sequence="20"
+              groups="maintenance.group_equipment_manager"/>
+
+    <menuitem id="menu_om_hr_asset_available"
+              action="om_hr_asset_action_available"
+              parent="menu_om_hr_assets"
+              sequence="30"
+              groups="maintenance.group_equipment_manager"/>
+
+    <menuitem id="menu_om_hr_asset_assignment"
+              action="om_hr_asset_assignment_action"
+              parent="menu_om_hr_assets"
+              sequence="40"
+              groups="maintenance.group_equipment_manager"/>
+
+    <menuitem id="menu_om_hr_asset_category"
+              name="Asset Categories"
+              action="maintenance.hr_equipment_category_action"
+              parent="hr.menu_config_employee"
+              sequence="30"
+              groups="maintenance.group_equipment_manager"/>
+
+</odoo>

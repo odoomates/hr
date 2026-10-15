@@ -1,0 +1,6 @@
+id,name,model_id,group_id/id,operation,domain
+access_om_hr_asset_assignment_own,om.hr.asset.assignment.own,om.hr.asset.assignment,base.group_user,r,"[('employee_id.user_id', '=', user.id)]"
+access_om_hr_asset_assignment_manager,om.hr.asset.assignment.manager,om.hr.asset.assignment,maintenance.group_equipment_manager,crud,
+om_hr_asset_assignment_company_rule,Asset assignments: multi-company,om.hr.asset.assignment,,crud,"[('company_id', 'in', company_ids)]"
+access_om_hr_asset_wizard_manager,om.hr.asset.wizard.manager,om.hr.asset.wizard,maintenance.group_equipment_manager,crud,
+access_om_print_template_asset,om.print.template.asset,om.print.template,maintenance.group_equipment_manager,crud,"[('model', '=', 'om.hr.asset.assignment')]"

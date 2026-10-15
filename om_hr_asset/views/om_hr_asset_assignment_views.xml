@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="om_hr_asset_assignment_view_form" model="ir.ui.view">
+        <field name="name">om.hr.asset.assignment.view.form</field>
+        <field name="model">om.hr.asset.assignment</field>
+        <field name="arch" type="xml">
+            <form string="Asset Assignment" create="0">
+                <header>
+                    <button name="action_print_handover" string="Print Handover Form" type="object"
+                            groups="maintenance.group_equipment_manager"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Lost" bg_color="text-bg-danger" invisible="state != 'lost'"/>
+                    <div class="oe_title">
+                        <h1><field name="equipment_id" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="employee_id" widget="many2one_avatar_employee" readonly="1"/>
+                            <field name="category_id"/>
+                            <field name="serial_no"/>
+                            <field name="date_from"/>
+                            <field name="condition_out"/>
+                            <field name="handed_by_id" widget="many2one_avatar_user"/>
+                        </group>
+                        <group>
+                            <field name="date_to" invisible="state == 'assigned'"/>
+                            <field name="condition_in" invisible="state != 'returned'"/>
+                            <field name="received_by_id" widget="many2one_avatar_user" invisible="state != 'returned'"/>
+                            <field name="charge_amount" invisible="state == 'assigned' and not charge_amount"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="company_id" groups="base.group_multi_company" readonly="1"/>
+                        </group>
+                    </group>
+                    <field name="note" placeholder="Accessories handed over, damages, ..."/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="om_hr_asset_assignment_view_list" model="ir.ui.view">
+        <field name="name">om.hr.asset.assignment.view.list</field>
+        <field name="model">om.hr.asset.assignment</field>
+        <field name="arch" type="xml">
+            <list string="Asset Assignments" create="0" decoration-danger="state == 'lost'"
+                  decoration-muted="state == 'returned'">
+                <field name="equipment_id"/>
+                <field name="serial_no" optional="show"/>
+                <field name="category_id" optional="show"/>
+                <field name="employee_id" widget="many2one_avatar_employee"/>
+                <field name="department_id" optional="hide"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="condition_out" optional="hide"/>
+                <field name="condition_in" optional="show"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="charge_amount" optional="show" sum="Total"/>
+                <field name="state" widget="badge" decoration-info="state == 'assigned'"
+                       decoration-danger="state == 'lost'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="om_hr_asset_assignment_view_search" model="ir.ui.view">
+        <field name="name">om.hr.asset.assignment.view.search</field>
+        <field name="model">om.hr.asset.assignment</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="equipment_id"/>
+                <field name="serial_no"/>
+                <field name="employee_id"/>
+                <field name="department_id"/>
+                <filter name="assigned" string="Held Now" domain="[('state', '=', 'assigned')]"/>
+                <filter name="returned" string="Returned" domain="[('state', '=', 'returned')]"/>
+                <filter name="lost" string="Lost" domain="[('state', '=', 'lost')]"/>
+                <filter name="charged" string="Charged" domain="[('charge_amount', '&gt;', 0)]"/>
+                <group>
+                    <filter name="group_employee" string="Employee" context="{'group_by': 'employee_id'}"/>
+                    <filter name="group_category" string="Category" context="{'group_by': 'category_id'}"/>
+                    <filter name="group_department" string="Department" context="{'group_by': 'department_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="om_hr_asset_assignment_action" model="ir.actions.act_window">
+        <field name="name">Assignments</field>
+        <field name="res_model">om.hr.asset.assignment</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_assigned': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No asset assigned yet</p>
+            <p>Assign an asset from its form: the handover, the return and any loss show here.</p>
+        </field>
+    </record>
+
+    <record id="om_hr_asset_assignment_action_my" model="ir.actions.act_window">
+        <field name="name">My Assets</field>
+        <field name="res_model">om.hr.asset.assignment</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('employee_id.user_id', '=', uid)]</field>
+        <field name="context">{'search_default_assigned': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No asset in your hands</p>
+            <p>The laptop, the phone or the tools the company hands over to you show here.</p>
+        </field>
+    </record>
+
+    <record id="om_hr_asset_wizard_view_form" model="ir.ui.view">
+        <field name="name">om.hr.asset.wizard.view.form</field>
+        <field name="model">om.hr.asset.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Asset">
+                <field name="mode" invisible="1"/>
+                <field name="currency_id" invisible="1"/>
+                <group>
+                    <field name="equipment_id" readonly="1"/>
+                    <field name="current_employee_id" invisible="not current_employee_id"/>
+                    <field name="employee_id" invisible="mode != 'assign'" required="mode == 'assign'"
+                           string="Assign To" widget="many2one_avatar_employee"/>
+                    <field name="date"/>
+                    <field name="condition" invisible="mode == 'lost'"
+                           string="Condition"/>
+                    <field name="charge_amount" invisible="mode == 'assign' or (mode == 'return' and condition != 'damaged')"/>
+                    <field name="request_maintenance" invisible="mode != 'return' or condition != 'damaged'"/>
+                    <field name="note" placeholder="Accessories, damages, circumstances of the loss, ..."/>
+                </group>
+                <footer>
+                    <button string="Confirm" name="action_confirm" type="object" class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

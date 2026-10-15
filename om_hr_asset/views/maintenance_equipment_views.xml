@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="maintenance_equipment_view_form_om_asset" model="ir.ui.view">
+        <field name="name">maintenance.equipment.form.om.asset</field>
+        <field name="model">maintenance.equipment</field>
+        <field name="inherit_id" ref="maintenance.hr_equipment_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/sheet" position="before">
+                <header>
+                    <button name="action_om_assign" string="Assign" type="object" class="btn-primary"
+                            invisible="employee_id or om_lost" groups="maintenance.group_equipment_manager"/>
+                    <button name="action_om_assign" string="Reassign" type="object"
+                            invisible="not employee_id" groups="maintenance.group_equipment_manager"/>
+                    <button name="action_om_return" string="Return" type="object" class="btn-primary"
+                            invisible="not employee_id" groups="maintenance.group_equipment_manager"/>
+                    <button name="action_om_lost" string="Report Lost" type="object"
+                            invisible="not employee_id" groups="maintenance.group_equipment_manager"/>
+                    <button name="action_om_found" string="Found" type="object" invisible="not om_lost"
+                            groups="maintenance.group_equipment_manager"/>
+                    <field name="om_asset_state" widget="statusbar" statusbar_visible="available,assigned"/>
+                </header>
+            </xpath>
+            <div name="button_box" position="inside">
+                <button name="action_om_open_assignments" type="object" class="oe_stat_button" icon="history">
+                    <field name="om_assignment_count" widget="statinfo" string="History"/>
+                </button>
+            </div>
+            <widget name="web_ribbon" position="after">
+                <widget name="web_ribbon" title="Lost" bg_color="text-bg-danger" invisible="not om_lost"/>
+                <field name="om_lost" invisible="1"/>
+            </widget>
+        </field>
+    </record>
+
+    <record id="maintenance_equipment_view_search_om_asset" model="ir.ui.view">
+        <field name="name">maintenance.equipment.search.om.asset</field>
+        <field name="model">maintenance.equipment</field>
+        <field name="inherit_id" ref="maintenance.hr_equipment_view_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <separator/>
+                <filter name="om_available" string="Available" domain="[('om_asset_state', '=', 'available')]"/>
+                <filter name="om_assigned" string="Assigned" domain="[('om_asset_state', '=', 'assigned')]"/>
+                <filter name="om_lost" string="Lost" domain="[('om_asset_state', '=', 'lost')]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="om_hr_asset_action" model="ir.actions.act_window">
+        <field name="name">Assets</field>
+        <field name="res_model">maintenance.equipment</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{'default_equipment_assign_to': 'employee'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Add an asset</p>
+            <p>Laptops, phones, vehicles, tools: assign them to employees and keep the history of who held them.</p>
+        </field>
+    </record>
+
+    <record id="om_hr_asset_action_available" model="ir.actions.act_window">
+        <field name="name">Available</field>
+        <field name="res_model">maintenance.equipment</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{'search_default_om_available': 1, 'default_equipment_assign_to': 'employee'}</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="hr_employee_view_form_om_asset" model="ir.ui.view">
+        <field name="name">hr.employee.view.form.om.asset</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='personal_information']" position="after">
+                <page name="om_assets" string="Assets" groups="hr.group_hr_user">
+                    <field name="om_asset_assignment_ids" readonly="1" context="{'search_default_assigned': 0}">
+                        <list decoration-muted="state == 'returned'" decoration-danger="state == 'lost'">
+                            <field name="equipment_id"/>
+                            <field name="serial_no"/>
+                            <field name="category_id" optional="show"/>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="condition_in" optional="show"/>
+                            <field name="currency_id" column_invisible="1"/>
+                            <field name="charge_amount" optional="show"/>
+                            <field name="state" widget="badge" decoration-info="state == 'assigned'"
+                                   decoration-danger="state == 'lost'"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
