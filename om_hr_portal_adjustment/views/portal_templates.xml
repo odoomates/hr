@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="portal_my_hr" inherit_id="om_hr_portal.portal_my_hr" name="My HR: Pay Adjustments">
+        <xpath expr="//div[@id='om_hr_cards']" position="inside">
+            <div class="col" style="order: 3;">
+                <t t-call="om_hr_portal.portal_my_hr_card" url="'/my/hr/adjustments'" icon="'payments'"
+                   title.translate="Pay Adjustments"
+                   text.translate="The bonuses, commissions and deductions of your payslips"/>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="portal_my_adjustments" name="My Pay Adjustments">
+        <t t-call="portal.portal_layout">
+            <div t-if="not adjustments" class="alert alert-info">No adjustment of your pay.</div>
+            <t t-if="adjustments" t-call="portal.portal_table">
+                <thead><tr><th>Adjustment</th><th>Type</th><th>From</th><th class="text-end">Each Month</th><th class="text-end">Done</th><th>Status</th></tr></thead>
+                <tbody>
+                    <tr t-foreach="adjustments" t-as="rec">
+                        <td><a t-attf-href="/my/hr/adjustments/#{rec.id}" t-out="rec.name"/>
+                            <div t-if="rec.description" class="small text-muted" t-out="rec.description"/></td>
+                        <td>
+                            <t t-out="rec.type_id.name"/>
+                            <span t-attf-class="badge ms-1 #{'text-bg-success' if rec.kind == 'addition' else 'text-bg-warning'}" t-field="rec.kind"/>
+                        </td>
+                        <td t-out="rec.date_start.strftime('%B %Y')"/>
+                        <td class="text-end">
+                            <span t-if="rec.amount_type == 'fixed'" t-field="rec.amount"/>
+                            <t t-else=""><t t-out="'%g' % rec.percent"/>% <span t-field="rec.percent_base"/></t>
+                        </td>
+                        <td class="text-end"><span t-field="rec.amount_done"/></td>
+                        <td><span t-attf-class="badge #{'text-bg-info' if rec.state == 'running' else 'text-bg-secondary'}" t-field="rec.state"/></td>
+                    </tr>
+                </tbody>
+            </t>
+        </t>
+    </template>
+
+    <template id="portal_my_adjustment" name="My Pay Adjustment">
+        <t t-call="portal.portal_layout">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0"><t t-out="adjustment.name"/> <small class="text-muted" t-out="adjustment.type_id.name"/></h4>
+                    <span class="badge text-bg-info" t-field="adjustment.state"/>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-3">Kind</dt><dd class="col-sm-9"><span t-field="adjustment.kind"/></dd>
+                        <dt t-if="adjustment.description" class="col-sm-3">Description</dt>
+                        <dd t-if="adjustment.description" class="col-sm-9" t-out="adjustment.description"/>
+                        <dt class="col-sm-3">Recurrence</dt><dd class="col-sm-9"><span t-field="adjustment.recurrence"/></dd>
+                        <dt class="col-sm-3">Each Month</dt>
+                        <dd class="col-sm-9">
+                            <span t-if="adjustment.amount_type == 'fixed'" t-field="adjustment.amount"/>
+                            <t t-else=""><t t-out="'%g' % adjustment.percent"/>% <span t-field="adjustment.percent_base"/></t>
+                        </dd>
+                        <dt t-if="adjustment.recurrence == 'total'" class="col-sm-3">Total</dt>
+                        <dd t-if="adjustment.recurrence == 'total'" class="col-sm-9"><span t-field="adjustment.total_amount"/></dd>
+                        <dt class="col-sm-3">Done</dt><dd class="col-sm-9"><span t-field="adjustment.amount_done"/></dd>
+                    </dl>
+                    <table t-if="adjustment.line_ids" class="table table-sm">
+                        <thead><tr><th>Month</th><th class="text-end">Amount</th><th>Status</th></tr></thead>
+                        <tbody>
+                            <tr t-foreach="adjustment.line_ids" t-as="line">
+                                <td t-out="line.date.strftime('%B %Y')"/>
+                                <td class="text-end"><span t-field="line.amount"/></td>
+                                <td><span t-field="line.state"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>
