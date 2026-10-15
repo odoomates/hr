@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="om_hr_certificate_view_form" model="ir.ui.view">
+        <field name="name">om.hr.certificate.view.form</field>
+        <field name="model">om.hr.certificate</field>
+        <field name="arch" type="xml">
+            <form string="Certificate Request">
+                <header>
+                    <button name="action_submit" string="Submit" type="object" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_approval_approve" string="Approve" type="object" class="btn-primary"
+                            invisible="not can_approve"/>
+                    <button name="action_approval_open_refuse" string="Refuse" type="object"
+                            invisible="not can_approve"/>
+                    <button name="action_download" string="Download" type="object" class="btn-primary"
+                            invisible="state != 'issued'"/>
+                    <button name="action_approval_reset" string="Back to Draft" type="object"
+                            invisible="state not in ('to_approve', 'refused', 'cancel')"/>
+                    <button name="action_approval_cancel" string="Cancel" type="object"
+                            invisible="state not in ('draft', 'to_approve')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,to_approve,issued"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="employee_id" readonly="state != 'draft'"/>
+                            <field name="template_id" readonly="state != 'draft'"
+                                   options="{'no_create': True, 'no_open': True}"/>
+                            <field name="addressee" readonly="state != 'draft'"
+                                   placeholder="e.g. Emirates NBD, or the Embassy of France"/>
+                        </group>
+                        <group>
+                            <field name="date"/>
+                            <field name="department_id"/>
+                            <field name="issue_name" invisible="not issue_id"/>
+                            <field name="issue_id" invisible="1"/>
+                            <field name="company_id" groups="base.group_multi_company" readonly="state != 'draft'"/>
+                            <field name="approval_step" invisible="state != 'to_approve'"/>
+                            <field name="approver_user_ids" widget="many2many_avatar_user"
+                                   invisible="state != 'to_approve'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Purpose" name="purpose">
+                            <field name="purpose" placeholder="e.g. To open a bank account"
+                                   readonly="state != 'draft'"/>
+                        </page>
+                        <page string="Approvals" name="approvals" invisible="not approval_line_ids">
+                            <field name="approval_line_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="approver_user_ids" widget="many2many_avatar_user"/>
+                                    <field name="state" widget="badge" decoration-info="state == 'pending'"
+                                           decoration-success="state == 'approved'"
+                                           decoration-danger="state == 'refused'"/>
+                                    <field name="user_id" widget="many2one_avatar_user"/>
+                                    <field name="date"/>
+                                    <field name="note"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="om_hr_certificate_view_list" model="ir.ui.view">
+        <field name="name">om.hr.certificate.view.list</field>
+        <field name="model">om.hr.certificate</field>
+        <field name="arch" type="xml">
+            <list string="Certificate Requests">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="employee_id" widget="many2one_avatar_employee"/>
+                <field name="template_id"/>
+                <field name="addressee" optional="show"/>
+                <field name="department_id" optional="hide"/>
+                <field name="issue_name" optional="show"/>
+                <field name="approval_step" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="state" widget="badge" decoration-info="state == 'to_approve'"
+                       decoration-success="state == 'issued'" decoration-danger="state == 'refused'"/>
+                <button name="action_download" type="object" icon="download" title="Download"
+                        invisible="state != 'issued'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="om_hr_certificate_view_search" model="ir.ui.view">
+        <field name="name">om.hr.certificate.view.search</field>
+        <field name="model">om.hr.certificate</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="template_id"/>
+                <filter name="mine" string="My Requests" domain="[('employee_id.user_id', '=', uid)]"/>
+                <filter name="to_approve_by_me" string="To Approve by Me" domain="[('approver_user_ids', 'in', uid)]"/>
+                <separator/>
+                <filter name="to_approve" string="To Approve" domain="[('state', '=', 'to_approve')]"/>
+                <filter name="issued" string="Issued" domain="[('state', '=', 'issued')]"/>
+                <group>
+                    <filter name="group_employee" string="Employee" context="{'group_by': 'employee_id'}"/>
+                    <filter name="group_template" string="Certificate" context="{'group_by': 'template_id'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="om_hr_certificate_action_my" model="ir.actions.act_window">
+        <field name="name">My Certificates</field>
+        <field name="res_model">om.hr.certificate</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('employee_id.user_id', '=', uid)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Ask for a certificate</p>
+            <p>A salary or an employment certificate for a bank or an embassy: once approved, you download it here.</p>
+        </field>
+    </record>
+
+    <record id="om_hr_certificate_action_to_approve" model="ir.actions.act_window">
+        <field name="name">To Approve</field>
+        <field name="res_model">om.hr.certificate</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_to_approve_by_me': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No certificate to approve</p>
+        </field>
+    </record>
+
+    <record id="om_hr_certificate_action" model="ir.actions.act_window">
+        <field name="name">All Requests</field>
+        <field name="res_model">om.hr.certificate</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="om_print_issue_action_hr" model="ir.actions.act_window">
+        <field name="name">Issued Certificates</field>
+        <field name="res_model">om.print.issue</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('res_model', '=', 'hr.employee')]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No certificate issued yet</p>
+            <p>Approved requests, and what HR prints from the Print menu of an employee, show here.</p>
+        </field>
+    </record>
+
+    <record id="om_print_template_action_hr" model="ir.actions.act_window">
+        <field name="name">Certificate Templates</field>
+        <field name="res_model">om.print.template</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('model', '=', 'hr.employee')]</field>
+        <field name="context" eval="{'default_model_id': ref('hr.model_hr_employee')}"/>
+    </record>
+
+    <record id="om_print_template_view_form_hr" model="ir.ui.view">
+        <field name="name">om.print.template.view.form.hr</field>
+        <field name="model">om.print.template</field>
+        <field name="inherit_id" ref="om_print_template.om_print_template_view_form"/>
+        <field name="arch" type="xml">
+            <field name="print_menu" position="after">
+                <field name="employee_request" invisible="model != 'hr.employee'"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="hr_employee_view_form_om_certificate" model="ir.ui.view">
+        <field name="name">hr.employee.view.form.om.certificate</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_open_om_print_issues" type="object" class="oe_stat_button" icon="badge"
+                        groups="hr.group_hr_user" invisible="not om_print_issue_count">
+                    <field name="om_print_issue_count" widget="statinfo" string="Certificates"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

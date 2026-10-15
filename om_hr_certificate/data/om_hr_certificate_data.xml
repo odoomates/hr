@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="seq_om_hr_certificate" model="ir.sequence">
+            <field name="name">Certificate Request</field>
+            <field name="code">om.hr.certificate</field>
+            <field name="prefix">CREQ/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="flow_om_hr_certificate" model="om.approval.flow">
+            <field name="name">Certificates</field>
+            <field name="model_id" ref="om_hr_certificate.model_om_hr_certificate"/>
+            <field name="fallback_group_id" ref="hr.group_hr_manager"/>
+            <field name="self_approve" eval="False"/>
+        </record>
+
+        <record id="flow_om_hr_certificate_manager" model="om.approval.step">
+            <field name="flow_id" ref="flow_om_hr_certificate"/>
+            <field name="sequence">10</field>
+            <field name="name">Manager</field>
+            <field name="approver_type">manager</field>
+        </record>
+
+        <record id="flow_om_hr_certificate_hr" model="om.approval.step">
+            <field name="flow_id" ref="flow_om_hr_certificate"/>
+            <field name="sequence">20</field>
+            <field name="name">HR</field>
+            <field name="approver_type">group</field>
+            <field name="group_id" ref="hr.group_hr_manager"/>
+        </record>
+
+        <record id="template_salary_certificate" model="om.print.template">
+            <field name="name">Salary Certificate</field>
+            <field name="sequence">10</field>
+            <field name="model_id" ref="hr.model_hr_employee"/>
+            <field name="code">SAL/%(year)s/</field>
+            <field name="subject">Salary Certificate</field>
+            <field name="employee_request" eval="True"/>
+            <field name="signatory_title">Human Resources</field>
+            <field name="body_html" type="html">
+<div>
+    <p>This is to certify that <strong t-out="object.name or ''"/> has been employed with
+        <t t-out="object.company_id.name or ''"/> since
+        <t t-out="format_date(object.version_id.contract_date_start) or ''"/>
+        <t t-if="object.job_title"> as <t t-out="object.job_title"/></t>.</p>
+    <p>The current gross monthly salary is
+        <strong t-out="format_amount(object.version_id.wage, object.company_id.currency_id) or ''"/>.</p>
+    <p>This certificate is issued at the request of the employee, without any liability on the part of the
+        company.</p>
+</div>
+            </field>
+        </record>
+
+        <record id="template_employment_certificate" model="om.print.template">
+            <field name="name">Employment Certificate</field>
+            <field name="sequence">20</field>
+            <field name="model_id" ref="hr.model_hr_employee"/>
+            <field name="code">EMP/%(year)s/</field>
+            <field name="subject">Employment Certificate</field>
+            <field name="employee_request" eval="True"/>
+            <field name="signatory_title">Human Resources</field>
+            <field name="body_html" type="html">
+<div>
+    <p>This is to certify that <strong t-out="object.name or ''"/> is employed with
+        <t t-out="object.company_id.name or ''"/> since
+        <t t-out="format_date(object.version_id.contract_date_start) or ''"/>
+        <t t-if="object.job_title"> as <t t-out="object.job_title"/></t>
+        <t t-if="object.department_id">, in the <t t-out="object.department_id.name"/> department</t>.</p>
+    <p>This certificate is issued at the request of the employee, without any liability on the part of the
+        company.</p>
+</div>
+            </field>
+        </record>
+
+        <record id="template_experience_certificate" model="om.print.template">
+            <field name="name">Experience Certificate</field>
+            <field name="sequence">30</field>
+            <field name="model_id" ref="hr.model_hr_employee"/>
+            <field name="code">EXP/%(year)s/</field>
+            <field name="subject">Experience Certificate</field>
+            <field name="employee_request" eval="True"/>
+            <field name="signatory_title">Human Resources</field>
+            <field name="body_html" type="html">
+<div>
+    <p>This is to certify that <strong t-out="object.name or ''"/> worked with
+        <t t-out="object.company_id.name or ''"/>
+        <t t-if="object.job_title"> as <t t-out="object.job_title"/></t>
+        from <t t-out="format_date(object.version_id.contract_date_start) or ''"/>
+        <t t-if="object.version_id.contract_date_end">
+            to <t t-out="format_date(object.version_id.contract_date_end)"/></t>
+        <t t-else=""> to date</t>.</p>
+    <p>We wish them every success in their future endeavours.</p>
+</div>
+            </field>
+        </record>
+
+        <record id="template_noc" model="om.print.template">
+            <field name="name">No Objection Certificate</field>
+            <field name="sequence">40</field>
+            <field name="model_id" ref="hr.model_hr_employee"/>
+            <field name="code">NOC/%(year)s/</field>
+            <field name="subject">No Objection Certificate</field>
+            <field name="employee_request" eval="True"/>
+            <field name="signatory_title">Human Resources</field>
+            <field name="body_html" type="html">
+<div>
+    <p>This is to certify that <strong t-out="object.name or ''"/>
+        <t t-if="object.job_title">, <t t-out="object.job_title"/>,</t> is employed with
+        <t t-out="object.company_id.name or ''"/>.</p>
+    <p>The company has no objection to the request made by the employee to the addressee of this
+        certificate.</p>
+</div>
+            </field>
+        </record>
+
+    </data>
+</odoo>

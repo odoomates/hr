@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_om_hr_certificates"
+              name="Certificates"
+              parent="hr.menu_hr_root"
+              sequence="86"/>
+
+    <menuitem id="menu_om_hr_certificate_my"
+              action="om_hr_certificate_action_my"
+              parent="om_hr_base.menu_my_hr"
+              sequence="40"/>
+
+    <menuitem id="menu_om_hr_certificate_to_approve"
+              action="om_hr_certificate_action_to_approve"
+              parent="menu_om_hr_certificates"
+              sequence="20"/>
+
+    <menuitem id="menu_om_hr_certificate_all"
+              action="om_hr_certificate_action"
+              parent="menu_om_hr_certificates"
+              sequence="30"
+              groups="hr.group_hr_user"/>
+
+    <menuitem id="menu_om_hr_certificate_issued"
+              action="om_print_issue_action_hr"
+              parent="menu_om_hr_certificates"
+              sequence="40"
+              groups="hr.group_hr_user"/>
+
+    <menuitem id="menu_om_hr_certificate_template"
+              action="om_print_template_action_hr"
+              parent="hr.menu_config_employee"
+              sequence="25"
+              groups="hr.group_hr_manager"/>
+
+</odoo>
