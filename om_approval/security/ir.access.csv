@@ -1,0 +1,13 @@
+id,name,model_id,group_id/id,operation,domain
+access_om_approval_flow_user,om.approval.flow.user,om.approval.flow,base.group_user,r,
+access_om_approval_flow_manager,om.approval.flow.manager,om.approval.flow,group_approval_manager,crud,
+access_om_approval_step_user,om.approval.step.user,om.approval.step,base.group_user,r,
+access_om_approval_step_manager,om.approval.step.manager,om.approval.step,group_approval_manager,crud,
+access_om_approval_button_user,om.approval.button.user,om.approval.button,base.group_user,r,
+access_om_approval_button_manager,om.approval.button.manager,om.approval.button,group_approval_manager,crud,
+access_om_approval_request_user,om.approval.request.user,om.approval.request,base.group_user,r,"['|', ('requester_id', '=', user.id), ('line_ids.approver_user_ids', 'in', user.id)]"
+access_om_approval_request_manager,om.approval.request.manager,om.approval.request,group_approval_manager,r,
+om_approval_request_company_rule,Approval requests: multi-company,om.approval.request,,crud,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"
+access_om_approval_line_user,om.approval.line.user,om.approval.line,base.group_user,r,"['|', ('request_id.requester_id', '=', user.id), ('request_id.line_ids.approver_user_ids', 'in', user.id)]"
+access_om_approval_line_manager,om.approval.line.manager,om.approval.line,group_approval_manager,r,
+access_om_approval_refuse_user,om.approval.refuse.user,om.approval.refuse,base.group_user,crud,
