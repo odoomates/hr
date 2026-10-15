@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="om_hr_asset_assignment_view_form_payroll" model="ir.ui.view">
+        <field name="name">om.hr.asset.assignment.view.form.payroll</field>
+        <field name="model">om.hr.asset.assignment</field>
+        <field name="inherit_id" ref="om_hr_asset.om_hr_asset_assignment_view_form"/>
+        <field name="arch" type="xml">
+            <field name="charge_amount" position="after">
+                <field name="payslip_id" invisible="not payslip_id" groups="om_hr_payroll.group_hr_payroll_user"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>
