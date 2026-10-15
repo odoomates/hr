@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="portal_entry_my_hr" model="portal.entry">
+        <field name="name">My HR</field>
+        <field name="description">Your payslips, time off, requests and documents</field>
+        <field name="url">/my/hr</field>
+        <field name="image" type="bytes" file="om_hr_portal/static/img/hr.svg"/>
+        <field name="placeholder_count">om_hr_employee_count</field>
+        <field name="sequence" eval="5"/>
+    </record>
+</odoo>

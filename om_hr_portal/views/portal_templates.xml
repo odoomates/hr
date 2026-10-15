@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- My HR > section > record, on every HR page of the portal -->
+    <template id="portal_breadcrumbs" inherit_id="portal.portal_breadcrumbs" name="My HR Breadcrumbs">
+        <xpath expr="//ol/li[1]" position="after">
+            <t t-if="page_name and page_name.startswith('om_hr')">
+                <li t-attf-class="breadcrumb-item #{'active' if page_name == 'om_hr' else ''}">
+                    <a t-if="page_name != 'om_hr'" href="/my/hr">My HR</a>
+                    <t t-else="">My HR</t>
+                </li>
+                <li t-if="om_section" t-attf-class="breadcrumb-item #{'' if om_record else 'active'}">
+                    <a t-if="om_record and om_section_url" t-att-href="om_section_url" t-out="om_section"/>
+                    <t t-else="" t-out="om_section"/>
+                </li>
+                <li t-if="om_record" class="breadcrumb-item active" t-out="om_record"/>
+            </t>
+        </xpath>
+    </template>
+
+    <!-- a card of the My HR page: the bridge modules add theirs in #om_hr_cards -->
+    <template id="portal_my_hr_card" name="My HR Card">
+        <a t-att-href="url" class="o_om_hr_card card text-decoration-none text-reset h-100">
+            <div class="card-body d-flex gap-3 align-items-start">
+                <i class="oi fs-2 text-primary" t-att-data-icon="icon" role="img" t-att-title="title"/>
+                <div>
+                    <h5 class="card-title mb-1" t-out="title"/>
+                    <p class="card-text text-muted small mb-0" t-out="text"/>
+                </div>
+            </div>
+        </a>
+    </template>
+
+    <template id="portal_my_hr" name="My HR">
+        <t t-call="portal.portal_layout">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <img t-if="employee.image_128" t-att-src="image_data_uri(employee.image_128)" class="rounded-circle"
+                     style="width: 64px; height: 64px; object-fit: cover;" alt="Photo"/>
+                <div>
+                    <h3 class="mb-0" t-out="employee.name"/>
+                    <div class="text-muted">
+                        <t t-out="employee.job_title or ''"/>
+                        <t t-if="employee.job_title and employee.department_id"> · </t>
+                        <t t-out="employee.department_id.name or ''"/>
+                    </div>
+                </div>
+            </div>
+            <div id="om_hr_cards" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+                <div class="col" style="order: 0;">
+                    <t t-call="om_hr_portal.portal_my_hr_card" url="'/my/hr/profile'" icon="'badge'"
+                       title.translate="My Profile" text.translate="Your job, your manager and your contacts at work"/>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="portal_my_hr_profile" name="My HR Profile">
+        <t t-call="portal.portal_layout">
+            <t t-set="om_section">My Profile</t>
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title" t-out="employee.name"/>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <dl class="row mb-0">
+                                <dt class="col-5">Job</dt><dd class="col-7" t-out="employee.job_title or employee.job_id.name or '-'"/>
+                                <dt class="col-5">Department</dt><dd class="col-7" t-out="employee.department_id.name or '-'"/>
+                                <dt class="col-5">Manager</dt><dd class="col-7" t-out="employee.parent_id.name or '-'"/>
+                                <dt class="col-5">Joined</dt>
+                                <dd class="col-7">
+                                    <span t-if="employee.version_id.contract_date_start" t-field="employee.version_id.contract_date_start"/>
+                                    <t t-else="">-</t>
+                                </dd>
+                            </dl>
+                        </div>
+                        <div class="col-md-6">
+                            <dl class="row mb-0">
+                                <dt class="col-5">Work Email</dt><dd class="col-7" t-out="employee.work_email or '-'"/>
+                                <dt class="col-5">Work Phone</dt><dd class="col-7" t-out="employee.work_phone or '-'"/>
+                                <dt class="col-5">Work Mobile</dt><dd class="col-7" t-out="employee.mobile_phone or '-'"/>
+                                <dt class="col-5">Company</dt><dd class="col-7" t-out="employee.company_id.name"/>
+                            </dl>
+                        </div>
+                    </div>
+                    <p class="text-muted small mt-3 mb-0">Something to correct? Tell HR.</p>
+                </div>
+            </div>
+        </t>
+    </template>
+
+</odoo>
