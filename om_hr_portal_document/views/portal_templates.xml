@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="portal_my_hr" inherit_id="om_hr_portal.portal_my_hr" name="My HR: Documents">
+        <xpath expr="//div[@id='om_hr_cards']" position="inside">
+            <div class="col" style="order: 5;">
+                <t t-call="om_hr_portal.portal_my_hr_card" url="'/my/hr/documents'" icon="'folder'"
+                   title.translate="Documents" text.translate="Your passport, visa, permits and IDs, with their expiry"/>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="portal_my_documents" name="My Documents">
+        <t t-call="portal.portal_layout">
+            <div t-if="uploaded" class="alert alert-success" role="status">Thank you: HR will check the new file.</div>
+            <div t-if="not documents" class="alert alert-info" role="status">HR has no document of yours yet.</div>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+                <div class="col" t-foreach="documents" t-as="rec">
+                    <div t-attf-class="card h-100 border-top border-4 #{'border-danger' if rec.state == 'expired' else 'border-warning' if rec.state == 'expiring' else 'border-success' if rec.state == 'valid' else ''}">
+                        <div class="card-body">
+                            <h5 class="card-title mb-1" t-out="rec.type_id.name"/>
+                            <div class="text-muted small" t-out="rec.number or ''"/>
+                            <div class="mt-2">
+                                <span t-if="rec.date_expiry" t-attf-class="badge #{'text-bg-danger' if rec.state == 'expired' else 'text-bg-warning' if rec.state == 'expiring' else 'text-bg-success'}">
+                                    <t t-if="rec.state == 'expired'">Expired</t><t t-else="">Expires</t>
+                                    <span t-field="rec.date_expiry"/>
+                                </span>
+                                <span t-else="" class="badge text-bg-light border">No expiry</span>
+                            </div>
+                            <ul class="list-unstyled small mt-2 mb-0">
+                                <li t-foreach="rec.attachment_ids" t-as="file">
+                                    <a t-attf-href="/my/hr/documents/#{rec.id}/files/#{file.id}"><i class="oi" data-icon="attach_file" title="File"/> <t t-out="file.name"/></a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <form t-attf-action="/my/hr/documents/#{rec.id}/upload" method="post" enctype="multipart/form-data"
+                                  class="d-flex gap-2 align-items-center">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                <input type="file" name="file" class="form-control form-control-sm" required="required"
+                                       t-attf-aria-label="New file for #{rec.type_id.name}"/>
+                                <button type="submit" class="btn btn-sm btn-secondary text-nowrap">Send</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>
