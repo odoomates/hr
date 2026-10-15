@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="om_hr_payroll_adjustment_type_view_list" model="ir.ui.view">
+        <field name="name">om.hr.payroll.adjustment.type.view.list</field>
+        <field name="model">om.hr.payroll.adjustment.type</field>
+        <field name="arch" type="xml">
+            <list string="Adjustment Types">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="kind" widget="badge" decoration-success="kind == 'addition'"
+                       decoration-warning="kind == 'deduction'"/>
+                <field name="category_id"/>
+                <field name="require_approval"/>
+                <field name="settle_at_exit"/>
+                <field name="company_id" groups="base.group_multi_company" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="om_hr_payroll_adjustment_type_view_form" model="ir.ui.view">
+        <field name="name">om.hr.payroll.adjustment.type.view.form</field>
+        <field name="model">om.hr.payroll.adjustment.type</field>
+        <field name="arch" type="xml">
+            <form string="Adjustment Type">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_rule" type="object" class="oe_stat_button" icon="fa-calculator"
+                                invisible="not rule_id" string="Salary Rule"/>
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="e.g. Bonus"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="kind" widget="radio" options="{'horizontal': true}"/>
+                            <field name="code"/>
+                            <field name="category_id"/>
+                            <field name="structure_ids" widget="many2many_tags"/>
+                        </group>
+                        <group>
+                            <field name="require_approval"/>
+                            <field name="settle_at_exit"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="rule_id" invisible="1"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                    <field name="description" placeholder="What it is for, shown when adding one"/>
+                    <div class="text-muted">
+                        The type has its own salary rule, kept in sync with it, in the structures above: set its
+                        accounts there when the payslips are posted in Accounting.
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="om_hr_payroll_adjustment_type_action" model="ir.actions.act_window">
+        <field name="name">Adjustment Types</field>
+        <field name="res_model">om.hr.payroll.adjustment.type</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'active_test': False}</field>
+    </record>
+
+</odoo>

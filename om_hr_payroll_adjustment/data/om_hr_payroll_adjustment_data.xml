@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="seq_om_hr_payroll_adjustment" model="ir.sequence">
+            <field name="name">Payroll Adjustment</field>
+            <field name="code">om.hr.payroll.adjustment</field>
+            <field name="prefix">ADJ/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="adjustment_type_bonus" model="om.hr.payroll.adjustment.type">
+            <field name="name">Bonus</field>
+            <field name="code">ADJ_BONUS</field>
+            <field name="sequence">10</field>
+            <field name="kind">addition</field>
+            <field name="category_id" ref="om_hr_payroll.ALW"/>
+        </record>
+
+        <record id="adjustment_type_commission" model="om.hr.payroll.adjustment.type">
+            <field name="name">Commission</field>
+            <field name="code">ADJ_COMMISSION</field>
+            <field name="sequence">20</field>
+            <field name="kind">addition</field>
+            <field name="category_id" ref="om_hr_payroll.ALW"/>
+        </record>
+
+        <record id="adjustment_type_allowance" model="om.hr.payroll.adjustment.type">
+            <field name="name">Other Allowance</field>
+            <field name="code">ADJ_ALLOWANCE</field>
+            <field name="sequence">30</field>
+            <field name="kind">addition</field>
+            <field name="category_id" ref="om_hr_payroll.ALW"/>
+            <field name="require_approval" eval="False"/>
+        </record>
+
+        <record id="adjustment_type_fine" model="om.hr.payroll.adjustment.type">
+            <field name="name">Fine</field>
+            <field name="code">ADJ_FINE</field>
+            <field name="sequence">40</field>
+            <field name="kind">deduction</field>
+            <field name="category_id" ref="om_hr_payroll.DED"/>
+            <field name="settle_at_exit" eval="True"/>
+        </record>
+
+        <record id="adjustment_type_court" model="om.hr.payroll.adjustment.type">
+            <field name="name">Court Deduction</field>
+            <field name="code">ADJ_COURT</field>
+            <field name="sequence">50</field>
+            <field name="kind">deduction</field>
+            <field name="category_id" ref="om_hr_payroll.DED"/>
+            <field name="require_approval" eval="False"/>
+            <field name="description">Deducted by order of a court, e.g. a garnishment: a percentage of the wage
+or a fixed amount, every month until the total ordered.</field>
+        </record>
+
+        <record id="adjustment_type_deduction" model="om.hr.payroll.adjustment.type">
+            <field name="name">Other Deduction</field>
+            <field name="code">ADJ_DEDUCTION</field>
+            <field name="sequence">60</field>
+            <field name="kind">deduction</field>
+            <field name="category_id" ref="om_hr_payroll.DED"/>
+            <field name="settle_at_exit" eval="True"/>
+        </record>
+
+        <record id="flow_om_hr_payroll_adjustment" model="om.approval.flow">
+            <field name="name">Payroll Adjustments</field>
+            <field name="model_id" ref="om_hr_payroll_adjustment.model_om_hr_payroll_adjustment"/>
+            <field name="fallback_group_id" ref="om_hr_payroll.group_hr_payroll_manager"/>
+            <field name="self_approve" eval="True"/>
+        </record>
+
+        <record id="flow_om_hr_payroll_adjustment_payroll" model="om.approval.step">
+            <field name="flow_id" ref="flow_om_hr_payroll_adjustment"/>
+            <field name="sequence">10</field>
+            <field name="name">Payroll Manager</field>
+            <field name="approver_type">group</field>
+            <field name="group_id" ref="om_hr_payroll.group_hr_payroll_manager"/>
+        </record>
+
+    </data>
+</odoo>

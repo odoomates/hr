@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="om_hr_payroll_adjustment_view_form" model="ir.ui.view">
+        <field name="name">om.hr.payroll.adjustment.view.form</field>
+        <field name="model">om.hr.payroll.adjustment</field>
+        <field name="arch" type="xml">
+            <form string="Payroll Adjustment">
+                <header>
+                    <button name="action_confirm" string="Confirm" type="object" class="btn-primary"
+                            invisible="state != 'draft'" groups="om_hr_payroll.group_hr_payroll_user"/>
+                    <button name="action_approval_approve" string="Approve" type="object" class="btn-primary"
+                            invisible="not can_approve"/>
+                    <button name="action_approval_open_refuse" string="Refuse" type="object"
+                            invisible="not can_approve"/>
+                    <button name="action_stop" string="Stop" type="object" invisible="state != 'running'"
+                            groups="om_hr_payroll.group_hr_payroll_user"
+                            confirm="Stop the adjustment? What is still due will not be paid or deducted."/>
+                    <button name="action_approval_reset" string="Back to Draft" type="object"
+                            invisible="state not in ('to_approve', 'refused', 'cancel')"
+                            groups="om_hr_payroll.group_hr_payroll_user"/>
+                    <button name="action_approval_cancel" string="Cancel" type="object"
+                            invisible="state not in ('draft', 'to_approve')"
+                            groups="om_hr_payroll.group_hr_payroll_user"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,to_approve,running,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="employee_id" readonly="state != 'draft'" widget="many2one_avatar_employee"/>
+                            <field name="type_id" readonly="state != 'draft'" options="{'no_create': True}"/>
+                            <field name="kind" invisible="not type_id"/>
+                            <field name="description"/>
+                            <field name="recurrence" readonly="state != 'draft'"/>
+                            <field name="date_start" readonly="state != 'draft'" widget="date"
+                                   options="{'format': 'MMMM yyyy'}"/>
+                            <field name="month_count" readonly="state != 'draft'" invisible="recurrence != 'months'"/>
+                        </group>
+                        <group>
+                            <field name="amount_type" widget="radio" options="{'horizontal': true}"
+                                   readonly="state != 'draft'"/>
+                            <field name="amount" readonly="state != 'draft'" invisible="amount_type != 'fixed'"
+                                   required="amount_type == 'fixed'"/>
+                            <label for="percent" invisible="amount_type != 'percent'"/>
+                            <div class="o_row" invisible="amount_type != 'percent'">
+                                <field name="percent" readonly="state != 'draft'" class="oe_inline"/>%
+                                <field name="percent_base" readonly="state != 'draft' or kind != 'deduction'"
+                                       class="oe_inline"/>
+                            </div>
+                            <field name="total_amount" readonly="state != 'draft'" invisible="recurrence != 'total'"
+                                   required="recurrence == 'total'"/>
+                            <field name="amount_done" invisible="state not in ('running', 'done')"/>
+                            <field name="amount_residual" invisible="state != 'running' or not amount_residual"/>
+                            <field name="department_id"/>
+                            <field name="company_id" groups="base.group_multi_company" readonly="state != 'draft'"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="approval_step" invisible="state != 'to_approve'"/>
+                            <field name="approver_user_ids" widget="many2many_avatar_user"
+                                   invisible="state != 'to_approve'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Months" name="lines" invisible="not line_ids">
+                            <field name="line_ids" readonly="1">
+                                <list>
+                                    <field name="date" widget="date" options="{'format': 'MMMM yyyy'}"/>
+                                    <field name="amount" sum="Total"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="adjustment_state" column_invisible="1"/>
+                                    <field name="state" widget="badge" decoration-success="state == 'paid'"/>
+                                    <field name="payslip_id" optional="show"
+                                           groups="om_hr_payroll.group_hr_payroll_user"/>
+                                    <field name="date_paid" optional="show"/>
+                                    <field name="note" optional="hide"/>
+                                    <button name="action_postpone" type="object" string="Postpone"
+                                            icon="schedule" groups="om_hr_payroll.group_hr_payroll_user"
+                                            invisible="state != 'to_pay' or adjustment_state != 'running'"/>
+                                    <button name="action_mark_paid" type="object" string="Done" icon="check"
+                                            groups="om_hr_payroll.group_hr_payroll_user"
+                                            invisible="state != 'to_pay' or adjustment_state != 'running'"
+                                            confirm="Mark this month as paid or deducted outside the payroll?"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Internal Note" name="note" groups="om_hr_payroll.group_hr_payroll_user">
+                            <field name="note"/>
+                        </page>
+                        <page string="Approvals" name="approvals" invisible="not approval_line_ids">
+                            <field name="approval_line_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="approver_user_ids" widget="many2many_avatar_user"/>
+                                    <field name="state" widget="badge" decoration-info="state == 'pending'"
+                                           decoration-success="state == 'approved'"
+                                           decoration-danger="state == 'refused'"/>
+                                    <field name="user_id" widget="many2one_avatar_user"/>
+                                    <field name="date"/>
+                                    <field name="note"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="om_hr_payroll_adjustment_view_list" model="ir.ui.view">
+        <field name="name">om.hr.payroll.adjustment.view.list</field>
+        <field name="model">om.hr.payroll.adjustment</field>
+        <field name="arch" type="xml">
+            <list string="Payroll Adjustments">
+                <field name="name"/>
+                <field name="employee_id" widget="many2one_avatar_employee"/>
+                <field name="type_id"/>
+                <field name="kind" optional="hide"/>
+                <field name="description" optional="show"/>
+                <field name="department_id" optional="hide"/>
+                <field name="date_start" widget="date" options="{'format': 'MMMM yyyy'}"/>
+                <field name="recurrence" optional="show"/>
+                <field name="amount_type" optional="hide"/>
+                <field name="amount" optional="show"/>
+                <field name="percent" optional="hide"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="amount_done" sum="Total"/>
+                <field name="amount_residual" optional="show" sum="Total"/>
+                <field name="state" widget="badge" decoration-info="state == 'to_approve'"
+                       decoration-success="state == 'running'" decoration-muted="state in ('done', 'cancel')"
+                       decoration-danger="state == 'refused'"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="om_hr_payroll_adjustment_view_search" model="ir.ui.view">
+        <field name="name">om.hr.payroll.adjustment.view.search</field>
+        <field name="model">om.hr.payroll.adjustment</field>
+        <field name="arch" type="xml">
+            <search string="Payroll Adjustments">
+                <field name="employee_id"/>
+                <field name="type_id"/>
+                <field name="department_id"/>
+                <field name="name"/>
+                <filter string="Additions" name="additions" domain="[('kind', '=', 'addition')]"/>
+                <filter string="Deductions" name="deductions" domain="[('kind', '=', 'deduction')]"/>
+                <separator/>
+                <filter string="To Approve" name="to_approve" domain="[('state', '=', 'to_approve')]"/>
+                <filter string="Running" name="running" domain="[('state', '=', 'running')]"/>
+                <filter string="Done" name="done" domain="[('state', '=', 'done')]"/>
+                <separator/>
+                <filter string="First Month" name="date_start" date="date_start"/>
+                <group>
+                    <filter string="Employee" name="group_employee" context="{'group_by': 'employee_id'}"/>
+                    <filter string="Type" name="group_type" context="{'group_by': 'type_id'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="om_hr_payroll_adjustment_action" model="ir.actions.act_window">
+        <field name="name">Payroll Adjustments</field>
+        <field name="res_model">om.hr.payroll.adjustment</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_running': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Add a bonus, a commission, a fine or a deduction</p>
+            <p>Once, for some months, or until a total: the payslips take it month after month.</p>
+        </field>
+    </record>
+
+    <record id="om_hr_payroll_adjustment_action_my" model="ir.actions.act_window">
+        <field name="name">My Adjustments</field>
+        <field name="res_model">om.hr.payroll.adjustment</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('employee_id.user_id', '=', uid), ('state', 'in', ('running', 'done'))]</field>
+        <field name="context">{'create': False, 'edit': False, 'delete': False}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No adjustment of your pay</p>
+            <p>The bonuses, commissions and deductions of your payslips show here.</p>
+        </field>
+    </record>
+
+    <record id="om_hr_payroll_adjustment_action_to_approve" model="ir.actions.act_window">
+        <field name="name">To Approve</field>
+        <field name="res_model">om.hr.payroll.adjustment</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', '=', 'to_approve'), ('approver_user_ids', 'in', uid)]</field>
+        <field name="context">{'create': False}</field>
+    </record>
+
+    <record id="om_hr_payroll_adjustment_line_view_list" model="ir.ui.view">
+        <field name="name">om.hr.payroll.adjustment.line.view.list</field>
+        <field name="model">om.hr.payroll.adjustment.line</field>
+        <field name="arch" type="xml">
+            <list string="Adjustment Months" create="0" edit="0">
+                <field name="date" widget="date" options="{'format': 'MMMM yyyy'}"/>
+                <field name="employee_id" widget="many2one_avatar_employee"/>
+                <field name="adjustment_id"/>
+                <field name="type_id"/>
+                <field name="amount" sum="Total"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="state" widget="badge" decoration-success="state == 'paid'"/>
+                <field name="payslip_id"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="om_hr_payroll_adjustment_line_view_search" model="ir.ui.view">
+        <field name="name">om.hr.payroll.adjustment.line.view.search</field>
+        <field name="model">om.hr.payroll.adjustment.line</field>
+        <field name="arch" type="xml">
+            <search string="Adjustment Months">
+                <field name="employee_id"/>
+                <field name="type_id"/>
+                <filter string="Due" name="due" domain="[('state', '=', 'to_pay')]"/>
+                <filter string="Done" name="paid" domain="[('state', '=', 'paid')]"/>
+                <filter string="Month" name="date" date="date"/>
+                <group>
+                    <filter string="Month" name="group_month" context="{'group_by': 'date:month'}"/>
+                    <filter string="Type" name="group_type" context="{'group_by': 'type_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="om_hr_payroll_adjustment_line_action" model="ir.actions.act_window">
+        <field name="name">Adjustments by Month</field>
+        <field name="res_model">om.hr.payroll.adjustment.line</field>
+        <field name="view_mode">list</field>
+        <field name="context">{'search_default_due': 1, 'search_default_group_month': 1}</field>
+    </record>
+
+    <record id="hr_payslip_view_form_om_adjustment" model="ir.ui.view">
+        <field name="name">hr.payslip.view.form.om.adjustment</field>
+        <field name="model">hr.payslip</field>
+        <field name="inherit_id" ref="om_hr_payroll.view_hr_payslip_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Adjustments" name="om_adjustments" invisible="not om_adjustment_line_ids">
+                    <field name="om_adjustment_line_ids">
+                        <list>
+                            <field name="adjustment_id"/>
+                            <field name="type_id"/>
+                            <field name="date" widget="date" options="{'format': 'MMMM yyyy'}"/>
+                            <field name="amount"/>
+                            <field name="currency_id" column_invisible="1"/>
+                            <field name="state" widget="badge" decoration-success="state == 'paid'"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

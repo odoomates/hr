@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="om_hr_payroll_adjustment_wizard_view_form" model="ir.ui.view">
+        <field name="name">om.hr.payroll.adjustment.wizard.view.form</field>
+        <field name="model">om.hr.payroll.adjustment.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Add Payroll Adjustments">
+                <group>
+                    <group>
+                        <field name="department_id"/>
+                        <field name="type_id" options="{'no_create': True}"/>
+                        <field name="kind" invisible="1"/>
+                        <field name="description"/>
+                        <field name="recurrence"/>
+                        <field name="date_start" widget="date" options="{'format': 'MMMM yyyy'}"/>
+                        <field name="month_count" invisible="recurrence != 'months'"/>
+                    </group>
+                    <group>
+                        <field name="amount_type" widget="radio" options="{'horizontal': true}"/>
+                        <field name="amount" invisible="amount_type != 'fixed'" required="amount_type == 'fixed'"/>
+                        <label for="percent" invisible="amount_type != 'percent'"/>
+                        <div class="o_row" invisible="amount_type != 'percent'">
+                            <field name="percent" class="oe_inline"/>%
+                            <field name="percent_base" readonly="kind != 'deduction'" class="oe_inline"/>
+                        </div>
+                        <field name="total_amount" invisible="recurrence != 'total'" required="recurrence == 'total'"/>
+                        <field name="confirm"/>
+                        <field name="currency_id" invisible="1"/>
+                        <field name="company_id" invisible="1"/>
+                    </group>
+                </group>
+                <field name="employee_ids" widget="many2many_tags_avatar"
+                       domain="[('company_id', 'in', [company_id, False])]"/>
+                <footer>
+                    <button name="action_create" string="Add" type="object" class="btn-primary"/>
+                    <button string="Discard" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="om_hr_payroll_adjustment_wizard_action" model="ir.actions.act_window">
+        <field name="name">Add Adjustments</field>
+        <field name="res_model">om.hr.payroll.adjustment.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>
