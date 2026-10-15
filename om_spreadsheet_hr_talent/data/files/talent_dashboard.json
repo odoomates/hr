@@ -1,0 +1,865 @@
+{
+    "version": "19.3.10",
+    "sheets": [
+        {
+            "id": "951ab88e-786e-5430-91ee-7afe8ac1c999",
+            "name": "Dashboard",
+            "colNumber": 20,
+            "rowNumber": 80,
+            "rows": {},
+            "cols": {},
+            "merges": [],
+            "cells": {
+                "A38": "=_t(\"Documents to Renew\")",
+                "A39": "=ODOO.LIST(1,20)"
+            },
+            "styles": {
+                "A38": 2
+            },
+            "formats": {},
+            "borders": {},
+            "conditionalFormats": [],
+            "dataValidationRules": [],
+            "figures": [
+                {
+                    "id": "9ecce7c4-85f4-5b4d-92d1-86469efd495a",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 0,
+                        "y": 0
+                    },
+                    "width": 323,
+                    "height": 110,
+                    "tag": "chart",
+                    "data": {
+                        "type": "scorecard",
+                        "title": {
+                            "text": "Appraisals to Do",
+                            "color": "#01666B",
+                            "bold": true
+                        },
+                        "background": "",
+                        "keyValue": "Data!B1",
+                        "baselineColorDown": "#00A04A",
+                        "baselineColorUp": "#DC6965",
+                        "baselineMode": "percentage",
+                        "humanize": true,
+                        "chartId": "9ecce7c4-85f4-5b4d-92d1-86469efd495a"
+                    }
+                },
+                {
+                    "id": "ef4d2276-c648-5ca0-88de-046c181870ca",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 333,
+                        "y": 0
+                    },
+                    "width": 323,
+                    "height": 110,
+                    "tag": "chart",
+                    "data": {
+                        "type": "scorecard",
+                        "title": {
+                            "text": "Appraisals Done",
+                            "color": "#01666B",
+                            "bold": true
+                        },
+                        "background": "",
+                        "keyValue": "Data!B2",
+                        "baselineColorDown": "#DC6965",
+                        "baselineColorUp": "#00A04A",
+                        "baselineMode": "percentage",
+                        "humanize": true,
+                        "chartId": "ef4d2276-c648-5ca0-88de-046c181870ca"
+                    }
+                },
+                {
+                    "id": "5802e730-aac1-52b3-9b6c-6ebe32bfd540",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 666,
+                        "y": 0
+                    },
+                    "width": 323,
+                    "height": 110,
+                    "tag": "chart",
+                    "data": {
+                        "type": "scorecard",
+                        "title": {
+                            "text": "Documents Expiring",
+                            "color": "#01666B",
+                            "bold": true
+                        },
+                        "background": "",
+                        "keyValue": "Data!B3",
+                        "baselineColorDown": "#00A04A",
+                        "baselineColorUp": "#DC6965",
+                        "baselineMode": "percentage",
+                        "humanize": true,
+                        "chartId": "5802e730-aac1-52b3-9b6c-6ebe32bfd540"
+                    }
+                },
+                {
+                    "id": "00532b70-0cab-5559-9cbd-4bb9fc3134be",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 0,
+                        "y": 120
+                    },
+                    "width": 323,
+                    "height": 110,
+                    "tag": "chart",
+                    "data": {
+                        "type": "scorecard",
+                        "title": {
+                            "text": "Documents Expired",
+                            "color": "#01666B",
+                            "bold": true
+                        },
+                        "background": "",
+                        "keyValue": "Data!B4",
+                        "baselineColorDown": "#00A04A",
+                        "baselineColorUp": "#DC6965",
+                        "baselineMode": "percentage",
+                        "humanize": true,
+                        "chartId": "00532b70-0cab-5559-9cbd-4bb9fc3134be"
+                    }
+                },
+                {
+                    "id": "f67d59e4-3f70-58d1-b26b-ff8ed797ac4b",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 333,
+                        "y": 120
+                    },
+                    "width": 323,
+                    "height": 110,
+                    "tag": "chart",
+                    "data": {
+                        "type": "scorecard",
+                        "title": {
+                            "text": "Exits in Progress",
+                            "color": "#01666B",
+                            "bold": true
+                        },
+                        "background": "",
+                        "keyValue": "Data!B5",
+                        "baselineColorDown": "#00A04A",
+                        "baselineColorUp": "#DC6965",
+                        "baselineMode": "percentage",
+                        "humanize": true,
+                        "chartId": "f67d59e4-3f70-58d1-b26b-ff8ed797ac4b"
+                    }
+                },
+                {
+                    "id": "6888182f-3af8-5de8-a0c4-6056abf38326",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 666,
+                        "y": 120
+                    },
+                    "width": 323,
+                    "height": 110,
+                    "tag": "chart",
+                    "data": {
+                        "type": "scorecard",
+                        "title": {
+                            "text": "Assets with Employees",
+                            "color": "#01666B",
+                            "bold": true
+                        },
+                        "background": "",
+                        "keyValue": "Data!B6",
+                        "baselineColorDown": "#DC6965",
+                        "baselineColorUp": "#00A04A",
+                        "baselineMode": "percentage",
+                        "humanize": true,
+                        "chartId": "6888182f-3af8-5de8-a0c4-6056abf38326"
+                    }
+                },
+                {
+                    "id": "fa564083-5ce9-5f8d-9aca-4f25b6db264f",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 0,
+                        "y": 240
+                    },
+                    "width": 489,
+                    "height": 280,
+                    "tag": "carousel",
+                    "data": {
+                        "chartDefinitions": {
+                            "8bb2d071-a810-5c7d-a163-de2849b6fc35": {
+                                "type": "bar",
+                                "title": {},
+                                "legendPosition": "top",
+                                "humanize": true,
+                                "dataSource": {
+                                    "type": "odoo",
+                                    "metaData": {
+                                        "groupBy": [
+                                            "rating_id"
+                                        ],
+                                        "measure": "__count",
+                                        "order": null,
+                                        "resModel": "om.hr.appraisal",
+                                        "mode": "bar",
+                                        "cumulatedStart": false
+                                    },
+                                    "searchParams": {
+                                        "comparison": null,
+                                        "context": {},
+                                        "domain": [
+                                            [
+                                                "state",
+                                                "=",
+                                                "done"
+                                            ]
+                                        ],
+                                        "groupBy": [
+                                            "rating_id"
+                                        ],
+                                        "orderBy": []
+                                    },
+                                    "actionXmlId": "om_hr_appraisal.om_hr_appraisal_action"
+                                },
+                                "dataSetStyles": {},
+                                "stacked": false
+                            }
+                        },
+                        "title": {
+                            "text": "Ratings of the Appraisals Done",
+                            "fontSize": 16,
+                            "bold": true,
+                            "color": "#01666B"
+                        },
+                        "items": [
+                            {
+                                "type": "chart",
+                                "chartId": "8bb2d071-a810-5c7d-a163-de2849b6fc35"
+                            }
+                        ],
+                        "fieldMatching": {
+                            "8bb2d071-a810-5c7d-a163-de2849b6fc35": {
+                                "c7ffee0c-33db-50a3-b786-1f7cf7b7d1af": {
+                                    "chain": "date_done",
+                                    "type": "date"
+                                },
+                                "fc3c1e7f-4c7d-54d3-92ef-d465ceb001e8": {
+                                    "chain": "department_id",
+                                    "type": "many2one"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "id": "fdbc5f3f-e4fa-5530-9e15-496bcb436e2f",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 499,
+                        "y": 240
+                    },
+                    "width": 489,
+                    "height": 280,
+                    "tag": "carousel",
+                    "data": {
+                        "chartDefinitions": {
+                            "3b2ae32f-8b2b-514c-92cf-201f8ae19ba6": {
+                                "type": "pie",
+                                "title": {},
+                                "legendPosition": "top",
+                                "humanize": true,
+                                "dataSource": {
+                                    "type": "odoo",
+                                    "metaData": {
+                                        "groupBy": [
+                                            "state"
+                                        ],
+                                        "measure": "__count",
+                                        "order": null,
+                                        "resModel": "om.hr.appraisal",
+                                        "mode": "pie",
+                                        "cumulatedStart": false
+                                    },
+                                    "searchParams": {
+                                        "comparison": null,
+                                        "context": {},
+                                        "domain": [
+                                            [
+                                                "state",
+                                                "!=",
+                                                "cancel"
+                                            ]
+                                        ],
+                                        "groupBy": [
+                                            "state"
+                                        ],
+                                        "orderBy": []
+                                    },
+                                    "actionXmlId": "om_hr_appraisal.om_hr_appraisal_action"
+                                },
+                                "dataSetStyles": {}
+                            }
+                        },
+                        "title": {
+                            "text": "Appraisals by Status",
+                            "fontSize": 16,
+                            "bold": true,
+                            "color": "#01666B"
+                        },
+                        "items": [
+                            {
+                                "type": "chart",
+                                "chartId": "3b2ae32f-8b2b-514c-92cf-201f8ae19ba6"
+                            }
+                        ],
+                        "fieldMatching": {
+                            "3b2ae32f-8b2b-514c-92cf-201f8ae19ba6": {
+                                "fc3c1e7f-4c7d-54d3-92ef-d465ceb001e8": {
+                                    "chain": "department_id",
+                                    "type": "many2one"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "id": "f32fde5d-5041-5e04-9268-0158bb600e74",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 0,
+                        "y": 530
+                    },
+                    "width": 489,
+                    "height": 280,
+                    "tag": "carousel",
+                    "data": {
+                        "chartDefinitions": {
+                            "3a21bc9d-9eba-512d-a974-4af4518b4ae2": {
+                                "type": "bar",
+                                "title": {},
+                                "legendPosition": "top",
+                                "humanize": true,
+                                "dataSource": {
+                                    "type": "odoo",
+                                    "metaData": {
+                                        "groupBy": [
+                                            "departure_reason_id"
+                                        ],
+                                        "measure": "__count",
+                                        "order": null,
+                                        "resModel": "om.hr.exit",
+                                        "mode": "bar",
+                                        "cumulatedStart": false
+                                    },
+                                    "searchParams": {
+                                        "comparison": null,
+                                        "context": {},
+                                        "domain": [
+                                            [
+                                                "state",
+                                                "in",
+                                                [
+                                                    "approved",
+                                                    "done"
+                                                ]
+                                            ]
+                                        ],
+                                        "groupBy": [
+                                            "departure_reason_id"
+                                        ],
+                                        "orderBy": []
+                                    },
+                                    "actionXmlId": "om_hr_exit.om_hr_exit_action"
+                                },
+                                "dataSetStyles": {},
+                                "stacked": false
+                            }
+                        },
+                        "title": {
+                            "text": "Exits by Reason",
+                            "fontSize": 16,
+                            "bold": true,
+                            "color": "#01666B"
+                        },
+                        "items": [
+                            {
+                                "type": "chart",
+                                "chartId": "3a21bc9d-9eba-512d-a974-4af4518b4ae2"
+                            }
+                        ],
+                        "fieldMatching": {
+                            "3a21bc9d-9eba-512d-a974-4af4518b4ae2": {
+                                "c7ffee0c-33db-50a3-b786-1f7cf7b7d1af": {
+                                    "chain": "date_notice",
+                                    "type": "date"
+                                },
+                                "fc3c1e7f-4c7d-54d3-92ef-d465ceb001e8": {
+                                    "chain": "department_id",
+                                    "type": "many2one"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "id": "8fbaf3c4-ce8d-557b-8f4e-03194763acf5",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 499,
+                        "y": 530
+                    },
+                    "width": 489,
+                    "height": 280,
+                    "tag": "carousel",
+                    "data": {
+                        "chartDefinitions": {
+                            "a117221b-9f64-59a1-b670-6b75e857acba": {
+                                "type": "bar",
+                                "title": {},
+                                "legendPosition": "top",
+                                "humanize": true,
+                                "dataSource": {
+                                    "type": "odoo",
+                                    "metaData": {
+                                        "groupBy": [
+                                            "type_id"
+                                        ],
+                                        "measure": "__count",
+                                        "order": null,
+                                        "resModel": "om.document",
+                                        "mode": "bar",
+                                        "cumulatedStart": false
+                                    },
+                                    "searchParams": {
+                                        "comparison": null,
+                                        "context": {},
+                                        "domain": [
+                                            [
+                                                "res_model",
+                                                "=",
+                                                "hr.employee"
+                                            ],
+                                            [
+                                                "state",
+                                                "in",
+                                                [
+                                                    "expiring",
+                                                    "expired"
+                                                ]
+                                            ]
+                                        ],
+                                        "groupBy": [
+                                            "type_id"
+                                        ],
+                                        "orderBy": []
+                                    },
+                                    "actionXmlId": "om_hr_document.om_document_action_hr"
+                                },
+                                "dataSetStyles": {},
+                                "stacked": false
+                            }
+                        },
+                        "title": {
+                            "text": "Documents to Renew by Type",
+                            "fontSize": 16,
+                            "bold": true,
+                            "color": "#01666B"
+                        },
+                        "items": [
+                            {
+                                "type": "chart",
+                                "chartId": "a117221b-9f64-59a1-b670-6b75e857acba"
+                            }
+                        ],
+                        "fieldMatching": {
+                            "a117221b-9f64-59a1-b670-6b75e857acba": {
+                                "fc3c1e7f-4c7d-54d3-92ef-d465ceb001e8": {
+                                    "chain": "department_id",
+                                    "type": "many2one"
+                                }
+                            }
+                        }
+                    }
+                }
+            ],
+            "tables": [],
+            "areGridLinesVisible": false,
+            "isVisible": true,
+            "headerGroups": {
+                "ROW": [],
+                "COL": []
+            },
+            "comments": {},
+            "backgroundColor": "#F9FAFB"
+        },
+        {
+            "id": "52ec117e-e26a-5f8d-bfdb-d29b1c3422f1",
+            "name": "Data",
+            "colNumber": 26,
+            "rowNumber": 100,
+            "rows": {},
+            "cols": {
+                "0": {
+                    "size": 200
+                },
+                "1": {
+                    "size": 130
+                }
+            },
+            "merges": [],
+            "cells": {
+                "A1": "=_t(\"Appraisals to do\")",
+                "B1": "=0+PIVOT.VALUE(1,\"__count\")",
+                "A2": "=_t(\"Appraisals done\")",
+                "B2": "=0+PIVOT.VALUE(2,\"__count\")",
+                "A3": "=_t(\"Documents expiring\")",
+                "B3": "=0+PIVOT.VALUE(3,\"__count\")",
+                "A4": "=_t(\"Documents expired\")",
+                "B4": "=0+PIVOT.VALUE(4,\"__count\")",
+                "A5": "=_t(\"Exits in progress\")",
+                "B5": "=0+PIVOT.VALUE(5,\"__count\")",
+                "A6": "=_t(\"Assets assigned\")",
+                "B6": "=0+PIVOT.VALUE(6,\"__count\")"
+            },
+            "styles": {
+                "A1": 1,
+                "A2": 1,
+                "A3": 1,
+                "A4": 1,
+                "A5": 1,
+                "A6": 1
+            },
+            "formats": {
+                "B1": 1,
+                "B2": 1,
+                "B3": 1,
+                "B4": 1,
+                "B5": 1,
+                "B6": 1
+            },
+            "borders": {},
+            "conditionalFormats": [],
+            "dataValidationRules": [],
+            "figures": [],
+            "tables": [],
+            "areGridLinesVisible": true,
+            "isVisible": true,
+            "headerGroups": {
+                "ROW": [],
+                "COL": []
+            },
+            "comments": {}
+        }
+    ],
+    "styles": {
+        "1": {
+            "textColor": "#434343"
+        },
+        "2": {
+            "textColor": "#434343",
+            "bold": true,
+            "fontSize": 11,
+            "fillColor": "#E7F2F2"
+        }
+    },
+    "formats": {
+        "1": "#,##0"
+    },
+    "borders": {},
+    "revisionId": "START_REVISION",
+    "uniqueFigureIds": true,
+    "settings": {
+        "locale": {
+            "name": "English (US)",
+            "code": "en_US",
+            "thousandsSeparator": ",",
+            "decimalSeparator": ".",
+            "dateFormat": "mm/dd/yyyy",
+            "timeFormat": "hh:mm:ss",
+            "formulaArgSeparator": ",",
+            "weekStart": 7
+        }
+    },
+    "pivots": {
+        "1": {
+            "type": "ODOO",
+            "id": "1",
+            "formulaId": "1",
+            "name": "Appraisals to Do",
+            "model": "om.hr.appraisal",
+            "domain": [
+                [
+                    "state",
+                    "in",
+                    [
+                        "new",
+                        "self",
+                        "review"
+                    ]
+                ]
+            ],
+            "context": {},
+            "measures": [
+                {
+                    "id": "__count",
+                    "fieldName": "__count"
+                }
+            ],
+            "rows": [],
+            "columns": [],
+            "fieldMatching": {
+                "fc3c1e7f-4c7d-54d3-92ef-d465ceb001e8": {
+                    "chain": "department_id",
+                    "type": "many2one"
+                }
+            }
+        },
+        "2": {
+            "type": "ODOO",
+            "id": "2",
+            "formulaId": "2",
+            "name": "Appraisals Done",
+            "model": "om.hr.appraisal",
+            "domain": [
+                [
+                    "state",
+                    "=",
+                    "done"
+                ]
+            ],
+            "context": {},
+            "measures": [
+                {
+                    "id": "__count",
+                    "fieldName": "__count"
+                }
+            ],
+            "rows": [],
+            "columns": [],
+            "fieldMatching": {
+                "c7ffee0c-33db-50a3-b786-1f7cf7b7d1af": {
+                    "chain": "date_done",
+                    "type": "date",
+                    "offset": 0
+                },
+                "fc3c1e7f-4c7d-54d3-92ef-d465ceb001e8": {
+                    "chain": "department_id",
+                    "type": "many2one"
+                }
+            }
+        },
+        "3": {
+            "type": "ODOO",
+            "id": "3",
+            "formulaId": "3",
+            "name": "Documents Expiring",
+            "model": "om.document",
+            "domain": [
+                [
+                    "res_model",
+                    "=",
+                    "hr.employee"
+                ],
+                [
+                    "state",
+                    "in",
+                    [
+                        "expiring"
+                    ]
+                ]
+            ],
+            "context": {},
+            "measures": [
+                {
+                    "id": "__count",
+                    "fieldName": "__count"
+                }
+            ],
+            "rows": [],
+            "columns": [],
+            "fieldMatching": {
+                "fc3c1e7f-4c7d-54d3-92ef-d465ceb001e8": {
+                    "chain": "department_id",
+                    "type": "many2one"
+                }
+            }
+        },
+        "4": {
+            "type": "ODOO",
+            "id": "4",
+            "formulaId": "4",
+            "name": "Documents Expired",
+            "model": "om.document",
+            "domain": [
+                [
+                    "res_model",
+                    "=",
+                    "hr.employee"
+                ],
+                [
+                    "state",
+                    "in",
+                    [
+                        "expired"
+                    ]
+                ]
+            ],
+            "context": {},
+            "measures": [
+                {
+                    "id": "__count",
+                    "fieldName": "__count"
+                }
+            ],
+            "rows": [],
+            "columns": [],
+            "fieldMatching": {
+                "fc3c1e7f-4c7d-54d3-92ef-d465ceb001e8": {
+                    "chain": "department_id",
+                    "type": "many2one"
+                }
+            }
+        },
+        "5": {
+            "type": "ODOO",
+            "id": "5",
+            "formulaId": "5",
+            "name": "Exits in Progress",
+            "model": "om.hr.exit",
+            "domain": [
+                [
+                    "state",
+                    "in",
+                    [
+                        "to_approve",
+                        "approved"
+                    ]
+                ]
+            ],
+            "context": {},
+            "measures": [
+                {
+                    "id": "__count",
+                    "fieldName": "__count"
+                }
+            ],
+            "rows": [],
+            "columns": [],
+            "fieldMatching": {
+                "fc3c1e7f-4c7d-54d3-92ef-d465ceb001e8": {
+                    "chain": "department_id",
+                    "type": "many2one"
+                }
+            }
+        },
+        "6": {
+            "type": "ODOO",
+            "id": "6",
+            "formulaId": "6",
+            "name": "Assets Assigned",
+            "model": "maintenance.equipment",
+            "domain": [
+                [
+                    "om_asset_state",
+                    "=",
+                    "assigned"
+                ]
+            ],
+            "context": {},
+            "measures": [
+                {
+                    "id": "__count",
+                    "fieldName": "__count"
+                }
+            ],
+            "rows": [],
+            "columns": [],
+            "fieldMatching": {}
+        }
+    },
+    "pivotNextId": 7,
+    "customTableStyles": {},
+    "namedRanges": [],
+    "globalFilters": [
+        {
+            "id": "c7ffee0c-33db-50a3-b786-1f7cf7b7d1af",
+            "type": "date",
+            "label": "Period",
+            "defaultValue": "this_year"
+        },
+        {
+            "id": "fc3c1e7f-4c7d-54d3-92ef-d465ceb001e8",
+            "type": "relation",
+            "label": "Department",
+            "modelName": "hr.department",
+            "defaultValueDisplayNames": []
+        }
+    ],
+    "lists": {
+        "1": {
+            "id": "1",
+            "name": "Documents to Renew",
+            "model": "om.document",
+            "domain": [
+                [
+                    "res_model",
+                    "=",
+                    "hr.employee"
+                ],
+                [
+                    "state",
+                    "in",
+                    [
+                        "expiring",
+                        "expired"
+                    ]
+                ]
+            ],
+            "context": {},
+            "columns": [
+                {
+                    "name": "employee_id",
+                    "string": "Employee"
+                },
+                {
+                    "name": "type_id",
+                    "string": "Type"
+                },
+                {
+                    "name": "number",
+                    "string": "Number"
+                },
+                {
+                    "name": "date_expiry",
+                    "string": "Expires On"
+                }
+            ],
+            "orderBy": [
+                {
+                    "name": "date_expiry",
+                    "asc": true
+                }
+            ],
+            "fieldMatching": {
+                "fc3c1e7f-4c7d-54d3-92ef-d465ceb001e8": {
+                    "chain": "department_id",
+                    "type": "many2one"
+                }
+            }
+        }
+    },
+    "listNextId": 2,
+    "odooLinkReferences": {}
+}
