@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="om_hr_gratuity_scheme_view_list" model="ir.ui.view">
+        <field name="name">om.hr.gratuity.scheme.view.list</field>
+        <field name="model">om.hr.gratuity.scheme</field>
+        <field name="arch" type="xml">
+            <list string="Gratuity Schemes">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="min_years"/>
+                <field name="max_months"/>
+                <field name="company_id" groups="base.group_multi_company" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="om_hr_gratuity_scheme_view_form" model="ir.ui.view">
+        <field name="name">om.hr.gratuity.scheme.view.form</field>
+        <field name="model">om.hr.gratuity.scheme</field>
+        <field name="arch" type="xml">
+            <form string="Gratuity Scheme">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. End of Service"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="days_per_month"/>
+                            <field name="min_years"/>
+                            <field name="max_months"/>
+                        </group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                    <separator string="Days of Pay per Year of Service"/>
+                    <field name="band_ids">
+                        <list editable="bottom">
+                            <field name="from_years"/>
+                            <field name="to_years"/>
+                            <field name="days_per_year"/>
+                        </list>
+                    </field>
+                    <separator string="Part Kept by Reason of Leaving"/>
+                    <field name="factor_ids">
+                        <list editable="bottom">
+                            <field name="departure_reason_ids" widget="many2many_tags"/>
+                            <field name="from_years"/>
+                            <field name="to_years"/>
+                            <field name="factor"/>
+                        </list>
+                    </field>
+                    <div class="text-muted">
+                        Each year of service earns the days of pay of its band, e.g. 21 days for each of the first
+                        five years and 30 days for each year after. The reasons of leaving listed below keep only part
+                        of it, e.g. a third for a resignation between 2 and 5 years; the others keep all of it.
+                    </div>
+                    <field name="note" placeholder="Notes, e.g. the law the scheme follows"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="om_hr_gratuity_scheme_action" model="ir.actions.act_window">
+        <field name="name">Gratuity Schemes</field>
+        <field name="res_model">om.hr.gratuity.scheme</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Describe your end of service gratuity</p>
+            <p>The days of pay a year of service earns, and how much of it each reason of leaving keeps.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_om_hr_gratuity_scheme"
+              action="om_hr_gratuity_scheme_action"
+              parent="om_hr_approval.menu_om_hr_approval_configuration"
+              sequence="45"/>
+
+</odoo>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="om_hr_exit_view_form" model="ir.ui.view">
+        <field name="name">om.hr.exit.view.form.gratuity</field>
+        <field name="model">om.hr.exit</field>
+        <field name="inherit_id" ref="om_hr_exit.om_hr_exit_view_form"/>
+        <field name="arch" type="xml">
+            <page name="interview" position="before">
+                <page string="Gratuity" name="gratuity" groups="hr.group_hr_user"
+                      invisible="state in ('refused', 'cancel')">
+                    <group>
+                        <group>
+                            <field name="gratuity_scheme_id" options="{'no_create': True}"
+                                   readonly="state == 'done'"/>
+                            <field name="gratuity_date_start" readonly="state == 'done'"/>
+                        </group>
+                        <group>
+                            <field name="gratuity_years"/>
+                            <field name="gratuity_wage"/>
+                            <field name="gratuity_days"/>
+                            <field name="gratuity_amount" class="fw-bold"/>
+                            <field name="gratuity_explanation"/>
+                        </group>
+                    </group>
+                    <button name="action_compute_gratuity" type="object" string="Compute Gratuity"
+                            class="btn-secondary" invisible="state == 'done'"/>
+                </page>
+            </page>
+        </field>
+    </record>
+
+</odoo>

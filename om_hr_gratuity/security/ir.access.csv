@@ -1,0 +1,8 @@
+id,name,model_id,group_id/id,operation,domain
+access_om_hr_gratuity_scheme_user,om.hr.gratuity.scheme.user,om.hr.gratuity.scheme,hr.group_hr_user,r,
+access_om_hr_gratuity_scheme_manager,om.hr.gratuity.scheme.manager,om.hr.gratuity.scheme,hr.group_hr_manager,crud,
+om_hr_gratuity_scheme_company_rule,Gratuity schemes: multi-company,om.hr.gratuity.scheme,,crud,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"
+access_om_hr_gratuity_band_user,om.hr.gratuity.band.user,om.hr.gratuity.band,hr.group_hr_user,r,
+access_om_hr_gratuity_band_manager,om.hr.gratuity.band.manager,om.hr.gratuity.band,hr.group_hr_manager,crud,
+access_om_hr_gratuity_factor_user,om.hr.gratuity.factor.user,om.hr.gratuity.factor,hr.group_hr_user,r,
+access_om_hr_gratuity_factor_manager,om.hr.gratuity.factor.manager,om.hr.gratuity.factor,hr.group_hr_manager,crud,
