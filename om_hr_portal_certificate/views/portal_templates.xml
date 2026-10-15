@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="portal_my_hr" inherit_id="om_hr_portal.portal_my_hr" name="My HR: Certificates">
+        <xpath expr="//div[@id='om_hr_cards']" position="inside">
+            <div class="col" style="order: 4;">
+                <t t-call="om_hr_portal.portal_my_hr_card" url="'/my/hr/certificates'" icon="'workspace_premium'"
+                   title.translate="Certificates" text.translate="Salary, employment or experience certificates, NOC"/>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="portal_my_certificates" name="My Certificates">
+        <t t-call="portal.portal_layout">
+            <div class="card mb-4">
+                <div class="card-header"><h5 class="mb-0">Ask for a Certificate</h5></div>
+                <div class="card-body">
+                    <div t-if="error" class="alert alert-danger" role="alert" t-out="error"/>
+                    <form action="/my/hr/certificates/new" method="post" class="row g-3">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <div class="col-md-4">
+                            <label class="form-label" for="om_cert_template">Certificate</label>
+                            <select class="form-select" id="om_cert_template" name="template_id" required="required">
+                                <option value="">Choose...</option>
+                                <option t-foreach="templates" t-as="template" t-att-value="template.id"
+                                        t-att-selected="str(template.id) == form.get('template_id')" t-out="template.name"/>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="om_cert_addressee">For</label>
+                            <input type="text" class="form-control" id="om_cert_addressee" name="addressee"
+                                   placeholder="e.g. a bank or an embassy" t-att-value="form.get('addressee')"/>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="om_cert_purpose">Purpose</label>
+                            <input type="text" class="form-control" id="om_cert_purpose" name="purpose" t-att-value="form.get('purpose')"/>
+                        </div>
+                        <div class="col-12"><button type="submit" class="btn btn-primary">Send the Request</button></div>
+                    </form>
+                </div>
+            </div>
+            <t t-if="certificates" t-call="portal.portal_table">
+                <thead><tr><th>Request</th><th>Certificate</th><th>For</th><th>Asked On</th><th>Status</th><th/></tr></thead>
+                <tbody>
+                    <tr t-foreach="certificates" t-as="rec">
+                        <td t-out="rec.name"/>
+                        <td t-out="rec.template_id.name"/>
+                        <td t-out="rec.addressee or ''"/>
+                        <td><span t-field="rec.date"/></td>
+                        <td><span t-attf-class="badge #{'text-bg-success' if rec.state in ('issued',) else 'text-bg-danger' if rec.state in ('refused', 'cancel') else 'text-bg-info'}" t-field="rec.state"/></td>
+                        <td class="text-end">
+                            <a t-if="rec.state == 'issued'" t-attf-href="/my/hr/certificates/#{rec.id}/pdf" class="btn btn-sm btn-secondary">
+                                <i class="oi" data-icon="download" title="Download"/> PDF
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </t>
+        </t>
+    </template>
+</odoo>
