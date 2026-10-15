@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="om_hr_loan_type_view_form_account" model="ir.ui.view">
+        <field name="name">om.hr.loan.type.view.form.account</field>
+        <field name="model">om.hr.loan.type</field>
+        <field name="inherit_id" ref="om_hr_loan.om_hr_loan_type_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='single_running']/.." position="after">
+                <group string="Accounting" groups="account.group_account_manager">
+                    <field name="account_id" options="{'no_create': True}"/>
+                    <field name="journal_id" options="{'no_create': True}"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="om_hr_loan_view_form_account" model="ir.ui.view">
+        <field name="name">om.hr.loan.view.form.account</field>
+        <field name="model">om.hr.loan</field>
+        <field name="inherit_id" ref="om_hr_loan.om_hr_loan_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('oe_title')]" position="before">
+                <div class="oe_button_box" name="button_box">
+                    <button name="action_open_payments" type="object" class="oe_stat_button" icon="payments"
+                            invisible="not payment_count" groups="account.group_account_invoice">
+                        <field name="payment_count" widget="statinfo" string="Payments"/>
+                    </button>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_account_payment_form_om_loan" model="ir.ui.view">
+        <field name="name">account.payment.form.om.loan</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_form"/>
+        <field name="arch" type="xml">
+            <field name="memo" position="after">
+                <field name="om_loan_id" invisible="not om_loan_id"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>
