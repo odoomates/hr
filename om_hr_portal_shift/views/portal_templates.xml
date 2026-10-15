@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="portal_my_hr" inherit_id="om_hr_portal.portal_my_hr" name="My HR: Shifts">
+        <xpath expr="//div[@id='om_hr_cards']" position="inside">
+            <div class="col" style="order: 1;">
+                <t t-call="om_hr_portal.portal_my_hr_card" url="'/my/hr/shifts'" icon="'schedule'"
+                   title.translate="Shifts"
+                   text.translate="Your shifts, the open shifts to claim, swaps with colleagues"/>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="shift_time" name="Shift Time">
+        <t t-out="shift.date.strftime('%a %d %b')"/>,
+        <t t-out="'%02d:%02d' % divmod(round(shift.hour_from * 60), 60)"/>-<t t-out="'%02d:%02d' % divmod(round(shift.hour_to * 60), 60)"/>
+        <span t-if="shift.template_id" class="text-muted" t-out="shift.template_id.name"/>
+    </template>
+
+    <template id="portal_my_shifts" name="My Shifts">
+        <t t-call="portal.portal_layout">
+            <div t-if="error" class="alert alert-danger" role="alert" t-out="error"/>
+            <div t-if="message" class="alert alert-success" role="alert" t-out="message"/>
+
+            <div t-if="to_accept" class="card mb-4 border-primary">
+                <div class="card-header"><h5 class="mb-0">Swaps Asked of You</h5></div>
+                <ul class="list-group list-group-flush">
+                    <li t-foreach="to_accept" t-as="rec"
+                        class="list-group-item d-flex justify-content-between align-items-center o_om_portal_swap">
+                        <span><t t-out="rec.employee_id.name"/>: <t t-out="rec.display_name"/>
+                            <div t-if="rec.note" class="small text-muted" t-out="rec.note"/></span>
+                        <span class="d-flex gap-2">
+                            <form t-attf-action="/my/hr/shifts/requests/#{rec.id}/accept" method="post">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                <button type="submit" class="btn btn-sm btn-primary">Accept</button>
+                            </form>
+                            <form t-attf-action="/my/hr/shifts/requests/#{rec.id}/decline" method="post">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                <button type="submit" class="btn btn-sm btn-secondary">Decline</button>
+                            </form>
+                        </span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header"><h5 class="mb-0">My Upcoming Shifts</h5></div>
+                <ul class="list-group list-group-flush">
+                    <li t-if="not shifts" class="list-group-item text-muted">No shift planned yet.</li>
+                    <li t-foreach="shifts" t-as="shift" class="list-group-item o_om_portal_shift">
+                        <t t-call="om_hr_portal_shift.shift_time"/>
+                        <div t-if="shift.note" class="small text-muted" t-out="shift.note"/>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header"><h5 class="mb-0">Open Shifts</h5></div>
+                <ul class="list-group list-group-flush">
+                    <li t-if="not open_shifts" class="list-group-item text-muted">No open shift for you.</li>
+                    <li t-foreach="open_shifts" t-as="shift"
+                        class="list-group-item d-flex justify-content-between align-items-center o_om_portal_open_shift">
+                        <span><t t-call="om_hr_portal_shift.shift_time"/></span>
+                        <form action="/my/hr/shifts/claim" method="post">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <input type="hidden" name="shift_id" t-att-value="shift.id"/>
+                            <button type="submit" class="btn btn-sm btn-primary">Claim</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+
+            <div t-if="shifts and colleague_shifts" class="card mb-4">
+                <div class="card-header"><h5 class="mb-0">Swap a Shift</h5></div>
+                <div class="card-body">
+                    <form action="/my/hr/shifts/swap" method="post" class="row g-3">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <div class="col-md-5">
+                            <label class="form-label" for="om_swap_mine">My shift</label>
+                            <select class="form-select" id="om_swap_mine" name="shift_id" required="required">
+                                <option t-foreach="shifts" t-as="shift" t-att-value="shift.id">
+                                    <t t-call="om_hr_portal_shift.shift_time"/>
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label" for="om_swap_theirs">For the shift of</label>
+                            <select class="form-select" id="om_swap_theirs" name="target_shift_id" required="required">
+                                <option t-foreach="colleague_shifts" t-as="shift" t-att-value="shift.id">
+                                    <t t-out="shift.employee_id.name"/>: <t t-call="om_hr_portal_shift.shift_time"/>
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">Ask</button>
+                        </div>
+                        <div class="col-12">
+                            <input type="text" class="form-control" name="note" placeholder="A word for your colleague"
+                                   t-att-value="form.get('note')"/>
+                        </div>
+                    </form>
+                    <div class="small text-muted mt-2">Your colleague accepts, then your manager approves.</div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header"><h5 class="mb-0">Days I Cannot Work</h5></div>
+                <div class="card-body">
+                    <form action="/my/hr/shifts/unavailable" method="post" class="row g-3 mb-3">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <div class="col-6 col-md-3">
+                            <label class="form-label" for="om_unavailable_from">From</label>
+                            <input type="date" class="form-control" id="om_unavailable_from" name="date_from"
+                                   required="required" t-att-value="form.get('date_from')"/>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label class="form-label" for="om_unavailable_to">To</label>
+                            <input type="date" class="form-control" id="om_unavailable_to" name="date_to"
+                                   t-att-value="form.get('date_to')"/>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="om_unavailable_reason">Reason</label>
+                            <input type="text" class="form-control" id="om_unavailable_reason" name="reason"
+                                   t-att-value="form.get('reason')"/>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-secondary w-100">Add</button>
+                        </div>
+                    </form>
+                    <ul class="list-group">
+                        <li t-foreach="unavailable" t-as="day"
+                            class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><span t-field="day.date_from"/> - <span t-field="day.date_to"/>
+                                <span class="text-muted" t-out="day.reason"/></span>
+                            <form t-attf-action="/my/hr/shifts/unavailable/#{day.id}/delete" method="post">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                <button type="submit" class="btn btn-sm btn-link text-danger">Remove</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <t t-if="shift_requests" t-call="portal.portal_table">
+                <thead><tr><th>Request</th><th>Waiting For</th><th>Status</th></tr></thead>
+                <tbody>
+                    <tr t-foreach="shift_requests" t-as="rec">
+                        <td t-out="rec.display_name"/>
+                        <td t-out="rec.approval_step if rec.state == 'to_approve' else rec.target_employee_id.name if rec.state == 'to_accept' else ''"/>
+                        <td><span t-attf-class="badge #{'text-bg-success' if rec.state == 'approved' else 'text-bg-danger' if rec.state in ('refused', 'cancel') else 'text-bg-info'}" t-field="rec.state"/></td>
+                    </tr>
+                </tbody>
+            </t>
+        </t>
+    </template>
+</odoo>
