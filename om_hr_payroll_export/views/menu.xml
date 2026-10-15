@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_om_payroll_bank_files"
+              action="om_file_export_action_payroll"
+              parent="om_hr_payroll.menu_hr_payroll_root"
+              sequence="80"
+              groups="om_hr_payroll.group_hr_payroll_manager"/>
+
+    <menuitem id="menu_om_payroll_bank_file_layouts"
+              action="om_file_layout_action_payroll"
+              parent="om_hr_payroll.menu_hr_payroll_configuration"
+              sequence="60"
+              groups="om_hr_payroll.group_hr_payroll_manager"/>
+
+</odoo>
