@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="om_hr_lateness_view_list" model="ir.ui.view">
+        <field name="name">om.hr.lateness.view.list</field>
+        <field name="model">om.hr.lateness</field>
+        <field name="arch" type="xml">
+            <list string="Lateness" create="0" edit="0" decoration-muted="state == 'excused'">
+                <field name="date"/>
+                <field name="employee_id" widget="many2one_avatar_employee"/>
+                <field name="department_id" optional="hide"/>
+                <field name="kind" widget="badge" decoration-warning="kind == 'late_in'"
+                       decoration-info="kind == 'early_out'"/>
+                <field name="scheduled_at" string="Scheduled" optional="show"/>
+                <field name="actual_at" string="Actual" optional="show"/>
+                <field name="minutes" sum="Total"/>
+                <field name="occurrence" string="#" optional="show"/>
+                <field name="penalty" optional="show"/>
+                <field name="state" widget="badge" decoration-success="state == 'excused'"/>
+                <field name="excuse_reason" optional="show"/>
+                <button name="action_open_excuse" type="object" string="Excuse" icon="check"
+                        invisible="state != 'counted'" groups="hr_attendance.group_hr_attendance_officer"/>
+                <button name="action_count_again" type="object" string="Count Again" icon="undo"
+                        invisible="state != 'excused'" groups="hr_attendance.group_hr_attendance_officer"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="om_hr_lateness_view_form" model="ir.ui.view">
+        <field name="name">om.hr.lateness.view.form</field>
+        <field name="model">om.hr.lateness</field>
+        <field name="arch" type="xml">
+            <form string="Lateness" create="0" edit="0">
+                <header>
+                    <button name="action_open_excuse" type="object" string="Excuse" class="btn-primary"
+                            invisible="state != 'counted'" groups="hr_attendance.group_hr_attendance_officer"/>
+                    <button name="action_count_again" type="object" string="Count Again"
+                            invisible="state != 'excused'" groups="hr_attendance.group_hr_attendance_officer"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="employee_id" widget="many2one_avatar_employee"/>
+                            <field name="date"/>
+                            <field name="kind"/>
+                            <field name="minutes"/>
+                        </group>
+                        <group>
+                            <field name="scheduled_at"/>
+                            <field name="actual_at"/>
+                            <field name="attendance_id"/>
+                            <field name="policy_id"/>
+                            <field name="occurrence"/>
+                            <field name="policy_line_id"/>
+                            <field name="excuse_reason" invisible="state != 'excused'"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="om_hr_lateness_view_pivot" model="ir.ui.view">
+        <field name="name">om.hr.lateness.view.pivot</field>
+        <field name="model">om.hr.lateness</field>
+        <field name="arch" type="xml">
+            <pivot string="Lateness">
+                <field name="employee_id" type="row"/>
+                <field name="date" interval="month" type="col"/>
+                <field name="minutes" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="om_hr_lateness_view_search" model="ir.ui.view">
+        <field name="name">om.hr.lateness.view.search</field>
+        <field name="model">om.hr.lateness</field>
+        <field name="arch" type="xml">
+            <search string="Lateness">
+                <field name="employee_id"/>
+                <field name="department_id"/>
+                <filter string="Late Arrivals" name="late_in" domain="[('kind', '=', 'late_in')]"/>
+                <filter string="Early Departures" name="early_out" domain="[('kind', '=', 'early_out')]"/>
+                <separator/>
+                <filter string="Counted" name="counted" domain="[('state', '=', 'counted')]"/>
+                <filter string="Excused" name="excused" domain="[('state', '=', 'excused')]"/>
+                <separator/>
+                <filter string="Date" name="date" date="date"/>
+                <group>
+                    <filter string="Employee" name="group_employee" context="{'group_by': 'employee_id'}"/>
+                    <filter string="Department" name="group_department" context="{'group_by': 'department_id'}"/>
+                    <filter string="Month" name="group_month" context="{'group_by': 'date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="om_hr_lateness_action" model="ir.actions.act_window">
+        <field name="name">Lateness</field>
+        <field name="res_model">om.hr.lateness</field>
+        <field name="view_mode">list,pivot,form</field>
+        <field name="context">{'search_default_counted': 1, 'search_default_date': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Nobody late</p>
+            <p>The late arrivals and the early departures beyond the grace minutes of the lateness policy, against the
+                working schedule, time off and public holidays left out.</p>
+        </field>
+    </record>
+
+    <record id="om_hr_lateness_action_my" model="ir.actions.act_window">
+        <field name="name">My Lateness</field>
+        <field name="res_model">om.hr.lateness</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('employee_id.user_id', '=', uid)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Always on time</p>
+            <p>Your late arrivals and early departures beyond the grace minutes show here.</p>
+        </field>
+    </record>
+
+    <record id="om_hr_lateness_excuse_view_form" model="ir.ui.view">
+        <field name="name">om.hr.lateness.excuse.view.form</field>
+        <field name="model">om.hr.lateness.excuse</field>
+        <field name="arch" type="xml">
+            <form string="Excuse">
+                <field name="lateness_ids" invisible="1"/>
+                <group>
+                    <field name="reason" placeholder="e.g. an errand for the company"/>
+                </group>
+                <footer>
+                    <button name="action_excuse" string="Excuse" type="object" class="btn-primary"/>
+                    <button string="Discard" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="om_hr_lateness_action_excuse" model="ir.actions.act_window">
+        <field name="name">Excuse</field>
+        <field name="res_model">om.hr.lateness.excuse</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="model_om_hr_lateness"/>
+        <field name="context">{'default_lateness_ids': active_ids}</field>
+        <field name="group_ids" eval="[(4, ref('hr_attendance.group_hr_attendance_officer'))]"/>
+    </record>
+
+    <record id="om_hr_lateness_policy_view_list" model="ir.ui.view">
+        <field name="name">om.hr.lateness.policy.view.list</field>
+        <field name="model">om.hr.lateness.policy</field>
+        <field name="arch" type="xml">
+            <list string="Lateness Policies">
+                <field name="name"/>
+                <field name="grace_in"/>
+                <field name="early_out"/>
+                <field name="grace_out"/>
+                <field name="monthly_cap_days"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="om_hr_lateness_policy_view_form" model="ir.ui.view">
+        <field name="name">om.hr.lateness.policy.view.form</field>
+        <field name="model">om.hr.lateness.policy</field>
+        <field name="arch" type="xml">
+            <form string="Lateness Policy">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="e.g. Office Staff"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="grace_in"/>
+                            <field name="early_out"/>
+                            <field name="grace_out" invisible="not early_out"/>
+                        </group>
+                        <group>
+                            <field name="monthly_cap_days"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                    <field name="description" placeholder="The policy in a few words, for the employees"/>
+                    <separator string="Penalties"/>
+                    <div class="text-muted mb-2">
+                        Each line is a band of minutes late, or early, from an occurrence in the month on: the 3rd time
+                        and after, unless a line starts at a later occurrence. Without a matching line, a lateness is
+                        recorded but not penalised.
+                    </div>
+                    <field name="line_ids">
+                        <list editable="bottom">
+                            <field name="applies_to"/>
+                            <field name="minutes_from"/>
+                            <field name="minutes_to"/>
+                            <field name="occurrence"/>
+                            <field name="penalty"/>
+                            <field name="amount" invisible="penalty != 'fixed'"/>
+                            <field name="percent" invisible="penalty != 'daily_percent'"/>
+                            <field name="factor" invisible="penalty != 'minutes'"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="om_hr_lateness_policy_action" model="ir.actions.act_window">
+        <field name="name">Lateness Policies</field>
+        <field name="res_model">om.hr.lateness.policy</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="hr_employee_view_form_om_lateness" model="ir.ui.view">
+        <field name="name">hr.employee.view.form.om.lateness</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <field name="resource_calendar_id" position="after">
+                <field name="om_lateness_policy_id" groups="hr.group_hr_user"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="res_config_settings_view_form_om_lateness" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.om.lateness</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="hr_attendance.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <block name="attendance_settings" position="inside">
+                <setting id="om_lateness_policy_setting" string="Lateness Policy" company_dependent="1"
+                         help="Grace minutes and penalties of the late arrivals and early departures, for the employees with no policy of their own.">
+                    <field name="om_lateness_policy_id" placeholder="The first policy"/>
+                    <div class="mt8">
+                        <button name="%(om_hr_lateness_policy_action)d" type="action" string="Lateness Policies"
+                                class="btn-link" icon="arrow_forward"/>
+                    </div>
+                </setting>
+            </block>
+        </field>
+    </record>
+
+    <!-- under the app itself: core keeps its Management menu for the officers managing all the attendances,
+         the officers of a team review the lateness of their team too -->
+    <menuitem id="menu_om_hr_lateness"
+              action="om_hr_lateness_action"
+              parent="hr_attendance.menu_hr_attendance_root"
+              sequence="7"
+              groups="hr_attendance.group_hr_attendance_officer"/>
+
+    <menuitem id="menu_om_hr_lateness_my"
+              action="om_hr_lateness_action_my"
+              parent="om_hr_base.menu_my_hr"
+              sequence="45"/>
+
+    <menuitem id="menu_om_hr_lateness_policy"
+              action="om_hr_lateness_policy_action"
+              parent="hr_attendance.menu_hr_attendance_configuration"
+              sequence="30"/>
+
+</odoo>
