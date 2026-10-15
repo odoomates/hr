@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="portal_my_hr" inherit_id="om_hr_portal.portal_my_hr" name="My HR: Time Off">
+        <xpath expr="//div[@id='om_hr_cards']" position="inside">
+            <div class="col" style="order: 2;">
+                <t t-call="om_hr_portal.portal_my_hr_card" url="'/my/hr/time-off'" icon="'luggage'"
+                   title.translate="Time Off" text.translate="What you have left, and your requests"/>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="portal_my_time_off" name="My Time Off">
+        <t t-call="portal.portal_layout">
+            <div t-if="balances" class="row row-cols-2 row-cols-md-4 g-3 mb-4">
+                <div class="col" t-foreach="balances" t-as="balance">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <div class="fs-3 fw-bold" t-out="'%g' % round(balance['left'], 2)"/>
+                            <div class="small text-muted">
+                                of <t t-out="'%g' % round(balance['total'], 2)"/>
+                                <t t-out="'hours' if balance['unit'] == 'hour' else 'days'"/> left
+                            </div>
+                            <div class="fw-semibold mt-1" t-out="balance['name']"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header"><h5 class="mb-0">Ask for Time Off</h5></div>
+                <div class="card-body">
+                    <div t-if="error" class="alert alert-danger" role="alert" t-out="error"/>
+                    <form action="/my/hr/time-off/new" method="post" class="row g-3">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <div class="col-md-4">
+                            <label class="form-label" for="om_leave_type">Type</label>
+                            <select class="form-select" id="om_leave_type" name="work_entry_type_id" required="required">
+                                <option value="">Choose...</option>
+                                <option t-foreach="leave_types" t-as="leave_type" t-att-value="leave_type.id"
+                                        t-att-selected="str(leave_type.id) == form.get('work_entry_type_id')"
+                                        t-out="leave_type.name"/>
+                            </select>
+                        </div>
+                        <div class="col-6 col-md-2">
+                            <label class="form-label" for="om_leave_from">From</label>
+                            <input type="date" class="form-control" id="om_leave_from" name="date_from" required="required"
+                                   t-att-value="form.get('date_from')"/>
+                        </div>
+                        <div class="col-6 col-md-2">
+                            <label class="form-label" for="om_leave_to">To</label>
+                            <input type="date" class="form-control" id="om_leave_to" name="date_to" required="required"
+                                   t-att-value="form.get('date_to')"/>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="om_leave_name">Reason</label>
+                            <input type="text" class="form-control" id="om_leave_name" name="name" t-att-value="form.get('name')"/>
+                        </div>
+                        <div class="col-12"><button type="submit" class="btn btn-primary">Send the Request</button></div>
+                    </form>
+                </div>
+            </div>
+
+            <t t-if="leaves" t-call="portal.portal_table">
+                <thead>
+                    <tr><th>Type</th><th>From</th><th>To</th><th class="text-end">Duration</th><th>Status</th><th/></tr>
+                </thead>
+                <tbody>
+                    <tr t-foreach="leaves" t-as="leave">
+                        <td t-out="leave.work_entry_type_id.name"/>
+                        <td><span t-field="leave.request_date_from"/></td>
+                        <td><span t-field="leave.request_date_to"/></td>
+                        <td class="text-end" t-out="leave.duration_display"/>
+                        <td>
+                            <span t-attf-class="badge #{'text-bg-success' if leave.state == 'validate' else 'text-bg-danger' if leave.state in ('refuse', 'cancel') else 'text-bg-info'}"
+                                  t-field="leave.state"/>
+                        </td>
+                        <td class="text-end">
+                            <form t-if="leave.state == 'confirm'" t-attf-action="/my/hr/time-off/#{leave.id}/cancel" method="post">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                <button type="submit" class="btn btn-sm btn-link text-danger p-0">Withdraw</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </t>
+        </t>
+    </template>
+
+</odoo>
