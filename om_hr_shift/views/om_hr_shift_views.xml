@@ -1,0 +1,536 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Templates -->
+    <record id="om_hr_shift_template_view_list" model="ir.ui.view">
+        <field name="name">om.hr.shift.template.view.list</field>
+        <field name="model">om.hr.shift.template</field>
+        <field name="arch" type="xml">
+            <list string="Shift Templates">
+                <field name="sequence" widget="handle"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="hour_from" widget="float_time"/>
+                <field name="hour_to" widget="float_time"/>
+                <field name="hours" widget="float_time"/>
+                <field name="department_ids" widget="many2many_tags" optional="show"/>
+                <field name="color" widget="color_picker"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="om_hr_shift_template_view_form" model="ir.ui.view">
+        <field name="name">om.hr.shift.template.view.form</field>
+        <field name="model">om.hr.shift.template</field>
+        <field name="arch" type="xml">
+            <form string="Shift Template">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="e.g. Morning"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <label for="hour_from" string="Hours"/>
+                            <div class="o_row">
+                                <field name="hour_from" widget="float_time" class="oe_inline"/> -
+                                <field name="hour_to" widget="float_time" class="oe_inline"/>
+                            </div>
+                            <label for="break_from" string="Unpaid Break"/>
+                            <div class="o_row">
+                                <field name="break_from" widget="float_time" class="oe_inline"/> -
+                                <field name="break_to" widget="float_time" class="oe_inline"/>
+                            </div>
+                            <field name="hours" widget="float_time"/>
+                            <field name="color" widget="color_picker"/>
+                        </group>
+                        <group>
+                            <field name="department_ids" widget="many2many_tags"/>
+                            <field name="job_ids" widget="many2many_tags"/>
+                            <field name="work_entry_type_id"/>
+                            <field name="allowance"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="om_hr_shift_template_action" model="ir.actions.act_window">
+        <field name="name">Shift Templates</field>
+        <field name="res_model">om.hr.shift.template</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Rotations -->
+    <record id="om_hr_shift_rotation_view_list" model="ir.ui.view">
+        <field name="name">om.hr.shift.rotation.view.list</field>
+        <field name="model">om.hr.shift.rotation</field>
+        <field name="arch" type="xml">
+            <list string="Rotations">
+                <field name="name"/>
+                <field name="pattern"/>
+                <field name="cycle_days"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="om_hr_shift_rotation_view_form" model="ir.ui.view">
+        <field name="name">om.hr.shift.rotation.view.form</field>
+        <field name="model">om.hr.shift.rotation</field>
+        <field name="arch" type="xml">
+            <form string="Rotation">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="e.g. 2 Mornings, 2 Nights, 2 Off"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="pattern"/>
+                            <field name="cycle_days"/>
+                        </group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                    <div class="text-muted mb-2">One line a day of the cycle: a shift, or empty for a day off.</div>
+                    <field name="line_ids">
+                        <list editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="template_id" placeholder="Day off"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="om_hr_shift_rotation_action" model="ir.actions.act_window">
+        <field name="name">Rotations</field>
+        <field name="res_model">om.hr.shift.rotation</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Shifts -->
+    <record id="om_hr_shift_view_list" model="ir.ui.view">
+        <field name="name">om.hr.shift.view.list</field>
+        <field name="model">om.hr.shift</field>
+        <field name="arch" type="xml">
+            <list string="Shifts" decoration-muted="state == 'draft'">
+                <header>
+                    <button name="action_publish" type="object" string="Publish"
+                            groups="om_hr_shift.group_shift_planner"/>
+                    <button name="action_unpublish" type="object" string="Back to Draft"
+                            groups="om_hr_shift.group_shift_planner"/>
+                </header>
+                <field name="date"/>
+                <field name="employee_id" widget="many2one_avatar_employee" placeholder="Open Shift"/>
+                <field name="department_id" optional="show"/>
+                <field name="template_id"/>
+                <field name="hour_from" widget="float_time"/>
+                <field name="hour_to" widget="float_time"/>
+                <field name="hours" widget="float_time" sum="Total"/>
+                <field name="state" widget="badge" decoration-success="state == 'published'"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="om_hr_shift_view_form" model="ir.ui.view">
+        <field name="name">om.hr.shift.view.form</field>
+        <field name="model">om.hr.shift</field>
+        <field name="arch" type="xml">
+            <form string="Shift">
+                <header>
+                    <button name="action_publish" type="object" string="Publish" class="btn-primary"
+                            invisible="state != 'draft'" groups="om_hr_shift.group_shift_planner"/>
+                    <button name="action_unpublish" type="object" string="Back to Draft"
+                            invisible="state != 'published'" groups="om_hr_shift.group_shift_planner"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="alert alert-warning" role="alert" invisible="not warning">
+                        <field name="warning"/>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="employee_id" widget="many2one_avatar_employee" placeholder="Open Shift"/>
+                            <field name="department_id"/>
+                            <field name="template_id"/>
+                            <field name="date"/>
+                        </group>
+                        <group>
+                            <label for="hour_from" string="Hours"/>
+                            <div class="o_row">
+                                <field name="hour_from" widget="float_time" class="oe_inline"/> -
+                                <field name="hour_to" widget="float_time" class="oe_inline"/>
+                            </div>
+                            <label for="break_from" string="Unpaid Break"/>
+                            <div class="o_row">
+                                <field name="break_from" widget="float_time" class="oe_inline"/> -
+                                <field name="break_to" widget="float_time" class="oe_inline"/>
+                            </div>
+                            <field name="hours" widget="float_time"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <field name="note" placeholder="A note for the employee"/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="om_hr_shift_view_calendar" model="ir.ui.view">
+        <field name="name">om.hr.shift.view.calendar</field>
+        <field name="model">om.hr.shift</field>
+        <field name="arch" type="xml">
+            <calendar string="Shifts" date_start="start" date_stop="stop" color="template_id" mode="week"
+                      event_open_popup="1" quick_create="0">
+                <field name="employee_id" filters="1"/>
+                <field name="template_id" filters="1"/>
+                <field name="state"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="om_hr_shift_view_pivot" model="ir.ui.view">
+        <field name="name">om.hr.shift.view.pivot</field>
+        <field name="model">om.hr.shift</field>
+        <field name="arch" type="xml">
+            <pivot string="Shifts">
+                <field name="employee_id" type="row"/>
+                <field name="date" interval="week" type="col"/>
+                <field name="hours" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="om_hr_shift_view_search" model="ir.ui.view">
+        <field name="name">om.hr.shift.view.search</field>
+        <field name="model">om.hr.shift</field>
+        <field name="arch" type="xml">
+            <search string="Shifts">
+                <field name="employee_id"/>
+                <field name="department_id"/>
+                <field name="template_id"/>
+                <filter string="Open Shifts" name="open" domain="[('employee_id', '=', False)]"/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Published" name="published" domain="[('state', '=', 'published')]"/>
+                <separator/>
+                <filter string="Upcoming" name="upcoming" domain="[('date', '&gt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="Date" name="date" date="date"/>
+                <group>
+                    <filter string="Employee" name="group_employee" context="{'group_by': 'employee_id'}"/>
+                    <filter string="Department" name="group_department" context="{'group_by': 'department_id'}"/>
+                    <filter string="Week" name="group_week" context="{'group_by': 'date:week'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="om_hr_shift_action" model="ir.actions.act_window">
+        <field name="name">Shifts</field>
+        <field name="res_model">om.hr.shift</field>
+        <field name="view_mode">list,calendar,pivot,form</field>
+        <field name="context">{'search_default_upcoming': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Plan the shifts on the Roster</p>
+            <p>Published, a shift is the working schedule of the employee: time off, attendances, overtime and
+                payroll follow it.</p>
+        </field>
+    </record>
+
+    <record id="om_hr_shift_action_my" model="ir.actions.act_window">
+        <field name="name">My Shifts</field>
+        <field name="res_model">om.hr.shift</field>
+        <field name="view_mode">calendar,list,form</field>
+        <field name="domain">[('employee_id.user_id', '=', uid), ('state', '=', 'published')]</field>
+        <field name="context">{'create': False, 'edit': False, 'delete': False}</field>
+    </record>
+
+    <record id="om_hr_shift_action_open" model="ir.actions.act_window">
+        <field name="name">Open Shifts</field>
+        <field name="res_model">om.hr.shift</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('employee_id', '=', False), ('state', '=', 'published')]</field>
+        <field name="context">{'create': False, 'edit': False, 'delete': False, 'search_default_upcoming': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No open shift</p>
+            <p>The shifts no one works yet show here: claim one from My Shift Requests.</p>
+        </field>
+    </record>
+
+    <record id="om_hr_shift_action_roster" model="ir.actions.client">
+        <field name="name">Roster</field>
+        <field name="tag">om_hr_shift_roster</field>
+    </record>
+
+    <!-- Unavailability -->
+    <record id="om_hr_shift_unavailability_view_list" model="ir.ui.view">
+        <field name="name">om.hr.shift.unavailability.view.list</field>
+        <field name="model">om.hr.shift.unavailability</field>
+        <field name="arch" type="xml">
+            <list string="Unavailability" editable="bottom">
+                <field name="employee_id" widget="many2one_avatar_employee"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="reason"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="om_hr_shift_unavailability_action" model="ir.actions.act_window">
+        <field name="name">Unavailability</field>
+        <field name="res_model">om.hr.shift.unavailability</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <record id="om_hr_shift_unavailability_action_my" model="ir.actions.act_window">
+        <field name="name">My Unavailability</field>
+        <field name="res_model">om.hr.shift.unavailability</field>
+        <field name="view_mode">list</field>
+        <field name="domain">[('employee_id.user_id', '=', uid)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Tell your planner the days you cannot work</p>
+            <p>They show on the roster.</p>
+        </field>
+    </record>
+
+    <!-- Requests -->
+    <record id="om_hr_shift_request_view_list" model="ir.ui.view">
+        <field name="name">om.hr.shift.request.view.list</field>
+        <field name="model">om.hr.shift.request</field>
+        <field name="arch" type="xml">
+            <list string="Shift Requests">
+                <field name="create_date" string="Asked On"/>
+                <field name="employee_id" widget="many2one_avatar_employee"/>
+                <field name="kind"/>
+                <field name="shift_id"/>
+                <field name="target_shift_id" optional="show"/>
+                <field name="approval_step" optional="show"/>
+                <field name="state" widget="badge" decoration-info="state in ('to_accept', 'to_approve')"
+                       decoration-success="state == 'approved'" decoration-danger="state == 'refused'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="om_hr_shift_request_view_form" model="ir.ui.view">
+        <field name="name">om.hr.shift.request.view.form</field>
+        <field name="model">om.hr.shift.request</field>
+        <field name="arch" type="xml">
+            <form string="Shift Request">
+                <header>
+                    <button name="action_submit" string="Send" type="object" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_accept" string="Accept" type="object" class="btn-primary"
+                            invisible="not can_accept"/>
+                    <button name="action_decline" string="Decline" type="object" invisible="not can_accept"/>
+                    <button name="action_approval_approve" string="Approve" type="object" class="btn-primary"
+                            invisible="not can_approve"/>
+                    <button name="action_approval_open_refuse" string="Refuse" type="object"
+                            invisible="not can_approve"/>
+                    <button name="action_approval_cancel" string="Cancel" type="object"
+                            invisible="state not in ('draft', 'to_accept', 'to_approve')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,to_accept,to_approve,approved"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="kind" widget="radio" readonly="state != 'draft'"/>
+                            <field name="employee_id" readonly="state != 'draft'"/>
+                            <field name="shift_id" readonly="state != 'draft'" options="{'no_create': True}"
+                                   domain="kind == 'claim' and [('employee_id', '=', False), ('state', '=', 'published')] or [('employee_id', '=', employee_id), ('state', '=', 'published')]"/>
+                            <field name="target_shift_id" readonly="state != 'draft'" invisible="kind != 'swap'"
+                                   required="kind == 'swap'" options="{'no_create': True}"
+                                   domain="[('employee_id', '!=', False), ('employee_id', '!=', employee_id), ('state', '=', 'published')]"/>
+                            <field name="note"/>
+                        </group>
+                        <group>
+                            <field name="target_employee_id" invisible="kind != 'swap'"/>
+                            <field name="approval_step" invisible="state != 'to_approve'"/>
+                            <field name="approver_user_ids" widget="many2many_avatar_user"
+                                   invisible="state != 'to_approve'"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="om_hr_shift_request_action" model="ir.actions.act_window">
+        <field name="name">Shift Requests</field>
+        <field name="res_model">om.hr.shift.request</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="om_hr_shift_request_action_my" model="ir.actions.act_window">
+        <field name="name">My Shift Requests</field>
+        <field name="res_model">om.hr.shift.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">['|', ('employee_id.user_id', '=', uid), ('target_employee_id.user_id', '=', uid)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Claim an open shift, or swap one with a colleague</p>
+            <p>The colleague accepts the swap, then your manager approves.</p>
+        </field>
+    </record>
+
+    <!-- Wizards -->
+    <record id="om_hr_shift_rostering_wizard_view_form" model="ir.ui.view">
+        <field name="name">om.hr.shift.rostering.wizard.view.form</field>
+        <field name="model">om.hr.shift.rostering.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Rostering">
+                <div class="text-muted mb-3" invisible="mode != 'start'">
+                    From this day, the published shifts are the working schedule of the employees: a new version of
+                    their contract gets a schedule of their own. The days before keep the schedule they had.
+                </div>
+                <group>
+                    <field name="mode" widget="radio" options="{'horizontal': true}"/>
+                    <field name="employee_ids" widget="many2many_tags_avatar"/>
+                    <field name="date"/>
+                    <field name="calendar_id" invisible="mode != 'stop'" required="mode == 'stop'"/>
+                </group>
+                <footer>
+                    <button name="action_confirm" string="Confirm" type="object" class="btn-primary"/>
+                    <button string="Discard" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="om_hr_shift_rostering_wizard_action" model="ir.actions.act_window">
+        <field name="name">Rostering</field>
+        <field name="res_model">om.hr.shift.rostering.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="hr.model_hr_employee"/>
+        <field name="context">{'default_employee_ids': active_ids}</field>
+        <field name="group_ids" eval="[(4, ref('om_hr_shift.group_shift_planner'))]"/>
+    </record>
+
+    <record id="om_hr_shift_rotation_wizard_view_form" model="ir.ui.view">
+        <field name="name">om.hr.shift.rotation.wizard.view.form</field>
+        <field name="model">om.hr.shift.rotation.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Apply a Rotation">
+                <group>
+                    <group>
+                        <field name="rotation_id" options="{'no_create': True}"/>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                    <group>
+                        <field name="stagger"/>
+                        <field name="skip_existing"/>
+                    </group>
+                </group>
+                <field name="employee_ids" widget="many2many_tags_avatar" placeholder="Employees"/>
+                <footer>
+                    <button name="action_apply" string="Create the Shifts" type="object" class="btn-primary"/>
+                    <button string="Discard" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="om_hr_shift_rotation_wizard_action" model="ir.actions.act_window">
+        <field name="name">Apply a Rotation</field>
+        <field name="res_model">om.hr.shift.rotation.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="om_hr_shift_publish_wizard_view_form" model="ir.ui.view">
+        <field name="name">om.hr.shift.publish.wizard.view.form</field>
+        <field name="model">om.hr.shift.publish.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Publish Shifts">
+                <div class="alert alert-warning" role="alert">
+                    <field name="warnings"/>
+                </div>
+                <group>
+                    <field name="reason" placeholder="Why publish anyway, kept on the shifts"/>
+                    <field name="shift_ids" invisible="1"/>
+                </group>
+                <footer>
+                    <button name="action_publish" string="Publish Anyway" type="object" class="btn-primary"/>
+                    <button string="Discard" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Employee and settings -->
+    <record id="hr_employee_view_form_om_shift" model="ir.ui.view">
+        <field name="name">hr.employee.view.form.om.shift</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_om_open_rostering" type="object" string="Rostering"
+                        groups="om_hr_shift.group_shift_planner"/>
+            </xpath>
+            <field name="resource_calendar_id" position="after">
+                <field name="om_roster_date_start" invisible="not om_roster_date_start"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="res_config_settings_view_form_om_shift" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.om.shift</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="hr.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <block name="work_organization_setting_container" position="after">
+                <block title="Shifts" name="om_shift_settings">
+                    <setting string="Minimum Rest" company_dependent="1"
+                             help="Hours between two shifts of an employee; the roster warns below.">
+                        <field name="om_shift_min_rest" widget="float_time"/>
+                    </setting>
+                    <setting string="Maximum Hours per Week" company_dependent="1"
+                             help="Hours of shifts of an employee in a week; the roster warns above.">
+                        <field name="om_shift_max_week_hours"/>
+                    </setting>
+                </block>
+            </block>
+        </field>
+    </record>
+
+    <!-- Menus -->
+    <menuitem id="menu_om_hr_shift_root" name="Shifts" sequence="76"
+              web_icon="om_hr_shift,static/description/icon.png"
+              groups="om_hr_shift.group_shift_planner"/>
+    <menuitem id="menu_om_hr_shift_roster" action="om_hr_shift_action_roster" parent="menu_om_hr_shift_root"
+              sequence="10"/>
+    <menuitem id="menu_om_hr_shift_shifts" action="om_hr_shift_action" parent="menu_om_hr_shift_root"
+              sequence="20"/>
+    <menuitem id="menu_om_hr_shift_requests" action="om_hr_shift_request_action" parent="menu_om_hr_shift_root"
+              sequence="30"/>
+    <menuitem id="menu_om_hr_shift_unavailability" action="om_hr_shift_unavailability_action"
+              parent="menu_om_hr_shift_root" sequence="40"/>
+    <menuitem id="menu_om_hr_shift_rotation_apply" action="om_hr_shift_rotation_wizard_action"
+              parent="menu_om_hr_shift_root" sequence="50"/>
+    <menuitem id="menu_om_hr_shift_configuration" name="Configuration" parent="menu_om_hr_shift_root"
+              sequence="90" groups="om_hr_shift.group_shift_manager"/>
+    <menuitem id="menu_om_hr_shift_template" action="om_hr_shift_template_action"
+              parent="menu_om_hr_shift_configuration" sequence="10"/>
+    <menuitem id="menu_om_hr_shift_rotation" action="om_hr_shift_rotation_action"
+              parent="menu_om_hr_shift_configuration" sequence="20"/>
+
+    <menuitem id="menu_my_hr_shifts" action="om_hr_shift_action_my" parent="om_hr_base.menu_my_hr" sequence="12"/>
+    <menuitem id="menu_my_hr_open_shifts" action="om_hr_shift_action_open" parent="om_hr_base.menu_my_hr"
+              sequence="13"/>
+    <menuitem id="menu_my_hr_shift_requests" action="om_hr_shift_request_action_my" parent="om_hr_base.menu_my_hr"
+              sequence="14"/>
+    <menuitem id="menu_my_hr_unavailability" action="om_hr_shift_unavailability_action_my"
+              parent="om_hr_base.menu_my_hr" sequence="15"/>
+
+</odoo>

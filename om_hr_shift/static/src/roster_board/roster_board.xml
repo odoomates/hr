@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="om_hr_shift.RosterBoard">
+        <div class="o_action o_om_roster h-100 d-flex flex-column">
+            <div class="o_om_roster_header d-flex flex-wrap align-items-center gap-2 p-3 border-bottom">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" t-on-click="() => this.move(-1)" title="Previous">
+                        <i class="oi" data-icon="chevron_left"/>
+                    </button>
+                    <button type="button" class="btn btn-secondary" t-on-click="() => this.move(0)">Today</button>
+                    <button type="button" class="btn btn-secondary" t-on-click="() => this.move(1)" title="Next">
+                        <i class="oi" data-icon="chevron_right"/>
+                    </button>
+                </div>
+                <span class="fw-bold fs-5 mx-2" t-out="this.period"/>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" t-att-class="{active: this.state.days === 7}"
+                            t-on-click="() => this.setDays(7)">Week</button>
+                    <button type="button" class="btn btn-secondary" t-att-class="{active: this.state.days === 14}"
+                            t-on-click="() => this.setDays(14)">2 Weeks</button>
+                </div>
+                <select class="form-select w-auto o_om_roster_department" t-on-change="(ev) => this.setDepartment(ev)">
+                    <option value="">All Departments</option>
+                    <option t-foreach="this.state.departments" t-as="department" t-key="department.id"
+                            t-att-value="department.id" t-att-selected="department.id === this.state.departmentId"
+                            t-out="department.complete_name"/>
+                </select>
+                <div class="flex-grow-1"/>
+                <t t-if="this.state.data.can_edit">
+                    <button type="button" class="btn btn-secondary" t-on-click="() => this.copyPrevious()">
+                        Copy Previous
+                    </button>
+                    <button type="button" class="btn btn-secondary" t-on-click="() => this.applyRotation()">
+                        Apply a Rotation
+                    </button>
+                    <button type="button" class="btn btn-primary o_om_roster_publish" t-on-click="() => this.publish()">
+                        Publish
+                    </button>
+                </t>
+            </div>
+            <div t-if="this.state.data.can_edit" class="d-flex flex-wrap align-items-center gap-2 px-3 py-2 border-bottom">
+                <span class="text-muted small">Plan:</span>
+                <button t-foreach="this.state.data.templates" t-as="template" t-key="template.id" type="button"
+                        class="btn btn-sm o_om_roster_template"
+                        t-attf-class="o_colorlist_item_color_#{template.color} #{template.id === this.state.templateId ? 'o_om_selected' : ''}"
+                        t-att-title="template.name" t-on-click="() => this.pickTemplate(template)">
+                    <b t-out="template.code"/> <span class="small" t-out="template.name"/>
+                </button>
+                <span t-if="this.state.templateId" class="text-muted small">then click the days</span>
+            </div>
+            <div class="o_om_roster_body flex-grow-1 overflow-auto" t-att-class="{'opacity-50': this.state.busy}">
+                <table class="table table-bordered table-sm mb-0 o_om_roster_table">
+                    <thead>
+                        <tr>
+                            <th class="o_om_roster_name">Employee</th>
+                            <th t-foreach="this.state.data.dates" t-as="date" t-key="date" class="text-center"
+                                t-att-class="{'o_om_weekend': this.isWeekend(date), 'o_om_today': this.isToday(date)}"
+                                t-out="this.dayLabel(date)"/>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="this.rows" t-as="row" t-key="row.id || 0">
+                            <td class="o_om_roster_name">
+                                <div class="fw-bold text-truncate" t-out="row.name"/>
+                                <div class="small text-muted text-truncate">
+                                    <t t-out="row.department"/>
+                                    <span t-if="row.id" class="float-end" t-out="this.hours(row.hours)"/>
+                                </div>
+                            </td>
+                            <td t-foreach="this.state.data.dates" t-as="date" t-key="date" class="o_om_roster_cell"
+                                t-att-class="{
+                                    'o_om_weekend': this.isWeekend(date),
+                                    'o_om_off': row.off[date],
+                                    'o_om_unavailable': row.unavailable[date],
+                                    'o_om_drag_over': this.state.dragOver === row.id + '-' + date,
+                                    'o_om_clickable': this.state.templateId,
+                                }"
+                                t-on-click="() => this.onCellClick(row, date)"
+                                t-on-dragover="(ev) => this.onDragOver(ev, row, date)"
+                                t-on-drop="(ev) => this.onDrop(ev, row, date)">
+                                <div t-if="row.off[date]" class="small text-muted text-truncate" t-att-title="row.off[date]">
+                                    <i class="oi" data-icon="luggage"/> <t t-out="row.off[date]"/>
+                                </div>
+                                <div t-if="row.unavailable[date]" class="small text-danger text-truncate"
+                                     t-att-title="row.unavailable[date]">
+                                    <i class="oi" data-icon="block"/> <t t-out="row.unavailable[date]"/>
+                                </div>
+                                <div t-foreach="this.shiftsOf(row, date)" t-as="shift" t-key="shift.id"
+                                     class="o_om_shift_chip" draggable="true"
+                                     t-attf-class="o_colorlist_item_color_#{shift.color} #{shift.state === 'draft' ? 'o_om_draft' : ''}"
+                                     t-att-title="shift.warning or shift.name"
+                                     t-on-click.stop="() => this.openShift(shift)"
+                                     t-on-dragstart="(ev) => this.onDragStart(ev, shift)"
+                                     t-on-dragend="() => this.onDragEnd()">
+                                    <b t-out="shift.label"/> <span t-out="shift.time"/>
+                                    <i t-if="shift.warning" class="oi ms-1" data-icon="warning"/>
+                                    <i t-if="this.state.data.can_edit" class="oi ms-1 o_om_shift_delete" data-icon="close"
+                                       title="Delete" t-on-click.stop="() => this.deleteShift(shift)"/>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div t-if="!this.state.data.employees.length" class="text-muted p-3">
+                    No rostered employee here yet: start rostering from the employee form, or plan a shift for them.
+                </div>
+            </div>
+            <div class="px-3 py-2 border-top small text-muted">
+                Dashed: draft, not published yet. A published shift is the working schedule of the employee.
+            </div>
+        </div>
+    </t>
+
+</templates>

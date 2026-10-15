@@ -1,0 +1,89 @@
+.o_om_roster {
+    background-color: $o-view-background-color;
+
+    .o_om_roster_table {
+        table-layout: fixed;
+        min-width: 60rem;
+
+        th {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            background-color: $o-view-background-color;
+        }
+    }
+
+    .o_om_roster_name {
+        width: 13rem;
+        position: sticky;
+        left: 0;
+        z-index: 2;
+        background-color: $o-view-background-color;
+    }
+
+    .o_om_roster_cell {
+        height: 3.5rem;
+        vertical-align: top;
+        padding: 0.2rem;
+
+        &.o_om_clickable {
+            cursor: copy;
+
+            &:hover {
+                background-color: rgba($primary, 0.06);
+            }
+        }
+
+        &.o_om_off {
+            background-image: repeating-linear-gradient(45deg, transparent, transparent 6px,
+                rgba($gray-500, 0.12) 6px, rgba($gray-500, 0.12) 12px);
+        }
+
+        &.o_om_unavailable {
+            background-color: rgba($danger, 0.06);
+        }
+
+        &.o_om_drag_over {
+            outline: 2px dashed $primary;
+            outline-offset: -2px;
+        }
+    }
+
+    .o_om_weekend {
+        background-color: rgba($gray-300, 0.35);
+    }
+
+    .o_om_today {
+        color: $primary;
+    }
+
+    .o_om_shift_chip {
+        border-radius: 0.3rem;
+        padding: 0.1rem 0.35rem;
+        margin-bottom: 0.15rem;
+        font-size: 0.8rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        cursor: grab;
+
+        &.o_om_draft {
+            opacity: 0.75;
+            outline: 1px dashed currentColor;
+            outline-offset: -1px;
+        }
+
+        .o_om_shift_delete {
+            display: none;
+            cursor: pointer;
+        }
+
+        &:hover .o_om_shift_delete {
+            display: inline;
+        }
+    }
+
+    .o_om_roster_template.o_om_selected {
+        box-shadow: 0 0 0 2px $primary;
+    }
+}

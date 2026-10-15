@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="template_morning" model="om.hr.shift.template">
+            <field name="name">Morning</field>
+            <field name="code">M</field>
+            <field name="sequence">10</field>
+            <field name="hour_from">6</field>
+            <field name="hour_to">14</field>
+            <field name="break_from">10</field>
+            <field name="break_to">10.5</field>
+            <field name="color">10</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="template_evening" model="om.hr.shift.template">
+            <field name="name">Evening</field>
+            <field name="code">E</field>
+            <field name="sequence">20</field>
+            <field name="hour_from">14</field>
+            <field name="hour_to">22</field>
+            <field name="break_from">18</field>
+            <field name="break_to">18.5</field>
+            <field name="color">3</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="template_night" model="om.hr.shift.template">
+            <field name="name">Night</field>
+            <field name="code">N</field>
+            <field name="sequence">30</field>
+            <field name="hour_from">22</field>
+            <field name="hour_to">6</field>
+            <field name="break_from">2</field>
+            <field name="break_to">2.5</field>
+            <field name="color">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="rotation_two_two_two" model="om.hr.shift.rotation">
+            <field name="name">2 Mornings, 2 Nights, 2 Off</field>
+            <field name="company_id" eval="False"/>
+            <field name="line_ids" eval="[
+                (0, 0, {'sequence': 1, 'template_id': ref('template_morning')}),
+                (0, 0, {'sequence': 2, 'template_id': ref('template_morning')}),
+                (0, 0, {'sequence': 3, 'template_id': ref('template_night')}),
+                (0, 0, {'sequence': 4, 'template_id': ref('template_night')}),
+                (0, 0, {'sequence': 5}),
+                (0, 0, {'sequence': 6}),
+            ]"/>
+        </record>
+
+        <record id="flow_shift_request" model="om.approval.flow">
+            <field name="name">Shift Requests</field>
+            <field name="model_id" ref="om_hr_shift.model_om_hr_shift_request"/>
+            <field name="fallback_group_id" ref="om_hr_shift.group_shift_planner"/>
+            <field name="self_approve" eval="False"/>
+        </record>
+
+        <record id="flow_shift_request_manager" model="om.approval.step">
+            <field name="flow_id" ref="flow_shift_request"/>
+            <field name="sequence">20</field>
+            <field name="name">Manager</field>
+            <field name="approver_type">manager</field>
+        </record>
+
+    </data>
+</odoo>
