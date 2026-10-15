@@ -1,0 +1,11 @@
+id,name,model_id,group_id/id,operation,domain
+access_om_hr_exit_checklist_user,om.hr.exit.checklist.user,om.hr.exit.checklist,hr.group_hr_user,r,
+access_om_hr_exit_checklist_manager,om.hr.exit.checklist.manager,om.hr.exit.checklist,hr.group_hr_manager,crud,
+om_hr_exit_checklist_company_rule,Exit checklist: multi-company,om.hr.exit.checklist,,crud,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"
+access_om_hr_exit_employee_read,om.hr.exit.employee.read,om.hr.exit,base.group_user,r,"['|', '|', ('employee_id.user_id', '=', user.id), ('approval_request_ids.line_ids.approver_user_ids', 'in', user.id), ('clearance_ids.responsible_user_ids', 'in', user.id)]"
+access_om_hr_exit_employee_draft,om.hr.exit.employee.draft,om.hr.exit,base.group_user,cud,"[('employee_id.user_id', '=', user.id), ('state', '=', 'draft')]"
+access_om_hr_exit_hr,om.hr.exit.hr,om.hr.exit,hr.group_hr_user,crud,
+om_hr_exit_company_rule,Exits: multi-company,om.hr.exit,,crud,"[('company_id', 'in', company_ids)]"
+access_om_hr_exit_clearance_employee_read,om.hr.exit.clearance.employee.read,om.hr.exit.clearance,base.group_user,r,"['|', '|', ('exit_id.employee_id.user_id', '=', user.id), ('responsible_user_ids', 'in', user.id), ('exit_id.approval_request_ids.line_ids.approver_user_ids', 'in', user.id)]"
+access_om_hr_exit_clearance_hr,om.hr.exit.clearance.hr,om.hr.exit.clearance,hr.group_hr_user,crud,
+om_hr_exit_clearance_company_rule,Exit clearance: multi-company,om.hr.exit.clearance,,crud,"[('company_id', 'in', company_ids)]"

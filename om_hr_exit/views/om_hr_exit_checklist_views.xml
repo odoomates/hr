@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="om_hr_exit_checklist_view_list" model="ir.ui.view">
+        <field name="name">om.hr.exit.checklist.view.list</field>
+        <field name="model">om.hr.exit.checklist</field>
+        <field name="arch" type="xml">
+            <list string="Exit Checklist">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="responsible_type"/>
+                <field name="departure_reason_ids" widget="many2many_tags" optional="show"/>
+                <field name="company_id" groups="base.group_multi_company" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="om_hr_exit_checklist_view_form" model="ir.ui.view">
+        <field name="name">om.hr.exit.checklist.view.form</field>
+        <field name="model">om.hr.exit.checklist</field>
+        <field name="arch" type="xml">
+            <form string="Exit Checklist Item">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Company Property Returned"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="responsible_type"/>
+                            <field name="group_id" invisible="responsible_type != 'group'"
+                                   required="responsible_type == 'group'"/>
+                            <field name="user_ids" widget="many2many_avatar_user"
+                                   invisible="responsible_type != 'user'" required="responsible_type == 'user'"/>
+                        </group>
+                        <group>
+                            <field name="departure_reason_ids" widget="many2many_tags"
+                                   placeholder="Every reason"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                    <field name="description" placeholder="What has to be done to clear the item"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="om_hr_exit_checklist_action" model="ir.actions.act_window">
+        <field name="name">Exit Checklist</field>
+        <field name="res_model">om.hr.exit.checklist</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create an item of the exit checklist</p>
+            <p>What has to be cleared before an employee leaves, and who clears it.</p>
+        </field>
+    </record>
+
+</odoo>

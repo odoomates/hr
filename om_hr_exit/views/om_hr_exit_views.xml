@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="om_hr_exit_view_form" model="ir.ui.view">
+        <field name="name">om.hr.exit.view.form</field>
+        <field name="model">om.hr.exit</field>
+        <field name="arch" type="xml">
+            <form string="Exit">
+                <header>
+                    <button name="action_submit" string="Submit" type="object" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_approval_approve" string="Approve" type="object" class="btn-primary"
+                            invisible="not can_approve"/>
+                    <button name="action_approval_open_refuse" string="Refuse" type="object"
+                            invisible="not can_approve"/>
+                    <button name="action_done" string="Register Departure" type="object" class="btn-primary"
+                            invisible="state != 'approved' or not is_cleared" groups="hr.group_hr_user"
+                            confirm="The contract ends on the last working day; the employee and his user are archived the day after."/>
+                    <button name="action_approval_reset" string="Back to Draft" type="object"
+                            invisible="state not in ('to_approve', 'refused', 'cancel')"/>
+                    <button name="action_approval_cancel" string="Withdraw" type="object"
+                            invisible="state not in ('draft', 'to_approve')"/>
+                    <button name="action_cancel_approved" string="Cancel Exit" type="object"
+                            invisible="state not in ('approved', 'done')" groups="hr.group_hr_user"
+                            confirm="The employee stays: cancel the exit, and his departure when not applied yet?"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,to_approve,approved,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="employee_id" readonly="state != 'draft'"/>
+                            <field name="departure_reason_id" readonly="state != 'draft'"
+                                   options="{'no_create': True, 'no_open': True}"/>
+                            <field name="date_notice" readonly="state not in ('draft', 'to_approve')"/>
+                            <field name="notice_days" readonly="state not in ('draft', 'to_approve')"/>
+                            <field name="last_working_day" readonly="state not in ('draft', 'to_approve')"/>
+                        </group>
+                        <group>
+                            <field name="department_id"/>
+                            <field name="job_id"/>
+                            <field name="company_id" groups="base.group_multi_company" readonly="state != 'draft'"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="clearance_progress" widget="progressbar"
+                                   invisible="state not in ('approved', 'done')"/>
+                            <field name="is_cleared" invisible="1"/>
+                            <field name="departure_id" invisible="not departure_id" groups="hr.group_hr_user"/>
+                            <field name="approval_step" invisible="state != 'to_approve'"/>
+                            <field name="approver_user_ids" widget="many2many_avatar_user"
+                                   invisible="state != 'to_approve'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Details" name="details">
+                            <field name="note" placeholder="Why does the employee leave?"
+                                   readonly="state != 'draft'"/>
+                        </page>
+                        <page string="Clearance" name="clearance" invisible="not clearance_ids">
+                            <field name="clearance_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="responsible_user_ids" widget="many2many_avatar_user"/>
+                                    <field name="state" widget="badge" decoration-success="state == 'done'"
+                                           decoration-muted="state == 'not_needed'"
+                                           decoration-warning="state == 'pending'"/>
+                                    <field name="user_id" widget="many2one_avatar_user" optional="show"/>
+                                    <field name="date" optional="show"/>
+                                    <button name="action_clear" type="object" string="Cleared" icon="check"
+                                            invisible="state != 'pending'"/>
+                                    <button name="action_not_needed" type="object" string="Not Needed" icon="block"
+                                            invisible="state != 'pending'"/>
+                                    <button name="action_reopen" type="object" string="Reopen" icon="undo"
+                                            invisible="state == 'pending'" groups="hr.group_hr_user"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Exit Interview" name="interview" groups="hr.group_hr_user">
+                            <group>
+                                <group>
+                                    <field name="interview_date"/>
+                                    <field name="would_rejoin"/>
+                                </group>
+                            </group>
+                            <field name="interview_note" placeholder="What the employee said about the company"/>
+                        </page>
+                        <page string="Approvals" name="approvals" invisible="not approval_line_ids">
+                            <field name="approval_line_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="approver_user_ids" widget="many2many_avatar_user"/>
+                                    <field name="state" widget="badge" decoration-info="state == 'pending'"
+                                           decoration-success="state == 'approved'"
+                                           decoration-danger="state == 'refused'"/>
+                                    <field name="user_id" widget="many2one_avatar_user"/>
+                                    <field name="date"/>
+                                    <field name="note"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="om_hr_exit_view_list" model="ir.ui.view">
+        <field name="name">om.hr.exit.view.list</field>
+        <field name="model">om.hr.exit</field>
+        <field name="arch" type="xml">
+            <list string="Exits">
+                <field name="name"/>
+                <field name="employee_id" widget="many2one_avatar_employee"/>
+                <field name="departure_reason_id"/>
+                <field name="date_notice"/>
+                <field name="last_working_day"/>
+                <field name="department_id" optional="hide"/>
+                <field name="clearance_progress" widget="progressbar" optional="show"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="state" widget="badge" decoration-info="state == 'to_approve'"
+                       decoration-warning="state == 'approved'" decoration-success="state == 'done'"
+                       decoration-danger="state == 'refused'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="om_hr_exit_view_search" model="ir.ui.view">
+        <field name="name">om.hr.exit.view.search</field>
+        <field name="model">om.hr.exit</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="departure_reason_id"/>
+                <filter name="my_exits" string="Mine" domain="[('employee_id.user_id', '=', uid)]"/>
+                <filter name="to_approve_by_me" string="To Approve by Me" domain="[('approver_user_ids', 'in', uid)]"/>
+                <separator/>
+                <filter name="to_approve" string="To Approve" domain="[('state', '=', 'to_approve')]"/>
+                <filter name="notice" string="In Notice Period" domain="[('state', '=', 'approved')]"/>
+                <filter name="done" string="Left" domain="[('state', '=', 'done')]"/>
+                <filter name="last_working_day" string="Last Working Day" date="last_working_day"/>
+                <group>
+                    <filter name="group_reason" string="Reason" context="{'group_by': 'departure_reason_id'}"/>
+                    <filter name="group_department" string="Department" context="{'group_by': 'department_id'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="om_hr_exit_clearance_view_list" model="ir.ui.view">
+        <field name="name">om.hr.exit.clearance.view.list</field>
+        <field name="model">om.hr.exit.clearance</field>
+        <field name="arch" type="xml">
+            <list string="Clearance" create="0" edit="0" delete="0">
+                <field name="exit_id"/>
+                <field name="employee_id" widget="many2one_avatar_employee"/>
+                <field name="name"/>
+                <field name="last_working_day"/>
+                <field name="responsible_user_ids" widget="many2many_avatar_user" optional="show"/>
+                <field name="state" widget="badge" decoration-success="state == 'done'"
+                       decoration-muted="state == 'not_needed'" decoration-warning="state == 'pending'"/>
+                <button name="action_clear" type="object" string="Cleared" icon="check" invisible="state != 'pending'"/>
+                <button name="action_not_needed" type="object" string="Not Needed" icon="block"
+                        invisible="state != 'pending'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="om_hr_exit_clearance_view_search" model="ir.ui.view">
+        <field name="name">om.hr.exit.clearance.view.search</field>
+        <field name="model">om.hr.exit.clearance</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <field name="name"/>
+                <filter name="mine" string="To Clear by Me"
+                        domain="[('state', '=', 'pending'), ('responsible_user_ids', 'in', uid)]"/>
+                <filter name="pending" string="To Clear" domain="[('state', '=', 'pending')]"/>
+                <group>
+                    <filter name="group_exit" string="Exit" context="{'group_by': 'exit_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="om_hr_exit_action_my" model="ir.actions.act_window">
+        <field name="name">My Resignation</field>
+        <field name="res_model">om.hr.exit</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('employee_id.user_id', '=', uid)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No resignation</p>
+            <p>To resign, give your notice here: your manager, then HR, approve it.</p>
+        </field>
+    </record>
+
+    <record id="om_hr_exit_action_to_approve" model="ir.actions.act_window">
+        <field name="name">To Approve</field>
+        <field name="res_model">om.hr.exit</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_to_approve_by_me': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No exit to approve</p>
+            <p>The resignations waiting for your approval show here.</p>
+        </field>
+    </record>
+
+    <record id="om_hr_exit_clearance_action" model="ir.actions.act_window">
+        <field name="name">To Clear</field>
+        <field name="res_model">om.hr.exit.clearance</field>
+        <field name="view_mode">list</field>
+        <field name="context">{'search_default_mine': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Nothing to clear</p>
+            <p>What you have to clear before a colleague leaves shows here.</p>
+        </field>
+    </record>
+
+    <record id="om_hr_exit_action" model="ir.actions.act_window">
+        <field name="name">All Exits</field>
+        <field name="res_model">om.hr.exit</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

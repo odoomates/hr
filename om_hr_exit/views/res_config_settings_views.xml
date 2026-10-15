@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.om_hr_exit</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="hr.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <block name="employees_setting_container" position="after">
+                <block title="Exits" name="om_hr_exit_setting_container">
+                    <setting company_dependent="1" id="om_hr_exit_notice_days_setting" string="Notice Period"
+                             help="Proposed between the notice of an exit and the last working day">
+                        <field name="om_hr_exit_notice_days" class="o_light_label"/> days
+                    </setting>
+                </block>
+            </block>
+        </field>
+    </record>
+
+</odoo>

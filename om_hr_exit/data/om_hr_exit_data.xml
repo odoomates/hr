@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="seq_om_hr_exit" model="ir.sequence">
+            <field name="name">Employee Exit</field>
+            <field name="code">om.hr.exit</field>
+            <field name="prefix">EXIT/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="flow_om_hr_exit" model="om.approval.flow">
+            <field name="name">Exits</field>
+            <field name="model_id" ref="om_hr_exit.model_om_hr_exit"/>
+            <field name="fallback_group_id" ref="hr.group_hr_manager"/>
+            <field name="self_approve" eval="False"/>
+        </record>
+
+        <record id="flow_om_hr_exit_manager" model="om.approval.step">
+            <field name="flow_id" ref="flow_om_hr_exit"/>
+            <field name="sequence">10</field>
+            <field name="name">Manager</field>
+            <field name="approver_type">manager</field>
+        </record>
+
+        <record id="flow_om_hr_exit_hr" model="om.approval.step">
+            <field name="flow_id" ref="flow_om_hr_exit"/>
+            <field name="sequence">20</field>
+            <field name="name">HR</field>
+            <field name="approver_type">group</field>
+            <field name="group_id" ref="hr.group_hr_manager"/>
+        </record>
+
+        <record id="checklist_handover" model="om.hr.exit.checklist">
+            <field name="name">Work Handed Over</field>
+            <field name="sequence">10</field>
+            <field name="responsible_type">manager</field>
+            <field name="description">The files, the customers and the tasks of the employee are handed over to a colleague.</field>
+        </record>
+
+        <record id="checklist_assets" model="om.hr.exit.checklist">
+            <field name="name">Company Property Returned</field>
+            <field name="sequence">20</field>
+            <field name="responsible_type">manager</field>
+            <field name="description">The laptop, the phone, the keys, the access card and the other property of the company are back.</field>
+        </record>
+
+        <record id="checklist_access" model="om.hr.exit.checklist">
+            <field name="name">Accesses Removed</field>
+            <field name="sequence">30</field>
+            <field name="responsible_type">group</field>
+            <field name="group_id" ref="base.group_system"/>
+            <field name="description">The email, the shared drives and the other systems of the company are closed to the employee.</field>
+        </record>
+
+        <record id="checklist_dues" model="om.hr.exit.checklist">
+            <field name="name">Dues Settled</field>
+            <field name="sequence">40</field>
+            <field name="responsible_type">group</field>
+            <field name="group_id" ref="hr.group_hr_manager"/>
+            <field name="description">The loans, the advances and the expenses of the employee are settled.</field>
+        </record>
+
+        <record id="checklist_interview" model="om.hr.exit.checklist">
+            <field name="name">Exit Interview</field>
+            <field name="sequence">50</field>
+            <field name="responsible_type">group</field>
+            <field name="group_id" ref="hr.group_hr_user"/>
+            <field name="departure_reason_ids" eval="[(4, ref('hr.departure_resigned')), (4, ref('hr.departure_retired'))]"/>
+            <field name="description">Ask the employee why he leaves and what the company could do better. Write it down on the exit.</field>
+        </record>
+
+    </data>
+</odoo>
