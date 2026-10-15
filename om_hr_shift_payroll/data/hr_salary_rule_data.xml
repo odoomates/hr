@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="hr_rule_shift_allowance" model="hr.salary.rule">
+            <field name="name">Shift Allowances</field>
+            <field name="sequence" eval="56"/>
+            <field name="code">SHIFT_ALW</field>
+            <field name="category_id" ref="om_hr_payroll.ALW"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = bool(inputs.SHIFT_ALW.amount)</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute"># the allowances of the published shifts, filled in when the payslip is computed
+result = inputs.SHIFT_ALW.amount</field>
+            <field name="input_ids" eval="[(0, 0, {'name': 'Shift Allowances', 'code': 'SHIFT_ALW'})]"/>
+            <field name="note">Pays the allowance of each published shift not paid yet, e.g. a night shift
+allowance, set on the shift templates. The shifts on time off are not paid. Add the rule to the salary structures
+paying shift allowances.</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <function model="hr.salary.rule" name="_om_hr_shift_add_to_base_structure"/>
+
+    </data>
+</odoo>

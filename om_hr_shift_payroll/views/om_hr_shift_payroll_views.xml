@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="hr_payslip_view_form_om_shift" model="ir.ui.view">
+        <field name="name">hr.payslip.view.form.om.shift</field>
+        <field name="model">hr.payslip</field>
+        <field name="inherit_id" ref="om_hr_payroll.view_hr_payslip_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Shift Allowances" name="om_shifts" invisible="not om_shift_ids">
+                    <field name="om_shift_ids" readonly="1">
+                        <list>
+                            <field name="date"/>
+                            <field name="template_id"/>
+                            <field name="hours" widget="float_time"/>
+                            <field name="currency_id" column_invisible="1"/>
+                            <field name="om_allowance" sum="Total"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="om_hr_shift_view_form_payroll" model="ir.ui.view">
+        <field name="name">om.hr.shift.view.form.payroll</field>
+        <field name="model">om.hr.shift</field>
+        <field name="inherit_id" ref="om_hr_shift.om_hr_shift_view_form"/>
+        <field name="arch" type="xml">
+            <field name="hours" position="after">
+                <field name="currency_id" invisible="1"/>
+                <field name="om_allowance" invisible="not om_allowance"/>
+                <field name="om_payslip_id" invisible="not om_payslip_id"
+                       groups="om_hr_payroll.group_hr_payroll_user"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>
