@@ -1,0 +1,21 @@
+.o_om_announcement_menu {
+    position: relative;
+
+    .o_om_announcement_counter {
+        position: absolute;
+        top: 0.1rem;
+        right: -0.2rem;
+        font-size: 0.65rem;
+        background-color: $o-success;
+        color: $white;
+    }
+}
+
+.o_om_announcement_dropdown {
+    width: 22rem;
+    max-width: 100vw;
+
+    .o_om_important {
+        border-left: 3px solid $warning;
+    }
+}

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="om_hr_announcement.AnnouncementMenu">
+        <Dropdown position="'bottom-end'" state="this.dropdown" beforeOpen.bind="this.load">
+            <button class="o_om_announcement_menu" title="Announcements">
+                <i class="oi" data-icon="campaign" role="img" aria-label="Announcements"/>
+                <span t-if="this.state.count" class="o_om_announcement_counter badge rounded-pill"
+                      t-out="this.state.count"/>
+            </button>
+            <t t-set-slot="content">
+                <div class="o_om_announcement_dropdown">
+                    <div t-if="!this.state.items.length" class="text-muted text-center p-3">
+                        You are up to date.
+                    </div>
+                    <div class="list-group list-group-flush">
+                        <div t-foreach="this.state.items" t-as="item" t-key="item.id"
+                             class="list-group-item list-group-item-action d-flex align-items-center gap-2 p-2 o_om_announcement_item"
+                             t-att-class="{'o_om_important': item.pinned}">
+                            <div class="flex-grow-1 overflow-hidden cursor-pointer" t-on-click="() => this.open(item)">
+                                <div class="text-truncate" t-att-class="{'fw-bold': !item.read}">
+                                    <i t-if="item.pinned" class="oi text-warning me-1" data-icon="campaign"/>
+                                    <t t-out="item.name"/>
+                                </div>
+                                <div class="small text-muted" t-out="this.formatDate(item.date)"/>
+                            </div>
+                            <button t-if="item.requires_ack" type="button" class="btn btn-sm btn-primary text-nowrap"
+                                    t-on-click.stop="() => this.acknowledge(item)">Acknowledge</button>
+                            <button t-elif="!item.read" type="button" class="btn btn-sm btn-secondary"
+                                    t-on-click.stop="() => this.open(item)">Read</button>
+                        </div>
+                        <a href="#" class="list-group-item list-group-item-action text-primary text-center"
+                           t-on-click.prevent="() => this.openAll()">See all announcements</a>
+                    </div>
+                </div>
+            </t>
+        </Dropdown>
+    </t>
+
+</templates>

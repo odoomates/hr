@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- For the authors: HR, or a department manager -->
+    <record id="om_hr_announcement_view_form" model="ir.ui.view">
+        <field name="name">om.hr.announcement.view.form</field>
+        <field name="model">om.hr.announcement</field>
+        <field name="arch" type="xml">
+            <form string="Announcement">
+                <header>
+                    <button name="action_publish" string="Publish" type="object" class="btn-primary"
+                            invisible="state != 'draft'"
+                            confirm="Publish the announcement to the employees it reaches?"/>
+                    <button name="action_remind" string="Remind Pending" type="object"
+                            invisible="state != 'published' or not requires_ack"/>
+                    <button name="action_draft" string="Back to Draft" type="object" invisible="state != 'scheduled'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,scheduled,published,expired"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" icon="visibility" type="object" name="action_open_recipients"
+                                invisible="not recipient_count">
+                            <div class="o_stat_info">
+                                <span class="o_stat_value"><field name="read_rate" widget="integer"/>%</span>
+                                <span class="o_stat_text">Read</span>
+                            </div>
+                        </button>
+                        <button class="oe_stat_button" icon="check_circle" type="object" name="action_open_recipients"
+                                context="{'search_default_pending': 1}" invisible="not recipient_count or not requires_ack">
+                            <div class="o_stat_info">
+                                <span class="o_stat_value"><field name="ack_rate" widget="integer"/>%</span>
+                                <span class="o_stat_text">Acknowledged</span>
+                            </div>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Important" bg_color="text-bg-warning" invisible="not pinned"/>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="e.g. The office is closed on Friday"
+                                   readonly="state in ('published', 'expired')"/></h1>
+                    </div>
+                    <group>
+                        <group string="Audience">
+                            <field name="audience" widget="radio" readonly="state != 'draft'"/>
+                            <field name="department_ids" widget="many2many_tags" invisible="audience != 'department'"
+                                   required="audience == 'department'" readonly="state != 'draft'"/>
+                            <field name="job_ids" widget="many2many_tags" invisible="audience != 'job'"
+                                   required="audience == 'job'" readonly="state != 'draft'"/>
+                            <field name="category_ids" widget="many2many_tags" invisible="audience != 'tag'"
+                                   required="audience == 'tag'" readonly="state != 'draft'"/>
+                            <field name="employee_ids" widget="many2many_tags_avatar" invisible="audience != 'employee'"
+                                   required="audience == 'employee'" readonly="state != 'draft'"/>
+                            <field name="audience_count" invisible="state != 'draft'"/>
+                            <field name="recipient_count" invisible="state == 'draft'"/>
+                            <field name="company_id" groups="base.group_multi_company" readonly="state != 'draft'"/>
+                        </group>
+                        <group string="Showing">
+                            <field name="date_start" readonly="state not in ('draft', 'scheduled')"/>
+                            <field name="date_end"/>
+                            <field name="pinned"/>
+                            <field name="requires_ack" readonly="state != 'draft'"/>
+                            <field name="remind_after_days" invisible="not requires_ack"/>
+                            <field name="date_published" invisible="not date_published"/>
+                            <field name="date_reminded" invisible="not date_reminded"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Message" name="body">
+                            <field name="body" placeholder="What the employees should know"
+                                   readonly="state in ('published', 'expired')"/>
+                            <field name="attachment_ids" widget="many2many_binary"
+                                   readonly="state in ('published', 'expired')"/>
+                        </page>
+                        <page string="Recipients" name="recipients" invisible="not recipient_ids">
+                            <field name="recipient_ids" readonly="1">
+                                <list>
+                                    <field name="employee_id" widget="many2one_avatar_employee"/>
+                                    <field name="department_id"/>
+                                    <field name="read_date"/>
+                                    <field name="ack_date" column_invisible="not parent.requires_ack"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- For the employees: the announcement as they read it -->
+    <record id="om_hr_announcement_view_form_reader" model="ir.ui.view">
+        <field name="name">om.hr.announcement.view.form.reader</field>
+        <field name="model">om.hr.announcement</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <form string="Announcement" create="0" edit="0" delete="0">
+                <header>
+                    <button name="action_acknowledge" string="I Have Read and Understood" type="object"
+                            class="btn-primary" invisible="not requires_ack or my_state == 'acknowledged'"/>
+                    <field name="my_state" widget="statusbar"
+                           statusbar_visible="unread,read,acknowledged" invisible="not requires_ack"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Important" bg_color="text-bg-warning" invisible="not pinned"/>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                        <div class="text-muted"><field name="date_start" widget="date" readonly="1"/></div>
+                    </div>
+                    <field name="body" readonly="1"/>
+                    <field name="attachment_ids" widget="many2many_binary" readonly="1" invisible="not attachment_ids"/>
+                    <field name="requires_ack" invisible="1"/>
+                    <field name="pinned" invisible="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="om_hr_announcement_view_kanban" model="ir.ui.view">
+        <field name="name">om.hr.announcement.view.kanban</field>
+        <field name="model">om.hr.announcement</field>
+        <field name="arch" type="xml">
+            <kanban string="Announcements" create="0">
+                <field name="my_state"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex align-items-start gap-2">
+                            <span t-if="record.pinned.raw_value" class="badge text-bg-warning">Important</span>
+                            <field name="name" class="fw-bold flex-grow-1"
+                                   t-att-class="record.my_state.raw_value == 'unread' and 'text-primary' or ''"/>
+                        </div>
+                        <field name="date_start" widget="date" class="small text-muted"/>
+                        <div class="d-flex gap-1 mt-1">
+                            <span t-if="record.my_state.raw_value == 'unread'" class="badge text-bg-info">Unread</span>
+                            <span t-if="record.requires_ack.raw_value and record.my_state.raw_value != 'acknowledged'"
+                                  class="badge text-bg-danger">To Acknowledge</span>
+                            <span t-if="record.my_state.raw_value == 'acknowledged'" class="badge text-bg-success">Acknowledged</span>
+                        </div>
+                        <field name="pinned" invisible="1"/>
+                        <field name="requires_ack" invisible="1"/>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="om_hr_announcement_view_list" model="ir.ui.view">
+        <field name="name">om.hr.announcement.view.list</field>
+        <field name="model">om.hr.announcement</field>
+        <field name="arch" type="xml">
+            <list string="Announcements" decoration-muted="state == 'expired'" decoration-bf="pinned">
+                <field name="name"/>
+                <field name="audience"/>
+                <field name="date_start" widget="date"/>
+                <field name="date_end" optional="show"/>
+                <field name="pinned" optional="hide"/>
+                <field name="recipient_count" optional="show"/>
+                <field name="read_rate" widget="progressbar" optional="show"/>
+                <field name="ack_rate" widget="progressbar" optional="show"/>
+                <field name="state" widget="badge" decoration-info="state == 'scheduled'"
+                       decoration-success="state == 'published'"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="om_hr_announcement_view_search" model="ir.ui.view">
+        <field name="name">om.hr.announcement.view.search</field>
+        <field name="model">om.hr.announcement</field>
+        <field name="arch" type="xml">
+            <search string="Announcements">
+                <field name="name"/>
+                <filter string="Unread" name="unread" domain="[('my_state', '=', 'unread')]"/>
+                <filter string="To Acknowledge" name="to_acknowledge"
+                        domain="[('requires_ack', '=', True), ('my_state', 'in', ('unread', 'read'))]"/>
+                <filter string="Important" name="pinned" domain="[('pinned', '=', True)]"/>
+                <separator/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Scheduled" name="scheduled" domain="[('state', '=', 'scheduled')]"/>
+                <filter string="Published" name="published" domain="[('state', '=', 'published')]"/>
+                <filter string="Expired" name="expired" domain="[('state', '=', 'expired')]"/>
+                <group>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Audience" name="group_audience" context="{'group_by': 'audience'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="om_hr_announcement_action" model="ir.actions.act_window">
+        <field name="name">Announcements</field>
+        <field name="res_model">om.hr.announcement</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('om_hr_announcement_view_list')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('om_hr_announcement_view_form')})]"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Tell your employees what they should know</p>
+            <p>A company, department or job position notice: published, it reaches each employee, who reads it and,
+                when you ask, acknowledges it.</p>
+        </field>
+    </record>
+
+    <record id="om_hr_announcement_action_my" model="ir.actions.act_window">
+        <field name="name">Announcements</field>
+        <field name="res_model">om.hr.announcement</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="domain">[('state', '=', 'published'), ('my_state', 'in', ('unread', 'read', 'acknowledged'))]</field>
+        <field name="context">{'create': False}</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'kanban', 'view_id': ref('om_hr_announcement_view_kanban')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('om_hr_announcement_view_form_reader')})]"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No announcement for you</p>
+        </field>
+    </record>
+
+    <record id="om_hr_announcement_read_view_pivot" model="ir.ui.view">
+        <field name="name">om.hr.announcement.read.view.pivot</field>
+        <field name="model">om.hr.announcement.read</field>
+        <field name="arch" type="xml">
+            <pivot string="Announcement Recipients">
+                <field name="department_id" type="row"/>
+                <field name="announcement_id" type="col"/>
+                <field name="is_read" type="measure"/>
+                <field name="is_acknowledged" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="om_hr_announcement_read_view_list" model="ir.ui.view">
+        <field name="name">om.hr.announcement.read.view.list</field>
+        <field name="model">om.hr.announcement.read</field>
+        <field name="arch" type="xml">
+            <list string="Recipients" create="0" edit="0">
+                <field name="announcement_id"/>
+                <field name="employee_id" widget="many2one_avatar_employee"/>
+                <field name="department_id"/>
+                <field name="read_date"/>
+                <field name="ack_date"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="om_hr_announcement_read_view_search" model="ir.ui.view">
+        <field name="name">om.hr.announcement.read.view.search</field>
+        <field name="model">om.hr.announcement.read</field>
+        <field name="arch" type="xml">
+            <search string="Recipients">
+                <field name="employee_id"/>
+                <field name="department_id"/>
+                <field name="announcement_id"/>
+                <filter string="Not Read" name="unread" domain="[('read_date', '=', False)]"/>
+                <filter string="Not Acknowledged" name="pending" domain="[('ack_date', '=', False)]"/>
+                <group>
+                    <filter string="Department" name="group_department" context="{'group_by': 'department_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="om_hr_announcement_read_action" model="ir.actions.act_window">
+        <field name="name">Announcement Report</field>
+        <field name="res_model">om.hr.announcement.read</field>
+        <field name="view_mode">pivot,list</field>
+    </record>
+
+    <menuitem id="menu_om_hr_announcement_my" action="om_hr_announcement_action_my" parent="om_hr_base.menu_my_hr"
+              sequence="2"/>
+    <menuitem id="menu_om_hr_announcements" name="Announcements" parent="hr.menu_hr_root" sequence="78"/>
+    <menuitem id="menu_om_hr_announcement" action="om_hr_announcement_action" parent="menu_om_hr_announcements"
+              sequence="10"/>
+    <menuitem id="menu_om_hr_announcement_report" action="om_hr_announcement_read_action"
+              parent="menu_om_hr_announcements" sequence="20" groups="hr.group_hr_user"/>
+
+</odoo>
