@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- The time off and attendance dashboard, in the Human Resources section of the Dashboards app. The file is
+         built by tools/build_dashboards.py. -->
+
+    <record id="dashboard_time" model="spreadsheet.dashboard">
+        <field name="name">Time Off and Attendance</field>
+        <field name="spreadsheet_binary_data" type="bytes" file="om_spreadsheet_hr_time/data/files/time_dashboard.json"/>
+        <field name="main_data_model_ids" eval="[Command.set([ref('hr_holidays.model_hr_leave'), ref('hr_attendance.model_hr_attendance')])]"/>
+        <field name="dashboard_group_id" ref="spreadsheet_dashboard.spreadsheet_dashboard_group_hr"/>
+        <field name="group_ids" eval="[Command.set([ref('hr.group_hr_user')])]"/>
+        <field name="sequence">30</field>
+        <field name="is_published">True</field>
+    </record>
+
+</odoo>

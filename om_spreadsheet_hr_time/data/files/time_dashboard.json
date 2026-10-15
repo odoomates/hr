@@ -1,0 +1,992 @@
+{
+    "version": "19.3.10",
+    "sheets": [
+        {
+            "id": "11df12f2-3e0e-5c5b-9e94-5ea9a67731f7",
+            "name": "Dashboard",
+            "colNumber": 20,
+            "rowNumber": 80,
+            "rows": {},
+            "cols": {},
+            "merges": [],
+            "cells": {
+                "A47": "=_t(\"Time Off Requests to Approve\")",
+                "A48": "=ODOO.LIST(1,20)"
+            },
+            "styles": {
+                "A47": 2
+            },
+            "formats": {},
+            "borders": {},
+            "conditionalFormats": [],
+            "dataValidationRules": [],
+            "figures": [
+                {
+                    "id": "1e4cabc5-40cb-5d3f-9dd8-142ea7b479b7",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 0,
+                        "y": 0
+                    },
+                    "width": 240,
+                    "height": 110,
+                    "tag": "chart",
+                    "data": {
+                        "type": "scorecard",
+                        "title": {
+                            "text": "Time Off (Days)",
+                            "color": "#01666B",
+                            "bold": true
+                        },
+                        "background": "",
+                        "keyValue": "Data!B3",
+                        "baselineColorDown": "#00A04A",
+                        "baselineColorUp": "#DC6965",
+                        "baselineMode": "percentage",
+                        "humanize": true,
+                        "chartId": "1e4cabc5-40cb-5d3f-9dd8-142ea7b479b7"
+                    }
+                },
+                {
+                    "id": "97f7e054-08d0-5b29-8a02-33c85c070f33",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 250,
+                        "y": 0
+                    },
+                    "width": 240,
+                    "height": 110,
+                    "tag": "chart",
+                    "data": {
+                        "type": "scorecard",
+                        "title": {
+                            "text": "Requests to Approve",
+                            "color": "#01666B",
+                            "bold": true
+                        },
+                        "background": "",
+                        "keyValue": "Data!B4",
+                        "baselineColorDown": "#00A04A",
+                        "baselineColorUp": "#DC6965",
+                        "baselineMode": "percentage",
+                        "humanize": true,
+                        "chartId": "97f7e054-08d0-5b29-8a02-33c85c070f33"
+                    }
+                },
+                {
+                    "id": "3d90a604-5d14-5f6e-a1e6-e56f4287ffdf",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 500,
+                        "y": 0
+                    },
+                    "width": 240,
+                    "height": 110,
+                    "tag": "chart",
+                    "data": {
+                        "type": "scorecard",
+                        "title": {
+                            "text": "Hours Worked",
+                            "color": "#01666B",
+                            "bold": true
+                        },
+                        "background": "",
+                        "keyValue": "Data!B5",
+                        "baselineColorDown": "#DC6965",
+                        "baselineColorUp": "#00A04A",
+                        "baselineMode": "percentage",
+                        "humanize": true,
+                        "chartId": "3d90a604-5d14-5f6e-a1e6-e56f4287ffdf"
+                    }
+                },
+                {
+                    "id": "c388c2a4-d336-5b7e-b2fa-fa525559510e",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 750,
+                        "y": 0
+                    },
+                    "width": 240,
+                    "height": 110,
+                    "tag": "chart",
+                    "data": {
+                        "type": "scorecard",
+                        "title": {
+                            "text": "Overtime Hours",
+                            "color": "#01666B",
+                            "bold": true
+                        },
+                        "background": "",
+                        "keyValue": "Data!B6",
+                        "baselineColorDown": "#00A04A",
+                        "baselineColorUp": "#DC6965",
+                        "baselineMode": "percentage",
+                        "humanize": true,
+                        "chartId": "c388c2a4-d336-5b7e-b2fa-fa525559510e"
+                    }
+                },
+                {
+                    "id": "58295c05-882d-578b-959e-f7b9aba74a0c",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 0,
+                        "y": 120
+                    },
+                    "width": 490,
+                    "height": 300,
+                    "tag": "chart",
+                    "data": {
+                        "type": "bar",
+                        "title": {
+                            "text": "Time Off by Month (Days)",
+                            "color": "#01666B",
+                            "bold": true
+                        },
+                        "legendPosition": "top",
+                        "humanize": true,
+                        "dataSource": {
+                            "type": "range",
+                            "labelRange": "Data!A11:A22",
+                            "dataSets": [
+                                {
+                                    "dataSetId": "0",
+                                    "dataRange": "Data!B11:B22"
+                                }
+                            ],
+                            "dataSetsHaveTitle": false
+                        },
+                        "dataSetStyles": {
+                            "0": {
+                                "label": "Time Off"
+                            }
+                        },
+                        "chartId": "58295c05-882d-578b-959e-f7b9aba74a0c",
+                        "stacked": false,
+                        "aggregated": false
+                    }
+                },
+                {
+                    "id": "9a190e86-4d16-5e5c-a942-addc1c2882cc",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 500,
+                        "y": 120
+                    },
+                    "width": 490,
+                    "height": 300,
+                    "tag": "chart",
+                    "data": {
+                        "type": "bar",
+                        "title": {
+                            "text": "Hours Worked and Overtime by Month",
+                            "color": "#01666B",
+                            "bold": true
+                        },
+                        "legendPosition": "top",
+                        "humanize": true,
+                        "dataSource": {
+                            "type": "range",
+                            "labelRange": "Data!A11:A22",
+                            "dataSets": [
+                                {
+                                    "dataSetId": "0",
+                                    "dataRange": "Data!C11:C22"
+                                },
+                                {
+                                    "dataSetId": "1",
+                                    "dataRange": "Data!D11:D22"
+                                }
+                            ],
+                            "dataSetsHaveTitle": false
+                        },
+                        "dataSetStyles": {
+                            "0": {
+                                "label": "Worked"
+                            },
+                            "1": {
+                                "label": "Overtime"
+                            }
+                        },
+                        "chartId": "9a190e86-4d16-5e5c-a942-addc1c2882cc",
+                        "stacked": true,
+                        "aggregated": false
+                    }
+                },
+                {
+                    "id": "045cf8df-5625-529f-8826-b17ac362d85b",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 0,
+                        "y": 430
+                    },
+                    "width": 490,
+                    "height": 280,
+                    "tag": "carousel",
+                    "data": {
+                        "chartDefinitions": {
+                            "8d9afbda-965f-5486-9b6f-ae32465f16a5": {
+                                "type": "pie",
+                                "title": {},
+                                "legendPosition": "top",
+                                "humanize": true,
+                                "dataSource": {
+                                    "type": "odoo",
+                                    "metaData": {
+                                        "groupBy": [
+                                            "work_entry_type_id"
+                                        ],
+                                        "measure": "number_of_days",
+                                        "order": null,
+                                        "resModel": "hr.leave",
+                                        "mode": "pie",
+                                        "cumulatedStart": false
+                                    },
+                                    "searchParams": {
+                                        "comparison": null,
+                                        "context": {},
+                                        "domain": [
+                                            [
+                                                "state",
+                                                "=",
+                                                "validate"
+                                            ]
+                                        ],
+                                        "groupBy": [
+                                            "work_entry_type_id"
+                                        ],
+                                        "orderBy": []
+                                    },
+                                    "actionXmlId": "hr_holidays.hr_leave_action_action_approve_department"
+                                },
+                                "dataSetStyles": {}
+                            }
+                        },
+                        "title": {
+                            "text": "Time Off by Type (Days)",
+                            "fontSize": 16,
+                            "bold": true,
+                            "color": "#01666B"
+                        },
+                        "items": [
+                            {
+                                "type": "chart",
+                                "chartId": "8d9afbda-965f-5486-9b6f-ae32465f16a5"
+                            }
+                        ],
+                        "fieldMatching": {
+                            "8d9afbda-965f-5486-9b6f-ae32465f16a5": {
+                                "c9315b27-459e-56ff-b413-28702b81ad65": {
+                                    "chain": "request_date_from",
+                                    "type": "date"
+                                },
+                                "3899a263-21d3-5d33-aedb-bab26d44b658": {
+                                    "chain": "department_id",
+                                    "type": "many2one"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "id": "251561e9-8c80-54b2-8948-5be564072d69",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 500,
+                        "y": 430
+                    },
+                    "width": 490,
+                    "height": 280,
+                    "tag": "carousel",
+                    "data": {
+                        "chartDefinitions": {
+                            "c4b4088d-3874-5941-aa1a-67263091eb5d": {
+                                "type": "bar",
+                                "title": {},
+                                "legendPosition": "top",
+                                "humanize": true,
+                                "dataSource": {
+                                    "type": "odoo",
+                                    "metaData": {
+                                        "groupBy": [
+                                            "department_id"
+                                        ],
+                                        "measure": "number_of_days",
+                                        "order": null,
+                                        "resModel": "hr.leave",
+                                        "mode": "bar",
+                                        "cumulatedStart": false
+                                    },
+                                    "searchParams": {
+                                        "comparison": null,
+                                        "context": {},
+                                        "domain": [
+                                            [
+                                                "state",
+                                                "=",
+                                                "validate"
+                                            ]
+                                        ],
+                                        "groupBy": [
+                                            "department_id"
+                                        ],
+                                        "orderBy": []
+                                    },
+                                    "actionXmlId": "hr_holidays.hr_leave_action_action_approve_department"
+                                },
+                                "dataSetStyles": {},
+                                "stacked": false
+                            }
+                        },
+                        "title": {
+                            "text": "Time Off by Department (Days)",
+                            "fontSize": 16,
+                            "bold": true,
+                            "color": "#01666B"
+                        },
+                        "items": [
+                            {
+                                "type": "chart",
+                                "chartId": "c4b4088d-3874-5941-aa1a-67263091eb5d"
+                            }
+                        ],
+                        "fieldMatching": {
+                            "c4b4088d-3874-5941-aa1a-67263091eb5d": {
+                                "c9315b27-459e-56ff-b413-28702b81ad65": {
+                                    "chain": "request_date_from",
+                                    "type": "date"
+                                },
+                                "3899a263-21d3-5d33-aedb-bab26d44b658": {
+                                    "chain": "department_id",
+                                    "type": "many2one"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "id": "f0bded22-ae6b-5ab9-9da2-e559d583fe3e",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 0,
+                        "y": 720
+                    },
+                    "width": 490,
+                    "height": 280,
+                    "tag": "carousel",
+                    "data": {
+                        "chartDefinitions": {
+                            "bb45bf72-1300-5580-971d-c46595b9db6d": {
+                                "type": "bar",
+                                "title": {},
+                                "legendPosition": "top",
+                                "humanize": true,
+                                "dataSource": {
+                                    "type": "odoo",
+                                    "metaData": {
+                                        "groupBy": [
+                                            "om_department_id"
+                                        ],
+                                        "measure": "worked_hours",
+                                        "order": null,
+                                        "resModel": "hr.attendance",
+                                        "mode": "bar",
+                                        "cumulatedStart": false
+                                    },
+                                    "searchParams": {
+                                        "comparison": null,
+                                        "context": {},
+                                        "domain": [
+                                            [
+                                                "state",
+                                                "=",
+                                                "validated"
+                                            ],
+                                            [
+                                                "time_rule_id",
+                                                "!=",
+                                                false
+                                            ]
+                                        ],
+                                        "groupBy": [
+                                            "om_department_id"
+                                        ],
+                                        "orderBy": []
+                                    },
+                                    "actionXmlId": "hr_attendance.hr_attendance_action"
+                                },
+                                "dataSetStyles": {},
+                                "stacked": false
+                            }
+                        },
+                        "title": {
+                            "text": "Overtime by Department (Hours)",
+                            "fontSize": 16,
+                            "bold": true,
+                            "color": "#01666B"
+                        },
+                        "items": [
+                            {
+                                "type": "chart",
+                                "chartId": "bb45bf72-1300-5580-971d-c46595b9db6d"
+                            }
+                        ],
+                        "fieldMatching": {
+                            "bb45bf72-1300-5580-971d-c46595b9db6d": {
+                                "c9315b27-459e-56ff-b413-28702b81ad65": {
+                                    "chain": "check_in",
+                                    "type": "datetime"
+                                },
+                                "3899a263-21d3-5d33-aedb-bab26d44b658": {
+                                    "chain": "om_department_id",
+                                    "type": "many2one"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "id": "7f2ee14d-2c99-52e3-a524-41f234896521",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 500,
+                        "y": 720
+                    },
+                    "width": 490,
+                    "height": 280,
+                    "tag": "carousel",
+                    "data": {
+                        "chartDefinitions": {
+                            "75206a72-5e9e-5e86-bb07-cf5ad03f8e7b": {
+                                "type": "bar",
+                                "title": {},
+                                "legendPosition": "top",
+                                "humanize": true,
+                                "dataSource": {
+                                    "type": "odoo",
+                                    "metaData": {
+                                        "groupBy": [
+                                            "om_department_id"
+                                        ],
+                                        "measure": "worked_hours",
+                                        "order": null,
+                                        "resModel": "hr.attendance",
+                                        "mode": "bar",
+                                        "cumulatedStart": false
+                                    },
+                                    "searchParams": {
+                                        "comparison": null,
+                                        "context": {},
+                                        "domain": [
+                                            [
+                                                "state",
+                                                "=",
+                                                "validated"
+                                            ],
+                                            [
+                                                "time_rule_id",
+                                                "=",
+                                                false
+                                            ]
+                                        ],
+                                        "groupBy": [
+                                            "om_department_id"
+                                        ],
+                                        "orderBy": []
+                                    },
+                                    "actionXmlId": "hr_attendance.hr_attendance_action"
+                                },
+                                "dataSetStyles": {},
+                                "stacked": false
+                            }
+                        },
+                        "title": {
+                            "text": "Hours Worked by Department",
+                            "fontSize": 16,
+                            "bold": true,
+                            "color": "#01666B"
+                        },
+                        "items": [
+                            {
+                                "type": "chart",
+                                "chartId": "75206a72-5e9e-5e86-bb07-cf5ad03f8e7b"
+                            }
+                        ],
+                        "fieldMatching": {
+                            "75206a72-5e9e-5e86-bb07-cf5ad03f8e7b": {
+                                "c9315b27-459e-56ff-b413-28702b81ad65": {
+                                    "chain": "check_in",
+                                    "type": "datetime"
+                                },
+                                "3899a263-21d3-5d33-aedb-bab26d44b658": {
+                                    "chain": "om_department_id",
+                                    "type": "many2one"
+                                }
+                            }
+                        }
+                    }
+                }
+            ],
+            "tables": [],
+            "areGridLinesVisible": false,
+            "isVisible": true,
+            "headerGroups": {
+                "ROW": [],
+                "COL": []
+            },
+            "comments": {},
+            "backgroundColor": "#F9FAFB"
+        },
+        {
+            "id": "ed96bd29-bce4-552d-80a8-154be72da878",
+            "name": "Data",
+            "colNumber": 26,
+            "rowNumber": 100,
+            "rows": {},
+            "cols": {
+                "0": {
+                    "size": 200
+                },
+                "1": {
+                    "size": 130
+                },
+                "2": {
+                    "size": 130
+                },
+                "3": {
+                    "size": 130
+                }
+            },
+            "merges": [],
+            "cells": {
+                "A1": "=_t(\"Period\")",
+                "B1": "=ODOO.FILTER.VALUE(\"Period\")",
+                "A2": "=_t(\"Start\")",
+                "B2": "=IF(ISNUMBER(B1),B1,DATE(YEAR(TODAY()),1,1))",
+                "A3": "=_t(\"Time off (days)\")",
+                "B3": "=0+PIVOT.VALUE(1,\"number_of_days\")",
+                "A4": "=_t(\"Pending requests\")",
+                "B4": "=0+PIVOT.VALUE(2,\"__count\")",
+                "A5": "=_t(\"Hours worked\")",
+                "B5": "=0+PIVOT.VALUE(3,\"worked_hours\")",
+                "A6": "=_t(\"Overtime hours\")",
+                "B6": "=0+PIVOT.VALUE(4,\"worked_hours\")",
+                "A10": "=_t(\"Month\")",
+                "B10": "=_t(\"Time off (days)\")",
+                "C10": "=_t(\"Hours worked\")",
+                "D10": "=_t(\"Overtime hours\")",
+                "A11": "=EDATE(DATE(YEAR($B$2),MONTH($B$2),1),0)",
+                "B11": "=0+PIVOT.VALUE(1,\"number_of_days\",\"request_date_from:month\",TEXT(A11,\"mm/yyyy\"))",
+                "C11": "=0+PIVOT.VALUE(3,\"worked_hours\",\"check_in:month\",TEXT(A11,\"mm/yyyy\"))",
+                "D11": "=0+PIVOT.VALUE(4,\"worked_hours\",\"check_in:month\",TEXT(A11,\"mm/yyyy\"))",
+                "A12": "=EDATE(DATE(YEAR($B$2),MONTH($B$2),1),1)",
+                "B12": "=0+PIVOT.VALUE(1,\"number_of_days\",\"request_date_from:month\",TEXT(A12,\"mm/yyyy\"))",
+                "C12": "=0+PIVOT.VALUE(3,\"worked_hours\",\"check_in:month\",TEXT(A12,\"mm/yyyy\"))",
+                "D12": "=0+PIVOT.VALUE(4,\"worked_hours\",\"check_in:month\",TEXT(A12,\"mm/yyyy\"))",
+                "A13": "=EDATE(DATE(YEAR($B$2),MONTH($B$2),1),2)",
+                "B13": "=0+PIVOT.VALUE(1,\"number_of_days\",\"request_date_from:month\",TEXT(A13,\"mm/yyyy\"))",
+                "C13": "=0+PIVOT.VALUE(3,\"worked_hours\",\"check_in:month\",TEXT(A13,\"mm/yyyy\"))",
+                "D13": "=0+PIVOT.VALUE(4,\"worked_hours\",\"check_in:month\",TEXT(A13,\"mm/yyyy\"))",
+                "A14": "=EDATE(DATE(YEAR($B$2),MONTH($B$2),1),3)",
+                "B14": "=0+PIVOT.VALUE(1,\"number_of_days\",\"request_date_from:month\",TEXT(A14,\"mm/yyyy\"))",
+                "C14": "=0+PIVOT.VALUE(3,\"worked_hours\",\"check_in:month\",TEXT(A14,\"mm/yyyy\"))",
+                "D14": "=0+PIVOT.VALUE(4,\"worked_hours\",\"check_in:month\",TEXT(A14,\"mm/yyyy\"))",
+                "A15": "=EDATE(DATE(YEAR($B$2),MONTH($B$2),1),4)",
+                "B15": "=0+PIVOT.VALUE(1,\"number_of_days\",\"request_date_from:month\",TEXT(A15,\"mm/yyyy\"))",
+                "C15": "=0+PIVOT.VALUE(3,\"worked_hours\",\"check_in:month\",TEXT(A15,\"mm/yyyy\"))",
+                "D15": "=0+PIVOT.VALUE(4,\"worked_hours\",\"check_in:month\",TEXT(A15,\"mm/yyyy\"))",
+                "A16": "=EDATE(DATE(YEAR($B$2),MONTH($B$2),1),5)",
+                "B16": "=0+PIVOT.VALUE(1,\"number_of_days\",\"request_date_from:month\",TEXT(A16,\"mm/yyyy\"))",
+                "C16": "=0+PIVOT.VALUE(3,\"worked_hours\",\"check_in:month\",TEXT(A16,\"mm/yyyy\"))",
+                "D16": "=0+PIVOT.VALUE(4,\"worked_hours\",\"check_in:month\",TEXT(A16,\"mm/yyyy\"))",
+                "A17": "=EDATE(DATE(YEAR($B$2),MONTH($B$2),1),6)",
+                "B17": "=0+PIVOT.VALUE(1,\"number_of_days\",\"request_date_from:month\",TEXT(A17,\"mm/yyyy\"))",
+                "C17": "=0+PIVOT.VALUE(3,\"worked_hours\",\"check_in:month\",TEXT(A17,\"mm/yyyy\"))",
+                "D17": "=0+PIVOT.VALUE(4,\"worked_hours\",\"check_in:month\",TEXT(A17,\"mm/yyyy\"))",
+                "A18": "=EDATE(DATE(YEAR($B$2),MONTH($B$2),1),7)",
+                "B18": "=0+PIVOT.VALUE(1,\"number_of_days\",\"request_date_from:month\",TEXT(A18,\"mm/yyyy\"))",
+                "C18": "=0+PIVOT.VALUE(3,\"worked_hours\",\"check_in:month\",TEXT(A18,\"mm/yyyy\"))",
+                "D18": "=0+PIVOT.VALUE(4,\"worked_hours\",\"check_in:month\",TEXT(A18,\"mm/yyyy\"))",
+                "A19": "=EDATE(DATE(YEAR($B$2),MONTH($B$2),1),8)",
+                "B19": "=0+PIVOT.VALUE(1,\"number_of_days\",\"request_date_from:month\",TEXT(A19,\"mm/yyyy\"))",
+                "C19": "=0+PIVOT.VALUE(3,\"worked_hours\",\"check_in:month\",TEXT(A19,\"mm/yyyy\"))",
+                "D19": "=0+PIVOT.VALUE(4,\"worked_hours\",\"check_in:month\",TEXT(A19,\"mm/yyyy\"))",
+                "A20": "=EDATE(DATE(YEAR($B$2),MONTH($B$2),1),9)",
+                "B20": "=0+PIVOT.VALUE(1,\"number_of_days\",\"request_date_from:month\",TEXT(A20,\"mm/yyyy\"))",
+                "C20": "=0+PIVOT.VALUE(3,\"worked_hours\",\"check_in:month\",TEXT(A20,\"mm/yyyy\"))",
+                "D20": "=0+PIVOT.VALUE(4,\"worked_hours\",\"check_in:month\",TEXT(A20,\"mm/yyyy\"))",
+                "A21": "=EDATE(DATE(YEAR($B$2),MONTH($B$2),1),10)",
+                "B21": "=0+PIVOT.VALUE(1,\"number_of_days\",\"request_date_from:month\",TEXT(A21,\"mm/yyyy\"))",
+                "C21": "=0+PIVOT.VALUE(3,\"worked_hours\",\"check_in:month\",TEXT(A21,\"mm/yyyy\"))",
+                "D21": "=0+PIVOT.VALUE(4,\"worked_hours\",\"check_in:month\",TEXT(A21,\"mm/yyyy\"))",
+                "A22": "=EDATE(DATE(YEAR($B$2),MONTH($B$2),1),11)",
+                "B22": "=0+PIVOT.VALUE(1,\"number_of_days\",\"request_date_from:month\",TEXT(A22,\"mm/yyyy\"))",
+                "C22": "=0+PIVOT.VALUE(3,\"worked_hours\",\"check_in:month\",TEXT(A22,\"mm/yyyy\"))",
+                "D22": "=0+PIVOT.VALUE(4,\"worked_hours\",\"check_in:month\",TEXT(A22,\"mm/yyyy\"))"
+            },
+            "styles": {
+                "A1": 1,
+                "A2": 1,
+                "A3": 1,
+                "A4": 1,
+                "A5": 1,
+                "A6": 1,
+                "A10": 2,
+                "B10": 2,
+                "C10": 2,
+                "D10": 2
+            },
+            "formats": {
+                "B1": 1,
+                "B2": 1,
+                "B3": 2,
+                "B4": 3,
+                "B5": 2,
+                "B6": 2,
+                "C1": 1,
+                "A11": 4,
+                "B11": 2,
+                "C11": 2,
+                "D11": 2,
+                "A12": 4,
+                "B12": 2,
+                "C12": 2,
+                "D12": 2,
+                "A13": 4,
+                "B13": 2,
+                "C13": 2,
+                "D13": 2,
+                "A14": 4,
+                "B14": 2,
+                "C14": 2,
+                "D14": 2,
+                "A15": 4,
+                "B15": 2,
+                "C15": 2,
+                "D15": 2,
+                "A16": 4,
+                "B16": 2,
+                "C16": 2,
+                "D16": 2,
+                "A17": 4,
+                "B17": 2,
+                "C17": 2,
+                "D17": 2,
+                "A18": 4,
+                "B18": 2,
+                "C18": 2,
+                "D18": 2,
+                "A19": 4,
+                "B19": 2,
+                "C19": 2,
+                "D19": 2,
+                "A20": 4,
+                "B20": 2,
+                "C20": 2,
+                "D20": 2,
+                "A21": 4,
+                "B21": 2,
+                "C21": 2,
+                "D21": 2,
+                "A22": 4,
+                "B22": 2,
+                "C22": 2,
+                "D22": 2
+            },
+            "borders": {},
+            "conditionalFormats": [],
+            "dataValidationRules": [],
+            "figures": [],
+            "tables": [],
+            "areGridLinesVisible": true,
+            "isVisible": true,
+            "headerGroups": {
+                "ROW": [],
+                "COL": []
+            },
+            "comments": {}
+        }
+    ],
+    "styles": {
+        "1": {
+            "textColor": "#434343"
+        },
+        "2": {
+            "textColor": "#434343",
+            "bold": true,
+            "fontSize": 11,
+            "fillColor": "#E7F2F2"
+        }
+    },
+    "formats": {
+        "1": "mm/dd/yyyy",
+        "2": "#,##0.0",
+        "3": "#,##0",
+        "4": "mmm yyyy"
+    },
+    "borders": {},
+    "revisionId": "START_REVISION",
+    "uniqueFigureIds": true,
+    "settings": {
+        "locale": {
+            "name": "English (US)",
+            "code": "en_US",
+            "thousandsSeparator": ",",
+            "decimalSeparator": ".",
+            "dateFormat": "mm/dd/yyyy",
+            "timeFormat": "hh:mm:ss",
+            "formulaArgSeparator": ",",
+            "weekStart": 7
+        }
+    },
+    "pivots": {
+        "1": {
+            "type": "ODOO",
+            "id": "1",
+            "formulaId": "1",
+            "name": "Time Off",
+            "model": "hr.leave",
+            "domain": [
+                [
+                    "state",
+                    "=",
+                    "validate"
+                ]
+            ],
+            "context": {},
+            "measures": [
+                {
+                    "id": "number_of_days",
+                    "fieldName": "number_of_days"
+                }
+            ],
+            "rows": [
+                {
+                    "fieldName": "request_date_from",
+                    "granularity": "month"
+                }
+            ],
+            "columns": [],
+            "fieldMatching": {
+                "c9315b27-459e-56ff-b413-28702b81ad65": {
+                    "chain": "request_date_from",
+                    "type": "date",
+                    "offset": 0
+                },
+                "3899a263-21d3-5d33-aedb-bab26d44b658": {
+                    "chain": "department_id",
+                    "type": "many2one"
+                }
+            }
+        },
+        "2": {
+            "type": "ODOO",
+            "id": "2",
+            "formulaId": "2",
+            "name": "Pending Requests",
+            "model": "hr.leave",
+            "domain": [
+                [
+                    "state",
+                    "in",
+                    [
+                        "confirm",
+                        "validate1"
+                    ]
+                ]
+            ],
+            "context": {},
+            "measures": [
+                {
+                    "id": "__count",
+                    "fieldName": "__count"
+                }
+            ],
+            "rows": [],
+            "columns": [],
+            "fieldMatching": {
+                "c9315b27-459e-56ff-b413-28702b81ad65": {
+                    "chain": "request_date_from",
+                    "type": "date",
+                    "offset": 0
+                },
+                "3899a263-21d3-5d33-aedb-bab26d44b658": {
+                    "chain": "department_id",
+                    "type": "many2one"
+                }
+            }
+        },
+        "3": {
+            "type": "ODOO",
+            "id": "3",
+            "formulaId": "3",
+            "name": "Hours Worked",
+            "model": "hr.attendance",
+            "domain": [
+                [
+                    "state",
+                    "=",
+                    "validated"
+                ],
+                [
+                    "time_rule_id",
+                    "=",
+                    false
+                ]
+            ],
+            "context": {},
+            "measures": [
+                {
+                    "id": "worked_hours",
+                    "fieldName": "worked_hours"
+                }
+            ],
+            "rows": [
+                {
+                    "fieldName": "check_in",
+                    "granularity": "month"
+                }
+            ],
+            "columns": [],
+            "fieldMatching": {
+                "c9315b27-459e-56ff-b413-28702b81ad65": {
+                    "chain": "check_in",
+                    "type": "datetime"
+                },
+                "3899a263-21d3-5d33-aedb-bab26d44b658": {
+                    "chain": "om_department_id",
+                    "type": "many2one"
+                }
+            }
+        },
+        "4": {
+            "type": "ODOO",
+            "id": "4",
+            "formulaId": "4",
+            "name": "Overtime Hours",
+            "model": "hr.attendance",
+            "domain": [
+                [
+                    "state",
+                    "=",
+                    "validated"
+                ],
+                [
+                    "time_rule_id",
+                    "!=",
+                    false
+                ]
+            ],
+            "context": {},
+            "measures": [
+                {
+                    "id": "worked_hours",
+                    "fieldName": "worked_hours"
+                }
+            ],
+            "rows": [
+                {
+                    "fieldName": "check_in",
+                    "granularity": "month"
+                }
+            ],
+            "columns": [],
+            "fieldMatching": {
+                "c9315b27-459e-56ff-b413-28702b81ad65": {
+                    "chain": "check_in",
+                    "type": "datetime"
+                },
+                "3899a263-21d3-5d33-aedb-bab26d44b658": {
+                    "chain": "om_department_id",
+                    "type": "many2one"
+                }
+            }
+        }
+    },
+    "pivotNextId": 5,
+    "customTableStyles": {},
+    "namedRanges": [],
+    "globalFilters": [
+        {
+            "id": "c9315b27-459e-56ff-b413-28702b81ad65",
+            "type": "date",
+            "label": "Period",
+            "defaultValue": "this_year"
+        },
+        {
+            "id": "3899a263-21d3-5d33-aedb-bab26d44b658",
+            "type": "relation",
+            "label": "Department",
+            "modelName": "hr.department",
+            "defaultValueDisplayNames": []
+        }
+    ],
+    "lists": {
+        "1": {
+            "id": "1",
+            "name": "Requests to Approve",
+            "model": "hr.leave",
+            "domain": [
+                [
+                    "state",
+                    "in",
+                    [
+                        "confirm",
+                        "validate1"
+                    ]
+                ]
+            ],
+            "context": {},
+            "columns": [
+                {
+                    "name": "employee_id",
+                    "string": "Employee"
+                },
+                {
+                    "name": "work_entry_type_id",
+                    "string": "Type"
+                },
+                {
+                    "name": "request_date_from",
+                    "string": "From"
+                },
+                {
+                    "name": "request_date_to",
+                    "string": "To"
+                },
+                {
+                    "name": "number_of_days",
+                    "string": "Days"
+                }
+            ],
+            "orderBy": [
+                {
+                    "name": "request_date_from",
+                    "asc": true
+                }
+            ],
+            "fieldMatching": {
+                "c9315b27-459e-56ff-b413-28702b81ad65": {
+                    "chain": "request_date_from",
+                    "type": "date",
+                    "offset": 0
+                },
+                "3899a263-21d3-5d33-aedb-bab26d44b658": {
+                    "chain": "department_id",
+                    "type": "many2one"
+                }
+            }
+        }
+    },
+    "listNextId": 2,
+    "odooLinkReferences": {}
+}
