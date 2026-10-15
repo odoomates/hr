@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="portal_my_hr" inherit_id="om_hr_portal.portal_my_hr" name="My HR: Assets">
+        <xpath expr="//div[@id='om_hr_cards']" position="inside">
+            <div class="col" style="order: 6;">
+                <t t-call="om_hr_portal.portal_my_hr_card" url="'/my/hr/assets'" icon="'inventory_2'"
+                   title.translate="Assets" text.translate="The laptop, phone or tools in your hands"/>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="portal_my_assets" name="My Assets">
+        <t t-call="portal.portal_layout">
+            <div t-if="not assignments" class="alert alert-info" role="status">No asset of the company in your hands.</div>
+            <t t-else="" t-call="portal.portal_table">
+                <thead><tr><th>Asset</th><th>Serial Number</th><th>Handed Over</th><th>Returned</th><th>Status</th></tr></thead>
+                <tbody>
+                    <tr t-foreach="assignments" t-as="rec">
+                        <td t-out="rec.equipment_id.name"/>
+                        <td t-out="rec.serial_no or ''"/>
+                        <td><span t-field="rec.date_from"/></td>
+                        <td><span t-if="rec.date_to" t-field="rec.date_to"/></td>
+                        <td><span t-attf-class="badge #{'text-bg-success' if rec.state in ('returned',) else 'text-bg-danger' if rec.state in ('lost',) else 'text-bg-info'}" t-field="rec.state"/></td>
+                    </tr>
+                </tbody>
+            </t>
+        </t>
+    </template>
+</odoo>
