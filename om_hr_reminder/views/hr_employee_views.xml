@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- My HR > Celebrations: the birthdays and the work anniversaries of the month, for every employee -->
+    <record id="hr_employee_public_view_list_celebrations" model="ir.ui.view">
+        <field name="name">hr.employee.public.list.celebrations</field>
+        <field name="model">hr.employee.public</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <list string="Celebrations" create="0" edit="0" delete="0" default_order="om_next_anniversary">
+                <field name="name" widget="many2one_avatar_employee"/>
+                <field name="department_id"/>
+                <field name="job_title" optional="show"/>
+                <field name="om_next_birthday" string="Birthday"/>
+                <field name="om_next_anniversary" string="Work Anniversary"/>
+                <field name="om_service_years" string="Years"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hr_employee_public_action_celebrations" model="ir.actions.act_window">
+        <field name="name">Celebrations</field>
+        <field name="res_model">hr.employee.public</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="hr_employee_public_view_list_celebrations"/>
+        <field name="domain">['|',
+            '&amp;', ('om_next_birthday', '&gt;=', (context_today() + relativedelta(day=1)).strftime('%Y-%m-%d')),
+                     ('om_next_birthday', '&lt;=', (context_today() + relativedelta(day=31)).strftime('%Y-%m-%d')),
+            '&amp;', ('om_next_anniversary', '&gt;=', (context_today() + relativedelta(day=1)).strftime('%Y-%m-%d')),
+                     ('om_next_anniversary', '&lt;=', (context_today() + relativedelta(day=31)).strftime('%Y-%m-%d'))]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No birthday or work anniversary this month</p>
+            <p>The birthdays show for the colleagues who let theirs be shown.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_my_hr_celebrations"
+              action="hr_employee_public_action_celebrations"
+              parent="om_hr_base.menu_my_hr"
+              sequence="95"/>
+
+    <record id="hr_employee_view_form_om_reminder" model="ir.ui.view">
+        <field name="name">hr.employee.view.form.om.reminder</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <field name="birthday" position="after">
+                <field name="om_next_anniversary" groups="hr.group_hr_user"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

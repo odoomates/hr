@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="ir_cron_update_reminder_dates" model="ir.cron">
+        <field name="name">HR Reminders: next birthdays, work anniversaries and probation ends</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_om_update_reminder_dates()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+    </record>
+
+    <!-- Ready-made Automation Rules: edit them, turn them off, or add your own on the same dates -->
+    <data noupdate="1">
+
+        <record id="automation_birthday" model="base.automation">
+            <field name="name">HR: birthday of an employee, to the manager</field>
+            <field name="model_id" ref="hr.model_hr_employee"/>
+            <field name="trigger">on_time</field>
+            <field name="trg_date_id" ref="om_hr_reminder.field_hr_employee__om_next_birthday"/>
+            <field name="trg_date_range">0</field>
+            <field name="trg_date_range_mode">after</field>
+            <field name="trg_date_range_type">day</field>
+        </record>
+        <record id="action_birthday" model="ir.actions.server">
+            <field name="name">Remind the manager of the birthday</field>
+            <field name="model_id" ref="hr.model_hr_employee"/>
+            <field name="base_automation_id" ref="automation_birthday"/>
+            <field name="usage">base_automation</field>
+            <field name="state">code</field>
+            <field name="code">records._om_remind('birthday')</field>
+        </record>
+
+        <record id="automation_anniversary" model="base.automation">
+            <field name="name">HR: work anniversary of an employee, to the manager and HR</field>
+            <field name="model_id" ref="hr.model_hr_employee"/>
+            <field name="trigger">on_time</field>
+            <field name="trg_date_id" ref="om_hr_reminder.field_hr_employee__om_next_anniversary"/>
+            <field name="trg_date_range">0</field>
+            <field name="trg_date_range_mode">after</field>
+            <field name="trg_date_range_type">day</field>
+        </record>
+        <record id="action_anniversary" model="ir.actions.server">
+            <field name="name">Remind the manager and HR of the work anniversary</field>
+            <field name="model_id" ref="hr.model_hr_employee"/>
+            <field name="base_automation_id" ref="automation_anniversary"/>
+            <field name="usage">base_automation</field>
+            <field name="state">code</field>
+            <field name="code">records._om_remind('anniversary')</field>
+        </record>
+
+        <record id="automation_probation" model="base.automation">
+            <field name="name">HR: probation ending, to the manager</field>
+            <field name="model_id" ref="hr.model_hr_employee"/>
+            <field name="trigger">on_time</field>
+            <field name="trg_date_id" ref="om_hr_reminder.field_hr_employee__om_probation_end"/>
+            <field name="trg_date_range">14</field>
+            <field name="trg_date_range_mode">before</field>
+            <field name="trg_date_range_type">day</field>
+        </record>
+        <record id="action_probation" model="ir.actions.server">
+            <field name="name">Remind the manager of the end of the probation</field>
+            <field name="model_id" ref="hr.model_hr_employee"/>
+            <field name="base_automation_id" ref="automation_probation"/>
+            <field name="usage">base_automation</field>
+            <field name="state">code</field>
+            <field name="code">records._om_remind('probation')</field>
+        </record>
+
+    </data>
+</odoo>
