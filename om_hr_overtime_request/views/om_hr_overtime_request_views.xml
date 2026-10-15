@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="om_hr_overtime_request_view_list" model="ir.ui.view">
+        <field name="name">om.hr.overtime.request.view.list</field>
+        <field name="model">om.hr.overtime.request</field>
+        <field name="arch" type="xml">
+            <list string="Overtime Requests">
+                <field name="date"/>
+                <field name="employee_id" widget="many2one_avatar_employee"/>
+                <field name="department_id" optional="hide"/>
+                <field name="hours" widget="float_time" sum="Total"/>
+                <field name="reason"/>
+                <field name="approval_step" optional="show"/>
+                <field name="state" widget="badge" decoration-info="state == 'to_approve'"
+                       decoration-success="state == 'approved'" decoration-danger="state == 'refused'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="om_hr_overtime_request_view_form" model="ir.ui.view">
+        <field name="name">om.hr.overtime.request.view.form</field>
+        <field name="model">om.hr.overtime.request</field>
+        <field name="arch" type="xml">
+            <form string="Overtime Request">
+                <header>
+                    <button name="action_submit" string="Send" type="object" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_approval_approve" string="Approve" type="object" class="btn-primary"
+                            invisible="not can_approve"/>
+                    <button name="action_approval_open_refuse" string="Refuse" type="object"
+                            invisible="not can_approve"/>
+                    <button name="action_approval_reset" string="Back to Draft" type="object"
+                            invisible="state not in ('to_approve', 'refused', 'cancel')"/>
+                    <button name="action_approval_cancel" string="Cancel" type="object"
+                            invisible="state not in ('draft', 'to_approve', 'approved')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,to_approve,approved"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="employee_id" readonly="state != 'draft'"/>
+                            <field name="date" readonly="state != 'draft'"/>
+                            <field name="hours" widget="float_time" readonly="state != 'draft'"/>
+                            <field name="reason" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="department_id"/>
+                            <field name="approval_step" invisible="state != 'to_approve'"/>
+                            <field name="approver_user_ids" widget="many2many_avatar_user"
+                                   invisible="state != 'to_approve'"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="om_hr_overtime_request_view_search" model="ir.ui.view">
+        <field name="name">om.hr.overtime.request.view.search</field>
+        <field name="model">om.hr.overtime.request</field>
+        <field name="arch" type="xml">
+            <search string="Overtime Requests">
+                <field name="employee_id"/>
+                <field name="department_id"/>
+                <filter string="To Approve" name="to_approve" domain="[('state', '=', 'to_approve')]"/>
+                <filter string="Approved" name="approved" domain="[('state', '=', 'approved')]"/>
+                <filter string="Date" name="date" date="date"/>
+                <group>
+                    <filter string="Employee" name="group_employee" context="{'group_by': 'employee_id'}"/>
+                    <filter string="Month" name="group_month" context="{'group_by': 'date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="om_hr_overtime_request_action" model="ir.actions.act_window">
+        <field name="name">Overtime Requests</field>
+        <field name="res_model">om.hr.overtime.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Authorise overtime in advance</p>
+            <p>With pre-approval on, the overtime of a day is accepted up to the approved hours; beyond, it waits for
+                the manager.</p>
+        </field>
+    </record>
+
+    <record id="om_hr_overtime_request_action_my" model="ir.actions.act_window">
+        <field name="name">My Overtime Requests</field>
+        <field name="res_model">om.hr.overtime.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('employee_id.user_id', '=', uid)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Ask your manager for overtime in advance</p>
+        </field>
+    </record>
+
+    <!-- The overtime of the time rules, with its approval -->
+    <record id="hr_attendance_view_list_om_overtime" model="ir.ui.view">
+        <field name="name">hr.attendance.view.list.om.overtime</field>
+        <field name="model">hr.attendance</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <list string="Overtime to Review" create="0" edit="0">
+                <header>
+                    <button name="action_om_overtime_accept" type="object" string="Accept"
+                            groups="hr_attendance.group_hr_attendance_officer"/>
+                    <button name="action_om_overtime_reject" type="object" string="Reject"
+                            groups="hr_attendance.group_hr_attendance_officer"/>
+                </header>
+                <field name="date"/>
+                <field name="employee_id" widget="many2one_avatar_employee"/>
+                <field name="check_in"/>
+                <field name="check_out"/>
+                <field name="worked_hours" widget="float_time" string="Hours" sum="Total"/>
+                <field name="time_rule_id"/>
+                <field name="om_overtime_status" widget="badge" decoration-warning="om_overtime_status == 'pending'"
+                       decoration-success="om_overtime_status in ('authorised', 'accepted')"
+                       decoration-danger="om_overtime_status == 'rejected'"/>
+                <button name="action_om_overtime_accept" type="object" string="Accept" icon="check"
+                        invisible="om_overtime_status != 'pending'" groups="hr_attendance.group_hr_attendance_officer"/>
+                <button name="action_om_overtime_reject" type="object" string="Reject" icon="close"
+                        invisible="om_overtime_status != 'pending'" groups="hr_attendance.group_hr_attendance_officer"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hr_attendance_action_om_overtime" model="ir.actions.act_window">
+        <field name="name">Overtime to Review</field>
+        <field name="res_model">hr.attendance</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="hr_attendance_view_list_om_overtime"/>
+        <field name="domain">[('om_overtime_status', '!=', False)]</field>
+        <field name="context">{'search_default_om_overtime_pending': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No overtime beyond what was approved</p>
+        </field>
+    </record>
+
+    <record id="hr_attendance_view_search_om_overtime" model="ir.ui.view">
+        <field name="name">hr.attendance.view.search.om.overtime</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.hr_attendance_view_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <filter string="Overtime Not Authorised" name="om_overtime_pending"
+                        domain="[('om_overtime_status', '=', 'pending')]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="res_config_settings_view_form_om_overtime" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.om.overtime</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="hr_attendance.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <block name="attendance_settings" position="inside">
+                <setting string="Overtime Needs Pre-Approval" company_dependent="1"
+                         help="The overtime of the time rules is accepted up to the hours approved in advance; beyond, it waits for the manager. Only accepted overtime is paid.">
+                    <field name="om_overtime_preapproval"/>
+                </setting>
+            </block>
+        </field>
+    </record>
+
+    <!-- under the app itself: core keeps its Management menu for the officers managing all the attendances,
+         the officers of a team review the overtime of their team too -->
+    <menuitem id="menu_om_overtime" name="Overtime" parent="hr_attendance.menu_hr_attendance_root" sequence="8"
+              groups="hr_attendance.group_hr_attendance_officer"/>
+    <menuitem id="menu_om_overtime_review" action="hr_attendance_action_om_overtime"
+              parent="menu_om_overtime" sequence="10"/>
+    <menuitem id="menu_om_overtime_requests" action="om_hr_overtime_request_action"
+              parent="menu_om_overtime" sequence="20"/>
+    <menuitem id="menu_my_hr_overtime_requests" action="om_hr_overtime_request_action_my"
+              parent="om_hr_base.menu_my_hr" sequence="47"/>
+
+</odoo>
