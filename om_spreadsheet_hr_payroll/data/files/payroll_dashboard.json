@@ -1,0 +1,929 @@
+{
+    "version": "19.3.10",
+    "sheets": [
+        {
+            "id": "40f49a4c-1528-5a3c-8c14-ee592cb35b7b",
+            "name": "Dashboard",
+            "colNumber": 20,
+            "rowNumber": 80,
+            "rows": {},
+            "cols": {},
+            "merges": [],
+            "cells": {
+                "A47": "=_t(\"Top Earners of the Period (Gross)\")",
+                "A48": "=PIVOT(4,10,FALSE,FALSE)"
+            },
+            "styles": {
+                "A47": 2
+            },
+            "formats": {},
+            "borders": {},
+            "conditionalFormats": [],
+            "dataValidationRules": [],
+            "figures": [
+                {
+                    "id": "96136aeb-fd35-5a44-b17d-039b07418114",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 0,
+                        "y": 0
+                    },
+                    "width": 190,
+                    "height": 110,
+                    "tag": "chart",
+                    "data": {
+                        "type": "scorecard",
+                        "title": {
+                            "text": "Gross Pay",
+                            "color": "#01666B",
+                            "bold": true
+                        },
+                        "background": "",
+                        "keyValue": "Data!B3",
+                        "baselineColorDown": "#DC6965",
+                        "baselineColorUp": "#00A04A",
+                        "baselineMode": "percentage",
+                        "humanize": true,
+                        "chartId": "96136aeb-fd35-5a44-b17d-039b07418114"
+                    }
+                },
+                {
+                    "id": "b3325e4b-d638-5669-bc44-0e698e63a5e9",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 200,
+                        "y": 0
+                    },
+                    "width": 190,
+                    "height": 110,
+                    "tag": "chart",
+                    "data": {
+                        "type": "scorecard",
+                        "title": {
+                            "text": "Net Pay",
+                            "color": "#01666B",
+                            "bold": true
+                        },
+                        "background": "",
+                        "keyValue": "Data!B4",
+                        "baselineColorDown": "#DC6965",
+                        "baselineColorUp": "#00A04A",
+                        "baselineMode": "percentage",
+                        "humanize": true,
+                        "chartId": "b3325e4b-d638-5669-bc44-0e698e63a5e9"
+                    }
+                },
+                {
+                    "id": "60bc2065-b8bc-5341-b3cb-7240f46a575f",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 400,
+                        "y": 0
+                    },
+                    "width": 190,
+                    "height": 110,
+                    "tag": "chart",
+                    "data": {
+                        "type": "scorecard",
+                        "title": {
+                            "text": "Employees Paid",
+                            "color": "#01666B",
+                            "bold": true
+                        },
+                        "background": "",
+                        "keyValue": "Data!B5",
+                        "baselineColorDown": "#DC6965",
+                        "baselineColorUp": "#00A04A",
+                        "baselineMode": "percentage",
+                        "humanize": true,
+                        "chartId": "60bc2065-b8bc-5341-b3cb-7240f46a575f"
+                    }
+                },
+                {
+                    "id": "d6b36ee1-74db-5f6c-98bf-f7aecd16bb2d",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 600,
+                        "y": 0
+                    },
+                    "width": 190,
+                    "height": 110,
+                    "tag": "chart",
+                    "data": {
+                        "type": "scorecard",
+                        "title": {
+                            "text": "Average Gross",
+                            "color": "#01666B",
+                            "bold": true
+                        },
+                        "background": "",
+                        "keyValue": "Data!B6",
+                        "baselineColorDown": "#DC6965",
+                        "baselineColorUp": "#00A04A",
+                        "baselineMode": "percentage",
+                        "humanize": true,
+                        "chartId": "d6b36ee1-74db-5f6c-98bf-f7aecd16bb2d"
+                    }
+                },
+                {
+                    "id": "a8c179ed-95a3-5341-89a1-08c60030582c",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 800,
+                        "y": 0
+                    },
+                    "width": 190,
+                    "height": 110,
+                    "tag": "chart",
+                    "data": {
+                        "type": "scorecard",
+                        "title": {
+                            "text": "Overtime Paid",
+                            "color": "#01666B",
+                            "bold": true
+                        },
+                        "background": "",
+                        "keyValue": "Data!B7",
+                        "baselineColorDown": "#00A04A",
+                        "baselineColorUp": "#DC6965",
+                        "baselineMode": "percentage",
+                        "humanize": true,
+                        "chartId": "a8c179ed-95a3-5341-89a1-08c60030582c"
+                    }
+                },
+                {
+                    "id": "2ae44bb6-5420-5c4f-ad8e-7fd7f847cebc",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 0,
+                        "y": 120
+                    },
+                    "width": 990,
+                    "height": 300,
+                    "tag": "chart",
+                    "data": {
+                        "type": "bar",
+                        "title": {
+                            "text": "Gross and Net Pay by Month",
+                            "color": "#01666B",
+                            "bold": true
+                        },
+                        "legendPosition": "top",
+                        "humanize": true,
+                        "dataSource": {
+                            "type": "range",
+                            "labelRange": "Data!A13:A24",
+                            "dataSets": [
+                                {
+                                    "dataSetId": "0",
+                                    "dataRange": "Data!B13:B24"
+                                },
+                                {
+                                    "dataSetId": "1",
+                                    "dataRange": "Data!C13:C24"
+                                }
+                            ],
+                            "dataSetsHaveTitle": false
+                        },
+                        "dataSetStyles": {
+                            "0": {
+                                "label": "Gross"
+                            },
+                            "1": {
+                                "label": "Net"
+                            }
+                        },
+                        "chartId": "2ae44bb6-5420-5c4f-ad8e-7fd7f847cebc",
+                        "stacked": false,
+                        "aggregated": false
+                    }
+                },
+                {
+                    "id": "d9c2767c-2fb3-5100-85f9-b3bd446bf15f",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 0,
+                        "y": 430
+                    },
+                    "width": 490,
+                    "height": 280,
+                    "tag": "carousel",
+                    "data": {
+                        "chartDefinitions": {
+                            "693776fa-1d75-537f-a97b-9449a99dfd69": {
+                                "type": "bar",
+                                "title": {},
+                                "legendPosition": "top",
+                                "humanize": true,
+                                "dataSource": {
+                                    "type": "odoo",
+                                    "metaData": {
+                                        "groupBy": [
+                                            "department_id"
+                                        ],
+                                        "measure": "total",
+                                        "order": null,
+                                        "resModel": "hr.payslip.analysis",
+                                        "mode": "bar",
+                                        "cumulatedStart": false
+                                    },
+                                    "searchParams": {
+                                        "comparison": null,
+                                        "context": {},
+                                        "domain": [
+                                            [
+                                                "state",
+                                                "=",
+                                                "done"
+                                            ],
+                                            [
+                                                "code",
+                                                "=",
+                                                "GROSS"
+                                            ]
+                                        ],
+                                        "groupBy": [
+                                            "department_id"
+                                        ],
+                                        "orderBy": []
+                                    },
+                                    "actionXmlId": "om_hr_payroll.action_hr_payslip_analysis"
+                                },
+                                "dataSetStyles": {},
+                                "stacked": false
+                            }
+                        },
+                        "title": {
+                            "text": "Gross Pay by Department",
+                            "fontSize": 16,
+                            "bold": true,
+                            "color": "#01666B"
+                        },
+                        "items": [
+                            {
+                                "type": "chart",
+                                "chartId": "693776fa-1d75-537f-a97b-9449a99dfd69"
+                            }
+                        ],
+                        "fieldMatching": {
+                            "693776fa-1d75-537f-a97b-9449a99dfd69": {
+                                "4759e0bf-f272-5524-a2bf-3138980c72dc": {
+                                    "chain": "date",
+                                    "type": "date"
+                                },
+                                "f5515967-d897-5e1b-97a9-7064a093e328": {
+                                    "chain": "department_id",
+                                    "type": "many2one"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "id": "f10e292f-7571-5d40-9e13-6bd62368c524",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 500,
+                        "y": 430
+                    },
+                    "width": 490,
+                    "height": 280,
+                    "tag": "carousel",
+                    "data": {
+                        "chartDefinitions": {
+                            "aae712ed-1fe9-54cf-b202-8e8b6f115fad": {
+                                "type": "bar",
+                                "title": {},
+                                "legendPosition": "top",
+                                "humanize": true,
+                                "dataSource": {
+                                    "type": "odoo",
+                                    "metaData": {
+                                        "groupBy": [
+                                            "category_id"
+                                        ],
+                                        "measure": "total",
+                                        "order": null,
+                                        "resModel": "hr.payslip.analysis",
+                                        "mode": "bar",
+                                        "cumulatedStart": false
+                                    },
+                                    "searchParams": {
+                                        "comparison": null,
+                                        "context": {},
+                                        "domain": [
+                                            [
+                                                "state",
+                                                "=",
+                                                "done"
+                                            ],
+                                            [
+                                                "category_id.code",
+                                                "in",
+                                                [
+                                                    "BASIC",
+                                                    "ALW",
+                                                    "DED"
+                                                ]
+                                            ]
+                                        ],
+                                        "groupBy": [
+                                            "category_id"
+                                        ],
+                                        "orderBy": []
+                                    },
+                                    "actionXmlId": "om_hr_payroll.action_hr_payslip_analysis"
+                                },
+                                "dataSetStyles": {},
+                                "stacked": false
+                            }
+                        },
+                        "title": {
+                            "text": "Pay by Category",
+                            "fontSize": 16,
+                            "bold": true,
+                            "color": "#01666B"
+                        },
+                        "items": [
+                            {
+                                "type": "chart",
+                                "chartId": "aae712ed-1fe9-54cf-b202-8e8b6f115fad"
+                            }
+                        ],
+                        "fieldMatching": {
+                            "aae712ed-1fe9-54cf-b202-8e8b6f115fad": {
+                                "4759e0bf-f272-5524-a2bf-3138980c72dc": {
+                                    "chain": "date",
+                                    "type": "date"
+                                },
+                                "f5515967-d897-5e1b-97a9-7064a093e328": {
+                                    "chain": "department_id",
+                                    "type": "many2one"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "id": "bf99b185-0fab-5d9d-95c9-2ab8271012b2",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 0,
+                        "y": 720
+                    },
+                    "width": 490,
+                    "height": 280,
+                    "tag": "carousel",
+                    "data": {
+                        "chartDefinitions": {
+                            "a127e358-63e2-5873-805a-b7f5b27daa06": {
+                                "type": "bar",
+                                "title": {},
+                                "legendPosition": "top",
+                                "humanize": true,
+                                "dataSource": {
+                                    "type": "odoo",
+                                    "metaData": {
+                                        "groupBy": [
+                                            "salary_rule_id"
+                                        ],
+                                        "measure": "total",
+                                        "order": null,
+                                        "resModel": "hr.payslip.analysis",
+                                        "mode": "bar",
+                                        "cumulatedStart": false
+                                    },
+                                    "searchParams": {
+                                        "comparison": null,
+                                        "context": {},
+                                        "domain": [
+                                            [
+                                                "state",
+                                                "=",
+                                                "done"
+                                            ],
+                                            [
+                                                "category_id.code",
+                                                "=",
+                                                "DED"
+                                            ]
+                                        ],
+                                        "groupBy": [
+                                            "salary_rule_id"
+                                        ],
+                                        "orderBy": []
+                                    },
+                                    "actionXmlId": "om_hr_payroll.action_hr_payslip_analysis"
+                                },
+                                "dataSetStyles": {},
+                                "stacked": false
+                            }
+                        },
+                        "title": {
+                            "text": "Deductions by Rule",
+                            "fontSize": 16,
+                            "bold": true,
+                            "color": "#01666B"
+                        },
+                        "items": [
+                            {
+                                "type": "chart",
+                                "chartId": "a127e358-63e2-5873-805a-b7f5b27daa06"
+                            }
+                        ],
+                        "fieldMatching": {
+                            "a127e358-63e2-5873-805a-b7f5b27daa06": {
+                                "4759e0bf-f272-5524-a2bf-3138980c72dc": {
+                                    "chain": "date",
+                                    "type": "date"
+                                },
+                                "f5515967-d897-5e1b-97a9-7064a093e328": {
+                                    "chain": "department_id",
+                                    "type": "many2one"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "id": "aca95215-6063-5cdd-be1b-7d526b6affdb",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 500,
+                        "y": 720
+                    },
+                    "width": 490,
+                    "height": 280,
+                    "tag": "carousel",
+                    "data": {
+                        "chartDefinitions": {
+                            "14d6c055-ac55-5a42-9a18-07f3f7c580ab": {
+                                "type": "bar",
+                                "title": {},
+                                "legendPosition": "top",
+                                "humanize": true,
+                                "dataSource": {
+                                    "type": "odoo",
+                                    "metaData": {
+                                        "groupBy": [
+                                            "job_id"
+                                        ],
+                                        "measure": "total",
+                                        "order": null,
+                                        "resModel": "hr.payslip.analysis",
+                                        "mode": "bar",
+                                        "cumulatedStart": false
+                                    },
+                                    "searchParams": {
+                                        "comparison": null,
+                                        "context": {},
+                                        "domain": [
+                                            [
+                                                "state",
+                                                "=",
+                                                "done"
+                                            ],
+                                            [
+                                                "code",
+                                                "=",
+                                                "GROSS"
+                                            ]
+                                        ],
+                                        "groupBy": [
+                                            "job_id"
+                                        ],
+                                        "orderBy": []
+                                    },
+                                    "actionXmlId": "om_hr_payroll.action_hr_payslip_analysis"
+                                },
+                                "dataSetStyles": {},
+                                "stacked": false
+                            }
+                        },
+                        "title": {
+                            "text": "Gross Pay by Job Position",
+                            "fontSize": 16,
+                            "bold": true,
+                            "color": "#01666B"
+                        },
+                        "items": [
+                            {
+                                "type": "chart",
+                                "chartId": "14d6c055-ac55-5a42-9a18-07f3f7c580ab"
+                            }
+                        ],
+                        "fieldMatching": {
+                            "14d6c055-ac55-5a42-9a18-07f3f7c580ab": {
+                                "4759e0bf-f272-5524-a2bf-3138980c72dc": {
+                                    "chain": "date",
+                                    "type": "date"
+                                },
+                                "f5515967-d897-5e1b-97a9-7064a093e328": {
+                                    "chain": "department_id",
+                                    "type": "many2one"
+                                }
+                            }
+                        }
+                    }
+                }
+            ],
+            "tables": [],
+            "areGridLinesVisible": false,
+            "isVisible": true,
+            "headerGroups": {
+                "ROW": [],
+                "COL": []
+            },
+            "comments": {},
+            "backgroundColor": "#F9FAFB"
+        },
+        {
+            "id": "15834df7-8ce6-513b-8745-f7d2ce78a811",
+            "name": "Data",
+            "colNumber": 26,
+            "rowNumber": 100,
+            "rows": {},
+            "cols": {
+                "0": {
+                    "size": 200
+                },
+                "1": {
+                    "size": 130
+                },
+                "2": {
+                    "size": 130
+                }
+            },
+            "merges": [],
+            "cells": {
+                "A1": "=_t(\"Period\")",
+                "B1": "=ODOO.FILTER.VALUE(\"Period\")",
+                "A2": "=_t(\"Start\")",
+                "B2": "=IF(ISNUMBER(B1),B1,DATE(YEAR(TODAY()),1,1))",
+                "A3": "=_t(\"Gross\")",
+                "B3": "=0+PIVOT.VALUE(1,\"total\",\"code\",\"GROSS\")",
+                "A4": "=_t(\"Net\")",
+                "B4": "=0+PIVOT.VALUE(1,\"total\",\"code\",\"NET\")",
+                "A5": "=_t(\"Employees paid\")",
+                "B5": "=0+PIVOT.VALUE(2,\"employee_count\")",
+                "A6": "=_t(\"Average gross\")",
+                "B6": "=IF(B5>0,B3/B5,0)",
+                "A7": "=_t(\"Overtime\")",
+                "B7": "=0+PIVOT.VALUE(1,\"total\",\"code\",\"OVERTIME\")",
+                "A8": "=_t(\"Loan deductions\")",
+                "B8": "=0-PIVOT.VALUE(1,\"total\",\"code\",\"LOAN\")",
+                "A12": "=_t(\"Month\")",
+                "B12": "=_t(\"Gross\")",
+                "C12": "=_t(\"Net\")",
+                "A13": "=EDATE(DATE(YEAR($B$2),MONTH($B$2),1),0)",
+                "B13": "=0+PIVOT.VALUE(3,\"total\",\"date:month\",TEXT(A13,\"mm/yyyy\"),\"code\",\"GROSS\")",
+                "C13": "=0+PIVOT.VALUE(3,\"total\",\"date:month\",TEXT(A13,\"mm/yyyy\"),\"code\",\"NET\")",
+                "A14": "=EDATE(DATE(YEAR($B$2),MONTH($B$2),1),1)",
+                "B14": "=0+PIVOT.VALUE(3,\"total\",\"date:month\",TEXT(A14,\"mm/yyyy\"),\"code\",\"GROSS\")",
+                "C14": "=0+PIVOT.VALUE(3,\"total\",\"date:month\",TEXT(A14,\"mm/yyyy\"),\"code\",\"NET\")",
+                "A15": "=EDATE(DATE(YEAR($B$2),MONTH($B$2),1),2)",
+                "B15": "=0+PIVOT.VALUE(3,\"total\",\"date:month\",TEXT(A15,\"mm/yyyy\"),\"code\",\"GROSS\")",
+                "C15": "=0+PIVOT.VALUE(3,\"total\",\"date:month\",TEXT(A15,\"mm/yyyy\"),\"code\",\"NET\")",
+                "A16": "=EDATE(DATE(YEAR($B$2),MONTH($B$2),1),3)",
+                "B16": "=0+PIVOT.VALUE(3,\"total\",\"date:month\",TEXT(A16,\"mm/yyyy\"),\"code\",\"GROSS\")",
+                "C16": "=0+PIVOT.VALUE(3,\"total\",\"date:month\",TEXT(A16,\"mm/yyyy\"),\"code\",\"NET\")",
+                "A17": "=EDATE(DATE(YEAR($B$2),MONTH($B$2),1),4)",
+                "B17": "=0+PIVOT.VALUE(3,\"total\",\"date:month\",TEXT(A17,\"mm/yyyy\"),\"code\",\"GROSS\")",
+                "C17": "=0+PIVOT.VALUE(3,\"total\",\"date:month\",TEXT(A17,\"mm/yyyy\"),\"code\",\"NET\")",
+                "A18": "=EDATE(DATE(YEAR($B$2),MONTH($B$2),1),5)",
+                "B18": "=0+PIVOT.VALUE(3,\"total\",\"date:month\",TEXT(A18,\"mm/yyyy\"),\"code\",\"GROSS\")",
+                "C18": "=0+PIVOT.VALUE(3,\"total\",\"date:month\",TEXT(A18,\"mm/yyyy\"),\"code\",\"NET\")",
+                "A19": "=EDATE(DATE(YEAR($B$2),MONTH($B$2),1),6)",
+                "B19": "=0+PIVOT.VALUE(3,\"total\",\"date:month\",TEXT(A19,\"mm/yyyy\"),\"code\",\"GROSS\")",
+                "C19": "=0+PIVOT.VALUE(3,\"total\",\"date:month\",TEXT(A19,\"mm/yyyy\"),\"code\",\"NET\")",
+                "A20": "=EDATE(DATE(YEAR($B$2),MONTH($B$2),1),7)",
+                "B20": "=0+PIVOT.VALUE(3,\"total\",\"date:month\",TEXT(A20,\"mm/yyyy\"),\"code\",\"GROSS\")",
+                "C20": "=0+PIVOT.VALUE(3,\"total\",\"date:month\",TEXT(A20,\"mm/yyyy\"),\"code\",\"NET\")",
+                "A21": "=EDATE(DATE(YEAR($B$2),MONTH($B$2),1),8)",
+                "B21": "=0+PIVOT.VALUE(3,\"total\",\"date:month\",TEXT(A21,\"mm/yyyy\"),\"code\",\"GROSS\")",
+                "C21": "=0+PIVOT.VALUE(3,\"total\",\"date:month\",TEXT(A21,\"mm/yyyy\"),\"code\",\"NET\")",
+                "A22": "=EDATE(DATE(YEAR($B$2),MONTH($B$2),1),9)",
+                "B22": "=0+PIVOT.VALUE(3,\"total\",\"date:month\",TEXT(A22,\"mm/yyyy\"),\"code\",\"GROSS\")",
+                "C22": "=0+PIVOT.VALUE(3,\"total\",\"date:month\",TEXT(A22,\"mm/yyyy\"),\"code\",\"NET\")",
+                "A23": "=EDATE(DATE(YEAR($B$2),MONTH($B$2),1),10)",
+                "B23": "=0+PIVOT.VALUE(3,\"total\",\"date:month\",TEXT(A23,\"mm/yyyy\"),\"code\",\"GROSS\")",
+                "C23": "=0+PIVOT.VALUE(3,\"total\",\"date:month\",TEXT(A23,\"mm/yyyy\"),\"code\",\"NET\")",
+                "A24": "=EDATE(DATE(YEAR($B$2),MONTH($B$2),1),11)",
+                "B24": "=0+PIVOT.VALUE(3,\"total\",\"date:month\",TEXT(A24,\"mm/yyyy\"),\"code\",\"GROSS\")",
+                "C24": "=0+PIVOT.VALUE(3,\"total\",\"date:month\",TEXT(A24,\"mm/yyyy\"),\"code\",\"NET\")"
+            },
+            "styles": {
+                "A1": 1,
+                "A2": 1,
+                "A3": 1,
+                "A4": 1,
+                "A5": 1,
+                "A6": 1,
+                "A7": 1,
+                "A8": 1,
+                "A12": 2,
+                "B12": 2,
+                "C12": 2
+            },
+            "formats": {
+                "B1": 1,
+                "B2": 1,
+                "B3": 2,
+                "B4": 2,
+                "B5": 2,
+                "B6": 2,
+                "B7": 2,
+                "B8": 2,
+                "C1": 1,
+                "A13": 3,
+                "B13": 2,
+                "C13": 2,
+                "A14": 3,
+                "B14": 2,
+                "C14": 2,
+                "A15": 3,
+                "B15": 2,
+                "C15": 2,
+                "A16": 3,
+                "B16": 2,
+                "C16": 2,
+                "A17": 3,
+                "B17": 2,
+                "C17": 2,
+                "A18": 3,
+                "B18": 2,
+                "C18": 2,
+                "A19": 3,
+                "B19": 2,
+                "C19": 2,
+                "A20": 3,
+                "B20": 2,
+                "C20": 2,
+                "A21": 3,
+                "B21": 2,
+                "C21": 2,
+                "A22": 3,
+                "B22": 2,
+                "C22": 2,
+                "A23": 3,
+                "B23": 2,
+                "C23": 2,
+                "A24": 3,
+                "B24": 2,
+                "C24": 2
+            },
+            "borders": {},
+            "conditionalFormats": [],
+            "dataValidationRules": [],
+            "figures": [],
+            "tables": [],
+            "areGridLinesVisible": true,
+            "isVisible": true,
+            "headerGroups": {
+                "ROW": [],
+                "COL": []
+            },
+            "comments": {}
+        }
+    ],
+    "styles": {
+        "1": {
+            "textColor": "#434343"
+        },
+        "2": {
+            "textColor": "#434343",
+            "bold": true,
+            "fontSize": 11,
+            "fillColor": "#E7F2F2"
+        }
+    },
+    "formats": {
+        "1": "mm/dd/yyyy",
+        "2": "#,##0",
+        "3": "mmm yyyy"
+    },
+    "borders": {},
+    "revisionId": "START_REVISION",
+    "uniqueFigureIds": true,
+    "settings": {
+        "locale": {
+            "name": "English (US)",
+            "code": "en_US",
+            "thousandsSeparator": ",",
+            "decimalSeparator": ".",
+            "dateFormat": "mm/dd/yyyy",
+            "timeFormat": "hh:mm:ss",
+            "formulaArgSeparator": ",",
+            "weekStart": 7
+        }
+    },
+    "pivots": {
+        "1": {
+            "type": "ODOO",
+            "id": "1",
+            "formulaId": "1",
+            "name": "Pay by Rule Code",
+            "model": "hr.payslip.analysis",
+            "domain": [
+                [
+                    "state",
+                    "=",
+                    "done"
+                ]
+            ],
+            "context": {},
+            "measures": [
+                {
+                    "id": "total",
+                    "fieldName": "total"
+                }
+            ],
+            "rows": [
+                {
+                    "fieldName": "code"
+                }
+            ],
+            "columns": [],
+            "fieldMatching": {
+                "4759e0bf-f272-5524-a2bf-3138980c72dc": {
+                    "chain": "date",
+                    "type": "date",
+                    "offset": 0
+                },
+                "f5515967-d897-5e1b-97a9-7064a093e328": {
+                    "chain": "department_id",
+                    "type": "many2one"
+                }
+            }
+        },
+        "2": {
+            "type": "ODOO",
+            "id": "2",
+            "formulaId": "2",
+            "name": "Employees Paid",
+            "model": "hr.payslip.analysis",
+            "domain": [
+                [
+                    "state",
+                    "=",
+                    "done"
+                ],
+                [
+                    "code",
+                    "=",
+                    "NET"
+                ]
+            ],
+            "context": {},
+            "measures": [
+                {
+                    "id": "employee_count",
+                    "fieldName": "employee_count"
+                }
+            ],
+            "rows": [],
+            "columns": [],
+            "fieldMatching": {
+                "4759e0bf-f272-5524-a2bf-3138980c72dc": {
+                    "chain": "date",
+                    "type": "date",
+                    "offset": 0
+                },
+                "f5515967-d897-5e1b-97a9-7064a093e328": {
+                    "chain": "department_id",
+                    "type": "many2one"
+                }
+            }
+        },
+        "3": {
+            "type": "ODOO",
+            "id": "3",
+            "formulaId": "3",
+            "name": "Pay by Month",
+            "model": "hr.payslip.analysis",
+            "domain": [
+                [
+                    "state",
+                    "=",
+                    "done"
+                ],
+                [
+                    "code",
+                    "in",
+                    [
+                        "GROSS",
+                        "NET"
+                    ]
+                ]
+            ],
+            "context": {},
+            "measures": [
+                {
+                    "id": "total",
+                    "fieldName": "total"
+                }
+            ],
+            "rows": [
+                {
+                    "fieldName": "date",
+                    "granularity": "month"
+                }
+            ],
+            "columns": [
+                {
+                    "fieldName": "code"
+                }
+            ],
+            "fieldMatching": {
+                "4759e0bf-f272-5524-a2bf-3138980c72dc": {
+                    "chain": "date",
+                    "type": "date",
+                    "offset": 0
+                },
+                "f5515967-d897-5e1b-97a9-7064a093e328": {
+                    "chain": "department_id",
+                    "type": "many2one"
+                }
+            }
+        },
+        "4": {
+            "type": "ODOO",
+            "id": "4",
+            "formulaId": "4",
+            "name": "Top Earners",
+            "model": "hr.payslip.analysis",
+            "domain": [
+                [
+                    "state",
+                    "=",
+                    "done"
+                ],
+                [
+                    "code",
+                    "=",
+                    "GROSS"
+                ]
+            ],
+            "context": {},
+            "measures": [
+                {
+                    "id": "total",
+                    "fieldName": "total"
+                }
+            ],
+            "rows": [
+                {
+                    "fieldName": "employee_id"
+                }
+            ],
+            "columns": [],
+            "fieldMatching": {
+                "4759e0bf-f272-5524-a2bf-3138980c72dc": {
+                    "chain": "date",
+                    "type": "date",
+                    "offset": 0
+                },
+                "f5515967-d897-5e1b-97a9-7064a093e328": {
+                    "chain": "department_id",
+                    "type": "many2one"
+                }
+            },
+            "sortedColumn": {
+                "measure": "total",
+                "order": "desc",
+                "domain": []
+            }
+        }
+    },
+    "pivotNextId": 5,
+    "customTableStyles": {},
+    "namedRanges": [],
+    "globalFilters": [
+        {
+            "id": "4759e0bf-f272-5524-a2bf-3138980c72dc",
+            "type": "date",
+            "label": "Period",
+            "defaultValue": "this_year"
+        },
+        {
+            "id": "f5515967-d897-5e1b-97a9-7064a093e328",
+            "type": "relation",
+            "label": "Department",
+            "modelName": "hr.department",
+            "defaultValueDisplayNames": []
+        }
+    ],
+    "lists": {},
+    "listNextId": 1,
+    "odooLinkReferences": {}
+}

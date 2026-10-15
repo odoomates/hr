@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- The payroll dashboard, in the Human Resources section of the Dashboards app. The file is built by
+         tools/build_dashboards.py. -->
+
+    <record id="dashboard_payroll" model="spreadsheet.dashboard">
+        <field name="name">Payroll</field>
+        <field name="spreadsheet_binary_data" type="bytes" file="om_spreadsheet_hr_payroll/data/files/payroll_dashboard.json"/>
+        <field name="main_data_model_ids" eval="[Command.set([ref('om_hr_payroll.model_hr_payslip')])]"/>
+        <field name="dashboard_group_id" ref="spreadsheet_dashboard.spreadsheet_dashboard_group_hr"/>
+        <field name="group_ids" eval="[Command.set([ref('om_hr_payroll.group_hr_payroll_user')])]"/>
+        <field name="sequence">20</field>
+        <field name="is_published">True</field>
+    </record>
+
+</odoo>
