@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_om_hr_loans"
+              name="Loans"
+              parent="hr.menu_hr_root"
+              sequence="85"/>
+
+    <menuitem id="menu_om_hr_loan_my"
+              action="om_hr_loan_action_my"
+              parent="om_hr_base.menu_my_hr"
+              sequence="30"/>
+
+    <menuitem id="menu_om_hr_loan_to_approve"
+              action="om_hr_loan_action_to_approve"
+              parent="menu_om_hr_loans"
+              sequence="20"/>
+
+    <menuitem id="menu_om_hr_loan_all"
+              action="om_hr_loan_action"
+              parent="menu_om_hr_loans"
+              sequence="30"
+              groups="hr.group_hr_user"/>
+
+    <menuitem id="menu_om_hr_loan_line"
+              action="om_hr_loan_line_action"
+              parent="menu_om_hr_loans"
+              sequence="40"
+              groups="hr.group_hr_user"/>
+
+    <menuitem id="menu_om_hr_loan_type"
+              action="om_hr_loan_type_action"
+              parent="om_hr_approval.menu_om_hr_approval_configuration"
+              sequence="30"/>
+
+</odoo>

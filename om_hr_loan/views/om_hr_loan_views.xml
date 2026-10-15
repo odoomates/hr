@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="om_hr_loan_view_form" model="ir.ui.view">
+        <field name="name">om.hr.loan.view.form</field>
+        <field name="model">om.hr.loan</field>
+        <field name="arch" type="xml">
+            <form string="Loan">
+                <header>
+                    <button name="action_submit" string="Submit" type="object" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_approval_approve" string="Approve" type="object" class="btn-primary"
+                            invisible="not can_approve"/>
+                    <button name="action_approval_open_refuse" string="Refuse" type="object"
+                            invisible="not can_approve"/>
+                    <button name="action_disburse" string="Paid Out" type="object" class="btn-primary"
+                            invisible="state != 'approved'" groups="hr.group_hr_user"
+                            confirm="Has the employee received the money? The installments become due."/>
+                    <button name="action_settle" string="Settle" type="object" invisible="state != 'running'"
+                            groups="hr.group_hr_user"
+                            confirm="Mark everything still due as repaid at once?"/>
+                    <button name="action_compute_installments" string="Compute Installments" type="object"
+                            invisible="state != 'draft'"/>
+                    <button name="action_approval_reset" string="Back to Draft" type="object"
+                            invisible="state not in ('to_approve', 'refused', 'cancel')"/>
+                    <button name="action_approval_cancel" string="Cancel" type="object"
+                            invisible="state not in ('draft', 'to_approve')"/>
+                    <button name="action_cancel_approved" string="Cancel" type="object"
+                            invisible="state != 'approved'" groups="hr.group_hr_user"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,to_approve,approved,running,paid"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="employee_id" readonly="state != 'draft'"/>
+                            <field name="type_id" readonly="state != 'draft'" options="{'no_create': True}"/>
+                            <field name="amount" readonly="state != 'draft'"/>
+                            <field name="installment_count" readonly="state != 'draft' or is_advance"
+                                   invisible="is_advance"/>
+                            <field name="date_start" readonly="state != 'draft'"/>
+                            <field name="is_advance" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="date"/>
+                            <field name="department_id"/>
+                            <field name="company_id" groups="base.group_multi_company" readonly="state != 'draft'"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="installment_amount" invisible="not line_ids"/>
+                            <field name="amount_paid" invisible="state not in ('running', 'paid')"/>
+                            <field name="amount_residual" invisible="state not in ('running', 'paid')"/>
+                            <field name="date_disbursed" invisible="not date_disbursed"/>
+                            <field name="approval_step" invisible="state != 'to_approve'"/>
+                            <field name="approver_user_ids" widget="many2many_avatar_user"
+                                   invisible="state != 'to_approve'"/>
+                        </group>
+                    </group>
+                    <div class="text-muted" invisible="not type_description or state != 'draft'">
+                        <field name="type_description"/>
+                    </div>
+                    <notebook>
+                        <page string="Installments" name="installments">
+                            <field name="line_ids" readonly="1">
+                                <list>
+                                    <field name="sequence" string="#"/>
+                                    <field name="date" widget="date" options="{'format': 'MMMM yyyy'}"/>
+                                    <field name="amount" sum="Total"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="loan_state" column_invisible="1"/>
+                                    <field name="state" widget="badge" decoration-success="state == 'paid'"/>
+                                    <field name="date_paid" optional="show"/>
+                                    <field name="note" optional="show"/>
+                                    <button name="action_postpone" type="object" string="Postpone" icon="schedule"
+                                            groups="hr.group_hr_user"
+                                            invisible="state != 'to_pay' or loan_state not in ('approved', 'running')"/>
+                                    <button name="action_mark_paid" type="object" string="Repaid" icon="check"
+                                            groups="hr.group_hr_user"
+                                            invisible="state != 'to_pay' or loan_state != 'running'"
+                                            confirm="Mark this installment as repaid outside the payroll?"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Reason" name="reason">
+                            <field name="reason" placeholder="What is the loan for?" readonly="state != 'draft'"/>
+                        </page>
+                        <page string="Approvals" name="approvals" invisible="not approval_line_ids">
+                            <field name="approval_line_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="approver_user_ids" widget="many2many_avatar_user"/>
+                                    <field name="state" widget="badge" decoration-info="state == 'pending'"
+                                           decoration-success="state == 'approved'"
+                                           decoration-danger="state == 'refused'"/>
+                                    <field name="user_id" widget="many2one_avatar_user"/>
+                                    <field name="date"/>
+                                    <field name="note"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="om_hr_loan_view_list" model="ir.ui.view">
+        <field name="name">om.hr.loan.view.list</field>
+        <field name="model">om.hr.loan</field>
+        <field name="arch" type="xml">
+            <list string="Loans">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="employee_id" widget="many2one_avatar_employee"/>
+                <field name="type_id"/>
+                <field name="department_id" optional="hide"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="amount" sum="Total"/>
+                <field name="amount_residual" sum="Total" optional="show"/>
+                <field name="approval_step" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="state" widget="badge" decoration-info="state in ('to_approve', 'approved')"
+                       decoration-warning="state == 'running'" decoration-success="state == 'paid'"
+                       decoration-danger="state == 'refused'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="om_hr_loan_view_search" model="ir.ui.view">
+        <field name="name">om.hr.loan.view.search</field>
+        <field name="model">om.hr.loan</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="type_id"/>
+                <filter name="my_loans" string="My Loans" domain="[('employee_id.user_id', '=', uid)]"/>
+                <filter name="to_approve_by_me" string="To Approve by Me" domain="[('approver_user_ids', 'in', uid)]"/>
+                <separator/>
+                <filter name="to_approve" string="To Approve" domain="[('state', '=', 'to_approve')]"/>
+                <filter name="to_pay_out" string="To Pay Out" domain="[('state', '=', 'approved')]"/>
+                <filter name="running" string="Repaying" domain="[('state', '=', 'running')]"/>
+                <filter name="paid" string="Repaid" domain="[('state', '=', 'paid')]"/>
+                <group>
+                    <filter name="group_employee" string="Employee" context="{'group_by': 'employee_id'}"/>
+                    <filter name="group_type" string="Type" context="{'group_by': 'type_id'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="om_hr_loan_line_view_list" model="ir.ui.view">
+        <field name="name">om.hr.loan.line.view.list</field>
+        <field name="model">om.hr.loan.line</field>
+        <field name="arch" type="xml">
+            <list string="Installments" create="0" edit="0" delete="0">
+                <field name="loan_id"/>
+                <field name="employee_id" widget="many2one_avatar_employee"/>
+                <field name="date" widget="date" options="{'format': 'MMMM yyyy'}"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="amount" sum="Total"/>
+                <field name="state" widget="badge" decoration-success="state == 'paid'"/>
+                <field name="date_paid" optional="show"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="om_hr_loan_line_view_search" model="ir.ui.view">
+        <field name="name">om.hr.loan.line.view.search</field>
+        <field name="model">om.hr.loan.line</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <field name="loan_id"/>
+                <filter name="to_pay" string="To Repay"
+                        domain="[('state', '=', 'to_pay'), ('loan_id.state', '=', 'running')]"/>
+                <filter name="date" string="Month" date="date"/>
+                <group>
+                    <filter name="group_month" string="Month" context="{'group_by': 'date:month'}"/>
+                    <filter name="group_employee" string="Employee" context="{'group_by': 'employee_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="om_hr_loan_action_my" model="ir.actions.act_window">
+        <field name="name">My Loans</field>
+        <field name="res_model">om.hr.loan</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('employee_id.user_id', '=', uid)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Ask for a loan or a salary advance</p>
+            <p>Your manager, then HR, approve it. It is repaid in monthly installments taken off your salary.</p>
+        </field>
+    </record>
+
+    <record id="om_hr_loan_action_to_approve" model="ir.actions.act_window">
+        <field name="name">To Approve</field>
+        <field name="res_model">om.hr.loan</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_to_approve_by_me': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No loan to approve</p>
+            <p>The loans waiting for your approval show here.</p>
+        </field>
+    </record>
+
+    <record id="om_hr_loan_action" model="ir.actions.act_window">
+        <field name="name">All Loans</field>
+        <field name="res_model">om.hr.loan</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="om_hr_loan_line_action" model="ir.actions.act_window">
+        <field name="name">Installments</field>
+        <field name="res_model">om.hr.loan.line</field>
+        <field name="view_mode">list</field>
+        <field name="context">{'search_default_to_pay': 1, 'search_default_group_month': 1}</field>
+    </record>
+
+</odoo>

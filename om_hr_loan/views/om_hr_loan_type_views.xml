@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="om_hr_loan_type_view_list" model="ir.ui.view">
+        <field name="name">om.hr.loan.type.view.list</field>
+        <field name="model">om.hr.loan.type</field>
+        <field name="arch" type="xml">
+            <list string="Loan Types">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="is_advance"/>
+                <field name="max_amount"/>
+                <field name="max_installments"/>
+                <field name="max_wage_percent"/>
+                <field name="min_service_months" optional="show"/>
+                <field name="single_running" optional="show"/>
+                <field name="company_id" groups="base.group_multi_company" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="om_hr_loan_type_view_form" model="ir.ui.view">
+        <field name="name">om.hr.loan.type.view.form</field>
+        <field name="model">om.hr.loan.type</field>
+        <field name="arch" type="xml">
+            <form string="Loan Type">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Personal Loan"/></h1>
+                    </div>
+                    <group>
+                        <group string="Limits">
+                            <field name="is_advance"/>
+                            <field name="max_amount"/>
+                            <field name="max_installments" invisible="is_advance"/>
+                            <field name="max_wage_percent"/>
+                        </group>
+                        <group string="Who">
+                            <field name="min_service_months"/>
+                            <field name="single_running"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                    <field name="description" placeholder="Explain the loan to the employees"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="om_hr_loan_type_action" model="ir.actions.act_window">
+        <field name="name">Loan Types</field>
+        <field name="res_model">om.hr.loan.type</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="seq_om_hr_loan" model="ir.sequence">
+            <field name="name">Employee Loan</field>
+            <field name="code">om.hr.loan</field>
+            <field name="prefix">LOAN/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="loan_type_advance" model="om.hr.loan.type">
+            <field name="name">Salary Advance</field>
+            <field name="sequence">10</field>
+            <field name="is_advance" eval="True"/>
+            <field name="max_installments">1</field>
+            <field name="max_wage_percent">50</field>
+            <field name="description">Part of your next salary, paid now and taken off that salary.</field>
+        </record>
+
+        <record id="loan_type_personal" model="om.hr.loan.type">
+            <field name="name">Personal Loan</field>
+            <field name="sequence">20</field>
+            <field name="max_installments">12</field>
+            <field name="max_wage_percent">30</field>
+            <field name="min_service_months">6</field>
+            <field name="description">Repaid in monthly installments taken off your salary, over a year at most.</field>
+        </record>
+
+        <record id="flow_om_hr_loan" model="om.approval.flow">
+            <field name="name">Loans</field>
+            <field name="model_id" ref="om_hr_loan.model_om_hr_loan"/>
+            <field name="fallback_group_id" ref="hr.group_hr_manager"/>
+            <field name="self_approve" eval="False"/>
+        </record>
+
+        <record id="flow_om_hr_loan_manager" model="om.approval.step">
+            <field name="flow_id" ref="flow_om_hr_loan"/>
+            <field name="sequence">10</field>
+            <field name="name">Manager</field>
+            <field name="approver_type">manager</field>
+        </record>
+
+        <record id="flow_om_hr_loan_hr" model="om.approval.step">
+            <field name="flow_id" ref="flow_om_hr_loan"/>
+            <field name="sequence">20</field>
+            <field name="name">HR</field>
+            <field name="approver_type">group</field>
+            <field name="group_id" ref="hr.group_hr_manager"/>
+        </record>
+
+    </data>
+</odoo>
