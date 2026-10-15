@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="om_hr_payroll_export_wizard_view_form_account" model="ir.ui.view">
+        <field name="name">om.hr.payroll.export.wizard.view.form.account</field>
+        <field name="model">om.hr.payroll.export.wizard</field>
+        <field name="inherit_id" ref="om_hr_payroll_export.om_hr_payroll_export_wizard_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//label[@for='preview']" position="before">
+                <group groups="account.group_account_invoice">
+                    <group>
+                        <field name="register_payment"/>
+                    </group>
+                    <group invisible="not register_payment">
+                        <field name="journal_id" required="register_payment" options="{'no_create': True}"/>
+                        <field name="payment_date" required="register_payment"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
