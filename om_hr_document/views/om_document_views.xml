@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="om_document_view_search_hr" model="ir.ui.view">
+        <field name="name">om.document.view.search.hr</field>
+        <field name="model">om.document</field>
+        <field name="inherit_id" ref="om_document.om_document_view_search"/>
+        <field name="arch" type="xml">
+            <field name="type_id" position="after">
+                <field name="employee_id"/>
+                <field name="department_id"/>
+            </field>
+            <filter name="group_type" position="before">
+                <filter name="group_employee" string="Employee" context="{'group_by': 'employee_id'}"/>
+                <filter name="group_department" string="Department" context="{'group_by': 'department_id'}"/>
+            </filter>
+        </field>
+    </record>
+
+    <record id="om_document_action_my" model="ir.actions.act_window">
+        <field name="name">My Documents</field>
+        <field name="res_model">om.document</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('employee_id.user_id', '=', uid)]</field>
+        <field name="context">{'create': False}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No document of yours yet</p>
+            <p>HR keeps your passport, visa and permits here, and reminds you before they expire.</p>
+        </field>
+    </record>
+
+    <record id="om_document_action_hr" model="ir.actions.act_window">
+        <field name="name">Employee Documents</field>
+        <field name="res_model">om.document</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('res_model', '=', 'hr.employee')]</field>
+        <field name="context">{'default_res_model': 'hr.employee'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Keep the documents of your employees</p>
+            <p>Passports, visas, work permits: open an employee and drop the files on the Documents tab.</p>
+        </field>
+    </record>
+
+    <record id="om_document_action_hr_expiring" model="ir.actions.act_window">
+        <field name="name">Expiring</field>
+        <field name="res_model">om.document</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="domain">[('res_model', '=', 'hr.employee'), ('state', 'in', ['expiring'])]</field>
+        <field name="context">{'default_res_model': 'hr.employee'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Nothing is about to expire</p>
+        </field>
+    </record>
+
+    <record id="om_document_action_hr_expired" model="ir.actions.act_window">
+        <field name="name">Expired</field>
+        <field name="res_model">om.document</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="domain">[('res_model', '=', 'hr.employee'), ('state', 'in', ['expired'])]</field>
+        <field name="context">{'default_res_model': 'hr.employee'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Nothing has expired</p>
+        </field>
+    </record>
+
+    <record id="om_document_type_action_hr" model="ir.actions.act_window">
+        <field name="name">Document Types</field>
+        <field name="res_model">om.document.type</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('res_model', '=', 'hr.employee')]</field>
+        <field name="context" eval="{'default_model_id': ref('hr.model_hr_employee')}"/>
+    </record>
+
+</odoo>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="hr_employee_view_form_om_document" model="ir.ui.view">
+        <field name="name">hr.employee.view.form.om.document</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_open_om_documents" type="object" class="oe_stat_button" icon="badge"
+                        groups="hr.group_hr_user">
+                    <field name="om_document_count" widget="statinfo" string="Documents"/>
+                </button>
+            </xpath>
+            <xpath expr="//page[@name='personal_information']" position="after">
+                <page name="om_documents" string="Documents" groups="hr.group_hr_user">
+                    <div class="alert alert-warning py-2" role="alert" invisible="not om_document_alert_count">
+                        <field name="om_document_alert_count" class="fw-bold"/> document(s) expiring or expired.
+                    </div>
+                    <field name="om_document_ids" widget="om_document_board" nolabel="1"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
