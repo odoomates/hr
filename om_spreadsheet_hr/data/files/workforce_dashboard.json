@@ -1,0 +1,834 @@
+{
+    "version": "19.3.10",
+    "sheets": [
+        {
+            "id": "b4759f38-e883-5bb5-a215-6f3d29a31169",
+            "name": "Dashboard",
+            "colNumber": 20,
+            "rowNumber": 80,
+            "rows": {},
+            "cols": {},
+            "merges": [],
+            "cells": {
+                "A47": "=_t(\"Contracts Ending in the Period\")",
+                "A48": "=ODOO.LIST(1,20)"
+            },
+            "styles": {
+                "A47": 2
+            },
+            "formats": {},
+            "borders": {},
+            "conditionalFormats": [],
+            "dataValidationRules": [],
+            "figures": [
+                {
+                    "id": "be7e74f2-4bf8-5cad-9329-4fa9f6b10ebf",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 0,
+                        "y": 0
+                    },
+                    "width": 190,
+                    "height": 110,
+                    "tag": "chart",
+                    "data": {
+                        "type": "scorecard",
+                        "title": {
+                            "text": "Headcount",
+                            "color": "#01666B",
+                            "bold": true
+                        },
+                        "background": "",
+                        "keyValue": "Data!B5",
+                        "baselineColorDown": "#DC6965",
+                        "baselineColorUp": "#00A04A",
+                        "baselineMode": "text",
+                        "humanize": true,
+                        "chartId": "be7e74f2-4bf8-5cad-9329-4fa9f6b10ebf",
+                        "baseline": "Data!B12",
+                        "baselineDescr": {
+                            "text": "since the start of the period"
+                        }
+                    }
+                },
+                {
+                    "id": "fe6100ca-e223-5708-8e42-c18c57ffdf16",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 200,
+                        "y": 0
+                    },
+                    "width": 190,
+                    "height": 110,
+                    "tag": "chart",
+                    "data": {
+                        "type": "scorecard",
+                        "title": {
+                            "text": "Joiners",
+                            "color": "#01666B",
+                            "bold": true
+                        },
+                        "background": "",
+                        "keyValue": "Data!B7",
+                        "baselineColorDown": "#DC6965",
+                        "baselineColorUp": "#00A04A",
+                        "baselineMode": "percentage",
+                        "humanize": true,
+                        "chartId": "fe6100ca-e223-5708-8e42-c18c57ffdf16"
+                    }
+                },
+                {
+                    "id": "dfa10596-94ea-5cdb-a65b-b59b70f54a74",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 400,
+                        "y": 0
+                    },
+                    "width": 190,
+                    "height": 110,
+                    "tag": "chart",
+                    "data": {
+                        "type": "scorecard",
+                        "title": {
+                            "text": "Leavers",
+                            "color": "#01666B",
+                            "bold": true
+                        },
+                        "background": "",
+                        "keyValue": "Data!B8",
+                        "baselineColorDown": "#00A04A",
+                        "baselineColorUp": "#DC6965",
+                        "baselineMode": "percentage",
+                        "humanize": true,
+                        "chartId": "dfa10596-94ea-5cdb-a65b-b59b70f54a74"
+                    }
+                },
+                {
+                    "id": "7d031dd9-1295-5c13-91ee-02899be59efb",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 600,
+                        "y": 0
+                    },
+                    "width": 190,
+                    "height": 110,
+                    "tag": "chart",
+                    "data": {
+                        "type": "scorecard",
+                        "title": {
+                            "text": "Turnover",
+                            "color": "#01666B",
+                            "bold": true
+                        },
+                        "background": "",
+                        "keyValue": "Data!B10",
+                        "baselineColorDown": "#00A04A",
+                        "baselineColorUp": "#DC6965",
+                        "baselineMode": "percentage",
+                        "humanize": true,
+                        "chartId": "7d031dd9-1295-5c13-91ee-02899be59efb"
+                    }
+                },
+                {
+                    "id": "2db2b013-da6c-53ec-bde4-811797d98a71",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 800,
+                        "y": 0
+                    },
+                    "width": 190,
+                    "height": 110,
+                    "tag": "chart",
+                    "data": {
+                        "type": "scorecard",
+                        "title": {
+                            "text": "Service (Years)",
+                            "color": "#01666B",
+                            "bold": true
+                        },
+                        "background": "",
+                        "keyValue": "Data!B11",
+                        "baselineColorDown": "#DC6965",
+                        "baselineColorUp": "#00A04A",
+                        "baselineMode": "percentage",
+                        "humanize": true,
+                        "chartId": "2db2b013-da6c-53ec-bde4-811797d98a71"
+                    }
+                },
+                {
+                    "id": "a6b3a559-57d4-5dba-8abe-29070ca4d643",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 0,
+                        "y": 120
+                    },
+                    "width": 990,
+                    "height": 300,
+                    "tag": "chart",
+                    "data": {
+                        "type": "combo",
+                        "title": {
+                            "text": "Headcount, Joiners and Leavers by Month",
+                            "color": "#01666B",
+                            "bold": true
+                        },
+                        "legendPosition": "top",
+                        "humanize": true,
+                        "dataSource": {
+                            "type": "range",
+                            "labelRange": "Data!A15:A26",
+                            "dataSets": [
+                                {
+                                    "dataSetId": "0",
+                                    "dataRange": "Data!D15:D26"
+                                },
+                                {
+                                    "dataSetId": "1",
+                                    "dataRange": "Data!E15:E26"
+                                },
+                                {
+                                    "dataSetId": "2",
+                                    "dataRange": "Data!C15:C26"
+                                }
+                            ],
+                            "dataSetsHaveTitle": false
+                        },
+                        "dataSetStyles": {
+                            "0": {
+                                "label": "Joiners",
+                                "type": "bar"
+                            },
+                            "1": {
+                                "label": "Leavers",
+                                "type": "bar"
+                            },
+                            "2": {
+                                "label": "Headcount",
+                                "type": "line"
+                            }
+                        },
+                        "chartId": "a6b3a559-57d4-5dba-8abe-29070ca4d643",
+                        "stacked": false,
+                        "aggregated": false
+                    }
+                },
+                {
+                    "id": "416f2786-807a-547b-8972-413466dea03d",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 0,
+                        "y": 430
+                    },
+                    "width": 490,
+                    "height": 280,
+                    "tag": "carousel",
+                    "data": {
+                        "chartDefinitions": {
+                            "13b781ed-0496-5065-836c-53c103086c46": {
+                                "type": "bar",
+                                "title": {},
+                                "legendPosition": "top",
+                                "humanize": true,
+                                "dataSource": {
+                                    "type": "odoo",
+                                    "metaData": {
+                                        "groupBy": [
+                                            "department_id"
+                                        ],
+                                        "measure": "__count",
+                                        "order": null,
+                                        "resModel": "hr.employee",
+                                        "mode": "bar",
+                                        "cumulatedStart": false
+                                    },
+                                    "searchParams": {
+                                        "comparison": null,
+                                        "context": {},
+                                        "domain": [],
+                                        "groupBy": [
+                                            "department_id"
+                                        ],
+                                        "orderBy": []
+                                    },
+                                    "actionXmlId": "hr.open_view_employee_list_my"
+                                },
+                                "dataSetStyles": {},
+                                "stacked": false
+                            }
+                        },
+                        "title": {
+                            "text": "Employees by Department",
+                            "fontSize": 16,
+                            "bold": true,
+                            "color": "#01666B"
+                        },
+                        "items": [
+                            {
+                                "type": "chart",
+                                "chartId": "13b781ed-0496-5065-836c-53c103086c46"
+                            }
+                        ],
+                        "fieldMatching": {
+                            "13b781ed-0496-5065-836c-53c103086c46": {
+                                "a05c81c3-32d3-5322-9249-fa0f75007159": {
+                                    "chain": "department_id",
+                                    "type": "many2one"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "id": "10d10cce-663b-5391-a4b6-f8f895fed610",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 500,
+                        "y": 430
+                    },
+                    "width": 490,
+                    "height": 280,
+                    "tag": "carousel",
+                    "data": {
+                        "chartDefinitions": {
+                            "06b8b587-f6b2-5074-a06b-64a419546e17": {
+                                "type": "bar",
+                                "title": {},
+                                "legendPosition": "top",
+                                "humanize": true,
+                                "dataSource": {
+                                    "type": "odoo",
+                                    "metaData": {
+                                        "groupBy": [
+                                            "job_id"
+                                        ],
+                                        "measure": "__count",
+                                        "order": null,
+                                        "resModel": "hr.employee",
+                                        "mode": "bar",
+                                        "cumulatedStart": false
+                                    },
+                                    "searchParams": {
+                                        "comparison": null,
+                                        "context": {},
+                                        "domain": [],
+                                        "groupBy": [
+                                            "job_id"
+                                        ],
+                                        "orderBy": []
+                                    },
+                                    "actionXmlId": "hr.open_view_employee_list_my"
+                                },
+                                "dataSetStyles": {},
+                                "stacked": false
+                            }
+                        },
+                        "title": {
+                            "text": "Employees by Job Position",
+                            "fontSize": 16,
+                            "bold": true,
+                            "color": "#01666B"
+                        },
+                        "items": [
+                            {
+                                "type": "chart",
+                                "chartId": "06b8b587-f6b2-5074-a06b-64a419546e17"
+                            }
+                        ],
+                        "fieldMatching": {
+                            "06b8b587-f6b2-5074-a06b-64a419546e17": {
+                                "a05c81c3-32d3-5322-9249-fa0f75007159": {
+                                    "chain": "department_id",
+                                    "type": "many2one"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "id": "4c14f382-498a-5d58-9171-590613152a1e",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 0,
+                        "y": 720
+                    },
+                    "width": 490,
+                    "height": 280,
+                    "tag": "carousel",
+                    "data": {
+                        "chartDefinitions": {
+                            "26a14d8a-b568-5b35-a8a9-70c362e2ebbc": {
+                                "type": "pie",
+                                "title": {},
+                                "legendPosition": "top",
+                                "humanize": true,
+                                "dataSource": {
+                                    "type": "odoo",
+                                    "metaData": {
+                                        "groupBy": [
+                                            "country_id"
+                                        ],
+                                        "measure": "__count",
+                                        "order": null,
+                                        "resModel": "hr.employee",
+                                        "mode": "pie",
+                                        "cumulatedStart": false
+                                    },
+                                    "searchParams": {
+                                        "comparison": null,
+                                        "context": {},
+                                        "domain": [],
+                                        "groupBy": [
+                                            "country_id"
+                                        ],
+                                        "orderBy": []
+                                    },
+                                    "actionXmlId": "hr.open_view_employee_list_my"
+                                },
+                                "dataSetStyles": {}
+                            }
+                        },
+                        "title": {
+                            "text": "Employees by Nationality",
+                            "fontSize": 16,
+                            "bold": true,
+                            "color": "#01666B"
+                        },
+                        "items": [
+                            {
+                                "type": "chart",
+                                "chartId": "26a14d8a-b568-5b35-a8a9-70c362e2ebbc"
+                            }
+                        ],
+                        "fieldMatching": {
+                            "26a14d8a-b568-5b35-a8a9-70c362e2ebbc": {
+                                "a05c81c3-32d3-5322-9249-fa0f75007159": {
+                                    "chain": "department_id",
+                                    "type": "many2one"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "id": "f735e73e-0d1e-5415-ba71-aa6537c70912",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 500,
+                        "y": 720
+                    },
+                    "width": 490,
+                    "height": 280,
+                    "tag": "carousel",
+                    "data": {
+                        "chartDefinitions": {
+                            "7102f5a7-4f8f-5570-b598-f4149311c375": {
+                                "type": "pie",
+                                "title": {},
+                                "legendPosition": "top",
+                                "humanize": true,
+                                "dataSource": {
+                                    "type": "odoo",
+                                    "metaData": {
+                                        "groupBy": [
+                                            "employee_type"
+                                        ],
+                                        "measure": "__count",
+                                        "order": null,
+                                        "resModel": "hr.employee",
+                                        "mode": "pie",
+                                        "cumulatedStart": false
+                                    },
+                                    "searchParams": {
+                                        "comparison": null,
+                                        "context": {},
+                                        "domain": [],
+                                        "groupBy": [
+                                            "employee_type"
+                                        ],
+                                        "orderBy": []
+                                    },
+                                    "actionXmlId": "hr.open_view_employee_list_my"
+                                },
+                                "dataSetStyles": {}
+                            }
+                        },
+                        "title": {
+                            "text": "Employees by Type",
+                            "fontSize": 16,
+                            "bold": true,
+                            "color": "#01666B"
+                        },
+                        "items": [
+                            {
+                                "type": "chart",
+                                "chartId": "7102f5a7-4f8f-5570-b598-f4149311c375"
+                            }
+                        ],
+                        "fieldMatching": {
+                            "7102f5a7-4f8f-5570-b598-f4149311c375": {
+                                "a05c81c3-32d3-5322-9249-fa0f75007159": {
+                                    "chain": "department_id",
+                                    "type": "many2one"
+                                }
+                            }
+                        }
+                    }
+                }
+            ],
+            "tables": [],
+            "areGridLinesVisible": false,
+            "isVisible": true,
+            "headerGroups": {
+                "ROW": [],
+                "COL": []
+            },
+            "comments": {},
+            "backgroundColor": "#F9FAFB"
+        },
+        {
+            "id": "19af09d9-d682-5c48-b3b2-917e6f6d6ab4",
+            "name": "Data",
+            "colNumber": 26,
+            "rowNumber": 100,
+            "rows": {},
+            "cols": {
+                "0": {
+                    "size": 200
+                },
+                "1": {
+                    "size": 130
+                },
+                "2": {
+                    "size": 130
+                },
+                "3": {
+                    "size": 110
+                },
+                "4": {
+                    "size": 110
+                }
+            },
+            "merges": [],
+            "cells": {
+                "A1": "=_t(\"Period\")",
+                "B1": "=ODOO.FILTER.VALUE(\"Period\")",
+                "A2": "=_t(\"End\")",
+                "B2": "=IF(ISNUMBER(C1),MIN(C1,TODAY()),TODAY())",
+                "A3": "=_t(\"Start\")",
+                "B3": "=IF(ISNUMBER(B1),B1,DATE(YEAR(TODAY()),1,1))",
+                "A4": "=_t(\"Departments\")",
+                "B4": "=ODOO.FILTER.VALUE(\"Department\")",
+                "A5": "=_t(\"Headcount\")",
+                "B5": "=OM.HR.HEADCOUNT(B2,B4)",
+                "A6": "=_t(\"Headcount at start\")",
+                "B6": "=OM.HR.HEADCOUNT(B3-1,B4)",
+                "A7": "=_t(\"Joiners\")",
+                "B7": "=OM.HR.JOINERS(B3,B2,B4)",
+                "A8": "=_t(\"Leavers\")",
+                "B8": "=OM.HR.LEAVERS(B3,B2,B4)",
+                "A9": "=_t(\"Average headcount\")",
+                "B9": "=AVERAGE(B5,B6)",
+                "A10": "=_t(\"Turnover\")",
+                "B10": "=IF(B9>0,B8/B9,0)",
+                "A11": "=_t(\"Average service (years)\")",
+                "B11": "=OM.HR.TENURE(B2,B4)",
+                "A12": "=_t(\"Change of headcount\")",
+                "B12": "=B5-B6",
+                "A14": "=_t(\"Month\")",
+                "B14": "=_t(\"Last day\")",
+                "C14": "=_t(\"Headcount\")",
+                "D14": "=_t(\"Joiners\")",
+                "E14": "=_t(\"Leavers\")",
+                "A15": "=EDATE(DATE(YEAR($B$3),MONTH($B$3),1),0)",
+                "B15": "=MIN(EOMONTH(A15,0),$B$2)",
+                "C15": "=IF(A15>$B$2,\"\",OM.HR.HEADCOUNT(B15,$B$4))",
+                "D15": "=IF(A15>$B$2,\"\",OM.HR.JOINERS(A15,B15,$B$4))",
+                "E15": "=IF(A15>$B$2,\"\",OM.HR.LEAVERS(A15,B15,$B$4))",
+                "A16": "=EDATE(DATE(YEAR($B$3),MONTH($B$3),1),1)",
+                "B16": "=MIN(EOMONTH(A16,0),$B$2)",
+                "C16": "=IF(A16>$B$2,\"\",OM.HR.HEADCOUNT(B16,$B$4))",
+                "D16": "=IF(A16>$B$2,\"\",OM.HR.JOINERS(A16,B16,$B$4))",
+                "E16": "=IF(A16>$B$2,\"\",OM.HR.LEAVERS(A16,B16,$B$4))",
+                "A17": "=EDATE(DATE(YEAR($B$3),MONTH($B$3),1),2)",
+                "B17": "=MIN(EOMONTH(A17,0),$B$2)",
+                "C17": "=IF(A17>$B$2,\"\",OM.HR.HEADCOUNT(B17,$B$4))",
+                "D17": "=IF(A17>$B$2,\"\",OM.HR.JOINERS(A17,B17,$B$4))",
+                "E17": "=IF(A17>$B$2,\"\",OM.HR.LEAVERS(A17,B17,$B$4))",
+                "A18": "=EDATE(DATE(YEAR($B$3),MONTH($B$3),1),3)",
+                "B18": "=MIN(EOMONTH(A18,0),$B$2)",
+                "C18": "=IF(A18>$B$2,\"\",OM.HR.HEADCOUNT(B18,$B$4))",
+                "D18": "=IF(A18>$B$2,\"\",OM.HR.JOINERS(A18,B18,$B$4))",
+                "E18": "=IF(A18>$B$2,\"\",OM.HR.LEAVERS(A18,B18,$B$4))",
+                "A19": "=EDATE(DATE(YEAR($B$3),MONTH($B$3),1),4)",
+                "B19": "=MIN(EOMONTH(A19,0),$B$2)",
+                "C19": "=IF(A19>$B$2,\"\",OM.HR.HEADCOUNT(B19,$B$4))",
+                "D19": "=IF(A19>$B$2,\"\",OM.HR.JOINERS(A19,B19,$B$4))",
+                "E19": "=IF(A19>$B$2,\"\",OM.HR.LEAVERS(A19,B19,$B$4))",
+                "A20": "=EDATE(DATE(YEAR($B$3),MONTH($B$3),1),5)",
+                "B20": "=MIN(EOMONTH(A20,0),$B$2)",
+                "C20": "=IF(A20>$B$2,\"\",OM.HR.HEADCOUNT(B20,$B$4))",
+                "D20": "=IF(A20>$B$2,\"\",OM.HR.JOINERS(A20,B20,$B$4))",
+                "E20": "=IF(A20>$B$2,\"\",OM.HR.LEAVERS(A20,B20,$B$4))",
+                "A21": "=EDATE(DATE(YEAR($B$3),MONTH($B$3),1),6)",
+                "B21": "=MIN(EOMONTH(A21,0),$B$2)",
+                "C21": "=IF(A21>$B$2,\"\",OM.HR.HEADCOUNT(B21,$B$4))",
+                "D21": "=IF(A21>$B$2,\"\",OM.HR.JOINERS(A21,B21,$B$4))",
+                "E21": "=IF(A21>$B$2,\"\",OM.HR.LEAVERS(A21,B21,$B$4))",
+                "A22": "=EDATE(DATE(YEAR($B$3),MONTH($B$3),1),7)",
+                "B22": "=MIN(EOMONTH(A22,0),$B$2)",
+                "C22": "=IF(A22>$B$2,\"\",OM.HR.HEADCOUNT(B22,$B$4))",
+                "D22": "=IF(A22>$B$2,\"\",OM.HR.JOINERS(A22,B22,$B$4))",
+                "E22": "=IF(A22>$B$2,\"\",OM.HR.LEAVERS(A22,B22,$B$4))",
+                "A23": "=EDATE(DATE(YEAR($B$3),MONTH($B$3),1),8)",
+                "B23": "=MIN(EOMONTH(A23,0),$B$2)",
+                "C23": "=IF(A23>$B$2,\"\",OM.HR.HEADCOUNT(B23,$B$4))",
+                "D23": "=IF(A23>$B$2,\"\",OM.HR.JOINERS(A23,B23,$B$4))",
+                "E23": "=IF(A23>$B$2,\"\",OM.HR.LEAVERS(A23,B23,$B$4))",
+                "A24": "=EDATE(DATE(YEAR($B$3),MONTH($B$3),1),9)",
+                "B24": "=MIN(EOMONTH(A24,0),$B$2)",
+                "C24": "=IF(A24>$B$2,\"\",OM.HR.HEADCOUNT(B24,$B$4))",
+                "D24": "=IF(A24>$B$2,\"\",OM.HR.JOINERS(A24,B24,$B$4))",
+                "E24": "=IF(A24>$B$2,\"\",OM.HR.LEAVERS(A24,B24,$B$4))",
+                "A25": "=EDATE(DATE(YEAR($B$3),MONTH($B$3),1),10)",
+                "B25": "=MIN(EOMONTH(A25,0),$B$2)",
+                "C25": "=IF(A25>$B$2,\"\",OM.HR.HEADCOUNT(B25,$B$4))",
+                "D25": "=IF(A25>$B$2,\"\",OM.HR.JOINERS(A25,B25,$B$4))",
+                "E25": "=IF(A25>$B$2,\"\",OM.HR.LEAVERS(A25,B25,$B$4))",
+                "A26": "=EDATE(DATE(YEAR($B$3),MONTH($B$3),1),11)",
+                "B26": "=MIN(EOMONTH(A26,0),$B$2)",
+                "C26": "=IF(A26>$B$2,\"\",OM.HR.HEADCOUNT(B26,$B$4))",
+                "D26": "=IF(A26>$B$2,\"\",OM.HR.JOINERS(A26,B26,$B$4))",
+                "E26": "=IF(A26>$B$2,\"\",OM.HR.LEAVERS(A26,B26,$B$4))"
+            },
+            "styles": {
+                "A1": 1,
+                "A2": 1,
+                "A3": 1,
+                "A4": 1,
+                "A5": 1,
+                "A6": 1,
+                "A7": 1,
+                "A8": 1,
+                "A9": 1,
+                "A10": 1,
+                "A11": 1,
+                "A12": 1,
+                "A14": 2,
+                "B14": 2,
+                "C14": 2,
+                "D14": 2,
+                "E14": 2
+            },
+            "formats": {
+                "B1": 1,
+                "B2": 1,
+                "B3": 1,
+                "B5": 2,
+                "B6": 2,
+                "B7": 2,
+                "B8": 2,
+                "B9": 3,
+                "B10": 4,
+                "B11": 3,
+                "B12": 2,
+                "C1": 1,
+                "A15": 5,
+                "B15": 1,
+                "C15": 2,
+                "D15": 2,
+                "E15": 2,
+                "A16": 5,
+                "B16": 1,
+                "C16": 2,
+                "D16": 2,
+                "E16": 2,
+                "A17": 5,
+                "B17": 1,
+                "C17": 2,
+                "D17": 2,
+                "E17": 2,
+                "A18": 5,
+                "B18": 1,
+                "C18": 2,
+                "D18": 2,
+                "E18": 2,
+                "A19": 5,
+                "B19": 1,
+                "C19": 2,
+                "D19": 2,
+                "E19": 2,
+                "A20": 5,
+                "B20": 1,
+                "C20": 2,
+                "D20": 2,
+                "E20": 2,
+                "A21": 5,
+                "B21": 1,
+                "C21": 2,
+                "D21": 2,
+                "E21": 2,
+                "A22": 5,
+                "B22": 1,
+                "C22": 2,
+                "D22": 2,
+                "E22": 2,
+                "A23": 5,
+                "B23": 1,
+                "C23": 2,
+                "D23": 2,
+                "E23": 2,
+                "A24": 5,
+                "B24": 1,
+                "C24": 2,
+                "D24": 2,
+                "E24": 2,
+                "A25": 5,
+                "B25": 1,
+                "C25": 2,
+                "D25": 2,
+                "E25": 2,
+                "A26": 5,
+                "B26": 1,
+                "C26": 2,
+                "D26": 2,
+                "E26": 2
+            },
+            "borders": {},
+            "conditionalFormats": [],
+            "dataValidationRules": [],
+            "figures": [],
+            "tables": [],
+            "areGridLinesVisible": true,
+            "isVisible": true,
+            "headerGroups": {
+                "ROW": [],
+                "COL": []
+            },
+            "comments": {}
+        }
+    ],
+    "styles": {
+        "1": {
+            "textColor": "#434343"
+        },
+        "2": {
+            "textColor": "#434343",
+            "bold": true,
+            "fontSize": 11,
+            "fillColor": "#E7F2F2"
+        }
+    },
+    "formats": {
+        "1": "mm/dd/yyyy",
+        "2": "#,##0",
+        "3": "0.0",
+        "4": "0.0%",
+        "5": "mmm yyyy"
+    },
+    "borders": {},
+    "revisionId": "START_REVISION",
+    "uniqueFigureIds": true,
+    "settings": {
+        "locale": {
+            "name": "English (US)",
+            "code": "en_US",
+            "thousandsSeparator": ",",
+            "decimalSeparator": ".",
+            "dateFormat": "mm/dd/yyyy",
+            "timeFormat": "hh:mm:ss",
+            "formulaArgSeparator": ",",
+            "weekStart": 7
+        }
+    },
+    "pivots": {},
+    "pivotNextId": 1,
+    "customTableStyles": {},
+    "namedRanges": [],
+    "globalFilters": [
+        {
+            "id": "d7d556e9-5bbb-5b2c-b9aa-3f1038efe58e",
+            "type": "date",
+            "label": "Period",
+            "defaultValue": "this_year"
+        },
+        {
+            "id": "a05c81c3-32d3-5322-9249-fa0f75007159",
+            "type": "relation",
+            "label": "Department",
+            "modelName": "hr.department",
+            "defaultValueDisplayNames": []
+        }
+    ],
+    "lists": {
+        "1": {
+            "id": "1",
+            "name": "Contracts Ending",
+            "model": "hr.version",
+            "domain": [
+                [
+                    "contract_date_end",
+                    "!=",
+                    false
+                ],
+                [
+                    "employee_id.active",
+                    "in",
+                    [
+                        true,
+                        false
+                    ]
+                ]
+            ],
+            "context": {
+                "active_test": false
+            },
+            "columns": [
+                {
+                    "name": "employee_id",
+                    "string": "Employee"
+                },
+                {
+                    "name": "department_id",
+                    "string": "Department"
+                },
+                {
+                    "name": "job_id",
+                    "string": "Job Position"
+                },
+                {
+                    "name": "contract_date_end",
+                    "string": "Contract End"
+                }
+            ],
+            "orderBy": [
+                {
+                    "name": "contract_date_end",
+                    "asc": true
+                }
+            ],
+            "fieldMatching": {
+                "d7d556e9-5bbb-5b2c-b9aa-3f1038efe58e": {
+                    "chain": "contract_date_end",
+                    "type": "date",
+                    "offset": 0
+                },
+                "a05c81c3-32d3-5322-9249-fa0f75007159": {
+                    "chain": "department_id",
+                    "type": "many2one"
+                }
+            }
+        }
+    },
+    "listNextId": 2,
+    "odooLinkReferences": {}
+}
