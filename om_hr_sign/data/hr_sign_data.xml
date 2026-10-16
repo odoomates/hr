@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="ir_cron_policy_remind" model="ir.cron">
+        <field name="name">Policies: Reminders</field>
+        <field name="model_id" ref="model_hr_policy_assignment"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_remind()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+    </record>
+
+    <template id="mail_policy_assigned" name="Policy Email">
+        <div>
+            <p>Hello <t t-out="assignment.employee_id.name"/>,</p>
+            <p t-if="reminder">This is a reminder.</p>
+            <p>
+                Please read <strong t-out="assignment.policy_id.name"/> and confirm you agree to it
+                <t t-if="assignment.date_due">by <t t-out="assignment.date_due"/></t>.
+            </p>
+            <p t-if="assignment.version_id.change_note" style="white-space: pre-line;"
+               t-out="assignment.version_id.change_note"/>
+            <p t-if="url" style="margin: 24px 0;">
+                <a t-att-href="url"
+                   style="background-color: #00796b; color: #ffffff; padding: 10px 18px; text-decoration: none; border-radius: 4px;">
+                    Read the Policy
+                </a>
+            </p>
+            <p t-else="">You find it in My HR.</p>
+        </div>
+    </template>
+
+</odoo>

@@ -1,0 +1,13 @@
+id,name,model_id,group_id/id,operation,domain
+access_hr_policy_employee,hr.policy.employee,hr.policy,base.group_user,r,"[('assignment_ids.employee_id.user_id', '=', user.id)]"
+access_hr_policy_hr,hr.policy.hr,hr.policy,hr.group_hr_user,crud,
+hr_policy_company_rule,Policies: multi-company,hr.policy,,crud,"[('company_id', 'in', company_ids)]"
+access_hr_policy_version_employee,hr.policy.version.employee,hr.policy.version,base.group_user,r,"[('assignment_ids.employee_id.user_id', '=', user.id)]"
+access_hr_policy_version_hr,hr.policy.version.hr,hr.policy.version,hr.group_hr_user,crud,
+hr_policy_version_company_rule,Policy versions: multi-company,hr.policy.version,,crud,"[('company_id', 'in', company_ids)]"
+access_hr_policy_assignment_employee,hr.policy.assignment.employee,hr.policy.assignment,base.group_user,r,"[('employee_id.user_id', '=', user.id)]"
+access_hr_policy_assignment_hr,hr.policy.assignment.hr,hr.policy.assignment,hr.group_hr_user,crud,
+hr_policy_assignment_company_rule,Policy answers: multi-company,hr.policy.assignment,,crud,"[('company_id', 'in', company_ids)]"
+access_sign_request_hr,sign.request.hr,sign.request,hr.group_hr_user,r,"['|', ('res_model', 'in', ('hr.employee', 'hr.policy.assignment')), ('signer_ids.partner_id.employee_ids', '!=', False)]"
+access_sign_request_signer_hr,sign.request.signer.hr,sign.request.signer,hr.group_hr_user,r,"['|', ('request_id.res_model', 'in', ('hr.employee', 'hr.policy.assignment')), ('request_id.signer_ids.partner_id.employee_ids', '!=', False)]"
+access_sign_log_hr,sign.log.hr,sign.log,hr.group_hr_user,r,"['|', ('request_id.res_model', 'in', ('hr.employee', 'hr.policy.assignment')), ('request_id.signer_ids.partner_id.employee_ids', '!=', False)]"

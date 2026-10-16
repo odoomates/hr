@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- policies, for HR -->
+
+    <record id="hr_policy_view_form" model="ir.ui.view">
+        <field name="name">hr.policy.view.form</field>
+        <field name="model">hr.policy</field>
+        <field name="arch" type="xml">
+            <form string="Policy">
+                <header>
+                    <button name="action_new_version" string="New Version" type="object" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_assignments" type="object" class="oe_stat_button" icon="task"
+                                invisible="not version_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_value"><field name="done_count"/> / <field name="assignment_count"/></span>
+                                <span class="o_stat_text">Answered</span>
+                            </div>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <field name="active" invisible="1"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Code of Conduct"/></h1>
+                    </div>
+                    <group>
+                        <group string="Answer">
+                            <field name="answer_type" widget="radio"/>
+                            <label for="due_days"/>
+                            <div class="o_row"><field name="due_days"/> days</div>
+                            <label for="remind_days"/>
+                            <div class="o_row"><field name="remind_days"/> days</div>
+                            <field name="assign_new"/>
+                            <field name="version_id"/>
+                        </group>
+                        <group string="Employees">
+                            <field name="audience" widget="radio"/>
+                            <field name="department_ids" widget="many2many_tags" invisible="audience != 'department'"
+                                   required="audience == 'department'"/>
+                            <field name="job_ids" widget="many2many_tags" invisible="audience != 'job'"
+                                   required="audience == 'job'"/>
+                            <field name="category_ids" widget="many2many_tags" invisible="audience != 'tag'"
+                                   required="audience == 'tag'"/>
+                            <field name="employee_ids" widget="many2many_tags_avatar" invisible="audience != 'employee'"
+                                   required="audience == 'employee'"/>
+                            <field name="audience_count"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Versions" name="versions">
+                            <field name="version_ids" readonly="1">
+                                <list>
+                                    <field name="number"/>
+                                    <field name="content_type"/>
+                                    <field name="date_published"/>
+                                    <field name="change_note" optional="show"/>
+                                    <field name="state" widget="badge" decoration-success="state == 'published'"
+                                           decoration-info="state == 'draft'"/>
+                                    <button name="action_open" type="object" icon="open_in_new" title="Open"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_policy_view_list" model="ir.ui.view">
+        <field name="name">hr.policy.view.list</field>
+        <field name="model">hr.policy</field>
+        <field name="arch" type="xml">
+            <list string="Policies">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="answer_type"/>
+                <field name="version_id"/>
+                <field name="audience_count"/>
+                <field name="pending_count"/>
+                <field name="done_rate" widget="progressbar"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hr_policy_view_search" model="ir.ui.view">
+        <field name="name">hr.policy.view.search</field>
+        <field name="model">hr.policy</field>
+        <field name="arch" type="xml">
+            <search string="Policies">
+                <field name="name"/>
+                <filter name="to_sign" string="Signed" domain="[('answer_type', '=', 'sign')]"/>
+                <filter name="to_agree" string="Read and Agree" domain="[('answer_type', '=', 'acknowledge')]"/>
+                <separator/>
+                <filter name="archived" string="Archived" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="hr_policy_action" model="ir.actions.act_window">
+        <field name="name">Policies</field>
+        <field name="res_model">hr.policy</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create a policy</p>
+            <p>The code of conduct, the IT use or an NDA: publish its text and the employees read and agree to it,
+                or sign it. A new version asks everyone again.</p>
+        </field>
+    </record>
+
+    <!-- versions -->
+
+    <record id="hr_policy_version_view_form" model="ir.ui.view">
+        <field name="name">hr.policy.version.view.form</field>
+        <field name="model">hr.policy.version</field>
+        <field name="arch" type="xml">
+            <form string="Policy Version">
+                <header>
+                    <button name="action_publish" string="Publish" type="object" class="btn-primary"
+                            invisible="state != 'draft'"
+                            confirm="Every employee of the policy is asked to answer this version. Publish it?"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="policy_id" readonly="1"/>
+                            <field name="content_type" widget="radio" readonly="state != 'draft'"/>
+                            <field name="document_file" filename="document_filename" invisible="content_type != 'pdf'"
+                                   readonly="state != 'draft'"/>
+                            <field name="document_filename" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="date_published" invisible="not date_published"/>
+                            <field name="published_by_id" invisible="not published_by_id"/>
+                            <field name="document_hash" invisible="not document_hash"/>
+                        </group>
+                    </group>
+                    <field name="change_note" placeholder="What changed since the previous version?"
+                           readonly="state != 'draft'"/>
+                    <field name="body" widget="html" class="oe-bordered-editor" invisible="content_type != 'text'"
+                           readonly="state != 'draft'"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- answers -->
+
+    <record id="hr_policy_assignment_view_list" model="ir.ui.view">
+        <field name="name">hr.policy.assignment.view.list</field>
+        <field name="model">hr.policy.assignment</field>
+        <field name="arch" type="xml">
+            <list string="Policy Answers" create="0" decoration-danger="is_overdue" decoration-muted="state == 'cancelled'">
+                <field name="policy_id"/>
+                <field name="version_id" optional="hide"/>
+                <field name="employee_id" widget="many2one_avatar_employee"/>
+                <field name="department_id" optional="show"/>
+                <field name="date_assigned" optional="hide"/>
+                <field name="date_due"/>
+                <field name="date_done" optional="show"/>
+                <field name="problem" optional="show"/>
+                <field name="is_overdue" column_invisible="1"/>
+                <field name="answer_type" column_invisible="1"/>
+                <field name="sign_state" optional="hide"/>
+                <field name="state" widget="badge" decoration-success="state == 'done'" decoration-warning="state == 'pending'"
+                       decoration-danger="state == 'declined'"/>
+                <button name="action_send_again" type="object" string="Ask Again" groups="hr.group_hr_user"
+                        invisible="answer_type != 'sign' or state not in ('pending', 'declined') or sign_state in ('sent', 'signed')"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hr_policy_assignment_view_form" model="ir.ui.view">
+        <field name="name">hr.policy.assignment.view.form</field>
+        <field name="model">hr.policy.assignment</field>
+        <field name="arch" type="xml">
+            <form string="Policy" create="0" edit="0">
+                <header>
+                    <button name="action_acknowledge" string="I Have Read and Agree" type="object" class="btn-primary"
+                            invisible="state != 'pending' or answer_type != 'acknowledge'"/>
+                    <button name="action_sign" string="Sign" type="object" class="btn-primary"
+                            invisible="state != 'pending' or answer_type != 'sign' or sign_state != 'sent'"/>
+                    <button name="action_send_again" string="Ask Again" type="object" groups="hr.group_hr_user"
+                            invisible="answer_type != 'sign' or state not in ('pending', 'declined') or sign_state in ('sent', 'signed')"/>
+                    <button name="action_cancel" string="Cancel" type="object" groups="hr.group_hr_user"
+                            invisible="state not in ('pending', 'declined')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="pending,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="policy_id" readonly="1"/></h1>
+                        <field name="version_id" readonly="1" class="text-muted"/>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="employee_id" readonly="1"/>
+                            <field name="date_due"/>
+                            <field name="answer_type" invisible="1"/>
+                            <field name="sign_state" invisible="1"/>
+                            <field name="content_type" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="date_done" invisible="not date_done"/>
+                            <field name="done_by_id" invisible="not done_by_id"/>
+                            <field name="ip" invisible="not ip"/>
+                            <field name="sign_request_id" invisible="not sign_request_id" groups="hr.group_hr_user"/>
+                            <field name="problem" invisible="not problem"/>
+                        </group>
+                    </group>
+                    <field name="body" readonly="1" invisible="content_type != 'text'"/>
+                    <field name="document_file" widget="pdf_viewer" readonly="1" invisible="content_type != 'pdf'"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_policy_assignment_view_kanban" model="ir.ui.view">
+        <field name="name">hr.policy.assignment.view.kanban</field>
+        <field name="model">hr.policy.assignment</field>
+        <field name="arch" type="xml">
+            <kanban create="0">
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex justify-content-between">
+                            <field name="policy_id" class="fw-bold"/>
+                            <field name="state" widget="label_selection"
+                                   options="{'classes': {'pending': 'warning', 'done': 'success', 'declined': 'danger'}}"/>
+                        </div>
+                        <div class="text-muted small">
+                            <field name="answer_type"/>
+                            <t t-if="record.date_due.raw_value"> · Due <field name="date_due"/></t>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="hr_policy_assignment_view_pivot" model="ir.ui.view">
+        <field name="name">hr.policy.assignment.view.pivot</field>
+        <field name="model">hr.policy.assignment</field>
+        <field name="arch" type="xml">
+            <pivot string="Policy Answers">
+                <field name="department_id" type="row"/>
+                <field name="state" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="hr_policy_assignment_view_search" model="ir.ui.view">
+        <field name="name">hr.policy.assignment.view.search</field>
+        <field name="model">hr.policy.assignment</field>
+        <field name="arch" type="xml">
+            <search string="Policy Answers">
+                <field name="employee_id"/>
+                <field name="department_id"/>
+                <field name="policy_id"/>
+                <filter name="pending" string="To Answer" domain="[('state', '=', 'pending')]"/>
+                <filter name="overdue" string="Overdue" domain="[('is_overdue', '=', True)]"/>
+                <filter name="done" string="Answered" domain="[('state', '=', 'done')]"/>
+                <filter name="declined" string="Declined" domain="[('state', '=', 'declined')]"/>
+                <separator/>
+                <filter name="current" string="Current Versions" domain="[('version_id.state', '=', 'published')]"/>
+                <group>
+                    <filter name="group_policy" string="Policy" context="{'group_by': 'policy_id'}"/>
+                    <filter name="group_department" string="Department" context="{'group_by': 'department_id'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="hr_policy_assignment_action" model="ir.actions.act_window">
+        <field name="name">Policy Answers</field>
+        <field name="res_model">hr.policy.assignment</field>
+        <field name="view_mode">list,pivot,form</field>
+        <field name="context">{'search_default_current': 1, 'search_default_pending': 1}</field>
+    </record>
+
+    <record id="hr_policy_assignment_action_my" model="ir.actions.act_window">
+        <field name="name">My Policies</field>
+        <field name="res_model">hr.policy.assignment</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('employee_id.user_id', '=', uid), ('state', '!=', 'cancelled')]</field>
+        <field name="context">{'create': False}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No policy to answer</p>
+            <p>The policies of the company you are asked to read and agree to, or to sign, show here.</p>
+        </field>
+    </record>
+
+    <!-- the signature requests of the employee -->
+    <record id="sign_request_action_my" model="ir.actions.act_window">
+        <field name="name">My Signatures</field>
+        <field name="res_model">sign.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('signer_ids.partner_id.user_ids', 'in', [uid]), ('state', '!=', 'draft')]</field>
+        <field name="context">{'create': False, 'search_default_to_sign': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Nothing to sign</p>
+            <p>The documents sent to you for signature show here.</p>
+        </field>
+    </record>
+
+    <!-- employees -->
+
+    <record id="hr_employee_view_form" model="ir.ui.view">
+        <field name="name">hr.employee.view.form.sign</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_open_sign_requests" type="object" class="oe_stat_button" icon="edit_square"
+                        groups="hr.group_hr_user" invisible="not sign_request_count">
+                    <field name="sign_request_count" widget="statinfo" string="Signatures"/>
+                </button>
+                <button name="action_open_policy_assignments" type="object" class="oe_stat_button" icon="task"
+                        groups="hr.group_hr_user">
+                    <field name="policy_pending_count" widget="statinfo" string="Policies to Answer"/>
+                </button>
+            </xpath>
+            <xpath expr="//header" position="inside">
+                <button name="action_request_signature" string="Request Signature" type="object"
+                        groups="om_sign.group_sign_user"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- menus -->
+
+    <menuitem id="menu_hr_policies" name="Policies" parent="hr.menu_hr_root" sequence="79" groups="hr.group_hr_user"/>
+    <menuitem id="menu_hr_policy" action="hr_policy_action" parent="menu_hr_policies" sequence="10"/>
+    <menuitem id="menu_hr_policy_assignment" action="hr_policy_assignment_action" parent="menu_hr_policies"
+              sequence="20"/>
+    <menuitem id="menu_hr_policy_my" action="hr_policy_assignment_action_my" parent="om_hr_base.menu_my_hr"
+              sequence="3"/>
+    <menuitem id="menu_sign_request_my" action="sign_request_action_my" parent="om_hr_base.menu_my_hr"
+              sequence="4"/>
+
+</odoo>
