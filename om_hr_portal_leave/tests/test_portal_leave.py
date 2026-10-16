@@ -2,11 +2,11 @@ from datetime import date
 
 from odoo.tests import tagged
 
-from odoo.addons.om_hr_portal.tests.common import OmHrPortalCase
+from odoo.addons.om_hr_portal.tests.common import HrPortalCase
 
 
 @tagged('post_install', '-at_install')
-class TestPortalLeave(OmHrPortalCase):
+class TestPortalLeave(HrPortalCase):
 
     @classmethod
     def setUpClass(cls):
