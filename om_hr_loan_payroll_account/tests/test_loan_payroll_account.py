@@ -31,7 +31,7 @@ class TestLoanPayrollAccount(AccountTestInvoicingCommon):
             'rule_ids': [Command.set((basic | cls.loan_rule | net).ids)], 'company_id': cls.env.company.id})
         cls.loan_account = cls.env['account.account'].create({
             'name': 'Employee Loans', 'code': 'EMPLOANP', 'account_type': 'asset_receivable', 'reconcile': True})
-        cls.loan_type = cls.env['om.hr.loan.type'].create({'name': 'Payroll Loan', 'single_running': False})
+        cls.loan_type = cls.env['hr.loan.type'].create({'name': 'Payroll Loan', 'single_running': False})
         cls.loan_type.write({'account_id': cls.loan_account.id,
                              'journal_id': cls.company_data['default_journal_bank'].id})
         cls.employee = cls.env['hr.employee'].create({
@@ -44,7 +44,7 @@ class TestLoanPayrollAccount(AccountTestInvoicingCommon):
         self.assertEqual(self.loan_rule.account_credit, self.env.ref('om_hr_payroll.hr_rule_net').account_debit)
 
     def test_installment_deducted_repays_the_loan_account(self):
-        loan = self.env['om.hr.loan'].create({
+        loan = self.env['hr.loan'].create({
             'employee_id': self.employee.id, 'type_id': self.loan_type.id, 'amount': 600.0,
             'installment_count': 2, 'date': date(2026, 6, 1), 'date_start': date(2026, 8, 1)})
         loan._compute_installments()
@@ -73,13 +73,13 @@ class TestLoanPayrollAccount(AccountTestInvoicingCommon):
         """ Two loan types on two loan accounts: each installment repays the account of its loan. """
         advance_account = self.env['account.account'].create({
             'name': 'Salary Advances', 'code': 'EMPADVP', 'account_type': 'asset_receivable', 'reconcile': True})
-        advance_type = self.env['om.hr.loan.type'].create({'name': 'Payroll Advance', 'single_running': False})
+        advance_type = self.env['hr.loan.type'].create({'name': 'Payroll Advance', 'single_running': False})
         advance_type.write({'account_id': advance_account.id,
                             'journal_id': self.company_data['default_journal_bank'].id})
         self.assertEqual(self.loan_rule.account_debit, self.loan_account, 'the rule keeps the first account')
-        loans = self.env['om.hr.loan']
+        loans = self.env['hr.loan']
         for loan_type, amount, count in ((self.loan_type, 600.0, 2), (advance_type, 100.0, 1)):
-            loan = self.env['om.hr.loan'].create({
+            loan = self.env['hr.loan'].create({
                 'employee_id': self.employee.id, 'type_id': loan_type.id, 'amount': amount,
                 'installment_count': count, 'date': date(2026, 6, 1), 'date_start': date(2026, 8, 1)})
             loan._compute_installments()

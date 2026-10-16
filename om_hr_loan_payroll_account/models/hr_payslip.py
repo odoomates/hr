@@ -8,7 +8,7 @@ class HrPayslipLine(models.Model):
         """ What the employee repays of a loan is matched with their loan: the employee is the partner of the
             lines on a loan account. """
         account = self.salary_rule_id.account_credit if credit_account else self.salary_rule_id.account_debit
-        if account and account in self.env['om.hr.loan.type'].sudo()._om_loan_accounts(self.slip_id.company_id):
+        if account and account in self.env['hr.loan.type'].sudo()._loan_accounts(self.slip_id.company_id):
             return self.slip_id.employee_id.sudo().work_contact_id.id
         return super()._get_partner_id(credit_account)
 
@@ -23,7 +23,7 @@ class HrPayslip(models.Model):
         rule = self.env.ref('om_hr_loan_payroll.hr_rule_loan', raise_if_not_found=False)
         slip = self.with_company(self.company_id)
         rule_account = rule and rule.sudo().with_company(slip.company_id).account_debit
-        loan_lines = slip._om_hr_loan_lines()
+        loan_lines = slip._hr_loan_lines()
         payslip_line = slip.line_ids.filtered(lambda line: line.salary_rule_id == rule)[:1]
         if not rule_account or not loan_lines or not payslip_line:
             return values
@@ -54,11 +54,11 @@ class HrPayslip(models.Model):
 
     def action_payslip_done(self):
         result = super().action_payslip_done()
-        self._om_reconcile_loans()
+        self._reconcile_loans()
         return result
 
-    def _om_reconcile_loans(self):
-        self.filtered(lambda slip: slip.move_id.state == 'posted')._om_hr_loan_lines().loan_id._om_reconcile()
+    def _reconcile_loans(self):
+        self.filtered(lambda slip: slip.move_id.state == 'posted')._hr_loan_lines().loan_id._reconcile()
 
 
 class HrPayslipRun(models.Model):
@@ -66,5 +66,5 @@ class HrPayslipRun(models.Model):
 
     def done_payslip_run(self):
         result = super().done_payslip_run()
-        self.slip_ids._om_reconcile_loans()
+        self.slip_ids._reconcile_loans()
         return result

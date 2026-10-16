@@ -1,27 +1,27 @@
 from odoo import api, models
 
 
-class OmHrLoanType(models.Model):
-    _inherit = 'om.hr.loan.type'
+class HrLoanType(models.Model):
+    _inherit = 'hr.loan.type'
 
     @api.model
-    def _om_loan_accounts(self, company):
+    def _loan_accounts(self, company):
         """ :return: the loan accounts of the loan types in the company """
         return self.with_company(company).with_context(active_test=False).search([]).account_id
 
     @api.model_create_multi
     def create(self, vals_list):
         types = super().create(vals_list)
-        types._om_set_loan_rule_accounts()
+        types._set_loan_rule_accounts()
         return types
 
     def write(self, vals):
         result = super().write(vals)
         if 'account_id' in vals:
-            self._om_set_loan_rule_accounts()
+            self._set_loan_rule_accounts()
         return result
 
-    def _om_set_loan_rule_accounts(self):
+    def _set_loan_rule_accounts(self):
         """ The loan installments of the payslips repay the loan account: the deduction is negative, so the loan
             account is the debit account of the loan rule, credited by it. Its other side is the account the net
             salary is taken from. Accounts already set on the rule are kept. """
