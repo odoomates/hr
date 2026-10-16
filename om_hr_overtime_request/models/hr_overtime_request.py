@@ -22,11 +22,12 @@ class HrOvertimeRequest(models.Model):
     _name = 'hr.overtime.request'
     _inherit = ['approval.mixin']
     _description = 'Overtime Request'
+    _check_company_auto = True
     _order = 'date desc, id desc'
     _mail_post_access = 'read'
 
     employee_id = fields.Many2one('hr.employee', required=True, index=True,
-                                  default=lambda self: self.env.user.employee_id)
+                                  default=lambda self: self.env.user.employee_id, check_company=True)
     company_id = fields.Many2one(related='employee_id.company_id', store=True)
     department_id = fields.Many2one(related='employee_id.department_id', store=True)
     date = fields.Date(required=True, index=True, default=fields.Date.context_today)
