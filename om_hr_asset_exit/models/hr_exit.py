@@ -33,7 +33,7 @@ class HrExitClearance(models.Model):
     _inherit = 'hr.exit.clearance'
 
     asset_assignment_id = fields.Many2one('hr.asset.assignment', string='Asset', readonly=True,
-                                          ondelete='set null')
+                                          ondelete='set null', check_company=True)
 
     def _close(self, state):
         held = self.filtered(lambda line: line.asset_assignment_id.state == 'assigned')
