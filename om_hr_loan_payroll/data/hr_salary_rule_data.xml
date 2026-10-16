@@ -18,7 +18,7 @@ salary structures deducting the loans.</field>
             <field name="company_id" eval="False"/>
         </record>
 
-        <function model="hr.salary.rule" name="_om_hr_loan_add_to_base_structure"/>
+        <function model="hr.salary.rule" name="_hr_loan_add_to_base_structure"/>
 
     </data>
 </odoo>

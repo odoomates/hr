@@ -31,8 +31,8 @@ class TestLoanPayroll(TransactionCase):
         cls.employee = cls.env['hr.employee'].create({
             'name': 'Borrower', 'tz': 'UTC', 'date_version': date(2026, 1, 1),
             'contract_date_start': date(2026, 1, 1), 'wage': 3000.0, 'struct_id': cls.structure.id})
-        loan_type = cls.env['om.hr.loan.type'].create({'name': 'Payroll Loan', 'single_running': False})
-        cls.loan = cls.env['om.hr.loan'].create({
+        loan_type = cls.env['hr.loan.type'].create({'name': 'Payroll Loan', 'single_running': False})
+        cls.loan = cls.env['hr.loan'].create({
             'employee_id': cls.employee.id, 'type_id': loan_type.id, 'amount': 900.0, 'installment_count': 3,
             'date': date(2026, 7, 1), 'date_start': date(2026, 8, 1)})
         cls.loan._compute_installments()

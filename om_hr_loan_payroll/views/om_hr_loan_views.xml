@@ -2,8 +2,8 @@
 <odoo>
 
     <record id="om_hr_loan_view_form" model="ir.ui.view">
-        <field name="name">om.hr.loan.view.form.payroll</field>
-        <field name="model">om.hr.loan</field>
+        <field name="name">hr.loan.view.form.payroll</field>
+        <field name="model">hr.loan</field>
         <field name="inherit_id" ref="om_hr_loan.om_hr_loan_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='line_ids']/list/field[@name='date_paid']" position="after">
@@ -13,8 +13,8 @@
     </record>
 
     <record id="om_hr_loan_line_view_list" model="ir.ui.view">
-        <field name="name">om.hr.loan.line.view.list.payroll</field>
-        <field name="model">om.hr.loan.line</field>
+        <field name="name">hr.loan.line.view.list.payroll</field>
+        <field name="model">hr.loan.line</field>
         <field name="inherit_id" ref="om_hr_loan.om_hr_loan_line_view_list"/>
         <field name="arch" type="xml">
             <field name="date_paid" position="after">

@@ -5,7 +5,7 @@ class HrSalaryRule(models.Model):
     _inherit = 'hr.salary.rule'
 
     @api.model
-    def _om_hr_loan_add_to_base_structure(self):
+    def _hr_loan_add_to_base_structure(self):
         """ The structures created from now on deduct the loans: the base structure gets the rule. The structures
             of the user are left as they are. """
         structure = self.env.ref('om_hr_payroll.structure_base', raise_if_not_found=False)
