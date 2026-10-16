@@ -15,12 +15,13 @@ class ApprovalRequest(models.Model):
     _name = 'approval.request'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Approval Request'
+    _check_company_auto = True
     _order = 'id desc'
     _mail_post_access = 'read'
 
     name = fields.Char(string='Reference', required=True, readonly=True, copy=False,
                        default=lambda self: self.env._('New'))
-    flow_id = fields.Many2one('approval.rule', readonly=True, ondelete='restrict')
+    flow_id = fields.Many2one('approval.rule', readonly=True, ondelete='restrict', check_company=True)
     res_model = fields.Char(string='Model', required=True, readonly=True, index=True)
     res_id = fields.Many2oneReference(string='Record ID', model_field='res_model', required=True, readonly=True,
                                       index=True)
@@ -335,6 +336,7 @@ class ApprovalLine(models.Model):
     _order = 'request_id, sequence, id'
 
     request_id = fields.Many2one('approval.request', required=True, ondelete='cascade', index=True)
+    company_id = fields.Many2one(related='request_id.company_id', store=True, index=True)
     step_id = fields.Many2one('approval.step', ondelete='set null')
     sequence = fields.Integer()
     name = fields.Char(string='Approval', required=True)

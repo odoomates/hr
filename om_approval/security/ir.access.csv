@@ -14,3 +14,5 @@ access_om_approval_refuse_user,approval.refuse.user,approval.refuse,base.group_u
 access_approval_delegation_own,approval.delegation.own,approval.delegation,base.group_user,crud,"[('user_id', '=', user.id)]"
 access_approval_delegation_substitute,approval.delegation.substitute,approval.delegation,base.group_user,r,"[('delegate_id', '=', user.id)]"
 access_approval_delegation_manager,approval.delegation.manager,approval.delegation,group_approval_manager,crud,
+approval_rule_company_rule,Approval flows: multi-company,approval.rule,,crud,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"
+approval_line_company_rule,Approvals: multi-company,approval.line,,crud,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"
