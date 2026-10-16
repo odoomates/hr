@@ -15,5 +15,6 @@
         'views/om_file_layout_views.xml',
         'views/menu.xml',
     ],
+    'demo': ['demo/om_file_layout_demo.xml'],
     'images': ['static/description/banner.gif'],
 }
