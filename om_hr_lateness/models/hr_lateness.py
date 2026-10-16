@@ -7,9 +7,10 @@ class HrLateness(models.Model):
     time off and the public holidays. """
     _name = 'hr.lateness'
     _description = 'Lateness'
+    _check_company_auto = True
     _order = 'date desc, employee_id, kind'
 
-    employee_id = fields.Many2one('hr.employee', required=True, index=True, ondelete='cascade')
+    employee_id = fields.Many2one('hr.employee', required=True, index=True, ondelete='cascade', check_company=True)
     company_id = fields.Many2one(related='employee_id.company_id', store=True, index=True)
     department_id = fields.Many2one(related='employee_id.department_id', store=True)
     date = fields.Date(required=True, index=True)
@@ -18,7 +19,7 @@ class HrLateness(models.Model):
     actual_at = fields.Datetime(string='Actual', required=True)
     minutes = fields.Integer(required=True, aggregator='sum')
     attendance_id = fields.Many2one('hr.attendance', ondelete='set null')
-    policy_id = fields.Many2one('hr.lateness.policy', ondelete='set null')
+    policy_id = fields.Many2one('hr.lateness.policy', ondelete='set null', check_company=True)
     state = fields.Selection([('counted', 'Counted'), ('excused', 'Excused')], required=True, default='counted',
                              index=True)
     excuse_reason = fields.Char(string='Excuse')

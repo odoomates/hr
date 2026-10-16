@@ -22,7 +22,11 @@ class HrEmployee(models.Model):
 
     lateness_policy_id = fields.Many2one(
         'hr.lateness.policy', groups='hr.group_hr_user',
-        help='Leave empty for the policy of the company.')
+        help='Leave empty for the policy of the company.', check_company=True)
+
+    @api.model
+    def _company_checked_fields(self):
+        return super()._company_checked_fields() + ['lateness_policy_id']
 
     def _lateness_policy(self):
         self.ensure_one()
