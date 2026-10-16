@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="portal_my_welcome_step" inherit_id="om_hr_preboarding.portal_my_welcome_step"
+              name="Pre-boarding Step: Policies and Signatures">
+        <xpath expr="//div[@id='preboarding_auto_step']" position="inside">
+            <a t-if="line.kind == 'policies'" href="/my/hr/policies" class="btn btn-primary">Read the Policies</a>
+            <a t-if="line.kind == 'signatures'" href="/my/signatures" class="btn btn-primary">Your Documents to Sign</a>
+        </xpath>
+    </template>
+
+</odoo>
