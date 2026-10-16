@@ -31,7 +31,7 @@ class TestMoved(TransactionCase):
     def test_already_owned(self):
         """ When om_hr_base already has the external id, the one of the source is left to its upgrade. """
         partners = self.env['res.partner'].create([{'name': 'Base'}, {'name': 'Payroll'}])
-        for module, partner in zip(('om_hr_base', 'om_hr_payroll'), partners):
+        for module, partner in zip(('om_hr_base', 'om_hr_payroll'), partners, strict=True):
             self.env['ir.model.data'].create({
                 'module': module, 'name': 'om_test_both', 'model': 'res.partner', 'res_id': partner.id})
 
