@@ -12,7 +12,7 @@ EMPLOYEE_WRITABLE = {'employee_feedback'}
 MANAGER_WRITABLE = {'manager_feedback', 'rating_id', 'meeting_date', 'date_deadline', 'goal_ids'}
 
 
-class OmHrAppraisal(models.Model):
+class HrAppraisal(models.Model):
     """ The review of an employee: the employee assesses themselves, then the manager reviews and rates them.
 
     Each side writes in a feedback the other side reads only when it is their turn: the manager reads the self
@@ -20,7 +20,7 @@ class OmHrAppraisal(models.Model):
     feedbacks are stored in fields only the super user reads; the fields the users see are computed from them
     with these rules, so that they hold through the API too.
     """
-    _name = 'om.hr.appraisal'
+    _name = 'hr.appraisal'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Appraisal'
     _order = 'date_deadline desc, id desc'
@@ -34,12 +34,12 @@ class OmHrAppraisal(models.Model):
     department_id = fields.Many2one(related='employee_id.department_id', store=True)
     kind = fields.Selection([('regular', 'Appraisal'), ('probation', 'Probation Review')],
                             string='Kind', required=True, default='regular')
-    cycle_id = fields.Many2one('om.hr.appraisal.cycle', string='Cycle', index=True, ondelete='set null')
+    cycle_id = fields.Many2one('hr.appraisal.cycle', string='Cycle', index=True, ondelete='set null')
     date_deadline = fields.Date(string='Deadline', required=True, tracking=True,
                                 default=lambda self: fields.Date.context_today(self) + timedelta(days=30))
     date_done = fields.Date(string='Done On', readonly=True, copy=False)
     meeting_date = fields.Datetime(string='Meeting', tracking=True)
-    template_id = fields.Many2one('om.hr.appraisal.template', string='Feedback Template')
+    template_id = fields.Many2one('hr.appraisal.template', string='Feedback Template')
     state = fields.Selection([
         ('new', 'To Start'),
         ('self', 'Self Assessment'),
@@ -47,8 +47,8 @@ class OmHrAppraisal(models.Model):
         ('done', 'Done'),
         ('cancel', 'Cancelled'),
     ], required=True, default='new', copy=False, index=True, tracking=True)
-    rating_id = fields.Many2one('om.hr.appraisal.rating', string='Rating', tracking=True)
-    goal_ids = fields.One2many('om.hr.appraisal.goal', 'appraisal_id', string='Goals')
+    rating_id = fields.Many2one('hr.appraisal.rating', string='Rating', tracking=True)
+    goal_ids = fields.One2many('hr.appraisal.goal', 'appraisal_id', string='Goals')
 
     employee_feedback_html = fields.Html(groups='base.group_system', copy=False, prefetch=False)
     manager_feedback_html = fields.Html(groups='base.group_system', copy=False, prefetch=False)
@@ -146,7 +146,7 @@ class OmHrAppraisal(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
-        Template = self.env['om.hr.appraisal.template']
+        Template = self.env['hr.appraisal.template']
         for vals in vals_list:
             if not vals.get('template_id') and vals.get('employee_id'):
                 vals['template_id'] = Template._get_for_employee(
@@ -271,7 +271,7 @@ class OmHrAppraisal(models.Model):
         return {
             'type': 'ir.actions.act_window',
             'name': _('New Contract Version'),
-            'res_model': 'om.hr.appraisal.version',
+            'res_model': 'hr.appraisal.version',
             'view_mode': 'form',
             'target': 'new',
             'context': {'default_appraisal_id': self.id},
@@ -286,14 +286,14 @@ class OmHrAppraisal(models.Model):
         today = fields.Date.context_today(self)
         for company in self.env['res.company'].search([]):
             employees = self.env['hr.employee'].search([('company_id', '=', company.id)])
-            if company.om_appraisal_probation:
+            if company.appraisal_probation:
                 self._plan_probation_reviews(employees, today, company)
-            if company.om_appraisal_auto:
+            if company.appraisal_auto:
                 self._plan_regular_appraisals(employees, today, company)
 
     @api.model
     def _plan_probation_reviews(self, employees, today, company):
-        horizon = today + timedelta(days=company.om_appraisal_probation_days)
+        horizon = today + timedelta(days=company.appraisal_probation_days)
         for employee in employees:
             trial_end = employee.sudo().version_id.trial_date_end
             if not trial_end or not today <= trial_end <= horizon:
@@ -306,13 +306,13 @@ class OmHrAppraisal(models.Model):
 
     @api.model
     def _plan_regular_appraisals(self, employees, today, company):
-        horizon = today + timedelta(days=company.om_appraisal_lead_days)
+        horizon = today + timedelta(days=company.appraisal_lead_days)
         open_employees = set(self.search(
             [('employee_id', 'in', employees.ids), ('state', 'in', OPEN_STATES)]).employee_id.ids)
         for employee in employees:
             if employee.id in open_employees:
                 continue
-            due = employee._om_next_appraisal_date()
+            due = employee._next_appraisal_date()
             if due and due <= horizon:
                 appraisal = self.create({'employee_id': employee.id, 'date_deadline': max(due, today)})
                 appraisal.action_start()
@@ -323,9 +323,9 @@ class OmHrAppraisal(models.Model):
         company = employee.company_id
         last = self.search([('employee_id', '=', employee.id), ('state', '=', 'done')],
                            order='date_done desc', limit=1)
-        if last and company.om_appraisal_interval_months:
-            return last.date_done + relativedelta(months=company.om_appraisal_interval_months)
+        if last and company.appraisal_interval_months:
+            return last.date_done + relativedelta(months=company.appraisal_interval_months)
         start = employee.sudo().version_id.contract_date_start
-        if not last and start and company.om_appraisal_first_months:
-            return start + relativedelta(months=company.om_appraisal_first_months)
+        if not last and start and company.appraisal_first_months:
+            return start + relativedelta(months=company.appraisal_first_months)
         return False

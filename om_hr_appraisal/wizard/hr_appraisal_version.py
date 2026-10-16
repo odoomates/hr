@@ -3,13 +3,13 @@ from dateutil.relativedelta import relativedelta
 from odoo import _, fields, models
 
 
-class OmHrAppraisalVersion(models.TransientModel):
+class HrAppraisalVersion(models.TransientModel):
     """ Record what an appraisal decided, e.g. a raise or a promotion, as a new version of the contract: the
     employee then opens on that version to change its wage, job or department, as for any other change. """
-    _name = 'om.hr.appraisal.version'
+    _name = 'hr.appraisal.version'
     _description = 'New Contract Version from an Appraisal'
 
-    appraisal_id = fields.Many2one('om.hr.appraisal', required=True, readonly=True)
+    appraisal_id = fields.Many2one('hr.appraisal', required=True, readonly=True)
     employee_id = fields.Many2one(related='appraisal_id.employee_id')
     date_version = fields.Date(
         string='Effective From', required=True,

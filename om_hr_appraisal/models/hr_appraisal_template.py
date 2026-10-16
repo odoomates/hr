@@ -1,9 +1,9 @@
 from odoo import api, fields, models
 
 
-class OmHrAppraisalTemplate(models.Model):
+class HrAppraisalTemplate(models.Model):
     """ The questions an appraisal starts from, for the employee and for the manager. """
-    _name = 'om.hr.appraisal.template'
+    _name = 'hr.appraisal.template'
     _description = 'Appraisal Feedback Template'
     _order = 'sequence, id'
 
@@ -26,9 +26,9 @@ class OmHrAppraisalTemplate(models.Model):
             or templates.filtered(lambda t: not t.department_ids)[:1]
 
 
-class OmHrAppraisalRating(models.Model):
+class HrAppraisalRating(models.Model):
     """ The overall rating a manager gives at the end of an appraisal. """
-    _name = 'om.hr.appraisal.rating'
+    _name = 'hr.appraisal.rating'
     _description = 'Appraisal Rating'
     _order = 'sequence, id'
 

@@ -2,8 +2,8 @@
 <odoo>
 
     <record id="om_hr_appraisal_goal_view_form" model="ir.ui.view">
-        <field name="name">om.hr.appraisal.goal.view.form</field>
-        <field name="model">om.hr.appraisal.goal</field>
+        <field name="name">hr.appraisal.goal.view.form</field>
+        <field name="model">hr.appraisal.goal</field>
         <field name="arch" type="xml">
             <form string="Goal">
                 <sheet>
@@ -33,8 +33,8 @@
     </record>
 
     <record id="om_hr_appraisal_goal_view_list" model="ir.ui.view">
-        <field name="name">om.hr.appraisal.goal.view.list</field>
-        <field name="model">om.hr.appraisal.goal</field>
+        <field name="name">hr.appraisal.goal.view.list</field>
+        <field name="model">hr.appraisal.goal</field>
         <field name="arch" type="xml">
             <list string="Goals" decoration-success="is_done">
                 <field name="employee_id" widget="many2one_avatar_employee"/>
@@ -48,8 +48,8 @@
     </record>
 
     <record id="om_hr_appraisal_goal_view_search" model="ir.ui.view">
-        <field name="name">om.hr.appraisal.goal.view.search</field>
-        <field name="model">om.hr.appraisal.goal</field>
+        <field name="name">hr.appraisal.goal.view.search</field>
+        <field name="model">hr.appraisal.goal</field>
         <field name="arch" type="xml">
             <search>
                 <field name="name"/>
@@ -68,7 +68,7 @@
 
     <record id="om_hr_appraisal_goal_action" model="ir.actions.act_window">
         <field name="name">Goals</field>
-        <field name="res_model">om.hr.appraisal.goal</field>
+        <field name="res_model">hr.appraisal.goal</field>
         <field name="view_mode">list,form</field>
         <field name="context">{'search_default_open': 1}</field>
         <field name="help" type="html">

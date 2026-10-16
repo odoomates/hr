@@ -4,9 +4,9 @@ from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 
-class OmHrAppraisalCycle(models.Model):
+class HrAppraisalCycle(models.Model):
     """ A review round, e.g. the annual review of 2026: one appraisal for each employee taking part. """
-    _name = 'om.hr.appraisal.cycle'
+    _name = 'hr.appraisal.cycle'
     _inherit = ['mail.thread']
     _description = 'Appraisal Cycle'
     _order = 'date_start desc, id desc'
@@ -16,7 +16,7 @@ class OmHrAppraisalCycle(models.Model):
     date_end = fields.Date(string='Period To', required=True)
     date_deadline = fields.Date(string='Deadline', required=True, tracking=True,
                                 default=lambda self: fields.Date.context_today(self) + timedelta(days=30))
-    template_id = fields.Many2one('om.hr.appraisal.template', string='Feedback Template',
+    template_id = fields.Many2one('hr.appraisal.template', string='Feedback Template',
                                   help='Leave empty to use the template of the department of each employee.')
     department_ids = fields.Many2many('hr.department', string='Departments')
     employee_ids = fields.Many2many('hr.employee', string='Employees',
@@ -25,7 +25,7 @@ class OmHrAppraisalCycle(models.Model):
                                  default=lambda self: self.env.company)
     state = fields.Selection([('draft', 'Draft'), ('running', 'Running'), ('done', 'Closed')],
                              required=True, default='draft', tracking=True)
-    appraisal_ids = fields.One2many('om.hr.appraisal', 'cycle_id', string='Appraisals')
+    appraisal_ids = fields.One2many('hr.appraisal', 'cycle_id', string='Appraisals')
     appraisal_count = fields.Integer(compute='_compute_progress')
     done_count = fields.Integer(compute='_compute_progress')
     progress = fields.Float(compute='_compute_progress')
@@ -54,7 +54,7 @@ class OmHrAppraisalCycle(models.Model):
             employees = cycle._get_employees() - cycle.appraisal_ids.employee_id
             if not employees and not cycle.appraisal_ids:
                 raise UserError(_('Choose the departments or the employees of %s first.', cycle.name))
-            appraisals = self.env['om.hr.appraisal'].create([{
+            appraisals = self.env['hr.appraisal'].create([{
                 'employee_id': employee.id,
                 'cycle_id': cycle.id,
                 'date_deadline': cycle.date_deadline,
@@ -73,7 +73,7 @@ class OmHrAppraisalCycle(models.Model):
         return {
             'type': 'ir.actions.act_window',
             'name': self.name,
-            'res_model': 'om.hr.appraisal',
+            'res_model': 'hr.appraisal',
             'view_mode': 'kanban,list,form',
             'domain': [('cycle_id', '=', self.id)],
             'context': {'default_cycle_id': self.id, 'default_date_deadline': self.date_deadline},

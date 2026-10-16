@@ -10,18 +10,18 @@
                 <block title="Appraisals" name="om_hr_appraisal_setting_container">
                     <setting company_dependent="1" id="om_appraisal_probation_setting" string="Probation Reviews"
                              help="A review for the manager before the end of the trial period of a contract">
-                        <field name="om_appraisal_probation"/>
-                        <div class="mt-2" invisible="not om_appraisal_probation">
-                            <field name="om_appraisal_probation_days" class="o_light_label oe_inline"/> days before it ends
+                        <field name="appraisal_probation"/>
+                        <div class="mt-2" invisible="not appraisal_probation">
+                            <field name="appraisal_probation_days" class="o_light_label oe_inline"/> days before it ends
                         </div>
                     </setting>
                     <setting company_dependent="1" id="om_appraisal_auto_setting" string="Plan the Appraisals"
                              help="Create the appraisals of the employees on their own">
-                        <field name="om_appraisal_auto"/>
-                        <div class="mt-2" invisible="not om_appraisal_auto">
-                            <div>First after <field name="om_appraisal_first_months" class="o_light_label oe_inline"/> months</div>
-                            <div>Then every <field name="om_appraisal_interval_months" class="o_light_label oe_inline"/> months</div>
-                            <div>Created <field name="om_appraisal_lead_days" class="o_light_label oe_inline"/> days ahead</div>
+                        <field name="appraisal_auto"/>
+                        <div class="mt-2" invisible="not appraisal_auto">
+                            <div>First after <field name="appraisal_first_months" class="o_light_label oe_inline"/> months</div>
+                            <div>Then every <field name="appraisal_interval_months" class="o_light_label oe_inline"/> months</div>
+                            <div>Created <field name="appraisal_lead_days" class="o_light_label oe_inline"/> days ahead</div>
                         </div>
                     </setting>
                 </block>

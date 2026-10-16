@@ -2,9 +2,9 @@ from odoo import _, api, fields, models
 from odoo.exceptions import AccessError
 
 
-class OmHrAppraisalGoal(models.Model):
+class HrAppraisalGoal(models.Model):
     """ What an employee aims at until the next appraisal; they update its progress themselves. """
-    _name = 'om.hr.appraisal.goal'
+    _name = 'hr.appraisal.goal'
     _inherit = ['mail.thread']
     _description = 'Appraisal Goal'
     _order = 'date_deadline, id'
@@ -13,7 +13,7 @@ class OmHrAppraisalGoal(models.Model):
     employee_id = fields.Many2one('hr.employee', string='Employee', required=True, index=True, tracking=True)
     manager_id = fields.Many2one(related='employee_id.parent_id', string='Manager')
     company_id = fields.Many2one(related='employee_id.company_id', store=True)
-    appraisal_id = fields.Many2one('om.hr.appraisal', string='Appraisal', index=True, ondelete='set null')
+    appraisal_id = fields.Many2one('hr.appraisal', string='Appraisal', index=True, ondelete='set null')
     description = fields.Html()
     target = fields.Char(help='How to tell the goal is reached, e.g. Close 20 deals a quarter.')
     date_deadline = fields.Date(string='Due Date', tracking=True)

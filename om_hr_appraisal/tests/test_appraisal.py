@@ -29,7 +29,7 @@ class TestAppraisal(TransactionCase):
         cls.rating = cls.env.ref('om_hr_appraisal.rating_meets')
 
     def new_appraisal(self, **values):
-        return self.env['om.hr.appraisal'].with_user(self.hr_user).create({
+        return self.env['hr.appraisal'].with_user(self.hr_user).create({
             'employee_id': self.employee.id, **values})
 
     def test_hr_responsible_reviews_without_a_manager_user(self):
@@ -107,7 +107,7 @@ class TestAppraisal(TransactionCase):
         self.assertEqual(appraisal.name, 'Probation Review of Appr Employee')
 
     def test_cycle(self):
-        cycle = self.env['om.hr.appraisal.cycle'].with_user(self.hr_user).create({
+        cycle = self.env['hr.appraisal.cycle'].with_user(self.hr_user).create({
             'name': 'Annual 2026', 'date_start': date(2025, 6, 1), 'date_end': date(2026, 5, 31),
             'date_deadline': date(2026, 6, 30), 'department_ids': [self.department.id],
             'employee_ids': [self.other.id]})
@@ -121,7 +121,7 @@ class TestAppraisal(TransactionCase):
 
     def test_planned_probation_review(self):
         self.employee.version_id.trial_date_end = date(2026, 6, 10)
-        Appraisal = self.env['om.hr.appraisal']
+        Appraisal = self.env['hr.appraisal']
         Appraisal._cron_plan_appraisals()
         probation = Appraisal.search([('employee_id', '=', self.employee.id), ('kind', '=', 'probation')])
         self.assertEqual((probation.state, probation.date_deadline), ('review', date(2026, 6, 10)))
@@ -132,10 +132,10 @@ class TestAppraisal(TransactionCase):
 
     def test_planned_regular_appraisals(self):
         company = self.employee.company_id
-        company.write({'om_appraisal_first_months': 6, 'om_appraisal_interval_months': 12,
-                       'om_appraisal_lead_days': 30, 'om_appraisal_probation': False})
-        Appraisal = self.env['om.hr.appraisal']
-        self.assertEqual(self.employee._om_next_appraisal_date(), date(2025, 7, 1))
+        company.write({'appraisal_first_months': 6, 'appraisal_interval_months': 12,
+                       'appraisal_lead_days': 30, 'appraisal_probation': False})
+        Appraisal = self.env['hr.appraisal']
+        self.assertEqual(self.employee._next_appraisal_date(), date(2025, 7, 1))
         Appraisal._cron_plan_appraisals()
         appraisal = Appraisal.search([('employee_id', '=', self.employee.id)])
         self.assertEqual((len(appraisal), appraisal.state), (1, 'self'))
@@ -144,7 +144,7 @@ class TestAppraisal(TransactionCase):
         self.assertEqual(Appraisal.search_count([('employee_id', '=', self.employee.id)]), 1, 'one open at a time')
 
         appraisal.sudo().write({'state': 'done', 'date_done': date(2026, 6, 1)})
-        self.assertEqual(self.employee._om_next_appraisal_date(), date(2027, 6, 1))
+        self.assertEqual(self.employee._next_appraisal_date(), date(2027, 6, 1))
         Appraisal._cron_plan_appraisals()
         self.assertEqual(Appraisal.search_count([('employee_id', '=', self.employee.id)]), 1, 'not due yet')
         with freeze_time('2027-05-10'):
@@ -157,7 +157,7 @@ class TestAppraisal(TransactionCase):
         with self.assertRaises(UserError):
             appraisal.with_user(self.manager_user).action_new_contract_version()
         action = appraisal.with_user(self.hr_user).action_new_contract_version()
-        wizard = self.env['om.hr.appraisal.version'].with_user(self.hr_user).with_context(action['context']).create({})
+        wizard = self.env['hr.appraisal.version'].with_user(self.hr_user).with_context(action['context']).create({})
         self.assertEqual(wizard.date_version, date(2026, 7, 1))
         result = wizard.action_create()
         version = self.env['hr.version'].browse(result['context']['version_id'])
@@ -165,7 +165,7 @@ class TestAppraisal(TransactionCase):
         self.assertEqual(result['res_model'], 'hr.employee')
 
     def test_goals(self):
-        goal = self.env['om.hr.appraisal.goal'].with_user(self.manager_user).create({
+        goal = self.env['hr.appraisal.goal'].with_user(self.manager_user).create({
             'name': 'Automate the bank reconciliation', 'employee_id': self.employee.id,
             'date_deadline': date(2026, 12, 31)})
         goal.with_user(self.employee_user).progress = 60

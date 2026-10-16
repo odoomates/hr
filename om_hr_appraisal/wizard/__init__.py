@@ -1,1 +1,1 @@
-from . import om_hr_appraisal_version
+from . import hr_appraisal_version

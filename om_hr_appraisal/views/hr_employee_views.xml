@@ -7,13 +7,13 @@
         <field name="inherit_id" ref="hr.view_employee_form"/>
         <field name="arch" type="xml">
             <xpath expr="//div[@name='button_box']" position="inside">
-                <button name="action_open_om_appraisals" type="object" class="oe_stat_button" icon="star"
+                <button name="action_open_appraisals" type="object" class="oe_stat_button" icon="star"
                         groups="hr.group_hr_user">
                     <div class="o_stat_info">
-                        <span class="o_stat_value"><field name="om_appraisal_count"/></span>
+                        <span class="o_stat_value"><field name="appraisal_count"/></span>
                         <span class="o_stat_text">Appraisals</span>
-                        <span class="o_stat_text text-muted" invisible="not om_next_appraisal_date">
-                            next <field name="om_next_appraisal_date" widget="date"/>
+                        <span class="o_stat_text text-muted" invisible="not next_appraisal_date">
+                            next <field name="next_appraisal_date" widget="date"/>
                         </span>
                     </div>
                 </button>
