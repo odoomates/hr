@@ -23,23 +23,24 @@ class HrAppraisal(models.Model):
     _name = 'hr.appraisal'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Appraisal'
+    _check_company_auto = True
     _order = 'date_deadline desc, id desc'
 
     name = fields.Char(compute='_compute_name', store=True)
-    employee_id = fields.Many2one('hr.employee', required=True, index=True, tracking=True)
+    employee_id = fields.Many2one('hr.employee', required=True, index=True, tracking=True, check_company=True)
     manager_id = fields.Many2one(
         'hr.employee', index=True, tracking=True,
-        compute='_compute_manager_id', store=True, readonly=False, precompute=True)
+        compute='_compute_manager_id', store=True, readonly=False, precompute=True, check_company=True)
     company_id = fields.Many2one(related='employee_id.company_id', store=True, index=True)
     department_id = fields.Many2one(related='employee_id.department_id', store=True)
     kind = fields.Selection([('regular', 'Appraisal'), ('probation', 'Probation Review')],
                             required=True, default='regular')
-    cycle_id = fields.Many2one('hr.appraisal.cycle', index=True, ondelete='set null')
+    cycle_id = fields.Many2one('hr.appraisal.cycle', index=True, ondelete='set null', check_company=True)
     date_deadline = fields.Date(string='Deadline', required=True, tracking=True,
                                 default=lambda self: fields.Date.context_today(self) + timedelta(days=30))
     date_done = fields.Date(string='Done On', readonly=True, copy=False)
     meeting_date = fields.Datetime(string='Meeting', tracking=True)
-    template_id = fields.Many2one('hr.appraisal.template', string='Feedback Template')
+    template_id = fields.Many2one('hr.appraisal.template', string='Feedback Template', check_company=True)
     state = fields.Selection([
         ('new', 'To Start'),
         ('self', 'Self Assessment'),

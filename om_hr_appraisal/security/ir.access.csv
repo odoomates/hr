@@ -14,3 +14,4 @@ access_om_hr_appraisal_template_manager,hr.appraisal.template.manager,hr.apprais
 access_om_hr_appraisal_rating_user,hr.appraisal.rating.user,hr.appraisal.rating,base.group_user,r,
 access_om_hr_appraisal_rating_manager,hr.appraisal.rating.manager,hr.appraisal.rating,hr.group_hr_manager,crud,
 access_om_hr_appraisal_version_hr,hr.appraisal.version.hr,hr.appraisal.version,hr.group_hr_user,crud,
+hr_appraisal_template_company_rule,Appraisal feedback templates: multi-company,hr.appraisal.template,,crud,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"

@@ -7,13 +7,14 @@ class HrAppraisalGoal(models.Model):
     _name = 'hr.appraisal.goal'
     _inherit = ['mail.thread']
     _description = 'Appraisal Goal'
+    _check_company_auto = True
     _order = 'date_deadline, id'
 
     name = fields.Char(string='Goal', required=True, tracking=True)
-    employee_id = fields.Many2one('hr.employee', required=True, index=True, tracking=True)
+    employee_id = fields.Many2one('hr.employee', required=True, index=True, tracking=True, check_company=True)
     manager_id = fields.Many2one(related='employee_id.parent_id', string='Manager')
     company_id = fields.Many2one(related='employee_id.company_id', store=True)
-    appraisal_id = fields.Many2one('hr.appraisal', index=True, ondelete='set null')
+    appraisal_id = fields.Many2one('hr.appraisal', index=True, ondelete='set null', check_company=True)
     description = fields.Html()
     target = fields.Char(help='How to tell the goal is reached, e.g. Close 20 deals a quarter.')
     date_deadline = fields.Date(string='Due Date', tracking=True)

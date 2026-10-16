@@ -9,6 +9,7 @@ class HrAppraisalCycle(models.Model):
     _name = 'hr.appraisal.cycle'
     _inherit = ['mail.thread']
     _description = 'Appraisal Cycle'
+    _check_company_auto = True
     _order = 'date_start desc, id desc'
 
     name = fields.Char(required=True, tracking=True)
@@ -16,7 +17,7 @@ class HrAppraisalCycle(models.Model):
     date_end = fields.Date(string='Period To', required=True)
     date_deadline = fields.Date(string='Deadline', required=True, tracking=True,
                                 default=lambda self: fields.Date.context_today(self) + timedelta(days=30))
-    template_id = fields.Many2one('hr.appraisal.template', string='Feedback Template',
+    template_id = fields.Many2one('hr.appraisal.template', string='Feedback Template', check_company=True,
                                   help='Leave empty to use the template of the department of each employee.')
     department_ids = fields.Many2many('hr.department', string='Departments')
     employee_ids = fields.Many2many('hr.employee', string='Employees',
