@@ -26,6 +26,7 @@ class TestHrPortal(HrPortalCase):
         self.assertIn('Storekeeper', profile.text)
         self.assertIn('Portal Manager', profile.text)
         self.assertNotIn('Portal Colleague', profile.text)
+        self.assertIn('<a href="/my/hr">My HR</a>', profile.text, 'the breadcrumbs lead back to My HR')
 
     def test_not_an_employee(self):
         new_test_user(self.env, 'om_portal_customer', groups='base.group_portal')

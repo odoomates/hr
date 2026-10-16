@@ -24,6 +24,7 @@ class TestPortalAnnouncement(HrPortalCase):
         page = self.get('/my/hr/announcements').text
         self.assertIn('New leave policy', page)
         self.assertNotIn('Colleague only', page)
+        self.assertIn('<a href="/my/hr">My HR</a>', page, 'the breadcrumbs lead back to My HR')
         self.assertIn('/my/hr/announcements', self.get('/my/hr').text)
         detail = self.get('/my/hr/announcements/%s' % self.mine.id).text
         self.assertIn('Read the new policy.', detail)

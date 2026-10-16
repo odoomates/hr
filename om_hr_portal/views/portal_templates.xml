@@ -4,9 +4,9 @@
     <!-- My HR > section > record, on every HR page of the portal -->
     <template id="portal_breadcrumbs" inherit_id="portal.portal_breadcrumbs" name="My HR Breadcrumbs">
         <xpath expr="//ol/li[1]" position="after">
-            <t t-if="page_name and page_name.startswith('om_hr')">
-                <li t-attf-class="breadcrumb-item #{'active' if page_name == 'om_hr' else ''}">
-                    <a t-if="page_name != 'om_hr'" href="/my/hr">My HR</a>
+            <t t-if="page_name and (page_name == 'hr' or page_name.startswith('hr_'))">
+                <li t-attf-class="breadcrumb-item #{'active' if page_name == 'hr' else ''}">
+                    <a t-if="page_name != 'hr'" href="/my/hr">My HR</a>
                     <t t-else="">My HR</t>
                 </li>
                 <li t-if="om_section" t-attf-class="breadcrumb-item #{'' if om_record else 'active'}">

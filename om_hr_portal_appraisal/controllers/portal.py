@@ -23,7 +23,7 @@ class HrPortalAppraisal(HrPortal):
             raise request.not_found()
         # what the employee may read: their own assessment, and the review of the manager once it is done
         return request.render('om_hr_portal_appraisal.portal_my_appraisal', self._values(
-            'om_hr_appraisal', appraisal=appraisal, saved=saved,
+            'hr_appraisal', appraisal=appraisal, saved=saved,
             self_text=html2plaintext(appraisal.employee_feedback_html or ''),
             manager_feedback=appraisal.manager_feedback_html if appraisal.state == 'done' else False,
             om_section='Appraisals', om_section_url='/my/hr/appraisals', om_record=appraisal.name))

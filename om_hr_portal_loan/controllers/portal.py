@@ -23,7 +23,7 @@ class HrPortalLoan(HrPortal):
     def hr_loan(self, loan_id, **kwargs):
         loan = self._own('hr.loan', loan_id)
         return request.render('om_hr_portal_loan.portal_my_loan', self._values(
-            'om_hr_loan', loan=loan, om_section='Loans', om_section_url='/my/hr/loans', om_record=loan.name))
+            'hr_loan', loan=loan, om_section='Loans', om_section_url='/my/hr/loans', om_record=loan.name))
 
     @http.route('/my/hr/loans/new', type='http', auth='user', website=True, methods=['POST'])
     def hr_loan_new(self, **post):

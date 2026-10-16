@@ -32,7 +32,7 @@ class HrPortalAnnouncement(HrPortal):
         line = self._announcement_line(announcement_id)
         line.announcement_id._mark_read()
         return request.render('om_hr_portal_announcement.portal_my_announcement', self._values(
-            'om_hr_announcement', line=line, announcement=line.announcement_id, om_section='Announcements',
+            'hr_announcement', line=line, announcement=line.announcement_id, om_section='Announcements',
             om_section_url='/my/hr/announcements', om_record=line.announcement_id.name))
 
     @http.route('/my/hr/announcements/<int:announcement_id>/acknowledge', type='http', auth='user', website=True,

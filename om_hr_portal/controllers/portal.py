@@ -40,7 +40,7 @@ class HrPortal(CustomerPortal):
 
     @http.route('/my/hr', type='http', auth='user', website=True)
     def hr_home(self, **kwargs):
-        return request.render('om_hr_portal.portal_my_hr', self._values('om_hr'))
+        return request.render('om_hr_portal.portal_my_hr', self._values('hr'))
 
     @http.route('/my/hr/profile', type='http', auth='user', website=True)
     def hr_profile(self, **kwargs):

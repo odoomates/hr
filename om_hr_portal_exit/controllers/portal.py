@@ -11,7 +11,7 @@ class HrPortalExit(HrPortal):
         employee = self._employee()
         exits = request.env['hr.exit'].sudo().search([('employee_id', '=', employee.id)])
         return request.render('om_hr_portal_exit.portal_my_exit', self._values(
-            'om_hr_exit', exits=exits, error=error, form=form or {}, om_section='Resignation',
+            'hr_exit', exits=exits, error=error, form=form or {}, om_section='Resignation',
             open_exit=exits.filtered(lambda e: e.state in ('draft', 'to_approve', 'approved'))[:1]))
 
     @http.route('/my/hr/resignation', type='http', auth='user', website=True)
