@@ -2,8 +2,8 @@
 <odoo>
 
     <record id="om_hr_payroll_export_wizard_view_form" model="ir.ui.view">
-        <field name="name">om.hr.payroll.export.wizard.view.form</field>
-        <field name="model">om.hr.payroll.export.wizard</field>
+        <field name="name">hr.payroll.export.wizard.view.form</field>
+        <field name="model">hr.payroll.export.wizard</field>
         <field name="mode">primary</field>
         <field name="inherit_id" ref="om_file_layout.om_file_export_wizard_view_form"/>
         <field name="arch" type="xml">
@@ -19,12 +19,12 @@
         <field name="inherit_id" ref="om_hr_payroll.view_hr_payslip_form"/>
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
-                <button name="action_om_export_bank_file" string="Export Bank File" type="object"
+                <button name="action_export_bank_file" string="Export Bank File" type="object"
                         invisible="state != 'done' or credit_note" groups="om_hr_payroll.group_hr_payroll_user"/>
             </xpath>
             <field name="credit_note" position="after">
-                <field name="om_exported" invisible="not om_exported"/>
-                <field name="om_file_export_ids" widget="many2many_tags" invisible="not om_file_export_ids"/>
+                <field name="exported" invisible="not exported"/>
+                <field name="file_export_ids" widget="many2many_tags" invisible="not file_export_ids"/>
             </field>
         </field>
     </record>
@@ -35,7 +35,7 @@
         <field name="inherit_id" ref="om_hr_payroll.view_hr_payslip_tree"/>
         <field name="arch" type="xml">
             <xpath expr="//list" position="inside">
-                <field name="om_exported" optional="hide"/>
+                <field name="exported" optional="hide"/>
             </xpath>
         </field>
     </record>
@@ -46,7 +46,7 @@
         <field name="inherit_id" ref="om_hr_payroll.hr_payslip_run_form"/>
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
-                <button name="action_om_export_bank_file" string="Export Bank File" type="object"
+                <button name="action_export_bank_file" string="Export Bank File" type="object"
                         invisible="state == 'draft'" groups="om_hr_payroll.group_hr_payroll_user"/>
             </xpath>
         </field>
@@ -54,7 +54,7 @@
 
     <record id="om_file_layout_action_payroll" model="ir.actions.act_window">
         <field name="name">Bank File Layouts</field>
-        <field name="res_model">om.file.layout</field>
+        <field name="res_model">file.layout</field>
         <field name="view_mode">list,form</field>
         <field name="domain">[('model', '=', 'hr.payslip')]</field>
         <field name="context" eval="{'default_model_id': ref('om_hr_payroll.model_hr_payslip')}"/>
@@ -62,7 +62,7 @@
 
     <record id="om_file_export_action_payroll" model="ir.actions.act_window">
         <field name="name">Bank Files</field>
-        <field name="res_model">om.file.export</field>
+        <field name="res_model">file.export</field>
         <field name="view_mode">list,form</field>
         <field name="domain">[('res_model', '=', 'hr.payslip')]</field>
     </record>

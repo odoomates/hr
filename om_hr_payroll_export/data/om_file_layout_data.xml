@@ -2,7 +2,7 @@
 <odoo>
     <data noupdate="1">
 
-        <record id="layout_bank_transfer_csv" model="om.file.layout">
+        <record id="layout_bank_transfer_csv" model="file.layout">
             <field name="name">Bank Transfer (CSV)</field>
             <field name="model_id" ref="om_hr_payroll.model_hr_payslip"/>
             <field name="file_format">csv</field>
@@ -11,38 +11,38 @@
 the bank accounts of the employee by their salary distribution. Copy it to make the layout your bank asks for.</field>
         </record>
 
-        <record id="layout_bank_transfer_csv_employee" model="om.file.layout.column">
+        <record id="layout_bank_transfer_csv_employee" model="file.layout.column">
             <field name="layout_id" ref="layout_bank_transfer_csv"/>
             <field name="sequence">10</field>
             <field name="name">Employee</field>
             <field name="expression">employee.name</field>
         </record>
-        <record id="layout_bank_transfer_csv_account" model="om.file.layout.column">
+        <record id="layout_bank_transfer_csv_account" model="file.layout.column">
             <field name="layout_id" ref="layout_bank_transfer_csv"/>
             <field name="sequence">20</field>
             <field name="name">Account Number</field>
             <field name="expression">bank.sanitized_account_number if bank else ''</field>
             <field name="required" eval="True"/>
         </record>
-        <record id="layout_bank_transfer_csv_holder" model="om.file.layout.column">
+        <record id="layout_bank_transfer_csv_holder" model="file.layout.column">
             <field name="layout_id" ref="layout_bank_transfer_csv"/>
             <field name="sequence">25</field>
             <field name="name">Account Holder</field>
             <field name="expression">(bank.holder_name or employee.name) if bank else employee.name</field>
         </record>
-        <record id="layout_bank_transfer_csv_bank" model="om.file.layout.column">
+        <record id="layout_bank_transfer_csv_bank" model="file.layout.column">
             <field name="layout_id" ref="layout_bank_transfer_csv"/>
             <field name="sequence">30</field>
             <field name="name">Bank</field>
             <field name="expression">bank.bank_name if bank else ''</field>
         </record>
-        <record id="layout_bank_transfer_csv_bic" model="om.file.layout.column">
+        <record id="layout_bank_transfer_csv_bic" model="file.layout.column">
             <field name="layout_id" ref="layout_bank_transfer_csv"/>
             <field name="sequence">40</field>
             <field name="name">BIC</field>
             <field name="expression">bank.bank_bic if bank else ''</field>
         </record>
-        <record id="layout_bank_transfer_csv_amount" model="om.file.layout.column">
+        <record id="layout_bank_transfer_csv_amount" model="file.layout.column">
             <field name="layout_id" ref="layout_bank_transfer_csv"/>
             <field name="sequence">50</field>
             <field name="name">Amount</field>
@@ -50,13 +50,13 @@ the bank accounts of the employee by their salary distribution. Copy it to make 
             <field name="value_type">decimal</field>
             <field name="required" eval="True"/>
         </record>
-        <record id="layout_bank_transfer_csv_currency" model="om.file.layout.column">
+        <record id="layout_bank_transfer_csv_currency" model="file.layout.column">
             <field name="layout_id" ref="layout_bank_transfer_csv"/>
             <field name="sequence">60</field>
             <field name="name">Currency</field>
             <field name="expression">currency.name</field>
         </record>
-        <record id="layout_bank_transfer_csv_reference" model="om.file.layout.column">
+        <record id="layout_bank_transfer_csv_reference" model="file.layout.column">
             <field name="layout_id" ref="layout_bank_transfer_csv"/>
             <field name="sequence">70</field>
             <field name="name">Reference</field>

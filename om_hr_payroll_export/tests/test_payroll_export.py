@@ -44,7 +44,7 @@ class TestPayrollExport(TransactionCase):
         return payslip
 
     def export(self, payslips):
-        action = payslips.action_om_export_bank_file()
+        action = payslips.action_export_bank_file()
         return Form(self.env[action['res_model']].with_context(action['context'])).save()
 
     def test_net_split_by_salary_distribution(self):
@@ -58,7 +58,7 @@ class TestPayrollExport(TransactionCase):
         self.assertIn('Split Payee,AE460260001015333439101,Split Payee,,,1200.00', content)
 
         wizard.action_download()
-        self.assertTrue(payslip.om_exported)
+        self.assertTrue(payslip.exported)
         self.assertIn('already in', self.export(payslip).problems)
 
     def test_problems(self):
@@ -79,7 +79,7 @@ class TestPayrollExport(TransactionCase):
         self.assertEqual(len(self.layout._get_lines(payslip | draft)), 2, 'the draft is left out')
 
     def test_payslip_lines_in_columns(self):
-        layout = self.env['om.file.layout'].create({
+        layout = self.env['file.layout'].create({
             'name': 'WPS', 'model_id': self.env['ir.model']._get_id('hr.payslip'), 'file_format': 'fixed',
             'line_ending': 'lf', 'column_ids': [
                 (0, 0, {'name': 'Basic', 'expression': "line('BASIC')", 'value_type': 'decimal',
