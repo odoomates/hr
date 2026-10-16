@@ -9,8 +9,8 @@ class TestTalentDashboard(HttpCase):
 
     def test_talent_dashboard(self):
         employee = self.env['hr.employee'].create({'name': 'Dashboard Talent'})
-        self.env['om.hr.appraisal'].create({'employee_id': employee.id})
-        self.env['om.document'].create({
+        self.env['hr.appraisal'].create({'employee_id': employee.id})
+        self.env['document.document'].create({
             'res_model': 'hr.employee', 'res_id': employee.id,
             'type_id': self.env.ref('om_hr_document.document_type_passport').id,
             'date_expiry': fields.Date.today() + timedelta(days=10)})

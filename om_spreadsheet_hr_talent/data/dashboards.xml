@@ -7,7 +7,7 @@
     <record id="dashboard_talent" model="spreadsheet.dashboard">
         <field name="name">Talent and Compliance</field>
         <field name="spreadsheet_binary_data" type="bytes" file="om_spreadsheet_hr_talent/data/files/talent_dashboard.json"/>
-        <field name="main_data_model_ids" eval="[Command.set([ref('om_hr_appraisal.model_om_hr_appraisal'), ref('om_document.model_om_document')])]"/>
+        <field name="main_data_model_ids" eval="[Command.set([ref('om_hr_appraisal.model_hr_appraisal'), ref('om_document.model_document_document')])]"/>
         <field name="dashboard_group_id" ref="spreadsheet_dashboard.spreadsheet_dashboard_group_hr"/>
         <field name="group_ids" eval="[Command.set([ref('hr.group_hr_user')])]"/>
         <field name="sequence">40</field>

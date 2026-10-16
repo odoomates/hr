@@ -28,7 +28,7 @@ DONE_APPRAISALS = [['state', '=', 'done']]
 EMPLOYEE_DOCUMENTS = [['res_model', '=', 'hr.employee']]
 TO_RENEW = EMPLOYEE_DOCUMENTS + [['state', 'in', ['expiring', 'expired']]]
 OPEN_EXITS = [['state', 'in', ['to_approve', 'approved']]]
-ASSIGNED_ASSETS = [['om_asset_state', '=', 'assigned']]
+ASSIGNED_ASSETS = [['asset_state', '=', 'assigned']]
 
 
 def build_talent():
@@ -40,17 +40,17 @@ def build_talent():
     by_department = {department: ('department_id', 'many2one')}
 
     pivots = {
-        'open_appraisals': workbook.pivot('Appraisals to Do', 'om.hr.appraisal', OPEN_APPRAISALS, ['__count'],
+        'open_appraisals': workbook.pivot('Appraisals to Do', 'hr.appraisal', OPEN_APPRAISALS, ['__count'],
                                           field_matching=by_department),
-        'done_appraisals': workbook.pivot('Appraisals Done', 'om.hr.appraisal', DONE_APPRAISALS, ['__count'],
+        'done_appraisals': workbook.pivot('Appraisals Done', 'hr.appraisal', DONE_APPRAISALS, ['__count'],
                                           field_matching={period: ('date_done', 'date'), **by_department}),
-        'expiring': workbook.pivot('Documents Expiring', 'om.document',
+        'expiring': workbook.pivot('Documents Expiring', 'document.document',
                                    EMPLOYEE_DOCUMENTS + [['state', 'in', ['expiring']]], ['__count'],
                                    field_matching=by_department),
-        'expired': workbook.pivot('Documents Expired', 'om.document',
+        'expired': workbook.pivot('Documents Expired', 'document.document',
                                   EMPLOYEE_DOCUMENTS + [['state', 'in', ['expired']]], ['__count'],
                                   field_matching=by_department),
-        'exits': workbook.pivot('Exits in Progress', 'om.hr.exit', OPEN_EXITS, ['__count'],
+        'exits': workbook.pivot('Exits in Progress', 'hr.exit', OPEN_EXITS, ['__count'],
                                 field_matching=by_department),
         'assets': workbook.pivot('Assets Assigned', 'maintenance.equipment', ASSIGNED_ASSETS, ['__count']),
     }
@@ -77,13 +77,13 @@ def build_talent():
     ], CARD_WIDTH, per_row=3)
 
     charts = [
-        ('ratings', 'bar', 'Ratings of the Appraisals Done', 'om.hr.appraisal', DONE_APPRAISALS, 'rating_id',
+        ('ratings', 'bar', 'Ratings of the Appraisals Done', 'hr.appraisal', DONE_APPRAISALS, 'rating_id',
          {period: ('date_done', 'date'), **by_department}, 'om_hr_appraisal.om_hr_appraisal_action'),
-        ('appraisal_status', 'pie', 'Appraisals by Status', 'om.hr.appraisal', [['state', '!=', 'cancel']], 'state',
+        ('appraisal_status', 'pie', 'Appraisals by Status', 'hr.appraisal', [['state', '!=', 'cancel']], 'state',
          by_department, 'om_hr_appraisal.om_hr_appraisal_action'),
-        ('exit_reasons', 'bar', 'Exits by Reason', 'om.hr.exit', [['state', 'in', ['approved', 'done']]],
+        ('exit_reasons', 'bar', 'Exits by Reason', 'hr.exit', [['state', 'in', ['approved', 'done']]],
          'departure_reason_id', {period: ('date_notice', 'date'), **by_department}, 'om_hr_exit.om_hr_exit_action'),
-        ('documents', 'bar', 'Documents to Renew by Type', 'om.document', TO_RENEW, 'type_id', by_department,
+        ('documents', 'bar', 'Documents to Renew by Type', 'document.document', TO_RENEW, 'type_id', by_department,
          'om_hr_document.om_document_action_hr'),
     ]
     for index, (key, chart_type, title, model, domain, group_by, matching, action) in enumerate(charts):
@@ -93,7 +93,7 @@ def build_talent():
                              field_matching=matching, action_xmlid=action)
 
     documents = workbook.odoo_list(
-        'Documents to Renew', 'om.document', TO_RENEW,
+        'Documents to Renew', 'document.document', TO_RENEW,
         [('employee_id', 'Employee'), ('type_id', 'Type'), ('number', 'Number'), ('date_expiry', 'Expires On')],
         order_by=[('date_expiry', True)], field_matching=by_department)
     title_row = 37

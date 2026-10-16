@@ -209,7 +209,7 @@
                                         ],
                                         "measure": "__count",
                                         "order": null,
-                                        "resModel": "om.hr.appraisal",
+                                        "resModel": "hr.appraisal",
                                         "mode": "bar",
                                         "cumulatedStart": false
                                     },
@@ -286,7 +286,7 @@
                                         ],
                                         "measure": "__count",
                                         "order": null,
-                                        "resModel": "om.hr.appraisal",
+                                        "resModel": "hr.appraisal",
                                         "mode": "pie",
                                         "cumulatedStart": false
                                     },
@@ -358,7 +358,7 @@
                                         ],
                                         "measure": "__count",
                                         "order": null,
-                                        "resModel": "om.hr.exit",
+                                        "resModel": "hr.exit",
                                         "mode": "bar",
                                         "cumulatedStart": false
                                     },
@@ -438,7 +438,7 @@
                                         ],
                                         "measure": "__count",
                                         "order": null,
-                                        "resModel": "om.document",
+                                        "resModel": "document.document",
                                         "mode": "bar",
                                         "cumulatedStart": false
                                     },
@@ -598,7 +598,7 @@
             "id": "1",
             "formulaId": "1",
             "name": "Appraisals to Do",
-            "model": "om.hr.appraisal",
+            "model": "hr.appraisal",
             "domain": [
                 [
                     "state",
@@ -631,7 +631,7 @@
             "id": "2",
             "formulaId": "2",
             "name": "Appraisals Done",
-            "model": "om.hr.appraisal",
+            "model": "hr.appraisal",
             "domain": [
                 [
                     "state",
@@ -665,7 +665,7 @@
             "id": "3",
             "formulaId": "3",
             "name": "Documents Expiring",
-            "model": "om.document",
+            "model": "document.document",
             "domain": [
                 [
                     "res_model",
@@ -701,7 +701,7 @@
             "id": "4",
             "formulaId": "4",
             "name": "Documents Expired",
-            "model": "om.document",
+            "model": "document.document",
             "domain": [
                 [
                     "res_model",
@@ -737,7 +737,7 @@
             "id": "5",
             "formulaId": "5",
             "name": "Exits in Progress",
-            "model": "om.hr.exit",
+            "model": "hr.exit",
             "domain": [
                 [
                     "state",
@@ -772,7 +772,7 @@
             "model": "maintenance.equipment",
             "domain": [
                 [
-                    "om_asset_state",
+                    "asset_state",
                     "=",
                     "assigned"
                 ]
@@ -811,7 +811,7 @@
         "1": {
             "id": "1",
             "name": "Documents to Renew",
-            "model": "om.document",
+            "model": "document.document",
             "domain": [
                 [
                     "res_model",
