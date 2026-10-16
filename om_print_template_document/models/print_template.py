@@ -2,11 +2,11 @@ from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
 
 
-class OmPrintTemplate(models.Model):
-    _inherit = 'om.print.template'
+class PrintTemplate(models.Model):
+    _inherit = 'print.template'
 
     document_type_id = fields.Many2one(
-        'om.document.type', string='File as Document', domain="[('res_model', '=', model)]",
+        'document.type', string='File as Document', domain="[('res_model', '=', model)]",
         help='Each print is also kept as a document of this type on the record printed, with its PDF.')
     validity_days = fields.Integer(
         string='Valid For (Days)',

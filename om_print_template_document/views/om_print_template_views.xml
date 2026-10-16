@@ -2,8 +2,8 @@
 <odoo>
 
     <record id="om_print_template_view_form_document" model="ir.ui.view">
-        <field name="name">om.print.template.view.form.document</field>
-        <field name="model">om.print.template</field>
+        <field name="name">print.template.view.form.document</field>
+        <field name="model">print.template</field>
         <field name="inherit_id" ref="om_print_template.om_print_template_view_form"/>
         <field name="arch" type="xml">
             <page name="signature" position="after">
@@ -25,8 +25,8 @@
     </record>
 
     <record id="om_print_issue_view_form_document" model="ir.ui.view">
-        <field name="name">om.print.issue.view.form.document</field>
-        <field name="model">om.print.issue</field>
+        <field name="name">print.issue.view.form.document</field>
+        <field name="model">print.issue</field>
         <field name="inherit_id" ref="om_print_template.om_print_issue_view_form"/>
         <field name="arch" type="xml">
             <field name="attachment_id" position="after">

@@ -3,10 +3,10 @@ from datetime import timedelta
 from odoo import fields, models
 
 
-class OmPrintIssue(models.Model):
-    _inherit = 'om.print.issue'
+class PrintIssue(models.Model):
+    _inherit = 'print.issue'
 
-    document_id = fields.Many2one('om.document', string='Document', readonly=True, copy=False)
+    document_id = fields.Many2one('document.document', string='Document', readonly=True, copy=False)
 
     def _on_issued(self):
         super()._on_issued()
@@ -14,7 +14,7 @@ class OmPrintIssue(models.Model):
         if not template.document_type_id or not self.attachment_id:
             return
         # the document belongs to the record: whoever may print files it, whatever their rights on documents
-        Document = self.env['om.document'].sudo()
+        Document = self.env['document.document'].sudo()
         document = Document.create({
             'res_model': self.res_model,
             'res_id': self.res_id,
