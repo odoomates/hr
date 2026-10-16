@@ -1,10 +1,10 @@
 id,name,model_id,group_id/id,operation,domain
-access_om_hr_request_category_employee,om.hr.request.category.employee,om.hr.request.category,base.group_user,r,
-access_om_hr_request_category_manager,om.hr.request.category.manager,om.hr.request.category,hr.group_hr_manager,crud,
-om_hr_request_category_company_rule,HR request categories: multi-company,om.hr.request.category,,crud,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"
-access_om_hr_request_employee_read,om.hr.request.employee.read,om.hr.request,base.group_user,r,"['|', ('employee_id.user_id', '=', user.id), ('approval_request_ids.line_ids.approver_user_ids', 'in', user.id)]"
-access_om_hr_request_employee_draft,om.hr.request.employee.draft,om.hr.request,base.group_user,cud,"[('employee_id.user_id', '=', user.id), ('approval_state', '=', 'draft')]"
-access_om_hr_request_hr,om.hr.request.hr,om.hr.request,hr.group_hr_user,crud,
-om_hr_request_company_rule,HR requests: multi-company,om.hr.request,,crud,"[('company_id', 'in', company_ids)]"
-access_om_approval_flow_hr_manager,om.approval.flow.hr.manager,om.approval.flow,hr.group_hr_manager,crud,"[('model', '=like', 'om.hr.%')]"
-access_om_approval_step_hr_manager,om.approval.step.hr.manager,om.approval.step,hr.group_hr_manager,crud,"[('flow_id.model', '=like', 'om.hr.%')]"
+access_om_hr_request_category_employee,hr.request.category.employee,hr.request.category,base.group_user,r,
+access_om_hr_request_category_manager,hr.request.category.manager,hr.request.category,hr.group_hr_manager,crud,
+om_hr_request_category_company_rule,HR request categories: multi-company,hr.request.category,,crud,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"
+access_om_hr_request_employee_read,hr.request.employee.read,hr.request,base.group_user,r,"['|', ('employee_id.user_id', '=', user.id), ('approval_request_ids.line_ids.approver_user_ids', 'in', user.id)]"
+access_om_hr_request_employee_draft,hr.request.employee.draft,hr.request,base.group_user,cud,"[('employee_id.user_id', '=', user.id), ('approval_state', '=', 'draft')]"
+access_om_hr_request_hr,hr.request.hr,hr.request,hr.group_hr_user,crud,
+om_hr_request_company_rule,HR requests: multi-company,hr.request,,crud,"[('company_id', 'in', company_ids)]"
+access_om_approval_flow_hr_manager,approval.rule.hr.manager,approval.rule,hr.group_hr_manager,crud,"[('model', '=like', 'hr.%')]"
+access_om_approval_step_hr_manager,approval.step.hr.manager,approval.step,hr.group_hr_manager,crud,"[('flow_id.model', '=like', 'hr.%')]"

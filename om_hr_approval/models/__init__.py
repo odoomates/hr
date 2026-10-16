@@ -1,3 +1,3 @@
-from . import om_approval_step
-from . import om_approval_request
-from . import om_hr_request
+from . import approval_step
+from . import approval_request
+from . import hr_request

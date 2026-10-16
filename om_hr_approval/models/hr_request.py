@@ -2,8 +2,8 @@ from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 
-class OmHrRequestCategory(models.Model):
-    _name = 'om.hr.request.category'
+class HrRequestCategory(models.Model):
+    _name = 'hr.request.category'
     _description = 'HR Request Category'
     _order = 'sequence, name'
 
@@ -14,10 +14,10 @@ class OmHrRequestCategory(models.Model):
     description = fields.Text(translate=True, help='Shown to the employee writing a request of the category.')
 
 
-class OmHrRequest(models.Model):
+class HrRequest(models.Model):
     """ What an employee asks HR for, approved along the approval flow of the HR requests. """
-    _name = 'om.hr.request'
-    _inherit = ['om.approval.mixin']
+    _name = 'hr.request'
+    _inherit = ['approval.mixin']
     _description = 'HR Request'
     _order = 'date desc, id desc'
     _mail_post_access = 'read'
@@ -31,7 +31,7 @@ class OmHrRequest(models.Model):
         compute='_compute_company_id', store=True, readonly=False, precompute=True)
     department_id = fields.Many2one(related='employee_id.department_id', store=True)
     category_id = fields.Many2one(
-        'om.hr.request.category', string='Category', required=True, tracking=True,
+        'hr.request.category', string='Category', required=True, tracking=True,
         domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
     category_description = fields.Text(related='category_id.description')
     date = fields.Date(required=True, default=fields.Date.context_today)
@@ -46,7 +46,7 @@ class OmHrRequest(models.Model):
     def create(self, vals_list):
         for vals in vals_list:
             if vals.get('name', _('New')) == _('New'):
-                vals['name'] = self.env['ir.sequence'].next_by_code('om.hr.request') or _('New')
+                vals['name'] = self.env['ir.sequence'].next_by_code('hr.request') or _('New')
         return super().create(vals_list)
 
     def unlink(self):

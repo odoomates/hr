@@ -4,27 +4,27 @@
 
         <record id="seq_om_hr_request" model="ir.sequence">
             <field name="name">HR Request</field>
-            <field name="code">om.hr.request</field>
+            <field name="code">hr.request</field>
             <field name="prefix">REQ/%(year)s/</field>
             <field name="padding">4</field>
             <field name="company_id" eval="False"/>
         </record>
 
-        <record id="flow_om_hr_request" model="om.approval.flow">
+        <record id="flow_om_hr_request" model="approval.rule">
             <field name="name">HR Requests</field>
-            <field name="model_id" ref="om_hr_approval.model_om_hr_request"/>
+            <field name="model_id" ref="om_hr_approval.model_hr_request"/>
             <field name="fallback_group_id" ref="hr.group_hr_manager"/>
             <field name="self_approve" eval="False"/>
         </record>
 
-        <record id="flow_om_hr_request_manager" model="om.approval.step">
+        <record id="flow_om_hr_request_manager" model="approval.step">
             <field name="flow_id" ref="flow_om_hr_request"/>
             <field name="sequence">10</field>
             <field name="name">Manager</field>
             <field name="approver_type">manager</field>
         </record>
 
-        <record id="flow_om_hr_request_hr" model="om.approval.step">
+        <record id="flow_om_hr_request_hr" model="approval.step">
             <field name="flow_id" ref="flow_om_hr_request"/>
             <field name="sequence">20</field>
             <field name="name">HR</field>
@@ -32,19 +32,19 @@
             <field name="group_id" ref="hr.group_hr_user"/>
         </record>
 
-        <record id="request_category_document" model="om.hr.request.category">
+        <record id="request_category_document" model="hr.request.category">
             <field name="name">Document</field>
             <field name="sequence">10</field>
             <field name="description">A certificate, a letter or a copy of a document HR keeps.</field>
         </record>
 
-        <record id="request_category_update" model="om.hr.request.category">
+        <record id="request_category_update" model="hr.request.category">
             <field name="name">Change of My Details</field>
             <field name="sequence">20</field>
             <field name="description">An address, a bank account, a family member or another detail HR keeps about you.</field>
         </record>
 
-        <record id="request_category_other" model="om.hr.request.category">
+        <record id="request_category_other" model="hr.request.category">
             <field name="name">Other</field>
             <field name="sequence">100</field>
         </record>

@@ -26,7 +26,7 @@ class TestHrRequest(TransactionCase):
         cls.category = cls.env.ref('om_hr_approval.request_category_document')
 
     def new_request(self, user=None, employee=None):
-        return self.env['om.hr.request'].with_user(user or self.employee_user).create({
+        return self.env['hr.request'].with_user(user or self.employee_user).create({
             'employee_id': (employee or self.employee).id, 'category_id': self.category.id,
             'description': 'A salary certificate for the bank'})
 
@@ -54,7 +54,7 @@ class TestHrRequest(TransactionCase):
         request = self.new_request()
         request.action_approval_submit()
         wizard_action = request.with_user(self.manager_user).action_approval_open_refuse()
-        self.env['om.approval.refuse'].with_user(self.manager_user).create({
+        self.env['approval.refuse'].with_user(self.manager_user).create({
             'request_id': wizard_action['context']['default_request_id'], 'reason': 'Ask the bank first'},
         ).action_refuse()
         self.assertEqual(request.approval_state, 'refused')
@@ -90,15 +90,15 @@ class TestHrRequest(TransactionCase):
 
     def test_manager_approver_on_any_button(self):
         """ The manager of the requester approves a button of another app. """
-        button = self.env['om.approval.button'].create({
+        button = self.env['approval.button'].create({
             'model_id': self.env['ir.model']._get_id('res.partner'), 'method': 'action_archive', 'name': 'Archive'})
-        self.env['om.approval.flow'].create({
+        self.env['approval.rule'].create({
             'name': 'Archive', 'model_id': button.model_id.id, 'button_id': button.id,
             'step_ids': [Command.create({'name': 'Manager', 'approver_type': 'manager'})]})
         self.employee_user.group_ids = [Command.link(self.env.ref('base.group_partner_manager').id)]
         partner = self.env['res.partner'].create({'name': 'Customer'})
-        self.env['om.approval.request'].with_user(self.employee_user)._gate_button(
+        self.env['approval.request'].with_user(self.employee_user)._gate_button(
             'res.partner', 'action_archive', partner.ids)
-        request = self.env['om.approval.request'].search([('res_model', '=', 'res.partner'),
+        request = self.env['approval.request'].search([('res_model', '=', 'res.partner'),
                                                          ('res_id', '=', partner.id)])
         self.assertEqual(request.approver_user_ids, self.manager_user)

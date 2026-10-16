@@ -1,8 +1,8 @@
 from odoo import api, fields, models
 
 
-class OmApprovalStep(models.Model):
-    _inherit = 'om.approval.step'
+class ApprovalStep(models.Model):
+    _inherit = 'approval.step'
 
     approver_type = fields.Selection(selection_add=[
         ('manager', 'Manager of the Employee'),
