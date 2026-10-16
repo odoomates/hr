@@ -18,13 +18,14 @@ class PrintIssue(models.Model):
     _name = 'print.issue'
     _inherit = ['mail.thread']
     _description = 'Issued Print'
+    _check_company_auto = True
     _order = 'date desc, id desc'
     _mail_post_access = 'read'
 
     name = fields.Char(string='Reference', required=True, readonly=True, copy=False,
                        default=lambda self: self.env._('Draft'))
     template_id = fields.Many2one('print.template', required=True, ondelete='restrict',
-                                 index=True, tracking=True)
+                                 index=True, tracking=True, check_company=True)
     res_model = fields.Char(string='Model', required=True, index=True)
     res_id = fields.Many2oneReference(string='Record ID', model_field='res_model', required=True, index=True)
     res_name = fields.Char(string='Printed For', compute='_compute_res_name')

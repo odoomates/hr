@@ -11,6 +11,7 @@ class PrintTemplate(models.Model):
     _name = 'print.template'
     _inherit = ['mail.render.mixin']
     _description = 'Print Template'
+    _check_company_auto = True
     _order = 'sequence, name, id'
     # what a template holds is trusted when printed, as for the email templates: only the template editors write
     # dynamic content into it, which the render mixin checks when a template is created or changed
@@ -32,7 +33,8 @@ class PrintTemplate(models.Model):
         string='Body', render_engine='qweb', render_options={'post_process': True}, prefetch=True,
         translate=True, sanitize='email_outgoing')
     code = fields.Char(string='Reference Prefix', help='Starts the reference of each print, e.g. CERT/.')
-    sequence_id = fields.Many2one('ir.sequence', string='Reference Sequence', readonly=True, copy=False)
+    sequence_id = fields.Many2one('ir.sequence', string='Reference Sequence', readonly=True, copy=False,
+                                  check_company=True)
     signatory_name = fields.Char(string='Signed By')
     signatory_title = fields.Char(string='Title', translate=True)
     signature = fields.Image(string='Signature or Stamp', max_width=512, max_height=256)
