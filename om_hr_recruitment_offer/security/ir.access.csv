@@ -1,0 +1,5 @@
+id,name,model_id,group_id/id,operation,domain
+access_hr_applicant_offer_recruiter,hr.applicant.offer.recruiter,hr.applicant.offer,hr_recruitment.group_hr_recruitment_user,crud,
+access_hr_applicant_offer_approver,hr.applicant.offer.approver,hr.applicant.offer,hr.group_hr_manager,r,
+hr_applicant_offer_company_rule,Offers: multi-company,hr.applicant.offer,,crud,"[('company_id', 'in', company_ids)]"
+access_hr_employee_type_recruiter,hr.employee.type.recruiter,hr.employee.type,hr_recruitment.group_hr_recruitment_user,r,

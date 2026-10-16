@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="sequence_hr_applicant_offer" model="ir.sequence">
+            <field name="name">Job Offer</field>
+            <field name="code">hr.applicant.offer</field>
+            <field name="prefix">OFFER/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- the offers are approved by HR; change the flow in Approvals, e.g. the department manager first -->
+        <record id="flow_offer" model="approval.rule">
+            <field name="name">Job Offers</field>
+            <field name="model_id" ref="model_hr_applicant_offer"/>
+            <field name="fallback_group_id" ref="hr.group_hr_manager"/>
+            <field name="self_approve" eval="False"/>
+        </record>
+
+        <record id="flow_offer_hr" model="approval.step">
+            <field name="flow_id" ref="flow_offer"/>
+            <field name="sequence">10</field>
+            <field name="name">HR</field>
+            <field name="approver_type">group</field>
+            <field name="group_id" ref="hr.group_hr_manager"/>
+        </record>
+
+        <record id="print_template_offer_letter" model="print.template">
+            <field name="name">Offer Letter</field>
+            <field name="model_id" ref="model_hr_applicant_offer"/>
+            <field name="code">OFFER/</field>
+            <field name="subject">Offer of Employment</field>
+            <field name="addressee">{{ object.applicant_id.partner_name or object.applicant_id.display_name }}</field>
+            <field name="print_menu" eval="False"/>
+            <field name="body_html" type="html">
+<div>
+    <p>Dear <t t-out="object.applicant_id.partner_name or object.applicant_id.display_name"/>,</p>
+    <p>We are pleased to offer you the position of <strong t-out="object.job_id.name"/>
+        <t t-if="object.department_id"> in our <t t-out="object.department_id.name"/> department</t>
+        at <t t-out="object.company_id.name"/>, on the following terms:</p>
+    <ul>
+        <li>Start date: <t t-out="format_date(object.date_start)"/></li>
+        <li>Monthly gross salary: <t t-out="format_amount(object.wage, object.currency_id)"/></li>
+        <li t-if="object.employee_type_id">Employment: <t t-out="object.employee_type_id.name"/></li>
+        <li t-if="object.resource_calendar_id">Working schedule: <t t-out="object.resource_calendar_id.name"/></li>
+        <li t-if="object.trial_date_end">Probation until: <t t-out="format_date(object.trial_date_end)"/></li>
+    </ul>
+    <p t-if="object.benefits" style="white-space: pre-line;"><t t-out="object.benefits"/></p>
+    <p>This offer is valid until <t t-out="format_date(object.date_valid)"/>. Sign this letter to accept it.</p>
+    <p>We look forward to working with you.</p>
+    <p>[signature: Company]</p>
+    <p>Accepted by the candidate:</p>
+    <p>[signature: Candidate]</p>
+</div>
+            </field>
+            <field name="sign_role_ids" eval="[
+                (0, 0, {'sequence': 10, 'name': 'Company', 'signer_type': 'issuer'}),
+                (0, 0, {'sequence': 20, 'name': 'Candidate', 'signer_type': 'field', 'field_path': 'applicant_id.partner_id'}),
+            ]"/>
+        </record>
+
+    </data>
+</odoo>

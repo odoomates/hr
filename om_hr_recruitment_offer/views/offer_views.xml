@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="hr_applicant_offer_view_form" model="ir.ui.view">
+        <field name="name">hr.applicant.offer.view.form</field>
+        <field name="model">hr.applicant.offer</field>
+        <field name="arch" type="xml">
+            <form string="Job Offer">
+                <header>
+                    <button name="action_submit" string="Submit for Approval" type="object" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_approval_approve" string="Approve" type="object" class="btn-primary"
+                            invisible="not can_approve"/>
+                    <button name="action_approval_open_refuse" string="Refuse" type="object" invisible="not can_approve"/>
+                    <button name="action_send" string="Send for Signature" type="object" class="btn-primary"
+                            invisible="state != 'approved'"
+                            confirm="The letter is issued, you sign it first, then the candidate gets it by email. Send it?"/>
+                    <button name="action_approval_reset" string="Back to Draft" type="object"
+                            invisible="state not in ('to_approve', 'refused')"/>
+                    <button name="action_approval_cancel" string="Cancel" type="object"
+                            invisible="state not in ('draft', 'to_approve')"/>
+                    <button name="action_cancel" string="Withdraw" type="object" invisible="state != 'sent'"
+                            confirm="The candidate can no longer sign it. Withdraw the offer?"/>
+                    <button name="action_reset" string="New Offer from This One" type="object"
+                            invisible="state not in ('refused', 'declined', 'expired', 'cancelled')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,to_approve,approved,sent,accepted"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_sign_requests" type="object" class="oe_stat_button" icon="edit_square"
+                                invisible="not sign_request_id">
+                            <field name="sign_request_count" widget="statinfo" string="Signatures"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Accepted" bg_color="text-bg-success" invisible="state != 'accepted'"/>
+                    <widget name="web_ribbon" title="Declined" bg_color="text-bg-warning" invisible="state != 'declined'"/>
+                    <widget name="web_ribbon" title="Expired" bg_color="text-bg-secondary" invisible="state != 'expired'"/>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group string="Position">
+                            <field name="applicant_id" readonly="state != 'draft'"/>
+                            <field name="candidate_name"/>
+                            <field name="job_id" readonly="state != 'draft'"/>
+                            <field name="department_id" readonly="state != 'draft'"/>
+                            <field name="employee_type_id" readonly="state != 'draft'"/>
+                            <field name="resource_calendar_id" readonly="state != 'draft'"/>
+                            <field name="company_id" groups="base.group_multi_company" readonly="state != 'draft'"/>
+                        </group>
+                        <group string="Terms">
+                            <field name="currency_id" invisible="1"/>
+                            <field name="wage" readonly="state != 'draft'"/>
+                            <field name="date_start" readonly="state != 'draft'"/>
+                            <field name="trial_date_end" readonly="state != 'draft'"/>
+                            <field name="date_valid" readonly="state != 'draft'"/>
+                            <field name="template_id" readonly="state != 'draft'" options="{'no_create': True}"/>
+                            <field name="issue_id" invisible="not issue_id"/>
+                            <field name="sign_request_id" invisible="not sign_request_id"/>
+                            <field name="date_accepted" invisible="not date_accepted"/>
+                            <field name="approval_step" invisible="state != 'to_approve'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Other Benefits" name="benefits">
+                            <field name="benefits" readonly="state != 'draft'"
+                                   placeholder="Printed in the letter, e.g. housing allowance, a phone, 30 days of leave."/>
+                        </page>
+                        <page string="Declined" name="declined" invisible="not decline_reason">
+                            <field name="decline_reason"/>
+                        </page>
+                        <page string="Approvals" name="approvals" invisible="not approval_line_ids">
+                            <field name="approval_line_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="approver_user_ids" widget="many2many_avatar_user"/>
+                                    <field name="state" widget="badge" decoration-info="state == 'pending'"
+                                           decoration-success="state == 'approved'" decoration-danger="state == 'refused'"/>
+                                    <field name="user_id" widget="many2one_avatar_user"/>
+                                    <field name="date"/>
+                                    <field name="note"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_applicant_offer_view_list" model="ir.ui.view">
+        <field name="name">hr.applicant.offer.view.list</field>
+        <field name="model">hr.applicant.offer</field>
+        <field name="arch" type="xml">
+            <list string="Job Offers">
+                <field name="name"/>
+                <field name="applicant_id"/>
+                <field name="job_id"/>
+                <field name="department_id" optional="show"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="wage" optional="show"/>
+                <field name="date_start"/>
+                <field name="date_valid" optional="show"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="state" widget="badge" decoration-info="state in ('draft', 'to_approve')"
+                       decoration-warning="state in ('approved', 'sent')" decoration-success="state == 'accepted'"
+                       decoration-danger="state in ('refused', 'declined')"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hr_applicant_offer_view_search" model="ir.ui.view">
+        <field name="name">hr.applicant.offer.view.search</field>
+        <field name="model">hr.applicant.offer</field>
+        <field name="arch" type="xml">
+            <search string="Job Offers">
+                <field name="name"/>
+                <field name="applicant_id"/>
+                <field name="job_id"/>
+                <filter name="open" string="Open" domain="[('state', 'in', ('draft', 'to_approve', 'approved', 'sent'))]"/>
+                <filter name="to_approve" string="To Approve" domain="[('state', '=', 'to_approve')]"/>
+                <filter name="sent" string="Waiting for the Candidate" domain="[('state', '=', 'sent')]"/>
+                <filter name="accepted" string="Accepted" domain="[('state', '=', 'accepted')]"/>
+                <group>
+                    <filter name="group_job" string="Job Position" context="{'group_by': 'job_id'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="hr_applicant_offer_action" model="ir.actions.act_window">
+        <field name="name">Offers</field>
+        <field name="res_model">hr.applicant.offer</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_open': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No offer yet</p>
+            <p>Make an offer from the applicant: once approved, the offer letter is signed by the company, then by
+                the candidate, and the applicant is hired.</p>
+        </field>
+    </record>
+
+    <record id="hr_applicant_view_form" model="ir.ui.view">
+        <field name="name">hr.applicant.view.form.offer</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header/button[@name='create_employee_from_applicant']" position="before">
+                <button name="action_new_offer" string="New Offer" type="object"
+                        groups="hr_recruitment.group_hr_recruitment_user" invisible="not active or employee_id"/>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_open_offers" type="object" class="oe_stat_button" icon="description"
+                        groups="hr_recruitment.group_hr_recruitment_user" invisible="not offer_count">
+                    <field name="offer_count" widget="statinfo" string="Offers"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+    <menuitem id="menu_hr_applicant_offer" action="hr_applicant_offer_action"
+              parent="hr_recruitment.menu_crm_case_categ0_act_job" sequence="50"
+              groups="hr_recruitment.group_hr_recruitment_user"/>
+
+</odoo>
