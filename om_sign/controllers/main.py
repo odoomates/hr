@@ -34,8 +34,11 @@ class SignPortal(CustomerPortal):
 
     def _page(self, signer, **values):
         return request.render('om_sign.sign_page', {
-            'signer': signer, 'sign_request': signer.request_id, 'base_url': '/sign/%s/%s' % (signer.id, signer.access_token),
-            **values})
+            'signer': signer,
+            'sign_request': signer.request_id,
+            'base_url': '/sign/%s/%s' % (signer.id, signer.access_token),
+            **values,
+        })
 
     @http.route('/sign/<int:signer_id>/<string:token>', type='http', auth='public', website=True, sitemap=False)
     def sign_page(self, signer_id, token, **kwargs):

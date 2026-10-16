@@ -32,7 +32,8 @@ class TestSignPortal(SignCommon, HttpCase):
         self.assertEqual(self.url_open('/sign/%s/wrong' % customer.id).status_code, 404)
         self.assertEqual(self.url_open('/sign/999999/wrong').status_code, 404)
 
-        result = self.make_jsonrpc_request(self.url(customer, '/accept'), {'name': 'Acme Buyer', 'signature': SIGNATURE})
+        result = self.make_jsonrpc_request(self.url(customer, '/accept'),
+                                           {'name': 'Acme Buyer', 'signature': SIGNATURE})
         self.assertTrue(result.get('force_refresh'), result)
         self.assertEqual(customer.state, 'signed')
         signed_log = sign_request.sudo().log_ids.filtered(lambda log: log.event == 'signed')

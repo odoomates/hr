@@ -274,8 +274,9 @@ class SignRequest(models.Model):
         for request in expired:
             request.sudo().write({'state': 'expired'})
             self.env['sign.log']._log(request, 'expired')
-            request.sudo().message_post(body=_('The request expired before everyone signed.'),
-                                        subtype_xmlid='mail.mt_note', partner_ids=request.requested_by_id.partner_id.ids)
+            request.sudo().message_post(
+                body=_('The request expired before everyone signed.'), subtype_xmlid='mail.mt_note',
+                partner_ids=request.requested_by_id.partner_id.ids)
             request._call_host('_on_sign_cancelled')
         now = fields.Datetime.now()
         signers = self.env['sign.request.signer'].search([
