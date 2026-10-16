@@ -8,18 +8,19 @@ class HrShiftRequest(models.Model):
     _name = 'hr.shift.request'
     _inherit = ['approval.mixin']
     _description = 'Shift Request'
+    _check_company_auto = True
     _order = 'id desc'
     _mail_post_access = 'read'
 
     kind = fields.Selection([('claim', 'Claim an Open Shift'), ('swap', 'Swap Shifts')], required=True,
                             default='claim')
     employee_id = fields.Many2one('hr.employee', required=True, index=True,
-                                  default=lambda self: self.env.user.employee_id)
+                                  default=lambda self: self.env.user.employee_id, check_company=True)
     company_id = fields.Many2one(related='employee_id.company_id', store=True)
-    shift_id = fields.Many2one('hr.shift', required=True, ondelete='cascade',
+    shift_id = fields.Many2one('hr.shift', required=True, ondelete='cascade', check_company=True,
                                help='The open shift claimed, or the shift of the employee given in a swap.')
     target_shift_id = fields.Many2one('hr.shift', string='Shift Taken', ondelete='cascade',
-                                      help='The shift of the colleague taken in a swap.')
+                                      help='The shift of the colleague taken in a swap.', check_company=True)
     target_employee_id = fields.Many2one(related='target_shift_id.employee_id', string='Colleague', store=True)
     note = fields.Char()
     state = fields.Selection([

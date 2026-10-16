@@ -1,4 +1,4 @@
-from odoo import SUPERUSER_ID, fields, models
+from odoo import SUPERUSER_ID, api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -7,9 +7,13 @@ class HrEmployee(models.Model):
 
     roster_calendar_id = fields.Many2one(
         'resource.calendar', string='Roster Schedule', readonly=True, copy=False, groups='hr.group_hr_user',
-        help='The variable working schedule of the employee, written by the published shifts.')
+        help='The variable working schedule of the employee, written by the published shifts.', check_company=True)
     roster_date_start = fields.Date(string='Rostered Since', readonly=True, copy=False, groups='hr.group_hr_user')
     shift_ids = fields.One2many('hr.shift', 'employee_id', string='Shifts')
+
+    @api.model
+    def _company_checked_fields(self):
+        return super()._company_checked_fields() + ['roster_calendar_id']
 
     def _start_rostering(self, date):
         """ From `date`, the employee works the shifts of the roster: a new version of the contract on a working

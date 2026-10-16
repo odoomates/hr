@@ -15,15 +15,16 @@ class HrShift(models.Model):
     _name = 'hr.shift'
     _inherit = ['mail.thread']
     _description = 'Shift'
+    _check_company_auto = True
     _order = 'date, hour_from, id'
 
     employee_id = fields.Many2one('hr.employee', index=True, tracking=True,
-                                  help='Empty for an open shift, which the employees may claim.')
+                                  help='Empty for an open shift, which the employees may claim.', check_company=True)
     company_id = fields.Many2one('res.company', required=True, index=True,
                                  compute='_compute_company_id', store=True, readonly=False, precompute=True)
     department_id = fields.Many2one('hr.department', compute='_compute_department_id',
-                                    store=True, readonly=False, index=True)
-    template_id = fields.Many2one('hr.shift.template', string='Shift Template', tracking=True)
+                                    store=True, readonly=False, index=True, check_company=True)
+    template_id = fields.Many2one('hr.shift.template', string='Shift Template', tracking=True, check_company=True)
     date = fields.Date(required=True, index=True, tracking=True)
     hour_from = fields.Float(string='From', required=True, tracking=True)
     hour_to = fields.Float(string='To', required=True, tracking=True, help='At or before the start: the next day.')
