@@ -2,9 +2,9 @@ from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
 
 
-class OmDocumentType(models.Model):
+class DocumentType(models.Model):
     """ A kind of document kept on a record, e.g. the passport of an employee or the trade license of a company. """
-    _name = 'om.document.type'
+    _name = 'document.type'
     _description = 'Document Type'
     _order = 'sequence, name, id'
 

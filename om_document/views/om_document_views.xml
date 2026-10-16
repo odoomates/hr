@@ -2,8 +2,8 @@
 <odoo>
 
     <record id="om_document_view_form" model="ir.ui.view">
-        <field name="name">om.document.view.form</field>
-        <field name="model">om.document</field>
+        <field name="name">document.document.view.form</field>
+        <field name="model">document.document</field>
         <field name="arch" type="xml">
             <form string="Document">
                 <header>
@@ -72,8 +72,8 @@
     </record>
 
     <record id="om_document_view_kanban" model="ir.ui.view">
-        <field name="name">om.document.view.kanban</field>
-        <field name="model">om.document</field>
+        <field name="name">document.document.view.kanban</field>
+        <field name="model">document.document</field>
         <field name="arch" type="xml">
             <kanban string="Documents" class="o_om_document_kanban" sample="1">
                 <field name="state"/>
@@ -108,8 +108,8 @@
     </record>
 
     <record id="om_document_view_list" model="ir.ui.view">
-        <field name="name">om.document.view.list</field>
-        <field name="model">om.document</field>
+        <field name="name">document.document.view.list</field>
+        <field name="model">document.document</field>
         <field name="arch" type="xml">
             <list string="Documents" decoration-danger="state == 'expired'" decoration-warning="state == 'expiring'">
                 <field name="res_name"/>
@@ -127,8 +127,8 @@
     </record>
 
     <record id="om_document_view_search" model="ir.ui.view">
-        <field name="name">om.document.view.search</field>
-        <field name="model">om.document</field>
+        <field name="name">document.document.view.search</field>
+        <field name="model">document.document</field>
         <field name="arch" type="xml">
             <search>
                 <field name="name"/>
@@ -155,7 +155,7 @@
 
     <record id="om_document_action" model="ir.actions.act_window">
         <field name="name">Documents</field>
-        <field name="res_model">om.document</field>
+        <field name="res_model">document.document</field>
         <field name="view_mode">kanban,list,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">Keep a document with its expiry date</p>
@@ -165,7 +165,7 @@
 
     <record id="om_document_action_expiring" model="ir.actions.act_window">
         <field name="name">Expiring Documents</field>
-        <field name="res_model">om.document</field>
+        <field name="res_model">document.document</field>
         <field name="view_mode">kanban,list,form</field>
         <field name="domain">[('state', 'in', ['expiring'])]</field>
         <field name="help" type="html">
@@ -175,7 +175,7 @@
 
     <record id="om_document_action_expired" model="ir.actions.act_window">
         <field name="name">Expired Documents</field>
-        <field name="res_model">om.document</field>
+        <field name="res_model">document.document</field>
         <field name="view_mode">kanban,list,form</field>
         <field name="domain">[('state', 'in', ['expired'])]</field>
         <field name="help" type="html">

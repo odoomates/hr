@@ -19,14 +19,14 @@ class TestDocument(TransactionCase):
         super().setUpClass()
         cls.responsible = new_test_user(cls.env, 'om_document_responsible', groups='base.group_user')
         cls.partner = cls.env['res.partner'].create({'name': 'Vendor', 'email': 'vendor@example.com'})
-        cls.doc_type = cls.env['om.document.type'].create({
+        cls.doc_type = cls.env['document.type'].create({
             'name': 'Insurance Certificate', 'code': 'INSURANCE',
             'model_id': cls.env['ir.model']._get_id('res.partner'),
             'reminder_days': '30,7,0', 'user_ids': [Command.link(cls.responsible.id)],
         })
 
     def new_document(self, date_expiry, **values):
-        return self.env['om.document'].create({
+        return self.env['document.document'].create({
             'res_model': 'res.partner', 'res_id': self.partner.id, 'type_id': self.doc_type.id,
             'number': 'INS-1', 'date_expiry': date_expiry, **values})
 
@@ -47,7 +47,7 @@ class TestDocument(TransactionCase):
         expiring = self.new_document(date(2026, 6, 20))
         expired = self.new_document(date(2026, 5, 31))
         none = self.new_document(False)
-        Document = self.env['om.document']
+        Document = self.env['document.document']
         mine = [('res_id', '=', self.partner.id)]
         self.assertEqual(Document.search(mine + [('state', 'in', ['expiring'])]), expiring)
         self.assertEqual(Document.search(mine + [('state', 'in', ['expired'])]), expired)
@@ -60,14 +60,14 @@ class TestDocument(TransactionCase):
             self.new_document(date(2026, 1, 1), date_issue=date(2026, 2, 1))
         with self.assertRaises(ValidationError):
             self.doc_type.reminder_days = '30,soon'
-        other_type = self.env['om.document.type'].create({
+        other_type = self.env['document.type'].create({
             'name': 'Badge', 'model_id': self.env['ir.model']._get_id('res.users')})
         with self.assertRaises(ValidationError):
             self.new_document(False, type_id=other_type.id)
 
     def test_reminders_fire_once_per_stage(self):
         document = self.new_document(date(2026, 6, 25))
-        Document = self.env['om.document']
+        Document = self.env['document.document']
         Document._cron_send_reminders()
         self.assertEqual(len(self.todos(document)), 1, '24 days left: the 30 days reminder')
         self.assertEqual(document.last_reminder, 30)
@@ -92,14 +92,14 @@ class TestDocument(TransactionCase):
         patcher.start()
         self.addCleanup(patcher.stop)
         document = self.new_document(date(2026, 6, 10))
-        self.env['om.document']._cron_send_reminders()
+        self.env['document.document']._cron_send_reminders()
         message = document.message_ids.filtered(lambda m: self.partner in m.partner_ids)
         self.assertTrue(message, 'the holder is emailed')
 
     def test_renew(self):
         document = self.new_document(date(2026, 6, 20))
         context = document.action_renew()['context']
-        renewal = self.env['om.document'].with_context(context).create({
+        renewal = self.env['document.document'].with_context(context).create({
             'number': 'INS-2', 'date_expiry': date(2027, 6, 20)})
         self.assertEqual((renewal.res_model, renewal.res_id, renewal.type_id),
                          ('res.partner', self.partner.id, self.doc_type))
@@ -109,18 +109,18 @@ class TestDocument(TransactionCase):
 
     def test_board(self):
         valid = self.new_document(date(2026, 9, 1))
-        other_type = self.env['om.document.type'].create({
+        other_type = self.env['document.type'].create({
             'name': 'Tax Certificate', 'model_id': self.env['ir.model']._get_id('res.partner')})
-        Document = self.env['om.document']
-        data = Document.om_board_data('res.partner', self.partner.id)
+        Document = self.env['document.document']
+        data = Document.board_data('res.partner', self.partner.id)
         self.assertEqual([doc['id'] for doc in data['documents']], [valid.id])
         self.assertIn(other_type.id, [missing['id'] for missing in data['missing']])
         self.assertNotIn(self.doc_type.id, [missing['id'] for missing in data['missing']])
 
         file = {'name': 'tax.pdf', 'mimetype': 'application/pdf', 'data': base64.b64encode(b'%PDF-1.4').decode()}
-        new_id = Document.om_board_upload('res.partner', self.partner.id, other_type.id, False, [file])
+        new_id = Document.board_upload('res.partner', self.partner.id, other_type.id, False, [file])
         created = Document.browse(new_id)
         self.assertEqual((created.type_id, created.attachment_ids.name), (other_type, 'tax.pdf'))
-        self.assertEqual(created.attachment_ids.res_model, 'om.document')
-        Document.om_board_upload('res.partner', self.partner.id, False, valid.id, [file, dict(file, name='b.pdf')])
+        self.assertEqual(created.attachment_ids.res_model, 'document.document')
+        Document.board_upload('res.partner', self.partner.id, False, valid.id, [file, dict(file, name='b.pdf')])
         self.assertEqual(len(valid.attachment_ids), 2)

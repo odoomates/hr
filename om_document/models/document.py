@@ -7,12 +7,12 @@ from odoo.fields import Domain
 from odoo.tools.misc import format_date
 
 
-class OmDocument(models.Model):
+class Document(models.Model):
     """ A document kept on any record, e.g. a passport on an employee, with its expiry date and its reminders.
 
-    The record holding it may inherit ``om.document.mixin`` to say who is reminded and who holds the document.
+    The record holding it may inherit ``document.mixin`` to say who is reminded and who holds the document.
     """
-    _name = 'om.document'
+    _name = 'document.document'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Document'
     _order = 'date_expiry, id desc'
@@ -26,7 +26,7 @@ class OmDocument(models.Model):
     record_ref = fields.Reference(selection='_selection_record_ref', string='Belongs To',
                                   compute='_compute_record_ref', inverse='_inverse_record_ref')
     type_id = fields.Many2one(
-        'om.document.type', string='Type', required=True, tracking=True, index=True,
+        'document.type', string='Type', required=True, tracking=True, index=True,
         domain="[('res_model', '=', res_model), '|', ('company_id', '=', False), ('company_id', '=', company_id)]")
     has_number = fields.Boolean(related='type_id.has_number')
     has_issue_date = fields.Boolean(related='type_id.has_issue_date')
@@ -53,9 +53,9 @@ class OmDocument(models.Model):
     last_reminder = fields.Integer(
         copy=False, default=-1,
         help='The reminder sent last, in days before the expiry date, -1 for none: each one is sent once.')
-    previous_id = fields.Many2one('om.document', string='Renews', copy=False, readonly=True, index=True)
-    renewal_ids = fields.One2many('om.document', 'previous_id', string='Renewals', context={'active_test': False})
-    next_id = fields.Many2one('om.document', string='Renewed By', compute='_compute_next_id')
+    previous_id = fields.Many2one('document.document', string='Renews', copy=False, readonly=True, index=True)
+    renewal_ids = fields.One2many('document.document', 'previous_id', string='Renewals', context={'active_test': False})
+    next_id = fields.Many2one('document.document', string='Renewed By', compute='_compute_next_id')
 
     @api.depends('type_id', 'number')
     def _compute_name(self):
@@ -79,7 +79,7 @@ class OmDocument(models.Model):
     @api.model
     def _selection_record_ref(self):
         """ The kinds of record a document type is kept on. """
-        models_ = self.env['om.document.type'].sudo().with_context(active_test=False).search([]).model_id
+        models_ = self.env['document.type'].sudo().with_context(active_test=False).search([]).model_id
         return [(model.model, model.name) for model in models_]
 
     @api.depends('res_model', 'res_id')
@@ -119,7 +119,7 @@ class OmDocument(models.Model):
             return NotImplemented
         today = fields.Date.context_today(self)
         expiring_ids = []
-        for doc_type in self.env['om.document.type'].with_context(active_test=False).search(
+        for doc_type in self.env['document.type'].with_context(active_test=False).search(
                 [('has_expiry_date', '=', True)]):
             horizon = today + timedelta(days=max(doc_type._get_reminder_days() or [0]))
             expiring_ids += self.sudo().with_context(active_test=False).search([
@@ -199,7 +199,7 @@ class OmDocument(models.Model):
         result = super().write(vals)
         if changed:
             # a new expiry date is reminded of again
-            super(OmDocument, changed.sudo()).write({'last_reminder': -1})
+            super(Document, changed.sudo()).write({'last_reminder': -1})
         return result
 
     # ------------------------------------------------------------------
@@ -215,7 +215,7 @@ class OmDocument(models.Model):
         return {
             'type': 'ir.actions.act_window',
             'name': _('Renew %s', self.name),
-            'res_model': 'om.document',
+            'res_model': 'document.document',
             'view_mode': 'form',
             'views': [(False, 'form')],
             'target': 'current',
@@ -246,7 +246,7 @@ class OmDocument(models.Model):
     # Documents widget of the record holding them
     # ------------------------------------------------------------------
 
-    def _om_board_values(self):
+    def _board_values(self):
         self.ensure_one()
         return {
             'id': self.id,
@@ -262,7 +262,7 @@ class OmDocument(models.Model):
         }
 
     @api.model
-    def om_board_data(self, res_model, res_id):
+    def board_data(self, res_model, res_id):
         """ :return: the documents of a record and the types it has no document of yet, for its widget """
         record = self.env[res_model].browse(res_id).exists()
         if not record:
@@ -271,17 +271,17 @@ class OmDocument(models.Model):
         documents = self.search([('res_model', '=', res_model), ('res_id', '=', res_id)],
                                 order='type_id, date_expiry desc, id desc')
         company = record.company_id if 'company_id' in record._fields and record.company_id else self.env.company
-        types = self.env['om.document.type'].search([
+        types = self.env['document.type'].search([
             ('res_model', '=', res_model), '|', ('company_id', '=', False), ('company_id', '=', company.id)])
         return {
-            'documents': [document._om_board_values() for document in documents],
+            'documents': [document._board_values() for document in documents],
             'missing': [{'id': doc_type.id, 'name': doc_type.name, 'description': doc_type.description or ''}
                         for doc_type in types - documents.type_id],
             'can_edit': self.has_access('create'),
         }
 
     @api.model
-    def om_board_upload(self, res_model, res_id, type_id, document_id, files):
+    def board_upload(self, res_model, res_id, type_id, document_id, files):
         """ Attach files dropped on the widget: to the document, or to a new document of the type.
 
         :param files: list of dicts with the name, the mimetype and the base64 data of each file
@@ -347,7 +347,7 @@ class OmDocument(models.Model):
     @api.model
     def _cron_send_reminders(self):
         today = fields.Date.context_today(self)
-        types = self.env['om.document.type'].search([('has_expiry_date', '=', True)])
+        types = self.env['document.type'].search([('has_expiry_date', '=', True)])
         horizon = today + timedelta(days=max([max(t._get_reminder_days() or [0]) for t in types] or [0]))
         documents = self.search([('type_id', 'in', types.ids), ('date_expiry', '!=', False),
                                  ('date_expiry', '<=', horizon)])

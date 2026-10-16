@@ -7,7 +7,7 @@ import { getDataURLFromFile } from "@web/core/utils/urls";
 import { FormViewDialog } from "@web/views/view_dialogs/form_view_dialog";
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
 
-const MODEL = "om.document";
+const MODEL = "document.document";
 
 /**
  * The documents of a record as cards: one per document, coloured by how close
@@ -49,7 +49,7 @@ export class DocumentBoardField extends Component {
         if (!this.resId) {
             return;
         }
-        const data = await this.orm.call(MODEL, "om_board_data", [this.resModel, this.resId]);
+        const data = await this.orm.call(MODEL, "board_data", [this.resModel, this.resId]);
         Object.assign(this.state, { documents: data.documents, missing: data.missing, canEdit: data.can_edit });
     }
 
@@ -159,7 +159,7 @@ export class DocumentBoardField extends Component {
                 mimetype: file.type,
                 data: (await getDataURLFromFile(file)).split(",")[1],
             })));
-            const documentId = await this.orm.call(MODEL, "om_board_upload", [
+            const documentId = await this.orm.call(MODEL, "board_upload", [
                 this.resModel, this.resId, type ? type.id : false, doc ? doc.id : false, files,
             ]);
             await this.refresh();

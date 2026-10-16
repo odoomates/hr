@@ -1,3 +1,3 @@
-from . import om_document_type
-from . import om_document
-from . import om_document_mixin
+from . import document_type
+from . import document
+from . import document_mixin

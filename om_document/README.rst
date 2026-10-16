@@ -33,7 +33,7 @@ Features
 * Multi-company: a document belongs to the company of its record; a type
   without a company is shared by all the companies.
 * Another module makes any model keep documents by inheriting
-  ``om.document.mixin``, as HR Documents does for the employees. The model
+  ``document.mixin``, as HR Documents does for the employees. The model
   names who is reminded in ``_document_responsible_users`` and who holds the
   documents in ``_document_holder_partner``.
 
