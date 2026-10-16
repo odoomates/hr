@@ -13,7 +13,7 @@ class TestOvertimeRequest(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.env.company.om_overtime_preapproval = True
+        cls.env.company.overtime_preapproval = True
         cls.manager_user = new_test_user(cls.env, 'om_ot_manager',
                                          groups='base.group_user,hr_attendance.group_hr_attendance_officer')
         cls.employee_user = new_test_user(cls.env, 'om_ot_employee', groups='base.group_user')
@@ -38,7 +38,7 @@ class TestOvertimeRequest(TransactionCase):
         })
 
     def request(self, hours):
-        request = self.env['om.hr.overtime.request'].with_user(self.employee_user).create(
+        request = self.env['hr.overtime.request'].with_user(self.employee_user).create(
             {'employee_id': self.employee.id, 'date': DAY, 'hours': hours, 'reason': 'Month end'})
         request.action_submit()
         return request
@@ -52,7 +52,7 @@ class TestOvertimeRequest(TransactionCase):
                                                  ('time_rule_id', '=', self.rule.id)], order='check_in')
 
     def summary(self):
-        return [(round((a.check_out - a.check_in).total_seconds() / 3600, 2), a.state, a.om_overtime_status)
+        return [(round((a.check_out - a.check_in).total_seconds() / 3600, 2), a.state, a.overtime_status)
                 for a in self.overtime()]
 
     def test_not_authorised_waits(self):
@@ -83,8 +83,8 @@ class TestOvertimeRequest(TransactionCase):
         self.work_twelve_hours()
         overtime = self.overtime()
         with self.assertRaises(UserError):
-            overtime.with_user(self.employee_user).action_om_overtime_accept()
-        overtime.with_user(self.manager_user).action_om_overtime_accept()
+            overtime.with_user(self.employee_user).action_overtime_accept()
+        overtime.with_user(self.manager_user).action_overtime_accept()
         self.assertEqual({(state, status) for _h, state, status in self.summary()}, {('validated', 'accepted')})
         self.request(1).with_user(self.manager_user).action_approval_approve()
         self.assertEqual({status for _h, _state, status in self.summary()}, {'accepted'},
@@ -92,13 +92,13 @@ class TestOvertimeRequest(TransactionCase):
 
     def test_manager_rejects(self):
         self.work_twelve_hours()
-        self.overtime().with_user(self.manager_user).action_om_overtime_reject()
+        self.overtime().with_user(self.manager_user).action_overtime_reject()
         self.assertEqual({(state, status) for _h, state, status in self.summary()}, {('refused', 'rejected')})
         self.request(2).with_user(self.manager_user).action_approval_approve()
         self.assertEqual({status for _h, _state, status in self.summary()}, {'rejected'})
 
     def test_without_preapproval(self):
-        self.env.company.om_overtime_preapproval = False
+        self.env.company.overtime_preapproval = False
         self.work_twelve_hours()
         self.assertEqual({(state, status) for _h, state, status in self.summary()}, {('validated', False)})
 

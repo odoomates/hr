@@ -2,8 +2,8 @@
 <odoo>
 
     <record id="om_hr_overtime_request_view_list" model="ir.ui.view">
-        <field name="name">om.hr.overtime.request.view.list</field>
-        <field name="model">om.hr.overtime.request</field>
+        <field name="name">hr.overtime.request.view.list</field>
+        <field name="model">hr.overtime.request</field>
         <field name="arch" type="xml">
             <list string="Overtime Requests">
                 <field name="date"/>
@@ -19,8 +19,8 @@
     </record>
 
     <record id="om_hr_overtime_request_view_form" model="ir.ui.view">
-        <field name="name">om.hr.overtime.request.view.form</field>
-        <field name="model">om.hr.overtime.request</field>
+        <field name="name">hr.overtime.request.view.form</field>
+        <field name="model">hr.overtime.request</field>
         <field name="arch" type="xml">
             <form string="Overtime Request">
                 <header>
@@ -58,8 +58,8 @@
     </record>
 
     <record id="om_hr_overtime_request_view_search" model="ir.ui.view">
-        <field name="name">om.hr.overtime.request.view.search</field>
-        <field name="model">om.hr.overtime.request</field>
+        <field name="name">hr.overtime.request.view.search</field>
+        <field name="model">hr.overtime.request</field>
         <field name="arch" type="xml">
             <search string="Overtime Requests">
                 <field name="employee_id"/>
@@ -77,7 +77,7 @@
 
     <record id="om_hr_overtime_request_action" model="ir.actions.act_window">
         <field name="name">Overtime Requests</field>
-        <field name="res_model">om.hr.overtime.request</field>
+        <field name="res_model">hr.overtime.request</field>
         <field name="view_mode">list,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">Authorise overtime in advance</p>
@@ -88,7 +88,7 @@
 
     <record id="om_hr_overtime_request_action_my" model="ir.actions.act_window">
         <field name="name">My Overtime Requests</field>
-        <field name="res_model">om.hr.overtime.request</field>
+        <field name="res_model">hr.overtime.request</field>
         <field name="view_mode">list,form</field>
         <field name="domain">[('employee_id.user_id', '=', uid)]</field>
         <field name="help" type="html">
@@ -104,9 +104,9 @@
         <field name="arch" type="xml">
             <list string="Overtime to Review" create="0" edit="0">
                 <header>
-                    <button name="action_om_overtime_accept" type="object" string="Accept"
+                    <button name="action_overtime_accept" type="object" string="Accept"
                             groups="hr_attendance.group_hr_attendance_officer"/>
-                    <button name="action_om_overtime_reject" type="object" string="Reject"
+                    <button name="action_overtime_reject" type="object" string="Reject"
                             groups="hr_attendance.group_hr_attendance_officer"/>
                 </header>
                 <field name="date"/>
@@ -115,13 +115,13 @@
                 <field name="check_out"/>
                 <field name="worked_hours" widget="float_time" string="Hours" sum="Total"/>
                 <field name="time_rule_id"/>
-                <field name="om_overtime_status" widget="badge" decoration-warning="om_overtime_status == 'pending'"
-                       decoration-success="om_overtime_status in ('authorised', 'accepted')"
-                       decoration-danger="om_overtime_status == 'rejected'"/>
-                <button name="action_om_overtime_accept" type="object" string="Accept" icon="check"
-                        invisible="om_overtime_status != 'pending'" groups="hr_attendance.group_hr_attendance_officer"/>
-                <button name="action_om_overtime_reject" type="object" string="Reject" icon="close"
-                        invisible="om_overtime_status != 'pending'" groups="hr_attendance.group_hr_attendance_officer"/>
+                <field name="overtime_status" widget="badge" decoration-warning="overtime_status == 'pending'"
+                       decoration-success="overtime_status in ('authorised', 'accepted')"
+                       decoration-danger="overtime_status == 'rejected'"/>
+                <button name="action_overtime_accept" type="object" string="Accept" icon="check"
+                        invisible="overtime_status != 'pending'" groups="hr_attendance.group_hr_attendance_officer"/>
+                <button name="action_overtime_reject" type="object" string="Reject" icon="close"
+                        invisible="overtime_status != 'pending'" groups="hr_attendance.group_hr_attendance_officer"/>
             </list>
         </field>
     </record>
@@ -131,7 +131,7 @@
         <field name="res_model">hr.attendance</field>
         <field name="view_mode">list</field>
         <field name="view_id" ref="hr_attendance_view_list_om_overtime"/>
-        <field name="domain">[('om_overtime_status', '!=', False)]</field>
+        <field name="domain">[('overtime_status', '!=', False)]</field>
         <field name="context">{'search_default_om_overtime_pending': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">No overtime beyond what was approved</p>
@@ -145,7 +145,7 @@
         <field name="arch" type="xml">
             <xpath expr="//search" position="inside">
                 <filter string="Overtime Not Authorised" name="om_overtime_pending"
-                        domain="[('om_overtime_status', '=', 'pending')]"/>
+                        domain="[('overtime_status', '=', 'pending')]"/>
             </xpath>
         </field>
     </record>
@@ -158,7 +158,7 @@
             <block name="attendance_settings" position="inside">
                 <setting string="Overtime Needs Pre-Approval" company_dependent="1"
                          help="The overtime of the time rules is accepted up to the hours approved in advance; beyond, it waits for the manager. Only accepted overtime is paid.">
-                    <field name="om_overtime_preapproval"/>
+                    <field name="overtime_preapproval"/>
                 </setting>
             </block>
         </field>

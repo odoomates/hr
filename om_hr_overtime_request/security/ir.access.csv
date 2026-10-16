@@ -1,6 +1,6 @@
 id,name,model_id,group_id/id,operation,domain
-access_request_read,om.hr.overtime.request.read,om.hr.overtime.request,base.group_user,r,"['|', '|', ('employee_id.user_id', '=', user.id), ('employee_id.parent_id.user_id', '=', user.id), ('approval_request_ids.line_ids.approver_user_ids', 'in', user.id)]"
-access_request_draft,om.hr.overtime.request.draft,om.hr.overtime.request,base.group_user,cud,"[('state', '=', 'draft'), '|', ('employee_id.user_id', '=', user.id), ('employee_id.parent_id.user_id', '=', user.id)]"
-access_request_officer,om.hr.overtime.request.officer,om.hr.overtime.request,hr_attendance.group_hr_attendance_officer,crud,"[('employee_id.attendance_manager_id', '=', user.id)]"
-access_request_user,om.hr.overtime.request.user,om.hr.overtime.request,hr_attendance.group_hr_attendance_user,crud,
-request_company_rule,Overtime requests: multi-company,om.hr.overtime.request,,crud,"[('company_id', 'in', company_ids)]"
+access_request_read,hr.overtime.request.read,hr.overtime.request,base.group_user,r,"['|', '|', ('employee_id.user_id', '=', user.id), ('employee_id.parent_id.user_id', '=', user.id), ('approval_request_ids.line_ids.approver_user_ids', 'in', user.id)]"
+access_request_draft,hr.overtime.request.draft,hr.overtime.request,base.group_user,cud,"[('state', '=', 'draft'), '|', ('employee_id.user_id', '=', user.id), ('employee_id.parent_id.user_id', '=', user.id)]"
+access_request_officer,hr.overtime.request.officer,hr.overtime.request,hr_attendance.group_hr_attendance_officer,crud,"[('employee_id.attendance_manager_id', '=', user.id)]"
+access_request_user,hr.overtime.request.user,hr.overtime.request,hr_attendance.group_hr_attendance_user,crud,
+request_company_rule,Overtime requests: multi-company,hr.overtime.request,,crud,"[('company_id', 'in', company_ids)]"

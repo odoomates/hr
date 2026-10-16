@@ -5,7 +5,7 @@ from odoo.exceptions import UserError, ValidationError
 class ResCompany(models.Model):
     _inherit = 'res.company'
 
-    om_overtime_preapproval = fields.Boolean(
+    overtime_preapproval = fields.Boolean(
         string='Overtime Needs Pre-Approval',
         help='Overtime beyond the hours approved in advance waits for the manager to accept or reject it.')
 
@@ -13,14 +13,14 @@ class ResCompany(models.Model):
 class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
-    om_overtime_preapproval = fields.Boolean(related='company_id.om_overtime_preapproval', readonly=False)
+    overtime_preapproval = fields.Boolean(related='company_id.overtime_preapproval', readonly=False)
 
 
-class OmHrOvertimeRequest(models.Model):
+class HrOvertimeRequest(models.Model):
     """ Overtime authorised in advance: asked by the employee or by the manager, approved along its flow. The
     overtime of the day is accepted up to the approved hours. """
-    _name = 'om.hr.overtime.request'
-    _inherit = ['om.approval.mixin']
+    _name = 'hr.overtime.request'
+    _inherit = ['approval.mixin']
     _description = 'Overtime Request'
     _order = 'date desc, id desc'
     _mail_post_access = 'read'
@@ -70,7 +70,7 @@ class OmHrOvertimeRequest(models.Model):
     def _on_approval_approved(self, request):
         super()._on_approval_approved(request)
         self.sudo().state = 'approved'
-        self.env['hr.attendance']._om_overtime_review({(r.employee_id, r.date) for r in self.sudo()})
+        self.env['hr.attendance']._overtime_review({(r.employee_id, r.date) for r in self.sudo()})
 
     def _on_approval_refused(self, request):
         super()._on_approval_refused(request)
@@ -89,9 +89,9 @@ class OmHrOvertimeRequest(models.Model):
             if not self.env.user.has_group('hr_attendance.group_hr_attendance_officer'):
                 raise UserError(_('An approved overtime is withdrawn by the attendance officers.'))
             approved.sudo().write({'state': 'cancel', 'approval_state': 'cancel'})
-            self.env['hr.attendance']._om_overtime_review({(r.employee_id, r.date) for r in approved.sudo()})
+            self.env['hr.attendance']._overtime_review({(r.employee_id, r.date) for r in approved.sudo()})
         others = self - approved
         if others:
-            super(OmHrOvertimeRequest, others).action_approval_cancel()
+            super(HrOvertimeRequest, others).action_approval_cancel()
             others.sudo().state = 'cancel'
         return True
