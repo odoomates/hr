@@ -104,7 +104,7 @@
                     <widget name="web_ribbon" title="Important" bg_color="text-bg-warning" invisible="not pinned"/>
                     <div class="oe_title">
                         <h1><field name="name" readonly="1"/></h1>
-                        <div class="text-muted"><field name="date_start" widget="date" readonly="1"/></div>
+                        <div class="text-muted"><field name="date_start" widget="datetime" options="{'show_time': false}" readonly="1"/></div>
                     </div>
                     <field name="body" readonly="1"/>
                     <field name="attachment_ids" widget="many2many_binary" readonly="1" invisible="not attachment_ids"/>
@@ -128,7 +128,7 @@
                             <field name="name" class="fw-bold flex-grow-1"
                                    t-att-class="record.my_state.raw_value == 'unread' and 'text-primary' or ''"/>
                         </div>
-                        <field name="date_start" widget="date" class="small text-muted"/>
+                        <field name="date_start" widget="datetime" options="{'show_time': false}" class="small text-muted"/>
                         <div class="d-flex gap-1 mt-1">
                             <span t-if="record.my_state.raw_value == 'unread'" class="badge text-bg-info">Unread</span>
                             <span t-if="record.requires_ack.raw_value and record.my_state.raw_value != 'acknowledged'"
@@ -150,7 +150,7 @@
             <list string="Announcements" decoration-muted="state == 'expired'" decoration-bf="pinned">
                 <field name="name"/>
                 <field name="audience"/>
-                <field name="date_start" widget="date"/>
+                <field name="date_start" widget="datetime" options="{'show_time': false}"/>
                 <field name="date_end" optional="show"/>
                 <field name="pinned" optional="hide"/>
                 <field name="recipient_count" optional="show"/>

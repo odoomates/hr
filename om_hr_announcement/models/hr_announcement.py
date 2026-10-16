@@ -4,28 +4,18 @@ from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 from odoo.fields import Domain
 
-AUDIENCES = [
-    ('company', 'The Whole Company'),
-    ('department', 'Departments'),
-    ('job', 'Job Positions'),
-    ('tag', 'Employee Tags'),
-    ('employee', 'Employees'),
-]
-
 
 class HrAnnouncement(models.Model):
     """ A notice to the employees of a company, of departments, of job positions, of tags, or to some employees:
     published, it reaches each of them, who read it and, when asked, acknowledge it. """
     _name = 'hr.announcement'
-    _inherit = ['mail.thread']
+    _inherit = ['mail.thread', 'hr.audience.mixin']
     _description = 'Announcement'
     _order = 'pinned desc, date_start desc, id desc'
 
     name = fields.Char(string='Title', required=True, translate=True, tracking=True)
     body = fields.Html(translate=True, sanitize_style=True)
     attachment_ids = fields.Many2many('ir.attachment', string='Attachments')
-    company_id = fields.Many2one('res.company', string='Company', required=True, index=True,
-                                 default=lambda self: self.env.company)
     pinned = fields.Boolean(string='Important', tracking=True,
                             help='Shown first and highlighted, in My HR and in the top bar.')
     requires_ack = fields.Boolean(string='Requires Acknowledgement', tracking=True,
@@ -44,14 +34,7 @@ class HrAnnouncement(models.Model):
     ], required=True, default='draft', index=True, tracking=True, copy=False)
     date_published = fields.Datetime(string='Published On', readonly=True, copy=False)
     date_reminded = fields.Datetime(string='Reminded On', readonly=True, copy=False)
-    audience = fields.Selection(AUDIENCES, required=True, default='company')
-    department_ids = fields.Many2many('hr.department', string='Departments',
-                                      help='Their sub-departments included.')
-    job_ids = fields.Many2many('hr.job', string='Job Positions')
-    category_ids = fields.Many2many('hr.employee.category', string='Employee Tags')
-    employee_ids = fields.Many2many('hr.employee', string='Employees')
     recipient_ids = fields.One2many('hr.announcement.read', 'announcement_id', string='Recipients', copy=False)
-    audience_count = fields.Integer(compute='_compute_audience_count', string='Employees Reached')
     recipient_count = fields.Integer(compute='_compute_rates', string='Number of Recipients')
     read_count = fields.Integer(compute='_compute_rates', string='Read')
     ack_count = fields.Integer(compute='_compute_rates', string='Acknowledged')
@@ -59,11 +42,6 @@ class HrAnnouncement(models.Model):
     ack_rate = fields.Float(compute='_compute_rates', string='Acknowledged (%)')
     my_state = fields.Selection([('unread', 'Unread'), ('read', 'Read'), ('acknowledged', 'Acknowledged')],
                                 compute='_compute_my_state', search='_search_my_state', string='My Status')
-
-    @api.depends('audience', 'department_ids', 'job_ids', 'category_ids', 'employee_ids', 'company_id')
-    def _compute_audience_count(self):
-        for announcement in self:
-            announcement.audience_count = len(announcement._audience())
 
     @api.depends('recipient_ids.read_date', 'recipient_ids.ack_date')
     def _compute_rates(self):
@@ -127,27 +105,6 @@ class HrAnnouncement(models.Model):
     def _managed_departments(self):
         managed = self.env['hr.department'].sudo().search([('manager_id.user_id', '=', self.env.uid)])
         return self.env['hr.department'].sudo().search([('id', 'child_of', managed.ids)])
-
-    # ------------------------------------------------------------------
-    # Audience
-    # ------------------------------------------------------------------
-
-    def _audience(self):
-        """ :return: the employees the announcement is for """
-        self.ensure_one()
-        Employee = self.env['hr.employee'].sudo()
-        domain = [('company_id', '=', self.company_id.id)]
-        if self.audience == 'department':
-            if not self.department_ids:
-                return Employee
-            domain.append(('department_id', 'child_of', self.department_ids.ids))
-        elif self.audience == 'job':
-            domain.append(('job_id', 'in', self.job_ids.ids))
-        elif self.audience == 'tag':
-            domain.append(('category_ids', 'in', self.category_ids.ids))
-        elif self.audience == 'employee':
-            domain.append(('id', 'in', self.employee_ids.ids))
-        return Employee.search(domain)
 
     # ------------------------------------------------------------------
     # Publishing
