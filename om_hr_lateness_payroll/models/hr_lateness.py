@@ -28,7 +28,7 @@ class HrLateness(models.Model):
     _inherit = 'hr.lateness'
 
     adjustment_id = fields.Many2one('hr.payroll.adjustment', string='Payroll Adjustment', ondelete='set null',
-                                    index=True, copy=False)
+                                    index=True, copy=False, check_company=True)
     currency_id = fields.Many2one(related='company_id.currency_id')
     penalty_amount = fields.Monetary(copy=False,
                                      help='Set when the penalties of the month become a payroll adjustment.')
