@@ -1,12 +1,12 @@
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
-from ..models.om_hr_asset_assignment import CONDITIONS
+from ..models.hr_asset_assignment import CONDITIONS
 
 
-class OmHrAssetWizard(models.TransientModel):
+class HrAssetWizard(models.TransientModel):
     """ Hand an asset over to an employee, take it back, or report it lost. """
-    _name = 'om.hr.asset.wizard'
+    _name = 'hr.asset.wizard'
     _description = 'Assign or Return an Asset'
 
     mode = fields.Selection([('assign', 'Assign'), ('return', 'Return'), ('lost', 'Report Lost')], required=True)
@@ -34,16 +34,16 @@ class OmHrAssetWizard(models.TransientModel):
         if self.mode == 'assign':
             if not self.employee_id:
                 raise UserError(_('Choose the employee receiving %s.', equipment.name))
-            if equipment.om_lost:
+            if equipment.lost:
                 raise UserError(_('%s is reported lost.', equipment.name))
-            equipment._om_open_assignments().sudo()._close(date=self.date, note=_('Handed over to %s.', self.employee_id.name))
+            equipment._open_assignments().sudo()._close(date=self.date, note=_('Handed over to %s.', self.employee_id.name))
             equipment.with_context(om_asset_no_log=True).write({
                 'employee_id': self.employee_id.id, 'equipment_assign_to': 'employee'})
-            assignment = equipment._om_open_assignment({
+            assignment = equipment._open_assignment({
                 'date_from': self.date, 'condition_out': self.condition, 'note': self.note,
                 'handed_by_id': self.env.user.id})
             return assignment.action_print_handover() or True
-        open_assignments = equipment._om_open_assignments()
+        open_assignments = equipment._open_assignments()
         if not open_assignments:
             raise UserError(_('%s is not assigned.', equipment.name))
         if self.mode == 'return':
@@ -58,7 +58,7 @@ class OmHrAssetWizard(models.TransientModel):
         else:
             open_assignments._close('lost', self.date, False, self.note, self.charge_amount)
             equipment.with_context(om_asset_no_log=True).write({
-                'employee_id': False, 'om_lost': True, 'scrap_date': self.date})
+                'employee_id': False, 'lost': True, 'scrap_date': self.date})
             equipment.message_post(body=_('Reported lost by %(user)s while held by %(employee)s.',
                                           user=self.env.user.name, employee=open_assignments.employee_id.name))
         return True

@@ -2,8 +2,8 @@
 <odoo>
 
     <record id="om_hr_asset_assignment_view_form" model="ir.ui.view">
-        <field name="name">om.hr.asset.assignment.view.form</field>
-        <field name="model">om.hr.asset.assignment</field>
+        <field name="name">hr.asset.assignment.view.form</field>
+        <field name="model">hr.asset.assignment</field>
         <field name="arch" type="xml">
             <form string="Asset Assignment" create="0">
                 <header>
@@ -42,8 +42,8 @@
     </record>
 
     <record id="om_hr_asset_assignment_view_list" model="ir.ui.view">
-        <field name="name">om.hr.asset.assignment.view.list</field>
-        <field name="model">om.hr.asset.assignment</field>
+        <field name="name">hr.asset.assignment.view.list</field>
+        <field name="model">hr.asset.assignment</field>
         <field name="arch" type="xml">
             <list string="Asset Assignments" create="0" decoration-danger="state == 'lost'"
                   decoration-muted="state == 'returned'">
@@ -65,8 +65,8 @@
     </record>
 
     <record id="om_hr_asset_assignment_view_search" model="ir.ui.view">
-        <field name="name">om.hr.asset.assignment.view.search</field>
-        <field name="model">om.hr.asset.assignment</field>
+        <field name="name">hr.asset.assignment.view.search</field>
+        <field name="model">hr.asset.assignment</field>
         <field name="arch" type="xml">
             <search>
                 <field name="equipment_id"/>
@@ -88,7 +88,7 @@
 
     <record id="om_hr_asset_assignment_action" model="ir.actions.act_window">
         <field name="name">Assignments</field>
-        <field name="res_model">om.hr.asset.assignment</field>
+        <field name="res_model">hr.asset.assignment</field>
         <field name="view_mode">list,form</field>
         <field name="context">{'search_default_assigned': 1}</field>
         <field name="help" type="html">
@@ -99,7 +99,7 @@
 
     <record id="om_hr_asset_assignment_action_my" model="ir.actions.act_window">
         <field name="name">My Assets</field>
-        <field name="res_model">om.hr.asset.assignment</field>
+        <field name="res_model">hr.asset.assignment</field>
         <field name="view_mode">list,form</field>
         <field name="domain">[('employee_id.user_id', '=', uid)]</field>
         <field name="context">{'search_default_assigned': 1}</field>
@@ -110,8 +110,8 @@
     </record>
 
     <record id="om_hr_asset_wizard_view_form" model="ir.ui.view">
-        <field name="name">om.hr.asset.wizard.view.form</field>
-        <field name="model">om.hr.asset.wizard</field>
+        <field name="name">hr.asset.wizard.view.form</field>
+        <field name="model">hr.asset.wizard</field>
         <field name="arch" type="xml">
             <form string="Asset">
                 <field name="mode" invisible="1"/>

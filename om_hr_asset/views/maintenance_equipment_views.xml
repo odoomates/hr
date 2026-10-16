@@ -8,27 +8,27 @@
         <field name="arch" type="xml">
             <xpath expr="//form/sheet" position="before">
                 <header>
-                    <button name="action_om_assign" string="Assign" type="object" class="btn-primary"
-                            invisible="employee_id or om_lost" groups="maintenance.group_equipment_manager"/>
-                    <button name="action_om_assign" string="Reassign" type="object"
+                    <button name="action_assign" string="Assign" type="object" class="btn-primary"
+                            invisible="employee_id or lost" groups="maintenance.group_equipment_manager"/>
+                    <button name="action_assign" string="Reassign" type="object"
                             invisible="not employee_id" groups="maintenance.group_equipment_manager"/>
-                    <button name="action_om_return" string="Return" type="object" class="btn-primary"
+                    <button name="action_return" string="Return" type="object" class="btn-primary"
                             invisible="not employee_id" groups="maintenance.group_equipment_manager"/>
-                    <button name="action_om_lost" string="Report Lost" type="object"
+                    <button name="action_lost" string="Report Lost" type="object"
                             invisible="not employee_id" groups="maintenance.group_equipment_manager"/>
-                    <button name="action_om_found" string="Found" type="object" invisible="not om_lost"
+                    <button name="action_found" string="Found" type="object" invisible="not lost"
                             groups="maintenance.group_equipment_manager"/>
-                    <field name="om_asset_state" widget="statusbar" statusbar_visible="available,assigned"/>
+                    <field name="asset_state" widget="statusbar" statusbar_visible="available,assigned"/>
                 </header>
             </xpath>
             <div name="button_box" position="inside">
-                <button name="action_om_open_assignments" type="object" class="oe_stat_button" icon="history">
-                    <field name="om_assignment_count" widget="statinfo" string="History"/>
+                <button name="action_open_assignments" type="object" class="oe_stat_button" icon="history">
+                    <field name="assignment_count" widget="statinfo" string="History"/>
                 </button>
             </div>
             <widget name="web_ribbon" position="after">
-                <widget name="web_ribbon" title="Lost" bg_color="text-bg-danger" invisible="not om_lost"/>
-                <field name="om_lost" invisible="1"/>
+                <widget name="web_ribbon" title="Lost" bg_color="text-bg-danger" invisible="not lost"/>
+                <field name="lost" invisible="1"/>
             </widget>
         </field>
     </record>
@@ -40,9 +40,9 @@
         <field name="arch" type="xml">
             <xpath expr="//search" position="inside">
                 <separator/>
-                <filter name="om_available" string="Available" domain="[('om_asset_state', '=', 'available')]"/>
-                <filter name="om_assigned" string="Assigned" domain="[('om_asset_state', '=', 'assigned')]"/>
-                <filter name="om_lost" string="Lost" domain="[('om_asset_state', '=', 'lost')]"/>
+                <filter name="om_available" string="Available" domain="[('asset_state', '=', 'available')]"/>
+                <filter name="om_assigned" string="Assigned" domain="[('asset_state', '=', 'assigned')]"/>
+                <filter name="lost" string="Lost" domain="[('asset_state', '=', 'lost')]"/>
             </xpath>
         </field>
     </record>

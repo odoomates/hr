@@ -4,30 +4,30 @@ from odoo import _, api, fields, models
 class MaintenanceEquipment(models.Model):
     _inherit = 'maintenance.equipment'
 
-    om_assignment_ids = fields.One2many('om.hr.asset.assignment', 'equipment_id', string='Assignments')
-    om_assignment_count = fields.Integer(compute='_compute_om_assignment_count')
-    om_lost = fields.Boolean(string='Lost', copy=False, tracking=True)
-    om_asset_state = fields.Selection([
+    assignment_ids = fields.One2many('hr.asset.assignment', 'equipment_id', string='Assignments')
+    assignment_count = fields.Integer(compute='_compute_assignment_count')
+    lost = fields.Boolean(string='Lost', copy=False, tracking=True)
+    asset_state = fields.Selection([
         ('available', 'Available'),
         ('assigned', 'Assigned'),
         ('lost', 'Lost'),
-    ], string='Asset Status', compute='_compute_om_asset_state', store=True)
+    ], string='Asset Status', compute='_compute_asset_state', store=True)
 
-    @api.depends('om_assignment_ids')
-    def _compute_om_assignment_count(self):
+    @api.depends('assignment_ids')
+    def _compute_assignment_count(self):
         for equipment in self:
-            equipment.om_assignment_count = len(equipment.om_assignment_ids)
+            equipment.assignment_count = len(equipment.assignment_ids)
 
-    @api.depends('employee_id', 'om_lost')
-    def _compute_om_asset_state(self):
+    @api.depends('employee_id', 'lost')
+    def _compute_asset_state(self):
         for equipment in self:
-            equipment.om_asset_state = 'lost' if equipment.om_lost else \
+            equipment.asset_state = 'lost' if equipment.lost else \
                 'assigned' if equipment.employee_id else 'available'
 
     @api.model_create_multi
     def create(self, vals_list):
         equipments = super().create(vals_list)
-        equipments.filtered('employee_id')._om_open_assignment()
+        equipments.filtered('employee_id')._open_assignment()
         return equipments
 
     def write(self, vals):
@@ -38,56 +38,56 @@ class MaintenanceEquipment(models.Model):
         for equipment, previous in holders.items():
             if equipment.employee_id == previous:
                 continue
-            equipment._om_open_assignments().sudo()._close(note=_('Unassigned from the asset.'))
+            equipment._open_assignments().sudo()._close(note=_('Unassigned from the asset.'))
             if equipment.employee_id:
-                equipment._om_open_assignment()
+                equipment._open_assignment()
         return result
 
-    def _om_open_assignments(self):
-        return self.env['om.hr.asset.assignment'].search(
+    def _open_assignments(self):
+        return self.env['hr.asset.assignment'].search(
             [('equipment_id', 'in', self.ids), ('state', '=', 'assigned')])
 
-    def _om_open_assignment(self, values=None):
+    def _open_assignment(self, values=None):
         """ The assignment of the asset to its employee, from today unless told otherwise. """
-        return self.env['om.hr.asset.assignment'].sudo().create([{
+        return self.env['hr.asset.assignment'].sudo().create([{
             'equipment_id': equipment.id,
             'employee_id': equipment.employee_id.id,
             **(values or {}),
         } for equipment in self])
 
-    def _om_open_wizard(self, mode):
+    def _open_wizard(self, mode):
         self.ensure_one()
         titles = {'assign': _('Assign %s', self.name), 'return': _('Return %s', self.name),
                   'lost': _('Report %s Lost', self.name)}
         return {
             'type': 'ir.actions.act_window',
             'name': titles[mode],
-            'res_model': 'om.hr.asset.wizard',
+            'res_model': 'hr.asset.wizard',
             'view_mode': 'form',
             'target': 'new',
             'context': {'default_equipment_id': self.id, 'default_mode': mode},
         }
 
-    def action_om_assign(self):
-        return self._om_open_wizard('assign')
+    def action_assign(self):
+        return self._open_wizard('assign')
 
-    def action_om_return(self):
-        return self._om_open_wizard('return')
+    def action_return(self):
+        return self._open_wizard('return')
 
-    def action_om_lost(self):
-        return self._om_open_wizard('lost')
+    def action_lost(self):
+        return self._open_wizard('lost')
 
-    def action_om_found(self):
+    def action_found(self):
         """ A lost asset turns up again: it is available. """
-        self.write({'om_lost': False, 'scrap_date': False})
+        self.write({'lost': False, 'scrap_date': False})
         return True
 
-    def action_om_open_assignments(self):
+    def action_open_assignments(self):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
             'name': _('History of %s', self.name),
-            'res_model': 'om.hr.asset.assignment',
+            'res_model': 'hr.asset.assignment',
             'view_mode': 'list,form',
             'domain': [('equipment_id', '=', self.id)],
             'context': {'create': False},

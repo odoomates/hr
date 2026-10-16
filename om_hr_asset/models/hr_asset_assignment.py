@@ -3,13 +3,13 @@ from odoo import _, api, fields, models
 CONDITIONS = [('new', 'New'), ('good', 'Good'), ('fair', 'Fair'), ('damaged', 'Damaged')]
 
 
-class OmHrAssetAssignment(models.Model):
+class HrAssetAssignment(models.Model):
     """ An asset in the hands of an employee, from the day it is handed over to the day it comes back or is lost.
 
     The current holder stays the employee of the equipment in core Maintenance: every change of it, made here or
     on the equipment, closes the assignment in progress and opens the next one.
     """
-    _name = 'om.hr.asset.assignment'
+    _name = 'hr.asset.assignment'
     _inherit = ['mail.thread']
     _description = 'Asset Assignment'
     _order = 'date_from desc, id desc'
