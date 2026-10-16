@@ -15,6 +15,11 @@
               parent="menu_om_approval_root"
               sequence="20"/>
 
+    <menuitem id="menu_approval_delegation_my"
+              action="approval_delegation_action_my"
+              parent="menu_om_approval_root"
+              sequence="25"/>
+
     <menuitem id="menu_om_approval_all"
               action="om_approval_request_action"
               parent="menu_om_approval_root"
@@ -31,5 +36,10 @@
               action="om_approval_flow_action"
               parent="menu_om_approval_configuration"
               sequence="10"/>
+
+    <menuitem id="menu_approval_delegation"
+              action="approval_delegation_action"
+              parent="menu_om_approval_configuration"
+              sequence="20"/>
 
 </odoo>

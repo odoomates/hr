@@ -123,6 +123,17 @@ class ApprovalStep(models.Model):
     domain = fields.Char(
         string='Only When', default='[]',
         help='The step is skipped for the records outside this domain, e.g. an amount above a threshold.')
+    remind_days = fields.Integer(string='Remind After', help='Days before the approvers are reminded, then again '
+                                                             'every as many days. 0 for no reminder.')
+    escalate_days = fields.Integer(string='Escalate After', help='Days before other users are asked to decide '
+                                                                 'too. 0 for no escalation.')
+    escalate_type = fields.Selection([
+        ('fallback', 'Fallback Group of the Flow'),
+        ('user', 'Given Users'),
+        ('group', 'Users of a Group'),
+    ], string='Escalate To', required=True, default=lambda self: self._default_escalate_type())
+    escalate_user_ids = fields.Many2many('res.users', 'approval_step_escalate_user_rel', string='Escalation Users')
+    escalate_group_id = fields.Many2one('res.groups', string='Escalation Group')
 
     @api.constrains('approver_type', 'group_id', 'user_ids', 'field_path')
     def _check_approver(self):
@@ -185,3 +196,23 @@ class ApprovalStep(models.Model):
 
     def _fallback_approvers(self, request):
         return request._fallback_approvers(self.flow_id.fallback_group_id)
+
+    @api.model
+    def _default_escalate_type(self):
+        return 'fallback'
+
+    def _escalation_users(self, line):
+        """ :return: the users asked to decide a step waiting too long """
+        self.ensure_one()
+        users = getattr(self, f'_escalate_{self.escalate_type}')(line)
+        return users.filtered(lambda user: user.active and not user.share) or \
+            self._escalate_fallback(line)
+
+    def _escalate_fallback(self, line):
+        return line.request_id._fallback_approvers(self.flow_id.fallback_group_id)
+
+    def _escalate_user(self, line):
+        return self.escalate_user_ids
+
+    def _escalate_group(self, line):
+        return self.escalate_group_id.all_user_ids

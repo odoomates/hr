@@ -1,4 +1,5 @@
 import logging
+from datetime import timedelta
 
 from odoo import api, fields, models
 from odoo.exceptions import UserError
@@ -184,7 +185,8 @@ class ApprovalRequest(models.Model):
     def action_approve(self):
         for request in self:
             line = request._check_approver()
-            line.sudo().write({'state': 'approved', 'user_id': self.env.user.id, 'date': fields.Datetime.now()})
+            line.sudo().write({'state': 'approved', 'user_id': self.env.user.id, 'date': fields.Datetime.now(),
+                               'note': line._on_behalf_note()})
             request.sudo().activity_feedback([ACTIVITY], feedback=self.env._('Approved'))
             request._next()
         return True
@@ -193,7 +195,7 @@ class ApprovalRequest(models.Model):
         for request in self:
             line = request._check_approver()
             line.sudo().write({'state': 'refused', 'user_id': self.env.user.id, 'date': fields.Datetime.now(),
-                               'note': reason})
+                               'note': '\n'.join(filter(None, [line._on_behalf_note(), reason]))})
             request.line_ids.filtered(lambda line: line.state == 'waiting').sudo().state = 'cancel'
             request.sudo().activity_unlink([ACTIVITY])
             request.sudo().state = 'refused'
@@ -257,10 +259,10 @@ class ApprovalRequest(models.Model):
         lines = self.line_ids.sorted(lambda line: (line.sequence, line.id))
         line = lines.filtered(lambda line: line.state == 'waiting')[:1]
         if line:
-            line.sudo().state = 'pending'
+            line.sudo().write({'state': 'pending', 'date_pending': fields.Datetime.now()})
             for user in line.approver_user_ids:
-                self.sudo().activity_schedule(ACTIVITY, summary=self.env._('Approve: %s', self.document_name),
-                                              user_id=user.id)
+                self._schedule_approval(user)
+            line._apply_delegations()
             return
         self.sudo().state = 'approved'
         self.sudo().message_post(body=self.env._('Approved.'), partner_ids=self.requester_id.partner_id.ids)
@@ -268,6 +270,11 @@ class ApprovalRequest(models.Model):
         self._call_document('_on_approval_approved')
         if self.method and self.flow_id.run_on_approval and self.requester_id != self.env.user:
             self._run_button()
+
+    def _schedule_approval(self, user):
+        self.ensure_one()
+        self.sudo().activity_schedule(ACTIVITY, summary=self.env._('Approve: %s', self.document_name),
+                                      user_id=user.id)
 
     def _run_button(self):
         """ Run the approved button as the requester. A failure, e.g. a record changed meanwhile, leaves the request
@@ -342,3 +349,67 @@ class ApprovalLine(models.Model):
     user_id = fields.Many2one('res.users', string='Decided By')
     date = fields.Datetime(string='Decided On')
     note = fields.Text()
+    date_pending = fields.Datetime(string='Asked On', readonly=True)
+    substitutes = fields.Json(readonly=True, help='The substitutes added, by user id: the names they stand for.')
+    date_reminded = fields.Datetime(string='Reminded On', readonly=True)
+    date_escalated = fields.Datetime(string='Escalated On', readonly=True)
+
+    # ------------------------------------------------------------------
+    # Substitutes and escalation
+    # ------------------------------------------------------------------
+
+    def _add_approvers(self, users, message):
+        """ Let `users` decide the step too: they get the activity, the request says why. """
+        self.ensure_one()
+        request = self.request_id
+        if not request.flow_id.self_approve:
+            users -= request._excluded_approvers()
+        users -= self.approver_user_ids
+        if not users:
+            return users
+        self.sudo().approver_user_ids = [(4, user.id) for user in users]
+        for user in users:
+            request._schedule_approval(user)
+        request.sudo().message_post(body=message, subtype_xmlid='mail.mt_note', partner_ids=users.partner_id.ids)
+        return users
+
+    def _apply_delegations(self):
+        """ Add the substitutes of the approvers away today. """
+        Delegation = self.env['approval.delegation']
+        for line in self.filtered(lambda line: line.state == 'pending'):
+            found = Delegation._substitutes(line.approver_user_ids, line.request_id.flow_id)
+            substitutes = dict(line.substitutes or {})
+            for delegate, stands_for in found.items():
+                message = self.env._('%(delegate)s approves %(step)s for %(users)s, away.', delegate=delegate.name,
+                                     step=line.name, users=', '.join(stands_for.mapped('name')))
+                if line._add_approvers(delegate, message):
+                    substitutes[str(delegate.id)] = stands_for.mapped('name')
+            if substitutes != (line.substitutes or {}):
+                line.sudo().substitutes = substitutes
+
+    def _on_behalf_note(self):
+        """ :return: the note of a decision taken by a substitute """
+        self.ensure_one()
+        names = (self.substitutes or {}).get(str(self.env.user.id))
+        return self.env._('On behalf of %s.', ', '.join(names)) if names else False
+
+    @api.model
+    def _cron_follow_up(self):
+        """ Every day: the substitutes of the approvers away from today, the reminders, the escalations. """
+        lines = self.sudo().search([('state', '=', 'pending'), ('request_id.state', '=', 'to_approve')])
+        lines._apply_delegations()
+        now = fields.Datetime.now()
+        for line in lines.filtered('step_id'):
+            step = line.step_id
+            asked = line.date_pending or line.create_date
+            if step.escalate_days and not line.date_escalated and asked <= now - timedelta(days=step.escalate_days):
+                users = step._escalation_users(line)
+                line._add_approvers(users, self.env._('%(step)s is waiting since %(days)s days: %(users)s asked to '
+                                                      'decide too.', step=line.name, days=step.escalate_days,
+                                                      users=', '.join(users.mapped('name'))))
+                line.sudo().date_escalated = now
+            elif step.remind_days and (line.date_reminded or asked) <= now - timedelta(days=step.remind_days):
+                line.request_id.sudo().message_post(
+                    body=self.env._('Reminder: %(step)s is waiting for your decision.', step=line.name),
+                    subtype_xmlid='mail.mt_note', partner_ids=line.approver_user_ids.partner_id.ids)
+                line.sudo().date_reminded = now

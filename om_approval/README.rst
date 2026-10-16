@@ -31,6 +31,18 @@ Features
 * Approvals > To Approve lists what waits for you, from every app; My Requests
   follows the approvals you asked for; All Requests shows them all to the
   approval administrators.
+* Delegations: an approver away names a substitute for a period, for every
+  flow or some of them (Approvals > My Delegations); the approval
+  administrators delegate for anyone. The substitute is asked the steps waiting
+  for the approver, decides "on behalf of" them, and the approver still can:
+  the first decision counts. The substitute of a substitute is followed too;
+  the requester never stands in for their own request unless the flow lets
+  them approve it.
+* A substitute set in the preferences of each user, suggested on their
+  delegations.
+* Reminders and escalation per step: the approvers are reminded after some
+  days, then other users are asked to decide too: given users, a group, or the
+  fallback group of the flow.
 * For developers: a model inheriting ``approval.mixin`` gets an approval of
   its own, submitted, approved, refused, cancelled or set back to draft.
 

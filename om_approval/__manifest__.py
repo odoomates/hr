@@ -16,6 +16,7 @@
         'wizard/om_approval_refuse_views.xml',
         'views/om_approval_flow_views.xml',
         'views/om_approval_request_views.xml',
+        'views/approval_delegation_views.xml',
         'views/menu.xml',
     ],
     'images': ['static/description/banner.gif'],

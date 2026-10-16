@@ -11,3 +11,6 @@ om_approval_request_company_rule,Approval requests: multi-company,approval.reque
 access_om_approval_line_user,approval.line.user,approval.line,base.group_user,r,"['|', ('request_id.requester_id', '=', user.id), ('request_id.line_ids.approver_user_ids', 'in', user.id)]"
 access_om_approval_line_manager,approval.line.manager,approval.line,group_approval_manager,r,
 access_om_approval_refuse_user,approval.refuse.user,approval.refuse,base.group_user,crud,
+access_approval_delegation_own,approval.delegation.own,approval.delegation,base.group_user,crud,"[('user_id', '=', user.id)]"
+access_approval_delegation_substitute,approval.delegation.substitute,approval.delegation,base.group_user,r,"[('delegate_id', '=', user.id)]"
+access_approval_delegation_manager,approval.delegation.manager,approval.delegation,group_approval_manager,crud,
