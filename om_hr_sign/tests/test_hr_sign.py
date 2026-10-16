@@ -204,7 +204,8 @@ class TestHrSign(TransactionCase):
         other_policy, other_version = self.policy(audience='employee', employee_ids=[Command.set(self.employee_b.ids)])
         other_version.action_publish()
         Assignment = self.env['hr.policy.assignment']
-        self.assertEqual(Assignment.with_user(self.user_a).search([]), self.assignment(version, self.employee_a))
+        mine = Assignment.with_user(self.user_a).search([('policy_id', 'in', (policy | other_policy).ids)])
+        self.assertEqual(mine, self.assignment(version, self.employee_a))
         self.assertEqual(policy.with_user(self.user_a).name, 'Code of Conduct')
         with self.assertRaises(AccessError):
             other_policy.with_user(self.user_a).read(['name'])

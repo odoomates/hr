@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- the code of conduct, read and agreed by the whole company: two employees answered already -->
+    <record id="demo_policy_conduct" model="hr.policy">
+        <field name="name">Code of Conduct</field>
+        <field name="answer_type">acknowledge</field>
+        <field name="audience">company</field>
+        <field name="due_days">14</field>
+        <field name="remind_days">7</field>
+    </record>
+    <record id="demo_policy_conduct_v1" model="hr.policy.version">
+        <field name="policy_id" ref="demo_policy_conduct"/>
+        <field name="body" type="html"><h3>Our code of conduct</h3>
+<p>We treat each other with respect, keep the information of our customers confidential, avoid conflicts of
+interest and speak up when something is wrong.</p></field>
+        <field name="change_note">First version.</field>
+    </record>
+    <record id="demo_assignment_conduct_admin" model="hr.policy.assignment">
+        <field name="version_id" ref="demo_policy_conduct_v1"/>
+        <field name="employee_id" ref="hr.employee_admin"/>
+        <field name="date_due" eval="(DateTime.today() + relativedelta(days=14)).strftime('%Y-%m-%d')"/>
+    </record>
+    <record id="demo_assignment_conduct_demo" model="hr.policy.assignment">
+        <field name="version_id" ref="demo_policy_conduct_v1"/>
+        <field name="employee_id" ref="hr.employee_qdp"/>
+        <field name="date_due" eval="(DateTime.today() + relativedelta(days=14)).strftime('%Y-%m-%d')"/>
+    </record>
+    <!-- published: the other employees are asked -->
+    <function model="hr.policy.version" name="action_publish" eval="[ref('demo_policy_conduct_v1')]"/>
+    <function model="hr.policy.assignment" name="action_acknowledge" uid="base.user_admin"
+              eval="[ref('demo_assignment_conduct_admin')]"/>
+    <function model="hr.policy.assignment" name="action_acknowledge" uid="base.user_demo"
+              eval="[ref('demo_assignment_conduct_demo')]"/>
+
+    <!-- the IT use policy of R&D, published, nobody answered yet -->
+    <record id="demo_policy_it" model="hr.policy">
+        <field name="name">IT Use</field>
+        <field name="answer_type">acknowledge</field>
+        <field name="audience">department</field>
+        <field name="department_ids" eval="[Command.set([ref('hr.dep_rd')])]"/>
+    </record>
+    <record id="demo_policy_it_v1" model="hr.policy.version">
+        <field name="policy_id" ref="demo_policy_it"/>
+        <field name="body" type="html"><p>Lock your screen when you leave your desk, use the password manager, and
+install software only from the company catalogue.</p></field>
+    </record>
+    <function model="hr.policy.version" name="action_publish" eval="[ref('demo_policy_it_v1')]"/>
+
+</odoo>

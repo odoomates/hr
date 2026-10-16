@@ -15,6 +15,7 @@
         'report/policy_report.xml',
         'views/hr_policy_views.xml',
     ],
+    'demo': ['demo/om_hr_sign_demo.xml'],
     'images': ['static/description/banner.gif'],
     'auto_install': True,
 }
