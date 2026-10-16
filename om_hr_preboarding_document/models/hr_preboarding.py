@@ -6,7 +6,7 @@ class HrPreboardingStep(models.Model):
 
     kind = fields.Selection(selection_add=[('document', 'Upload a Document')], ondelete={'document': 'cascade'})
     document_type_id = fields.Many2one(
-        'document.type', domain=[('res_model', '=', 'hr.employee')],
+        'document.type', domain=[('res_model', '=', 'hr.employee')], check_company=True,
         help='The document the new hire uploads, e.g. Passport. The step is done once a file is uploaded.')
 
     @api.model
