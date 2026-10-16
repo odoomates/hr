@@ -1,3 +1,3 @@
 id,name,model_id,group_id/id,operation,domain
-access_penalty_wizard,om.hr.lateness.penalty.wizard,om.hr.lateness.penalty.wizard,om_hr_payroll.group_hr_payroll_user,crud,
-access_lateness_payroll,om.hr.lateness.payroll,om.hr.lateness,om_hr_payroll.group_hr_payroll_user,r,
+access_penalty_wizard,hr.lateness.penalty.wizard,hr.lateness.penalty.wizard,om_hr_payroll.group_hr_payroll_user,crud,
+access_lateness_payroll,hr.lateness.payroll,hr.lateness,om_hr_payroll.group_hr_payroll_user,r,

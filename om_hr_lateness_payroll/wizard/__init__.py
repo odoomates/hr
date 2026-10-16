@@ -1,1 +1,1 @@
-from . import om_hr_lateness_penalty_wizard
+from . import hr_lateness_penalty_wizard

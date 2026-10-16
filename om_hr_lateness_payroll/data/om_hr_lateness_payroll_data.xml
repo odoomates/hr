@@ -3,15 +3,15 @@
 
     <record id="ir_cron_lateness_penalties" model="ir.cron">
         <field name="name">Lateness: penalties of the month before, as payroll adjustments</field>
-        <field name="model_id" ref="om_hr_lateness.model_om_hr_lateness"/>
+        <field name="model_id" ref="om_hr_lateness.model_hr_lateness"/>
         <field name="state">code</field>
-        <field name="code">model._cron_om_lateness_penalties()</field>
+        <field name="code">model._cron_lateness_penalties()</field>
         <field name="interval_number">1</field>
         <field name="interval_type">days</field>
     </record>
 
     <data noupdate="1">
-        <record id="adjustment_type_lateness" model="om.hr.payroll.adjustment.type">
+        <record id="adjustment_type_lateness" model="hr.payroll.adjustment.type">
             <field name="name">Lateness</field>
             <field name="code">ADJ_LATE</field>
             <field name="sequence">45</field>

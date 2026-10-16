@@ -22,7 +22,7 @@ class TestLatenessPayroll(TransactionCase):
                 for day in range(5)] + [
                 Command.create({'dayofweek': str(day), 'hour_from': 13, 'hour_to': 17, 'day_period': 'afternoon'})
                 for day in range(5)]})
-        cls.policy = cls.env['om.hr.lateness.policy'].create({
+        cls.policy = cls.env['hr.lateness.policy'].create({
             'name': 'Pay Policy', 'grace_in': 5, 'early_out': False, 'line_ids': [
                 Command.create({'minutes_from': 0, 'minutes_to': 30, 'occurrence': 1, 'penalty': 'fixed',
                                 'amount': 20}),
@@ -50,7 +50,7 @@ class TestLatenessPayroll(TransactionCase):
             'name': 'Lateness Structure', 'code': 'LATES', 'rule_ids': [Command.set((rules | net).ids)]})
         cls.employee = cls.env['hr.employee'].create({
             'name': 'Late Payee', 'tz': 'UTC', 'resource_calendar_id': cls.calendar.id,
-            'om_lateness_policy_id': cls.policy.id, 'date_version': date(2026, 1, 1),
+            'lateness_policy_id': cls.policy.id, 'date_version': date(2026, 1, 1),
             'contract_date_start': date(2026, 1, 1), 'wage': 3000.0, 'struct_id': cls.structure.id})
         cls.employee.version_id.resource_calendar_id = cls.calendar
 
@@ -66,11 +66,11 @@ class TestLatenessPayroll(TransactionCase):
         self.attend(9, 9, 0)    # 60 min: 1 h x 12.5 x 2
 
     def compute(self):
-        return self.env['om.hr.lateness'].with_user(self.officer)._om_compute_penalties(date(2026, 9, 1),
+        return self.env['hr.lateness'].with_user(self.officer)._compute_penalties(date(2026, 9, 1),
                                                                                         self.employee)
 
     def lateness(self):
-        return self.env['om.hr.lateness'].search([('employee_id', '=', self.employee.id)], order='date')
+        return self.env['hr.lateness'].search([('employee_id', '=', self.employee.id)], order='date')
 
     def payslip(self):
         with Form(self.env['hr.payslip']) as form:
@@ -86,7 +86,7 @@ class TestLatenessPayroll(TransactionCase):
         self.assertEqual((adjustment.type_id, adjustment.amount, adjustment.state),
                          (self.late_type, 55.0, 'running'))
         self.assertEqual(self.lateness().mapped('penalty_amount'), [20, 10, 25])
-        self.assertEqual(adjustment.om_lateness_ids, self.lateness())
+        self.assertEqual(adjustment.lateness_ids, self.lateness())
         self.assertIn('3 late arrivals', adjustment.description)
         self.assertEqual(self.compute(), adjustment, 'computed again: the same adjustment')
         payslip = self.payslip()
@@ -94,11 +94,11 @@ class TestLatenessPayroll(TransactionCase):
 
     def test_excuse_follows(self):
         adjustment = self.compute()
-        self.lateness()[1].with_user(self.officer)._om_excuse('Doctor')
+        self.lateness()[1].with_user(self.officer)._excuse('Doctor')
         self.assertEqual(adjustment.amount, 45, 'the excused 10 goes')
         self.assertEqual(self.lateness().mapped('penalty_amount'), [20, 0, 25])
-        self.lateness()[0].with_user(self.officer)._om_excuse('Traffic')
-        self.lateness()[2].with_user(self.officer)._om_excuse('Errand')
+        self.lateness()[0].with_user(self.officer)._excuse('Traffic')
+        self.lateness()[2].with_user(self.officer)._excuse('Errand')
         self.assertEqual(adjustment.state, 'cancel', 'nothing left to take off')
 
     def test_paid_stays(self):
@@ -106,7 +106,7 @@ class TestLatenessPayroll(TransactionCase):
         self.payslip().action_payslip_done()
         self.assertEqual(adjustment.state, 'done')
         with self.assertRaises(UserError):
-            self.lateness()[0].with_user(self.officer)._om_excuse('Too late')
+            self.lateness()[0].with_user(self.officer)._excuse('Too late')
         self.lateness()[0].sudo().write({'minutes': 25})
         self.compute()
         self.assertEqual(adjustment.amount, 55, 'a payslip took it: it stays')
@@ -122,22 +122,22 @@ class TestLatenessPayroll(TransactionCase):
         self.assertEqual(self.compute().amount, 30, 'the hour late is taken off by the Attendance Adjustment')
 
     def test_cron_on_the_first(self):
-        Lateness = self.env['om.hr.lateness']
+        Lateness = self.env['hr.lateness']
         with patch.object(fields.Date, 'context_today', lambda *args, **kwargs: date(2026, 10, 2)):
-            Lateness._cron_om_lateness_penalties()
+            Lateness._cron_lateness_penalties()
         self.assertFalse(self.lateness().adjustment_id, 'not the 1st')
         with patch.object(fields.Date, 'context_today', lambda *args, **kwargs: date(2026, 10, 1)):
-            Lateness._cron_om_lateness_penalties()
+            Lateness._cron_lateness_penalties()
             self.assertFalse(self.lateness().adjustment_id, 'not asked for')
-            self.employee.company_id.om_lateness_auto_penalties = True
-            Lateness._cron_om_lateness_penalties()
+            self.employee.company_id.lateness_auto_penalties = True
+            Lateness._cron_lateness_penalties()
         self.assertEqual(self.lateness().adjustment_id.amount, 55)
 
     def test_wizard_for_payroll_only(self):
-        wizard = self.env['om.hr.lateness.penalty.wizard'].with_user(self.officer).create(
+        wizard = self.env['hr.lateness.penalty.wizard'].with_user(self.officer).create(
             {'month': date(2026, 9, 1), 'employee_ids': [Command.set(self.employee.ids)]})
         action = wizard.action_compute()
-        self.assertEqual(self.env['om.hr.payroll.adjustment'].search(action['domain']).amount, 55)
+        self.assertEqual(self.env['hr.payroll.adjustment'].search(action['domain']).amount, 55)
         user = new_test_user(self.env, 'om_late_nobody', groups='base.group_user')
         with self.assertRaises((UserError, AccessError)):
-            self.env['om.hr.lateness.penalty.wizard'].with_user(user).create({'month': date(2026, 9, 1)})
+            self.env['hr.lateness.penalty.wizard'].with_user(user).create({'month': date(2026, 9, 1)})

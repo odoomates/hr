@@ -2,8 +2,8 @@
 <odoo>
 
     <record id="om_hr_lateness_view_list_payroll" model="ir.ui.view">
-        <field name="name">om.hr.lateness.view.list.payroll</field>
-        <field name="model">om.hr.lateness</field>
+        <field name="name">hr.lateness.view.list.payroll</field>
+        <field name="model">hr.lateness</field>
         <field name="inherit_id" ref="om_hr_lateness.om_hr_lateness_view_list"/>
         <field name="arch" type="xml">
             <field name="penalty" position="after">
@@ -15,8 +15,8 @@
     </record>
 
     <record id="om_hr_lateness_view_form_payroll" model="ir.ui.view">
-        <field name="name">om.hr.lateness.view.form.payroll</field>
-        <field name="model">om.hr.lateness</field>
+        <field name="name">hr.lateness.view.form.payroll</field>
+        <field name="model">hr.lateness</field>
         <field name="inherit_id" ref="om_hr_lateness.om_hr_lateness_view_form"/>
         <field name="arch" type="xml">
             <field name="policy_line_id" position="after">
@@ -28,13 +28,13 @@
     </record>
 
     <record id="om_hr_payroll_adjustment_view_form_lateness" model="ir.ui.view">
-        <field name="name">om.hr.payroll.adjustment.view.form.lateness</field>
-        <field name="model">om.hr.payroll.adjustment</field>
+        <field name="name">hr.payroll.adjustment.view.form.lateness</field>
+        <field name="model">hr.payroll.adjustment</field>
         <field name="inherit_id" ref="om_hr_payroll_adjustment.om_hr_payroll_adjustment_view_form"/>
         <field name="arch" type="xml">
             <page name="lines" position="after">
-                <page string="Lateness" name="lateness" invisible="not om_lateness_ids">
-                    <field name="om_lateness_ids" readonly="1">
+                <page string="Lateness" name="lateness" invisible="not lateness_ids">
+                    <field name="lateness_ids" readonly="1">
                         <list>
                             <field name="date"/>
                             <field name="kind"/>
@@ -51,8 +51,8 @@
     </record>
 
     <record id="om_hr_lateness_penalty_wizard_view_form" model="ir.ui.view">
-        <field name="name">om.hr.lateness.penalty.wizard.view.form</field>
-        <field name="model">om.hr.lateness.penalty.wizard</field>
+        <field name="name">hr.lateness.penalty.wizard.view.form</field>
+        <field name="model">hr.lateness.penalty.wizard</field>
         <field name="arch" type="xml">
             <form string="Compute Lateness Penalties">
                 <div class="text-muted mb-3">
@@ -74,7 +74,7 @@
 
     <record id="om_hr_lateness_penalty_wizard_action" model="ir.actions.act_window">
         <field name="name">Lateness Penalties</field>
-        <field name="res_model">om.hr.lateness.penalty.wizard</field>
+        <field name="res_model">hr.lateness.penalty.wizard</field>
         <field name="view_mode">form</field>
         <field name="target">new</field>
     </record>
@@ -87,7 +87,7 @@
             <xpath expr="//setting[@id='om_lateness_policy_setting']" position="after">
                 <setting string="Lateness Penalties Every Month" company_dependent="1"
                          help="On the 1st, the penalties of the month before become payroll adjustments. Otherwise, Payroll &gt; Adjustments &gt; Lateness Penalties. A penalty of minutes is not taken from a contract paid on attendances: its Attendance Adjustment takes the hours off already.">
-                    <field name="om_lateness_auto_penalties"/>
+                    <field name="lateness_auto_penalties"/>
                 </setting>
             </xpath>
         </field>
