@@ -15,6 +15,7 @@
         'views/om_document_views.xml',
         'views/menu.xml',
     ],
+    'demo': ['demo/om_hr_document_demo.xml'],
     'assets': {
         'web.assets_tests': [
             'om_hr_document/static/tests/tours/**/*',
