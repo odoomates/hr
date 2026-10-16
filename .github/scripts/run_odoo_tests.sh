@@ -35,7 +35,8 @@ CONF
 drop() { dropdb --if-exists "$db" >/dev/null 2>&1; rm -f "$conf"; }
 trap drop EXIT
 dropdb --if-exists "$db" >/dev/null 2>&1
-createdb "$db" || exit 1
+# as Odoo creates its databases: its parent paths are compared with the C sort order
+createdb --encoding=UTF8 --lc-collate=C --template=template0 "$db" || exit 1
 
 echo "Installing $modules on $db, testing $tags"
 "$python" "$odoo/odoo-bin" -c "$conf" -d "$db" -i "$modules" --with-demo --test-tags "$tags" \

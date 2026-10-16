@@ -37,7 +37,8 @@ new_conf=$(conf "$repo")
 drop() { dropdb --if-exists "$db" >/dev/null 2>&1; rm -f "$old_conf" "$new_conf"; }
 trap drop EXIT
 dropdb --if-exists "$db" >/dev/null 2>&1
-createdb "$db" || exit 1
+# as Odoo creates its databases: its parent paths are compared with the C sort order
+createdb --encoding=UTF8 --lc-collate=C --template=template0 "$db" || exit 1
 
 echo "Installing $modules from $(git -C "$old" log -1 --format='%h %s' 2>/dev/null || echo "$old")"
 "$python" "$odoo/odoo-bin" -c "$old_conf" -d "$db" -i "$modules" --with-demo --stop-after-init \
