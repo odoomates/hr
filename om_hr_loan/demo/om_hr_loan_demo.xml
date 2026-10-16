@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- a personal loan paid out two months ago, its first two installments repaid -->
+    <record id="demo_loan_running" model="hr.loan">
+        <field name="employee_id" ref="hr.employee_vad"/>
+        <field name="type_id" ref="loan_type_personal"/>
+        <field name="date" eval="(DateTime.today() - relativedelta(months=2, days=10)).strftime('%Y-%m-%d')"/>
+        <field name="amount">6000</field>
+        <field name="installment_count">12</field>
+        <field name="date_start" eval="(DateTime.today() - relativedelta(months=2, day=1)).strftime('%Y-%m-%d')"/>
+        <field name="reason">Car repair</field>
+    </record>
+    <function model="hr.loan" name="action_submit" eval="[[ref('demo_loan_running')]]"/>
+    <function model="hr.loan" name="action_approval_approve" eval="[[ref('demo_loan_running')]]"/>
+    <function model="hr.loan" name="action_approval_approve" eval="[[ref('demo_loan_running')]]"/>
+    <function model="hr.loan" name="action_disburse" eval="[[ref('demo_loan_running')]]"/>
+    <function model="hr.loan" name="write" eval="[[ref('demo_loan_running')], {'date_disbursed': (DateTime.today() - relativedelta(months=2, days=5)).strftime('%Y-%m-%d')}]"/>
+    <function model="hr.loan.line" name="action_mark_paid">
+        <value model="hr.loan.line" search="[('loan_id', '=', ref('demo_loan_running')), ('sequence', '=', 1)]"/>
+    </function>
+    <function model="hr.loan.line" name="action_mark_paid">
+        <value model="hr.loan.line" search="[('loan_id', '=', ref('demo_loan_running')), ('sequence', '=', 2)]"/>
+    </function>
+
+    <!-- a salary advance waiting for its approval -->
+    <record id="demo_loan_advance" model="hr.loan">
+        <field name="employee_id" ref="hr.employee_qdp"/>
+        <field name="type_id" ref="loan_type_advance"/>
+        <field name="amount">1000</field>
+        <field name="date_start" eval="(DateTime.today() + relativedelta(months=1, day=1)).strftime('%Y-%m-%d')"/>
+        <field name="reason">School fees</field>
+    </record>
+    <function model="hr.loan" name="action_submit" eval="[[ref('demo_loan_advance')]]"/>
+
+</odoo>

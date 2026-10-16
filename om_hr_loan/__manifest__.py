@@ -15,5 +15,6 @@
         'views/om_hr_loan_views.xml',
         'views/menu.xml',
     ],
+    'demo': ['demo/om_hr_loan_demo.xml'],
     'images': ['static/description/banner.gif'],
 }
