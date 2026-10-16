@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- a review cycle under way: an appraisal at each stage -->
+    <record id="demo_cycle" model="hr.appraisal.cycle">
+        <field name="name">Yearly Review</field>
+        <field name="date_start" eval="(DateTime.today() + relativedelta(years=-1)).strftime('%Y-%m-%d')"/>
+        <field name="date_end" eval="(DateTime.today() + relativedelta(days=-1)).strftime('%Y-%m-%d')"/>
+        <field name="date_deadline" eval="(DateTime.today() + relativedelta(days=21)).strftime('%Y-%m-%d')"/>
+        <field name="template_id" ref="template_default"/>
+        <field name="state">running</field>
+    </record>
+
+    <record id="demo_appraisal_demo" model="hr.appraisal">
+        <field name="employee_id" ref="hr.employee_qdp"/>
+        <field name="cycle_id" ref="demo_cycle"/>
+        <field name="date_deadline" eval="(DateTime.today() + relativedelta(days=21)).strftime('%Y-%m-%d')"/>
+    </record>
+
+    <record id="demo_appraisal_light" model="hr.appraisal">
+        <field name="employee_id" ref="hr.employee_light"/>
+        <field name="cycle_id" ref="demo_cycle"/>
+        <field name="date_deadline" eval="(DateTime.today() + relativedelta(days=21)).strftime('%Y-%m-%d')"/>
+        <field name="meeting_date" eval="(DateTime.today() + relativedelta(days=7, hour=10, minute=0)).strftime('%Y-%m-%d %H:%M:%S')"/>
+    </record>
+
+    <record id="demo_appraisal_al" model="hr.appraisal">
+        <field name="employee_id" ref="hr.employee_al"/>
+        <field name="cycle_id" ref="demo_cycle"/>
+        <field name="date_deadline" eval="(DateTime.today() + relativedelta(days=21)).strftime('%Y-%m-%d')"/>
+    </record>
+
+    <!-- Marc Demo assesses himself; Monica Light is with her manager; Al is reviewed and rated -->
+    <function model="hr.appraisal" name="action_start"
+              eval="[[ref('demo_appraisal_demo'), ref('demo_appraisal_light'), ref('demo_appraisal_al')]]"/>
+    <function model="hr.appraisal" name="action_submit_self" eval="[[ref('demo_appraisal_light')]]"/>
+    <function model="hr.appraisal" name="write"
+              eval="[[ref('demo_appraisal_al')], {'rating_id': ref('rating_exceeds')}]"/>
+    <function model="hr.appraisal" name="action_done" eval="[[ref('demo_appraisal_al')]]"/>
+
+    <record id="demo_goal_deals" model="hr.appraisal.goal">
+        <field name="name">Close the onboarding of three new customers</field>
+        <field name="employee_id" ref="hr.employee_qdp"/>
+        <field name="appraisal_id" ref="demo_appraisal_demo"/>
+        <field name="target">Three customers live, with their training done</field>
+        <field name="date_deadline" eval="(DateTime.today() + relativedelta(months=3)).strftime('%Y-%m-%d')"/>
+        <field name="progress">60</field>
+    </record>
+
+    <record id="demo_goal_mentor" model="hr.appraisal.goal">
+        <field name="name">Mentor a trainee</field>
+        <field name="employee_id" ref="hr.employee_al"/>
+        <field name="appraisal_id" ref="demo_appraisal_al"/>
+        <field name="target">The trainee works on their own by the end of the period</field>
+        <field name="date_deadline" eval="(DateTime.today() + relativedelta(days=-10)).strftime('%Y-%m-%d')"/>
+        <field name="progress">100</field>
+    </record>
+
+    <record id="demo_goal_course" model="hr.appraisal.goal">
+        <field name="name">Follow the project management course</field>
+        <field name="employee_id" ref="hr.employee_light"/>
+        <field name="appraisal_id" ref="demo_appraisal_light"/>
+        <field name="date_deadline" eval="(DateTime.today() + relativedelta(months=2)).strftime('%Y-%m-%d')"/>
+        <field name="progress">30</field>
+    </record>
+
+</odoo>
