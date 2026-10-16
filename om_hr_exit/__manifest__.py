@@ -16,5 +16,6 @@
         'views/res_config_settings_views.xml',
         'views/menu.xml',
     ],
+    'demo': ['demo/om_hr_exit_demo.xml'],
     'images': ['static/description/banner.gif'],
 }

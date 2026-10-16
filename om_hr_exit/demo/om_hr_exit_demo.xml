@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- a resignation approved, in its notice period, its clearance under way -->
+    <record id="demo_exit_resignation" model="hr.exit">
+        <field name="employee_id" ref="hr.employee_fme"/>
+        <field name="departure_reason_id" ref="hr.departure_resigned"/>
+        <field name="date_notice" eval="(DateTime.today() - relativedelta(days=10)).strftime('%Y-%m-%d')"/>
+        <field name="notice_days">30</field>
+        <field name="note">Moving abroad with the family.</field>
+    </record>
+    <function model="hr.exit" name="action_submit" eval="[[ref('demo_exit_resignation')]]"/>
+    <function model="hr.exit" name="action_approval_approve" eval="[[ref('demo_exit_resignation')]]"/>
+    <function model="hr.exit" name="action_approval_approve" eval="[[ref('demo_exit_resignation')]]"/>
+    <function model="hr.exit.clearance" name="action_clear">
+        <value model="hr.exit.clearance"
+               search="[('exit_id', '=', ref('demo_exit_resignation')), ('checklist_id', '=', ref('checklist_handover'))]"/>
+    </function>
+
+</odoo>
