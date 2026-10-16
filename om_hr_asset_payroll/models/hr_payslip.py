@@ -8,7 +8,7 @@ class HrAssetAssignment(models.Model):
 
     payslip_id = fields.Many2one('hr.payslip', string='Deducted On', readonly=True, copy=False,
                                  index='btree_not_null', ondelete='set null',
-                                 groups='om_hr_payroll.group_hr_payroll_user')
+                                 groups='om_hr_payroll.group_hr_payroll_user', check_company=True)
 
 
 class HrPayslip(models.Model):
