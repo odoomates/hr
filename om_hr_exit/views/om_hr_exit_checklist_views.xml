@@ -2,8 +2,8 @@
 <odoo>
 
     <record id="om_hr_exit_checklist_view_list" model="ir.ui.view">
-        <field name="name">om.hr.exit.checklist.view.list</field>
-        <field name="model">om.hr.exit.checklist</field>
+        <field name="name">hr.exit.checklist.view.list</field>
+        <field name="model">hr.exit.checklist</field>
         <field name="arch" type="xml">
             <list string="Exit Checklist">
                 <field name="sequence" widget="handle"/>
@@ -16,8 +16,8 @@
     </record>
 
     <record id="om_hr_exit_checklist_view_form" model="ir.ui.view">
-        <field name="name">om.hr.exit.checklist.view.form</field>
-        <field name="model">om.hr.exit.checklist</field>
+        <field name="name">hr.exit.checklist.view.form</field>
+        <field name="model">hr.exit.checklist</field>
         <field name="arch" type="xml">
             <form string="Exit Checklist Item">
                 <sheet>
@@ -49,7 +49,7 @@
 
     <record id="om_hr_exit_checklist_action" model="ir.actions.act_window">
         <field name="name">Exit Checklist</field>
-        <field name="res_model">om.hr.exit.checklist</field>
+        <field name="res_model">hr.exit.checklist</field>
         <field name="view_mode">list,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">Create an item of the exit checklist</p>

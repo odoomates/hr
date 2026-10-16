@@ -1,10 +1,10 @@
 from odoo import fields, models
 
 
-class OmHrExitChecklist(models.Model):
+class HrExitChecklist(models.Model):
     """ What has to be cleared before an employee leaves, and who clears it, e.g. the manager getting the laptop
         back. Each approved exit gets a clearance line per item. """
-    _name = 'om.hr.exit.checklist'
+    _name = 'hr.exit.checklist'
     _description = 'Exit Checklist Item'
     _order = 'sequence, id'
 

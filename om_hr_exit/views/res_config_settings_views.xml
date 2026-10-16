@@ -10,7 +10,7 @@
                 <block title="Exits" name="om_hr_exit_setting_container">
                     <setting company_dependent="1" id="om_hr_exit_notice_days_setting" string="Notice Period"
                              help="Proposed between the notice of an exit and the last working day">
-                        <field name="om_hr_exit_notice_days" class="o_light_label"/> days
+                        <field name="hr_exit_notice_days" class="o_light_label"/> days
                     </setting>
                 </block>
             </block>

@@ -19,8 +19,8 @@ class TestExit(TransactionCase):
         cls.env.ref('om_hr_exit.flow_om_hr_exit_hr').group_id = cls.env['res.groups'].create({
             'name': 'Exit Approvers', 'user_ids': [Command.link(cls.hr_admin.id)]})
         # a checklist of our own: the manager and IT
-        cls.env['om.hr.exit.checklist'].search([]).active = False
-        cls.env['om.hr.exit.checklist'].create([
+        cls.env['hr.exit.checklist'].search([]).active = False
+        cls.env['hr.exit.checklist'].create([
             {'name': 'Handover', 'responsible_type': 'manager'},
             {'name': 'Laptop', 'responsible_type': 'user', 'user_ids': [Command.link(cls.it_user.id)]},
             {'name': 'Retirement gift', 'responsible_type': 'user', 'user_ids': [Command.link(cls.it_user.id)],
@@ -38,7 +38,7 @@ class TestExit(TransactionCase):
             values['date_notice'] = date_notice
         if notice_days is not None:
             values['notice_days'] = notice_days
-        exit_ = self.env['om.hr.exit'].with_user(self.employee_user).create(values)
+        exit_ = self.env['hr.exit'].with_user(self.employee_user).create(values)
         return exit_
 
     def approve(self, exit_):
@@ -47,14 +47,14 @@ class TestExit(TransactionCase):
         exit_.with_user(self.hr_admin).action_approval_approve()
 
     def test_notice_period(self):
-        self.env.company.om_hr_exit_notice_days = 60
+        self.env.company.hr_exit_notice_days = 60
         exit_ = self.resign(date_notice=date(2026, 3, 1))
         self.assertEqual(exit_.departure_reason_id, self.env.ref('hr.departure_resigned'))
         self.assertEqual(exit_.notice_days, 60)
         self.assertEqual(exit_.last_working_day, date(2026, 4, 30))
 
     def test_resignation_to_departure(self):
-        today = fields.Date.context_today(self.env['om.hr.exit'])
+        today = fields.Date.context_today(self.env['hr.exit'])
         exit_ = self.resign(date_notice=today - timedelta(days=40), notice_days=30)
         self.approve(exit_)
         self.assertEqual(exit_.state, 'approved')
@@ -83,7 +83,7 @@ class TestExit(TransactionCase):
         self.assertFalse(self.employee.active)
 
     def test_future_departure_and_cancel(self):
-        today = fields.Date.context_today(self.env['om.hr.exit'])
+        today = fields.Date.context_today(self.env['hr.exit'])
         exit_ = self.resign(date_notice=today, notice_days=30)
         self.approve(exit_)
         exit_.clearance_ids.with_user(self.hr_user).action_clear()
@@ -109,9 +109,9 @@ class TestExit(TransactionCase):
         exit_ = self.resign()
         exit_.with_user(self.employee_user).action_submit()
         colleague = new_test_user(self.env, 'om_exit_colleague', groups='base.group_user')
-        self.assertFalse(self.env['om.hr.exit'].with_user(colleague).search([('id', '=', exit_.id)]))
-        self.assertTrue(self.env['om.hr.exit'].with_user(self.manager_user).search([('id', '=', exit_.id)]))
+        self.assertFalse(self.env['hr.exit'].with_user(colleague).search([('id', '=', exit_.id)]))
+        self.assertTrue(self.env['hr.exit'].with_user(self.manager_user).search([('id', '=', exit_.id)]))
         exit_.with_user(self.manager_user).action_approval_approve()
         exit_.with_user(self.hr_admin).action_approval_approve()
-        self.assertTrue(self.env['om.hr.exit'].with_user(self.it_user).search([('id', '=', exit_.id)]),
+        self.assertTrue(self.env['hr.exit'].with_user(self.it_user).search([('id', '=', exit_.id)]),
                         'IT sees the exit it clears')

@@ -7,11 +7,11 @@ OPEN_STATES = ('draft', 'to_approve', 'approved')
 TODO = 'mail.mail_activity_data_todo'
 
 
-class OmHrExit(models.Model):
+class HrExit(models.Model):
     """ An employee leaving the company: a resignation, or a contract HR ends. Approved along the approval flow of
         the exits, cleared during the notice period, then registered as the departure of the employee. """
-    _name = 'om.hr.exit'
-    _inherit = ['om.approval.mixin']
+    _name = 'hr.exit'
+    _inherit = ['approval.mixin']
     _description = 'Employee Exit'
     _order = 'date_notice desc, id desc'
     _mail_post_access = 'read'
@@ -47,7 +47,7 @@ class OmHrExit(models.Model):
     ], required=True, default='draft', copy=False, index=True, tracking=True,
         help='Notice Period: approved, the employee is cleared until the last working day. Left: the departure of '
              'the employee is registered.')
-    clearance_ids = fields.One2many('om.hr.exit.clearance', 'exit_id', string='Clearance', copy=False)
+    clearance_ids = fields.One2many('hr.exit.clearance', 'exit_id', string='Clearance', copy=False)
     clearance_progress = fields.Float(compute='_compute_clearance', string='Cleared (%)')
     is_cleared = fields.Boolean(compute='_compute_clearance')
     departure_id = fields.Many2one('hr.employee.departure', string='Departure', readonly=True, copy=False)
@@ -64,7 +64,7 @@ class OmHrExit(models.Model):
     @api.depends('company_id')
     def _compute_notice_days(self):
         for exit_ in self:
-            exit_.notice_days = (exit_.company_id or self.env.company).om_hr_exit_notice_days
+            exit_.notice_days = (exit_.company_id or self.env.company).hr_exit_notice_days
 
     @api.depends('date_notice', 'notice_days')
     def _compute_last_working_day(self):
@@ -90,7 +90,7 @@ class OmHrExit(models.Model):
     def create(self, vals_list):
         for vals in vals_list:
             if vals.get('name', _('New')) == _('New'):
-                vals['name'] = self.env['ir.sequence'].next_by_code('om.hr.exit') or _('New')
+                vals['name'] = self.env['ir.sequence'].next_by_code('hr.exit') or _('New')
         return super().create(vals_list)
 
     def unlink(self):
@@ -155,10 +155,10 @@ class OmHrExit(models.Model):
         """ A clearance line per item of the checklist applying to the reason of the exit, with a to-do for the
             users clearing it. """
         for exit_ in self:
-            items = self.env['om.hr.exit.checklist'].search([
+            items = self.env['hr.exit.checklist'].search([
                 ('company_id', 'in', [False, exit_.company_id.id])]).filtered(
                 lambda item: not item.departure_reason_ids or exit_.departure_reason_id in item.departure_reason_ids)
-            lines = self.env['om.hr.exit.clearance'].create([{
+            lines = self.env['hr.exit.clearance'].create([{
                 'exit_id': exit_.id,
                 'checklist_id': item.id,
                 'sequence': item.sequence,
@@ -215,17 +215,17 @@ class OmHrExit(models.Model):
             raise UserError(_('Only HR closes or cancels an approved exit.'))
 
 
-class OmHrExitClearance(models.Model):
+class HrExitClearance(models.Model):
     """ One item of the checklist an exit is cleared with. """
-    _name = 'om.hr.exit.clearance'
+    _name = 'hr.exit.clearance'
     _description = 'Exit Clearance'
     _order = 'exit_id, sequence, id'
 
-    exit_id = fields.Many2one('om.hr.exit', required=True, ondelete='cascade', index=True)
+    exit_id = fields.Many2one('hr.exit', required=True, ondelete='cascade', index=True)
     employee_id = fields.Many2one(related='exit_id.employee_id', store=True)
     company_id = fields.Many2one(related='exit_id.company_id', store=True)
     last_working_day = fields.Date(related='exit_id.last_working_day')
-    checklist_id = fields.Many2one('om.hr.exit.checklist', string='Checklist Item', ondelete='set null')
+    checklist_id = fields.Many2one('hr.exit.checklist', string='Checklist Item', ondelete='set null')
     sequence = fields.Integer()
     name = fields.Char(required=True)
     description = fields.Text()

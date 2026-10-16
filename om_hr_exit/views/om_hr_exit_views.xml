@@ -2,8 +2,8 @@
 <odoo>
 
     <record id="om_hr_exit_view_form" model="ir.ui.view">
-        <field name="name">om.hr.exit.view.form</field>
-        <field name="model">om.hr.exit</field>
+        <field name="name">hr.exit.view.form</field>
+        <field name="model">hr.exit</field>
         <field name="arch" type="xml">
             <form string="Exit">
                 <header>
@@ -107,8 +107,8 @@
     </record>
 
     <record id="om_hr_exit_view_list" model="ir.ui.view">
-        <field name="name">om.hr.exit.view.list</field>
-        <field name="model">om.hr.exit</field>
+        <field name="name">hr.exit.view.list</field>
+        <field name="model">hr.exit</field>
         <field name="arch" type="xml">
             <list string="Exits">
                 <field name="name"/>
@@ -127,8 +127,8 @@
     </record>
 
     <record id="om_hr_exit_view_search" model="ir.ui.view">
-        <field name="name">om.hr.exit.view.search</field>
-        <field name="model">om.hr.exit</field>
+        <field name="name">hr.exit.view.search</field>
+        <field name="model">hr.exit</field>
         <field name="arch" type="xml">
             <search>
                 <field name="name"/>
@@ -151,8 +151,8 @@
     </record>
 
     <record id="om_hr_exit_clearance_view_list" model="ir.ui.view">
-        <field name="name">om.hr.exit.clearance.view.list</field>
-        <field name="model">om.hr.exit.clearance</field>
+        <field name="name">hr.exit.clearance.view.list</field>
+        <field name="model">hr.exit.clearance</field>
         <field name="arch" type="xml">
             <list string="Clearance" create="0" edit="0" delete="0">
                 <field name="exit_id"/>
@@ -170,8 +170,8 @@
     </record>
 
     <record id="om_hr_exit_clearance_view_search" model="ir.ui.view">
-        <field name="name">om.hr.exit.clearance.view.search</field>
-        <field name="model">om.hr.exit.clearance</field>
+        <field name="name">hr.exit.clearance.view.search</field>
+        <field name="model">hr.exit.clearance</field>
         <field name="arch" type="xml">
             <search>
                 <field name="employee_id"/>
@@ -188,7 +188,7 @@
 
     <record id="om_hr_exit_action_my" model="ir.actions.act_window">
         <field name="name">My Resignation</field>
-        <field name="res_model">om.hr.exit</field>
+        <field name="res_model">hr.exit</field>
         <field name="view_mode">list,form</field>
         <field name="domain">[('employee_id.user_id', '=', uid)]</field>
         <field name="help" type="html">
@@ -199,7 +199,7 @@
 
     <record id="om_hr_exit_action_to_approve" model="ir.actions.act_window">
         <field name="name">To Approve</field>
-        <field name="res_model">om.hr.exit</field>
+        <field name="res_model">hr.exit</field>
         <field name="view_mode">list,form</field>
         <field name="context">{'search_default_to_approve_by_me': 1}</field>
         <field name="help" type="html">
@@ -210,7 +210,7 @@
 
     <record id="om_hr_exit_clearance_action" model="ir.actions.act_window">
         <field name="name">To Clear</field>
-        <field name="res_model">om.hr.exit.clearance</field>
+        <field name="res_model">hr.exit.clearance</field>
         <field name="view_mode">list</field>
         <field name="context">{'search_default_mine': 1}</field>
         <field name="help" type="html">
@@ -221,7 +221,7 @@
 
     <record id="om_hr_exit_action" model="ir.actions.act_window">
         <field name="name">All Exits</field>
-        <field name="res_model">om.hr.exit</field>
+        <field name="res_model">hr.exit</field>
         <field name="view_mode">list,form</field>
     </record>
 

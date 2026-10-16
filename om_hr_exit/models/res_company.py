@@ -4,7 +4,7 @@ from odoo import fields, models
 class ResCompany(models.Model):
     _inherit = 'res.company'
 
-    om_hr_exit_notice_days = fields.Integer(
+    hr_exit_notice_days = fields.Integer(
         string='Notice Period (Days)', default=30,
         help='Proposed between the notice and the last working day of an exit.')
 
@@ -12,4 +12,4 @@ class ResCompany(models.Model):
 class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
-    om_hr_exit_notice_days = fields.Integer(related='company_id.om_hr_exit_notice_days', readonly=False)
+    hr_exit_notice_days = fields.Integer(related='company_id.hr_exit_notice_days', readonly=False)
