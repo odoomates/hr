@@ -130,8 +130,8 @@ class TestPayrollAccount(AccountTestInvoicingCommon):
         # the rules and the structure are shared: each company sets its own accounts on the rules
         structure = self.employee.version_id.struct_id
         structure.company_id = False
+        structure.rule_ids.company_id = False
         basic = structure.rule_ids.filtered(lambda rule: rule.code == 'BASIC')
-        basic.company_id = False
         payable_2 = self.env['account.account'].with_company(company_2).create({
             'name': 'Salaries Payable 2', 'code': 'SALPAY2', 'account_type': 'liability_current',
         })

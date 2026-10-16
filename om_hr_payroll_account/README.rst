@@ -84,6 +84,11 @@ The upgrade to 1.2.0 sets the accounts, the analytic account and the tax of the 
 company: the value of a rule is kept for the companies that can use it (the companies of the account
 and their branches), and only for the company of the rule when it has one.
 
+The upgrade to 1.2.3 checks the companies of the salary journals, analytic accounts and taxes of the
+contracts, payslips, batches and salary rules: they belong to the company of the record. Nothing is
+changed by the upgrade: the records already linking another company are listed as warnings in the
+server log, and the next change of such a record asks to fix its link first.
+
 Configuration
 =============
 

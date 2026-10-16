@@ -26,8 +26,9 @@ class HrPayslipLine(models.Model):
 
     # a payslip line is the line of one company: it keeps the accounts of its rule, as they were computed,
     # where the model of the salary rules holds one value per company
-    analytic_account_id = fields.Many2one('account.analytic.account', 'Analytic Account', company_dependent=False)
-    account_tax_id = fields.Many2one('account.tax', 'Tax', company_dependent=False)
+    analytic_account_id = fields.Many2one('account.analytic.account', 'Analytic Account', company_dependent=False,
+                                          check_company=True)
+    account_tax_id = fields.Many2one('account.tax', 'Tax', company_dependent=False, check_company=True)
     account_debit = fields.Many2one('account.account', 'Debit Account', company_dependent=False)
     account_credit = fields.Many2one('account.account', 'Credit Account', company_dependent=False)
 
@@ -60,9 +61,9 @@ class HrPayslip(models.Model):
     )
     journal_id = fields.Many2one(
         'account.journal', 'Salary Journal', required=True, default=_default_salary_journal,
-        domain="[('company_id', '=', company_id)]",
+        domain="[('company_id', '=', company_id)]", check_company=True,
     )
-    move_id = fields.Many2one('account.move', 'Accounting Entry', readonly=True, copy=False)
+    move_id = fields.Many2one('account.move', 'Accounting Entry', readonly=True, copy=False, check_company=True)
     payment_ids = fields.Many2many(
         'account.payment', 'hr_payslip_account_payment_rel', 'payslip_id', 'payment_id', string='Payments',
         readonly=True, copy=False, groups='account.group_account_invoice,account.group_account_readonly',
@@ -421,8 +422,9 @@ class HrSalaryRule(models.Model):
     _inherit = 'hr.salary.rule'
 
     # the default rules are shared by the companies: each company sets its own accounts on them
-    analytic_account_id = fields.Many2one('account.analytic.account', 'Analytic Account', company_dependent=True)
-    account_tax_id = fields.Many2one('account.tax', 'Tax', company_dependent=True)
+    analytic_account_id = fields.Many2one('account.analytic.account', 'Analytic Account', company_dependent=True,
+                                          check_company=True)
+    account_tax_id = fields.Many2one('account.tax', 'Tax', company_dependent=True, check_company=True)
     account_debit = fields.Many2one('account.account', 'Debit Account', company_dependent=True)
     account_credit = fields.Many2one('account.account', 'Credit Account', company_dependent=True)
 
@@ -431,8 +433,12 @@ class HrVersion(models.Model):
     _inherit = 'hr.version'
     _description = 'Employee Contract'
 
-    analytic_account_id = fields.Many2one('account.analytic.account', 'Analytic Account')
-    journal_id = fields.Many2one('account.journal', 'Salary Journal')
+    analytic_account_id = fields.Many2one('account.analytic.account', 'Analytic Account', check_company=True)
+    journal_id = fields.Many2one('account.journal', 'Salary Journal', check_company=True)
+
+    @api.model
+    def _company_checked_fields(self):
+        return super()._company_checked_fields() + ['journal_id', 'analytic_account_id']
 
 
 class HrPayslipRun(models.Model):
@@ -440,7 +446,7 @@ class HrPayslipRun(models.Model):
 
     journal_id = fields.Many2one(
         'account.journal', 'Salary Journal', required=True, default=_default_salary_journal,
-        domain="[('company_id', '=', company_id)]",
+        domain="[('company_id', '=', company_id)]", check_company=True,
     )
     consolidated_move = fields.Boolean(
         'Consolidated Entry', copy=False,
@@ -454,6 +460,23 @@ class HrPayslipRun(models.Model):
         compute='_compute_payments', groups='account.group_account_invoice,account.group_account_readonly',
     )
 
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        """ A batch of another company takes the salary journal of its company. """
+        for vals in vals_list:
+            if vals.get('company_id') and 'journal_id' not in vals:
+                company = self.env['res.company'].browse(vals['company_id'])
+                vals['journal_id'] = _default_salary_journal(self.with_company(company))
+                if not vals['journal_id']:
+                    raise UserError(self.env._('%s has no miscellaneous journal for the salaries: create one in '
+                                               'Accounting first.', company.name))
+        return super().create(vals_list)
+
+    @api.onchange('company_id')
+    def _onchange_company_id_journal(self):
+        if self.company_id and self.journal_id.company_id != self.company_id:
+            self.journal_id = _default_salary_journal(self.with_company(self.company_id))
     @api.depends('slip_ids.payment_state', 'slip_ids.state', 'slip_ids.move_id')
     def _compute_payments(self):
         for run in self:

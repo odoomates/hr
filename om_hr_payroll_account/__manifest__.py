@@ -1,6 +1,6 @@
 {
     'name': 'Odoo 20 HR Payroll Accounting',
-    'version': '1.2.2',
+    'version': '1.2.3',
     'category': 'Generic Modules/Human Resources',
     'summary': 'Payroll accounting for Odoo 20 Community: payslip journal entries and salary payments',
     'description': 'Connects the payroll to Accounting. Each confirmed payslip posts a journal entry built from the '
