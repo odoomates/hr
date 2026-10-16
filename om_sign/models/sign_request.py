@@ -28,12 +28,13 @@ class SignRequest(models.Model):
     _name = 'sign.request'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Signature Request'
+    _check_company_auto = True
     _order = 'id desc'
 
     name = fields.Char(string='Document', required=True, tracking=True)
     reference = fields.Char(readonly=True, copy=False, default=lambda self: self.env._('New'))
     issue_id = fields.Many2one('print.issue', string='Issued Print', ondelete='restrict', index='btree_not_null',
-                               readonly=True)
+                               readonly=True, check_company=True)
     res_model = fields.Char(string='Model', index=True, readonly=True)
     res_id = fields.Many2oneReference(string='Record ID', model_field='res_model', index=True, readonly=True)
     res_name = fields.Char(string='Signed For', compute='_compute_res_name')

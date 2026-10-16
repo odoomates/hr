@@ -27,6 +27,7 @@ class SignLog(models.Model):
 
     request_id = fields.Many2one('sign.request', required=True, ondelete='cascade', index=True, readonly=True)
     signer_id = fields.Many2one('sign.request.signer', ondelete='set null', readonly=True)
+    company_id = fields.Many2one(related='request_id.company_id', store=True, index=True)
     event = fields.Selection(EVENTS, required=True, readonly=True)
     date = fields.Datetime(required=True, default=fields.Datetime.now, readonly=True)
     partner_id = fields.Many2one('res.partner', string='By', readonly=True)

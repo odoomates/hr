@@ -11,3 +11,5 @@ access_sign_request_signer_manager,sign.request.signer.manager,sign.request.sign
 access_sign_log_signer,sign.log.signer,sign.log,base.group_user,r,"[('request_id.signer_ids.partner_id', '=', user.partner_id.id), ('request_id.state', '!=', 'draft')]"
 access_sign_log_user,sign.log.user,sign.log,om_sign.group_sign_user,r,"[('request_id.requested_by_id', '=', user.id)]"
 access_sign_log_manager,sign.log.manager,sign.log,om_sign.group_sign_manager,r,
+sign_request_signer_company_rule,Signers: multi-company,sign.request.signer,,crud,"[('company_id', 'in', company_ids)]"
+sign_log_company_rule,Signature evidence: multi-company,sign.log,,crud,"[('company_id', 'in', company_ids)]"

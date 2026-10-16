@@ -31,6 +31,7 @@ class SignRequestSigner(models.Model):
 
     request_id = fields.Many2one('sign.request', required=True, ondelete='cascade', index=True)
     request_state = fields.Selection(related='request_id.state', string='Request Status')
+    company_id = fields.Many2one(related='request_id.company_id', store=True, index=True)
     sequence = fields.Integer(
         default=10, help='The signers of the same sequence sign together; a higher one waits for the lower ones.')
     role_name = fields.Char(string='Role')
