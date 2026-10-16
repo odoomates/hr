@@ -11,15 +11,15 @@ SECTIONS = [('header', 'Header'), ('line', 'Line'), ('footer', 'Footer')]
 LINE_ENDINGS = {'crlf': '\r\n', 'lf': '\n'}
 
 
-class OmFileLayout(models.Model):
+class FileLayout(models.Model):
     """ The layout of a file sent out of Odoo, e.g. the salary transfer file of a bank: CSV, fixed width or Excel,
     with a header, one line per record and a footer, each made of columns computed from the records.
 
     Each layout adds an entry to the Action menu of its model. A model may give the lines of the file itself,
-    instead of one line per record, with ``_om_file_lines(layout)``: the salary transfers of payslips split over
+    instead of one line per record, with ``_file_lines(layout)``: the salary transfers of payslips split over
     several bank accounts, for instance.
     """
-    _name = 'om.file.layout'
+    _name = 'file.layout'
     _description = 'File Layout'
     _order = 'sequence, name, id'
 
@@ -51,22 +51,22 @@ class OmFileLayout(models.Model):
         help='{layout}, {date} (20260630), {datetime} (20260630_1530) and {company} are replaced. The extension '
              'follows the format.')
     extension = fields.Char(help='Leave empty for .csv, .txt or .xlsx.')
-    column_ids = fields.One2many('om.file.layout.column', 'layout_id', string='Columns', copy=True)
-    header_column_ids = fields.One2many('om.file.layout.column', 'layout_id', string='Header',
+    column_ids = fields.One2many('file.layout.column', 'layout_id', string='Columns', copy=True)
+    header_column_ids = fields.One2many('file.layout.column', 'layout_id', string='Header',
                                         domain=[('section', '=', 'header')], context={'default_section': 'header'})
-    line_column_ids = fields.One2many('om.file.layout.column', 'layout_id', string='Lines',
+    line_column_ids = fields.One2many('file.layout.column', 'layout_id', string='Lines',
                                       domain=[('section', '=', 'line')], context={'default_section': 'line'})
-    footer_column_ids = fields.One2many('om.file.layout.column', 'layout_id', string='Footer',
+    footer_column_ids = fields.One2many('file.layout.column', 'layout_id', string='Footer',
                                         domain=[('section', '=', 'footer')], context={'default_section': 'footer'})
     action_menu = fields.Boolean(string='In the Action Menu', default=True)
     ref_ir_act_window = fields.Many2one('ir.actions.act_window', readonly=True, copy=False)
     company_id = fields.Many2one('res.company', string='Company',
                                  help='Leave empty to share the layout with all the companies.')
-    export_ids = fields.One2many('om.file.export', 'layout_id', string='Exports')
+    export_ids = fields.One2many('file.export', 'layout_id', string='Exports')
     export_count = fields.Integer(compute='_compute_export_count')
 
     def _compute_export_count(self):
-        counts = dict(self.env['om.file.export']._read_group(
+        counts = dict(self.env['file.export']._read_group(
             [('layout_id', 'in', self.ids)], ['layout_id'], ['__count']))
         for layout in self:
             layout.export_count = counts.get(layout, 0)
@@ -103,7 +103,7 @@ class OmFileLayout(models.Model):
                 continue
             values = {
                 'name': _('Export: %s', layout.name),
-                'res_model': 'om.file.export.wizard',
+                'res_model': 'file.export.wizard',
                 'view_mode': 'form',
                 'target': 'new',
                 'context': repr({'default_layout_id': layout.id}),
@@ -122,8 +122,8 @@ class OmFileLayout(models.Model):
     def _get_lines(self, records):
         """ :return: the values each line of the file is computed from, a dict per line """
         self.ensure_one()
-        if hasattr(records, '_om_file_lines'):
-            return records._om_file_lines(self)
+        if hasattr(records, '_file_lines'):
+            return records._file_lines(self)
         return [{'record': record, 'object': record} for record in records]
 
     def _base_context(self, records, lines):
@@ -234,19 +234,19 @@ class OmFileLayout(models.Model):
         return {
             'type': 'ir.actions.act_window',
             'name': _('Exports'),
-            'res_model': 'om.file.export',
+            'res_model': 'file.export',
             'view_mode': 'list,form',
             'domain': [('layout_id', '=', self.id)],
         }
 
 
-class OmFileLayoutColumn(models.Model):
+class FileLayoutColumn(models.Model):
     """ A value of the file: what it holds and how it is written. """
-    _name = 'om.file.layout.column'
+    _name = 'file.layout.column'
     _description = 'File Layout Column'
     _order = 'layout_id, section, sequence, id'
 
-    layout_id = fields.Many2one('om.file.layout', required=True, ondelete='cascade', index=True)
+    layout_id = fields.Many2one('file.layout', required=True, ondelete='cascade', index=True)
     section = fields.Selection(SECTIONS, required=True, default='line')
     sequence = fields.Integer(default=10)
     name = fields.Char(string='Title', required=True)

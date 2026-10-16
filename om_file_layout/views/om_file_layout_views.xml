@@ -2,8 +2,8 @@
 <odoo>
 
     <record id="om_file_layout_column_view_list" model="ir.ui.view">
-        <field name="name">om.file.layout.column.view.list</field>
-        <field name="model">om.file.layout.column</field>
+        <field name="name">file.layout.column.view.list</field>
+        <field name="model">file.layout.column</field>
         <field name="arch" type="xml">
             <list editable="bottom">
                 <field name="sequence" widget="handle"/>
@@ -25,8 +25,8 @@
     </record>
 
     <record id="om_file_layout_view_form" model="ir.ui.view">
-        <field name="name">om.file.layout.view.form</field>
-        <field name="model">om.file.layout</field>
+        <field name="name">file.layout.view.form</field>
+        <field name="model">file.layout</field>
         <field name="arch" type="xml">
             <form string="File Layout">
                 <sheet>
@@ -82,8 +82,8 @@
     </record>
 
     <record id="om_file_layout_view_list" model="ir.ui.view">
-        <field name="name">om.file.layout.view.list</field>
-        <field name="model">om.file.layout</field>
+        <field name="name">file.layout.view.list</field>
+        <field name="model">file.layout</field>
         <field name="arch" type="xml">
             <list string="File Layouts">
                 <field name="sequence" widget="handle"/>
@@ -98,7 +98,7 @@
 
     <record id="om_file_layout_action" model="ir.actions.act_window">
         <field name="name">File Layouts</field>
-        <field name="res_model">om.file.layout</field>
+        <field name="res_model">file.layout</field>
         <field name="view_mode">list,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">Design a file to send out of Odoo</p>
@@ -108,8 +108,8 @@
     </record>
 
     <record id="om_file_export_view_list" model="ir.ui.view">
-        <field name="name">om.file.export.view.list</field>
-        <field name="model">om.file.export</field>
+        <field name="name">file.export.view.list</field>
+        <field name="model">file.export</field>
         <field name="arch" type="xml">
             <list string="Exports" create="0" decoration-warning="problems">
                 <field name="create_date" string="Exported On"/>
@@ -126,8 +126,8 @@
     </record>
 
     <record id="om_file_export_view_form" model="ir.ui.view">
-        <field name="name">om.file.export.view.form</field>
-        <field name="model">om.file.export</field>
+        <field name="name">file.export.view.form</field>
+        <field name="model">file.export</field>
         <field name="arch" type="xml">
             <form string="Export" create="0" edit="0">
                 <header>
@@ -159,8 +159,8 @@
     </record>
 
     <record id="om_file_export_view_search" model="ir.ui.view">
-        <field name="name">om.file.export.view.search</field>
-        <field name="model">om.file.export</field>
+        <field name="name">file.export.view.search</field>
+        <field name="model">file.export</field>
         <field name="arch" type="xml">
             <search>
                 <field name="name"/>
@@ -176,7 +176,7 @@
 
     <record id="om_file_export_action" model="ir.actions.act_window">
         <field name="name">Exports</field>
-        <field name="res_model">om.file.export</field>
+        <field name="res_model">file.export</field>
         <field name="view_mode">list,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">Nothing exported yet</p>
@@ -185,8 +185,8 @@
     </record>
 
     <record id="om_file_export_wizard_view_form" model="ir.ui.view">
-        <field name="name">om.file.export.wizard.view.form</field>
-        <field name="model">om.file.export.wizard</field>
+        <field name="name">file.export.wizard.view.form</field>
+        <field name="model">file.export.wizard</field>
         <field name="arch" type="xml">
             <form string="Export">
                 <field name="res_model" invisible="1"/>

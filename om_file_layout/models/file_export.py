@@ -1,14 +1,14 @@
 from odoo import _, fields, models
 
 
-class OmFileExport(models.Model):
+class FileExport(models.Model):
     """ A file exported with a layout, kept as it was sent: who exported it, when, and for which records. """
-    _name = 'om.file.export'
+    _name = 'file.export'
     _description = 'File Export'
     _order = 'create_date desc, id desc'
 
     name = fields.Char(string='File', required=True, readonly=True)
-    layout_id = fields.Many2one('om.file.layout', string='Layout', required=True, readonly=True, index=True,
+    layout_id = fields.Many2one('file.layout', string='Layout', required=True, readonly=True, index=True,
                                 ondelete='restrict')
     res_model = fields.Char(string='Model', readonly=True)
     res_ids = fields.Json(string='Records', readonly=True)

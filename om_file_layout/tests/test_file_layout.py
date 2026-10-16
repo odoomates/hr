@@ -17,12 +17,12 @@ class TestFileLayout(TransactionCase):
         cls.model_id = cls.env['ir.model']._get_id('res.partner')
 
     def layout(self, **values):
-        return self.env['om.file.layout'].create({'name': 'Partners', 'model_id': self.model_id, **values})
+        return self.env['file.layout'].create({'name': 'Partners', 'model_id': self.model_id, **values})
 
     def wizard(self, layout, records=None):
         records = records or self.partners
         context = {'active_model': 'res.partner', 'active_ids': records.ids, 'default_layout_id': layout.id}
-        return Form(self.env['om.file.export.wizard'].with_user(self.user).with_context(context)).save()
+        return Form(self.env['file.export.wizard'].with_user(self.user).with_context(context)).save()
 
     def test_csv(self):
         layout = self.layout(file_format='csv', csv_separator=';', line_ending='lf', column_ids=[
@@ -71,7 +71,7 @@ class TestFileLayout(TransactionCase):
         self.assertIn('Alpha Trading', wizard.preview)
 
         action = wizard.action_download()
-        export = self.env['om.file.export'].search([('layout_id', '=', layout.id)])
+        export = self.env['file.export'].search([('layout_id', '=', layout.id)])
         self.assertEqual((export.record_count, export.line_count, export.create_uid),
                          (2, 2, self.user))
         self.assertEqual(sorted(export.res_ids), sorted(self.partners.ids))

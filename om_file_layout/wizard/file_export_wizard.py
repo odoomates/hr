@@ -2,12 +2,12 @@ from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 
-class OmFileExportWizard(models.TransientModel):
+class FileExportWizard(models.TransientModel):
     """ Export the records selected with a layout: preview the file and its problems, then download it. """
-    _name = 'om.file.export.wizard'
+    _name = 'file.export.wizard'
     _description = 'Export a File'
 
-    layout_id = fields.Many2one('om.file.layout', string='Layout', required=True,
+    layout_id = fields.Many2one('file.layout', string='Layout', required=True,
                                 domain="[('model', '=', res_model)]")
     res_model = fields.Char(required=True)
     res_ids = fields.Json(required=True)
@@ -59,7 +59,7 @@ class OmFileExportWizard(models.TransientModel):
         layout = self.layout_id
         result = layout._render(records)
         name = layout._get_file_name()
-        export = self.env['om.file.export'].create({
+        export = self.env['file.export'].create({
             'name': name,
             'layout_id': layout.id,
             'res_model': self.res_model,
@@ -76,8 +76,8 @@ class OmFileExportWizard(models.TransientModel):
             'res_model': export._name,
             'res_id': export.id,
         })
-        if hasattr(records, '_om_file_exported'):
-            records._om_file_exported(export)
+        if hasattr(records, '_file_exported'):
+            records._file_exported(export)
         return export
 
     def action_download(self):
