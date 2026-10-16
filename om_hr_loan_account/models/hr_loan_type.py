@@ -1,8 +1,8 @@
 from odoo import fields, models
 
 
-class OmHrLoanType(models.Model):
-    _inherit = 'om.hr.loan.type'
+class HrLoanType(models.Model):
+    _inherit = 'hr.loan.type'
 
     account_id = fields.Many2one(
         'account.account', string='Loan Account', company_dependent=True,

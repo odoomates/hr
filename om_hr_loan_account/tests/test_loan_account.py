@@ -16,7 +16,7 @@ class TestLoanAccount(AccountTestInvoicingCommon):
         cls.loan_account = cls.env['account.account'].create({
             'name': 'Employee Loans', 'code': 'EMPLOAN', 'account_type': 'asset_receivable', 'reconcile': True})
         cls.bank_journal = cls.company_data['default_journal_bank']
-        cls.loan_type = cls.env['om.hr.loan.type'].create({'name': 'Accounted Loan', 'single_running': False})
+        cls.loan_type = cls.env['hr.loan.type'].create({'name': 'Accounted Loan', 'single_running': False})
         cls.loan_type.write({'account_id': cls.loan_account.id, 'journal_id': cls.bank_journal.id})
         cls.employee = cls.env['hr.employee'].create({
             'name': 'Borrowing Employee', 'company_id': cls.env.company.id,
@@ -24,7 +24,7 @@ class TestLoanAccount(AccountTestInvoicingCommon):
         cls.partner = cls.employee.work_contact_id
 
     def running_loan(self, loan_type=None):
-        loan = self.env['om.hr.loan'].create({
+        loan = self.env['hr.loan'].create({
             'employee_id': self.employee.id, 'type_id': (loan_type or self.loan_type).id, 'amount': 900.0,
             'installment_count': 3, 'date': date(2026, 6, 1), 'date_start': date(2026, 7, 1)})
         loan._compute_installments()
@@ -60,7 +60,7 @@ class TestLoanAccount(AccountTestInvoicingCommon):
         self.assertTrue(all(lines.mapped('reconciled')), 'the loan account is reconciled for the employee')
 
     def test_loan_type_without_accounting(self):
-        plain = self.env['om.hr.loan.type'].create({'name': 'Plain Loan', 'single_running': False})
+        plain = self.env['hr.loan.type'].create({'name': 'Plain Loan', 'single_running': False})
         loan = self.running_loan(plain)
         self.assertEqual(loan.state, 'running')
         self.assertFalse(loan.payment_ids)
