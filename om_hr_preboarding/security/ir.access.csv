@@ -1,0 +1,10 @@
+id,name,model_id,group_id/id,operation,domain
+access_hr_preboarding_employee,hr.preboarding.employee,hr.preboarding,base.group_user,r,"[('employee_id.user_id', '=', user.id)]"
+access_hr_preboarding_hr,hr.preboarding.hr,hr.preboarding,hr.group_hr_user,crud,
+hr_preboarding_company_rule,Pre-boardings: multi-company,hr.preboarding,,crud,"[('company_id', 'in', company_ids)]"
+access_hr_preboarding_line_employee,hr.preboarding.line.employee,hr.preboarding.line,base.group_user,r,"[('employee_id.user_id', '=', user.id)]"
+access_hr_preboarding_line_hr,hr.preboarding.line.hr,hr.preboarding.line,hr.group_hr_user,crud,
+access_hr_preboarding_step_hr,hr.preboarding.step.hr,hr.preboarding.step,hr.group_hr_user,r,
+access_hr_preboarding_step_manager,hr.preboarding.step.manager,hr.preboarding.step,hr.group_hr_manager,crud,
+hr_preboarding_step_company_rule,Pre-boarding steps: multi-company,hr.preboarding.step,,crud,"[('company_id', 'in', company_ids)]"
+access_hr_preboarding_send_back_hr,hr.preboarding.send.back.hr,hr.preboarding.send.back,hr.group_hr_user,crud,

@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="hr_preboarding_view_form" model="ir.ui.view">
+        <field name="name">hr.preboarding.view.form</field>
+        <field name="model">hr.preboarding</field>
+        <field name="arch" type="xml">
+            <form string="Pre-boarding" create="0">
+                <header>
+                    <button name="action_send_welcome" string="Send the Welcome Again" type="object"
+                            invisible="state != 'running'"/>
+                    <button name="action_cancel" string="Cancel" type="object" invisible="state != 'running'"
+                            confirm="The new hire can no longer do their steps. Cancel the pre-boarding?"/>
+                    <field name="state" widget="statusbar" statusbar_visible="running,done,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="employee_id" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date_start" readonly="state != 'running'"/>
+                            <field name="buddy_id" readonly="state != 'running'"/>
+                            <field name="department_id"/>
+                        </group>
+                        <group>
+                            <field name="progress" widget="progressbar"/>
+                            <field name="to_review_count"/>
+                            <field name="date_done" invisible="not date_done"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Steps" name="steps">
+                            <field name="line_ids" readonly="1">
+                                <list decoration-info="state == 'submitted'" decoration-muted="state == 'done'">
+                                    <field name="name"/>
+                                    <field name="kind"/>
+                                    <field name="date_done"/>
+                                    <field name="state" widget="badge" decoration-success="state == 'done'"
+                                           decoration-info="state == 'submitted'" decoration-warning="state == 'returned'"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="First Day Information" name="welcome">
+                            <field name="welcome" readonly="state != 'running'"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_preboarding_line_view_form" model="ir.ui.view">
+        <field name="name">hr.preboarding.line.view.form</field>
+        <field name="model">hr.preboarding.line</field>
+        <field name="arch" type="xml">
+            <form string="Pre-boarding Step" create="0">
+                <header>
+                    <button name="action_apply" string="Apply" type="object" class="btn-primary"
+                            invisible="state != 'submitted'"/>
+                    <button name="action_open_send_back" string="Send Back" type="object"
+                            invisible="state != 'submitted'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                        <field name="employee_id" readonly="1"/>
+                    </div>
+                    <field name="review_html" invisible="not review_html"/>
+                    <group>
+                        <field name="review_note" invisible="not review_note"/>
+                        <field name="date_done" invisible="not date_done"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_preboarding_view_list" model="ir.ui.view">
+        <field name="name">hr.preboarding.view.list</field>
+        <field name="model">hr.preboarding</field>
+        <field name="arch" type="xml">
+            <list string="Pre-boardings" create="0">
+                <field name="employee_id" widget="many2one_avatar_employee"/>
+                <field name="department_id" optional="show"/>
+                <field name="date_start"/>
+                <field name="buddy_id" optional="show"/>
+                <field name="progress" widget="progressbar"/>
+                <field name="to_review_count" optional="show"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="state" widget="badge" decoration-success="state == 'done'" decoration-info="state == 'running'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hr_preboarding_view_kanban" model="ir.ui.view">
+        <field name="name">hr.preboarding.view.kanban</field>
+        <field name="model">hr.preboarding</field>
+        <field name="arch" type="xml">
+            <kanban create="0">
+                <templates>
+                    <t t-name="card">
+                        <field name="employee_id" class="fw-bold"/>
+                        <div class="text-muted small">First day: <field name="date_start"/></div>
+                        <field name="progress" widget="progressbar"/>
+                        <div t-if="record.to_review_count.raw_value" class="small text-info">
+                            <field name="to_review_count"/> to review
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="hr_preboarding_view_search" model="ir.ui.view">
+        <field name="name">hr.preboarding.view.search</field>
+        <field name="model">hr.preboarding</field>
+        <field name="arch" type="xml">
+            <search string="Pre-boardings">
+                <field name="employee_id"/>
+                <field name="department_id"/>
+                <filter name="running" string="In Progress" domain="[('state', '=', 'running')]"/>
+                <filter name="to_review" string="To Review" domain="[('line_ids.state', '=', 'submitted')]"/>
+                <filter name="done" string="Completed" domain="[('state', '=', 'done')]"/>
+                <group>
+                    <filter name="group_department" string="Department" context="{'group_by': 'department_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="hr_preboarding_action" model="ir.actions.act_window">
+        <field name="name">Pre-boarding</field>
+        <field name="res_model">hr.preboarding</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{'search_default_running': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No new hire getting ready</p>
+            <p>Start Pre-boarding on the form of an employee who starts soon: they give their details and read what
+                to know for their first day on the website, and you review what they give.</p>
+        </field>
+    </record>
+
+    <!-- steps -->
+
+    <record id="hr_preboarding_step_view_list" model="ir.ui.view">
+        <field name="name">hr.preboarding.step.view.list</field>
+        <field name="model">hr.preboarding.step</field>
+        <field name="arch" type="xml">
+            <list string="Pre-boarding Steps">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="kind"/>
+                <field name="audience"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hr_preboarding_step_view_form" model="ir.ui.view">
+        <field name="name">hr.preboarding.step.view.form</field>
+        <field name="model">hr.preboarding.step</field>
+        <field name="arch" type="xml">
+            <form string="Pre-boarding Step">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <field name="active" invisible="1"/>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="e.g. Your emergency contact"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="kind"/>
+                            <field name="sequence"/>
+                        </group>
+                        <group string="Asked To">
+                            <field name="audience" widget="radio"/>
+                            <field name="department_ids" widget="many2many_tags" invisible="audience != 'department'"
+                                   required="audience == 'department'"/>
+                            <field name="job_ids" widget="many2many_tags" invisible="audience != 'job'"
+                                   required="audience == 'job'"/>
+                            <field name="category_ids" widget="many2many_tags" invisible="audience != 'tag'"
+                                   required="audience == 'tag'"/>
+                            <field name="employee_ids" widget="many2many_tags_avatar" invisible="audience != 'employee'"
+                                   required="audience == 'employee'"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <field name="description" placeholder="What the new hire reads or does on this step."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_preboarding_step_action" model="ir.actions.act_window">
+        <field name="name">Pre-boarding Steps</field>
+        <field name="res_model">hr.preboarding.step</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="hr_preboarding_send_back_view_form" model="ir.ui.view">
+        <field name="name">hr.preboarding.send.back.view.form</field>
+        <field name="model">hr.preboarding.send.back</field>
+        <field name="arch" type="xml">
+            <form string="Send Back">
+                <field name="line_id" invisible="1"/>
+                <field name="note" placeholder="What should the new hire correct?"/>
+                <footer>
+                    <button name="action_send_back" string="Send Back" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- employees -->
+
+    <record id="hr_employee_view_form" model="ir.ui.view">
+        <field name="name">hr.employee.view.form.preboarding</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <field name="preboarding_state" invisible="1"/>
+                <button name="action_start_preboarding" string="Start Pre-boarding" type="object"
+                        groups="hr.group_hr_user" invisible="preboarding_state == 'running'"/>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_open_preboarding" type="object" class="oe_stat_button" icon="task"
+                        groups="hr.group_hr_user" invisible="not preboarding_state">
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">Pre-boarding</span>
+                        <span class="o_stat_value"><field name="preboarding_state" readonly="1"/></span>
+                    </div>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.om_hr_preboarding</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="hr.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <block name="employees_setting_container" position="after">
+                <block title="Pre-boarding" name="om_hr_preboarding_setting_container">
+                    <setting company_dependent="1" id="preboarding_plan_setting" string="Onboarding Plan"
+                             help="Launched on the employee when their pre-boarding starts">
+                        <field name="preboarding_plan_id" options="{'no_create': True}"/>
+                    </setting>
+                    <setting company_dependent="1" id="preboarding_welcome_setting" string="First Day Information"
+                             help="Shown to each new hire; it can be changed for each of them">
+                        <field name="preboarding_welcome"/>
+                    </setting>
+                </block>
+            </block>
+        </field>
+    </record>
+
+    <menuitem id="menu_hr_preboarding" action="hr_preboarding_action" parent="hr.menu_hr_root" sequence="4"
+              groups="hr.group_hr_user"/>
+    <menuitem id="menu_hr_preboarding_step" action="hr_preboarding_step_action"
+              parent="hr.menu_human_resources_configuration" sequence="60" groups="hr.group_hr_manager"/>
+
+</odoo>

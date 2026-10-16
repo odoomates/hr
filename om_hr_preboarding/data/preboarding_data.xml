@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="ir_cron_preboarding_follow_up" model="ir.cron">
+        <field name="name">Pre-boarding: Follow Up</field>
+        <field name="model_id" ref="model_hr_preboarding"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_follow_up()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+    </record>
+
+    <data noupdate="1">
+        <record id="step_details" model="hr.preboarding.step">
+            <field name="name">Your personal details</field>
+            <field name="sequence">10</field>
+            <field name="kind">details</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+        <record id="step_emergency" model="hr.preboarding.step">
+            <field name="name">Your emergency contact</field>
+            <field name="sequence">20</field>
+            <field name="kind">emergency</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+        <record id="step_bank" model="hr.preboarding.step">
+            <field name="name">Your bank account, for your salary</field>
+            <field name="sequence">30</field>
+            <field name="kind">bank</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+        <record id="step_ids" model="hr.preboarding.step">
+            <field name="name">Your ID numbers</field>
+            <field name="sequence">40</field>
+            <field name="kind">ids</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+        <record id="step_first_day" model="hr.preboarding.step">
+            <field name="name">Your first day</field>
+            <field name="sequence">90</field>
+            <field name="kind">read</field>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="description" type="html"><p>Bring your ID and your bank details. Your manager shows you
+around and introduces you to the team; your equipment is ready at your desk.</p></field>
+        </record>
+    </data>
+
+</odoo>
