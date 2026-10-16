@@ -21,7 +21,7 @@ export class OmHrPlugin extends OdooEvaluationPlugin {
      * @returns {number}
      */
     getOmHrFigure(measure, dateFrom, dateTo, departments) {
-        const result = this.getters.getServerData().batch.get("hr.version", "om_spreadsheet_fetch_hr", {
+        const result = this.getters.getServerData().batch.get("hr.version", "spreadsheet_fetch_hr", {
             measure,
             date_from: dateFrom,
             date_to: dateTo,

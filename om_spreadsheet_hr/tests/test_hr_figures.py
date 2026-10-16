@@ -24,7 +24,7 @@ class TestHrFigures(TransactionCase):
         cls.leaver.active = False
 
     def fetch(self, measure, date_from, date_to, departments='Figures Department'):
-        return self.env['hr.version'].om_spreadsheet_fetch_hr([{
+        return self.env['hr.version'].spreadsheet_fetch_hr([{
             'measure': measure, 'date_from': date_from, 'date_to': date_to, 'departments': departments,
         }])[0]['value']
 
@@ -49,7 +49,7 @@ class TestHrFigures(TransactionCase):
     def test_hr_only(self):
         user = new_test_user(self.env, 'om_figures_plain', groups='base.group_user')
         # the batch of the spreadsheet gives the error to the formula instead of raising it
-        result = self.env['hr.version'].with_user(user).om_spreadsheet_fetch_hr(
+        result = self.env['hr.version'].with_user(user).spreadsheet_fetch_hr(
             [{'measure': 'headcount', 'date_to': '2026-01-01'}])
         self.assertIn('__error__', result[0])
         self.assertNotIn('value', result[0])

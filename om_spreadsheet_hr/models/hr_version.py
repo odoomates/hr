@@ -9,7 +9,7 @@ class HrVersion(models.Model):
     _inherit = 'hr.version'
 
     @api.model
-    def _om_spreadsheet_versions(self, date_from, date_to, departments):
+    def _spreadsheet_versions(self, date_from, date_to, departments):
         """ :return: the versions of the employees of the selected companies under contract at some point
             between the two dates, archived ones included: the employees who left still count in the past """
         domain = [
@@ -25,10 +25,10 @@ class HrVersion(models.Model):
         return versions
 
     @api.model
-    def _om_headcount_versions(self, date, departments):
+    def _headcount_versions(self, date, departments):
         """ :return: per employee under contract on the date, the version in effect on that day """
         current = {}
-        for version in self._om_spreadsheet_versions(date, date, departments):
+        for version in self._spreadsheet_versions(date, date, departments):
             if version.date_version and version.date_version > date:
                 continue
             known = current.get(version.employee_id)
@@ -39,7 +39,7 @@ class HrVersion(models.Model):
     @api.readonly
     @api.model
     @spreadsheet_safe_batch
-    def om_spreadsheet_fetch_hr(self, args_list):
+    def spreadsheet_fetch_hr(self, args_list):
         """ The figures of the OM.HR spreadsheet formulas, for the companies selected by the user::
 
             [{measure: 'headcount' | 'joiners' | 'leavers' | 'tenure', date_from: str, date_to: str,
@@ -56,16 +56,16 @@ class HrVersion(models.Model):
             date_from = fields.Date.to_date(args.get('date_from')) or date_to
             departments = args.get('departments') or ''
             if measure in ('headcount', 'tenure'):
-                current = self._om_headcount_versions(date_to, departments)
+                current = self._headcount_versions(date_to, departments)
                 if measure == 'headcount':
                     value = len(current)
                 else:
-                    starts = self._om_first_starts(list(current))
+                    starts = self._first_starts(list(current))
                     years = [(date_to - starts[employee]).days / 365.25 for employee in current if starts.get(employee)]
                     value = sum(years) / len(years) if years else 0.0
             elif measure in ('joiners', 'leavers'):
                 field = 'contract_date_start' if measure == 'joiners' else 'contract_date_end'
-                versions = self._om_spreadsheet_versions(date_from, date_to, departments).filtered(
+                versions = self._spreadsheet_versions(date_from, date_to, departments).filtered(
                     lambda v: v[field] and date_from <= v[field] <= date_to)
                 value = len(versions.employee_id)
             else:
@@ -74,7 +74,7 @@ class HrVersion(models.Model):
         return results
 
     @api.model
-    def _om_first_starts(self, employees):
+    def _first_starts(self, employees):
         """ :return: per employee, the first day of their first contract """
         starts = defaultdict(lambda: False)
         if not employees:
