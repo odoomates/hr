@@ -9,8 +9,7 @@ class HrExit(models.Model):
 
     gratuity_scheme_id = fields.Many2one(
         'hr.gratuity.scheme', groups='hr.group_hr_user',
-        compute='_compute_gratuity_scheme_id', store=True, readonly=False,
-        domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
+        compute='_compute_gratuity_scheme_id', store=True, readonly=False, check_company=True)
     gratuity_date_start = fields.Date(string='Service From', groups='hr.group_hr_user',
                                       compute='_compute_gratuity_date_start', store=True, readonly=False)
     gratuity_wage = fields.Monetary(string='Wage', groups='hr.group_hr_user', currency_field='currency_id',
