@@ -2,8 +2,8 @@
 <odoo>
 
     <record id="om_hr_loan_view_form" model="ir.ui.view">
-        <field name="name">om.hr.loan.view.form</field>
-        <field name="model">om.hr.loan</field>
+        <field name="name">hr.loan.view.form</field>
+        <field name="model">hr.loan</field>
         <field name="arch" type="xml">
             <form string="Loan">
                 <header>
@@ -107,8 +107,8 @@
     </record>
 
     <record id="om_hr_loan_view_list" model="ir.ui.view">
-        <field name="name">om.hr.loan.view.list</field>
-        <field name="model">om.hr.loan</field>
+        <field name="name">hr.loan.view.list</field>
+        <field name="model">hr.loan</field>
         <field name="arch" type="xml">
             <list string="Loans">
                 <field name="name"/>
@@ -129,8 +129,8 @@
     </record>
 
     <record id="om_hr_loan_view_search" model="ir.ui.view">
-        <field name="name">om.hr.loan.view.search</field>
-        <field name="model">om.hr.loan</field>
+        <field name="name">hr.loan.view.search</field>
+        <field name="model">hr.loan</field>
         <field name="arch" type="xml">
             <search>
                 <field name="name"/>
@@ -153,8 +153,8 @@
     </record>
 
     <record id="om_hr_loan_line_view_list" model="ir.ui.view">
-        <field name="name">om.hr.loan.line.view.list</field>
-        <field name="model">om.hr.loan.line</field>
+        <field name="name">hr.loan.line.view.list</field>
+        <field name="model">hr.loan.line</field>
         <field name="arch" type="xml">
             <list string="Installments" create="0" edit="0" delete="0">
                 <field name="loan_id"/>
@@ -170,8 +170,8 @@
     </record>
 
     <record id="om_hr_loan_line_view_search" model="ir.ui.view">
-        <field name="name">om.hr.loan.line.view.search</field>
-        <field name="model">om.hr.loan.line</field>
+        <field name="name">hr.loan.line.view.search</field>
+        <field name="model">hr.loan.line</field>
         <field name="arch" type="xml">
             <search>
                 <field name="employee_id"/>
@@ -189,7 +189,7 @@
 
     <record id="om_hr_loan_action_my" model="ir.actions.act_window">
         <field name="name">My Loans</field>
-        <field name="res_model">om.hr.loan</field>
+        <field name="res_model">hr.loan</field>
         <field name="view_mode">list,form</field>
         <field name="domain">[('employee_id.user_id', '=', uid)]</field>
         <field name="help" type="html">
@@ -200,7 +200,7 @@
 
     <record id="om_hr_loan_action_to_approve" model="ir.actions.act_window">
         <field name="name">To Approve</field>
-        <field name="res_model">om.hr.loan</field>
+        <field name="res_model">hr.loan</field>
         <field name="view_mode">list,form</field>
         <field name="context">{'search_default_to_approve_by_me': 1}</field>
         <field name="help" type="html">
@@ -211,13 +211,13 @@
 
     <record id="om_hr_loan_action" model="ir.actions.act_window">
         <field name="name">All Loans</field>
-        <field name="res_model">om.hr.loan</field>
+        <field name="res_model">hr.loan</field>
         <field name="view_mode">list,form</field>
     </record>
 
     <record id="om_hr_loan_line_action" model="ir.actions.act_window">
         <field name="name">Installments</field>
-        <field name="res_model">om.hr.loan.line</field>
+        <field name="res_model">hr.loan.line</field>
         <field name="view_mode">list</field>
         <field name="context">{'search_default_to_pay': 1, 'search_default_group_month': 1}</field>
     </record>

@@ -1,12 +1,12 @@
 id,name,model_id,group_id/id,operation,domain
-access_om_hr_loan_type_employee,om.hr.loan.type.employee,om.hr.loan.type,base.group_user,r,
-access_om_hr_loan_type_manager,om.hr.loan.type.manager,om.hr.loan.type,hr.group_hr_manager,crud,
-om_hr_loan_type_company_rule,Loan types: multi-company,om.hr.loan.type,,crud,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"
-access_om_hr_loan_employee_read,om.hr.loan.employee.read,om.hr.loan,base.group_user,r,"['|', ('employee_id.user_id', '=', user.id), ('approval_request_ids.line_ids.approver_user_ids', 'in', user.id)]"
-access_om_hr_loan_employee_draft,om.hr.loan.employee.draft,om.hr.loan,base.group_user,cud,"[('employee_id.user_id', '=', user.id), ('state', '=', 'draft')]"
-access_om_hr_loan_hr,om.hr.loan.hr,om.hr.loan,hr.group_hr_user,crud,
-om_hr_loan_company_rule,Loans: multi-company,om.hr.loan,,crud,"[('company_id', 'in', company_ids)]"
-access_om_hr_loan_line_employee_read,om.hr.loan.line.employee.read,om.hr.loan.line,base.group_user,r,"['|', ('loan_id.employee_id.user_id', '=', user.id), ('loan_id.approval_request_ids.line_ids.approver_user_ids', 'in', user.id)]"
-access_om_hr_loan_line_employee_draft,om.hr.loan.line.employee.draft,om.hr.loan.line,base.group_user,cud,"[('loan_id.employee_id.user_id', '=', user.id), ('loan_id.state', '=', 'draft')]"
-access_om_hr_loan_line_hr,om.hr.loan.line.hr,om.hr.loan.line,hr.group_hr_user,crud,
-om_hr_loan_line_company_rule,Loan installments: multi-company,om.hr.loan.line,,crud,"[('company_id', 'in', company_ids)]"
+access_om_hr_loan_type_employee,hr.loan.type.employee,hr.loan.type,base.group_user,r,
+access_om_hr_loan_type_manager,hr.loan.type.manager,hr.loan.type,hr.group_hr_manager,crud,
+om_hr_loan_type_company_rule,Loan types: multi-company,hr.loan.type,,crud,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"
+access_om_hr_loan_employee_read,hr.loan.employee.read,hr.loan,base.group_user,r,"['|', ('employee_id.user_id', '=', user.id), ('approval_request_ids.line_ids.approver_user_ids', 'in', user.id)]"
+access_om_hr_loan_employee_draft,hr.loan.employee.draft,hr.loan,base.group_user,cud,"[('employee_id.user_id', '=', user.id), ('state', '=', 'draft')]"
+access_om_hr_loan_hr,hr.loan.hr,hr.loan,hr.group_hr_user,crud,
+om_hr_loan_company_rule,Loans: multi-company,hr.loan,,crud,"[('company_id', 'in', company_ids)]"
+access_om_hr_loan_line_employee_read,hr.loan.line.employee.read,hr.loan.line,base.group_user,r,"['|', ('loan_id.employee_id.user_id', '=', user.id), ('loan_id.approval_request_ids.line_ids.approver_user_ids', 'in', user.id)]"
+access_om_hr_loan_line_employee_draft,hr.loan.line.employee.draft,hr.loan.line,base.group_user,cud,"[('loan_id.employee_id.user_id', '=', user.id), ('loan_id.state', '=', 'draft')]"
+access_om_hr_loan_line_hr,hr.loan.line.hr,hr.loan.line,hr.group_hr_user,crud,
+om_hr_loan_line_company_rule,Loan installments: multi-company,hr.loan.line,,crud,"[('company_id', 'in', company_ids)]"

@@ -2,8 +2,8 @@
 <odoo>
 
     <record id="om_hr_loan_type_view_list" model="ir.ui.view">
-        <field name="name">om.hr.loan.type.view.list</field>
-        <field name="model">om.hr.loan.type</field>
+        <field name="name">hr.loan.type.view.list</field>
+        <field name="model">hr.loan.type</field>
         <field name="arch" type="xml">
             <list string="Loan Types">
                 <field name="sequence" widget="handle"/>
@@ -20,8 +20,8 @@
     </record>
 
     <record id="om_hr_loan_type_view_form" model="ir.ui.view">
-        <field name="name">om.hr.loan.type.view.form</field>
-        <field name="model">om.hr.loan.type</field>
+        <field name="name">hr.loan.type.view.form</field>
+        <field name="model">hr.loan.type</field>
         <field name="arch" type="xml">
             <form string="Loan Type">
                 <sheet>
@@ -52,7 +52,7 @@
 
     <record id="om_hr_loan_type_action" model="ir.actions.act_window">
         <field name="name">Loan Types</field>
-        <field name="res_model">om.hr.loan.type</field>
+        <field name="res_model">hr.loan.type</field>
         <field name="view_mode">list,form</field>
     </record>
 

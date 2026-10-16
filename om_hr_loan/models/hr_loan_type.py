@@ -1,9 +1,9 @@
 from odoo import fields, models
 
 
-class OmHrLoanType(models.Model):
+class HrLoanType(models.Model):
     """ A kind of loan and its limits, e.g. a salary advance repaid at once, or a personal loan over a year. """
-    _name = 'om.hr.loan.type'
+    _name = 'hr.loan.type'
     _description = 'Loan Type'
     _order = 'sequence, name'
 

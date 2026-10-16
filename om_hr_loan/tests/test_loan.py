@@ -22,10 +22,10 @@ class TestLoan(TransactionCase):
         cls.employee = Employee.create({
             'name': 'Loan Employee', 'user_id': cls.employee_user.id, 'parent_id': cls.manager.id,
             'date_version': date(2024, 1, 1), 'contract_date_start': date(2024, 1, 1), 'wage': 3000.0})
-        cls.loan_type = cls.env['om.hr.loan.type'].create({'name': 'Test Loan', 'max_installments': 12})
+        cls.loan_type = cls.env['hr.loan.type'].create({'name': 'Test Loan', 'max_installments': 12})
 
     def new_loan(self, amount=1000.0, count=3, **values):
-        return self.env['om.hr.loan'].with_user(self.employee_user).create({
+        return self.env['hr.loan'].with_user(self.employee_user).create({
             'employee_id': self.employee.id, 'type_id': self.loan_type.id, 'amount': amount,
             'installment_count': count, 'date': date(2026, 7, 10), 'date_start': date(2026, 8, 15), **values})
 
@@ -104,7 +104,7 @@ class TestLoan(TransactionCase):
 
     def test_advance(self):
         self.loan_type.is_advance = True
-        with Form(self.env['om.hr.loan'].with_user(self.employee_user)) as form:
+        with Form(self.env['hr.loan'].with_user(self.employee_user)) as form:
             form.type_id = self.loan_type
             form.amount = 900
         self.assertEqual(form.record.installment_count, 1)
@@ -117,5 +117,5 @@ class TestLoan(TransactionCase):
         with self.assertRaises(AccessError):
             loan.with_user(self.employee_user).reason = 'Changed once submitted'
         other = new_test_user(self.env, 'om_loan_other', groups='base.group_user')
-        self.assertFalse(self.env['om.hr.loan'].with_user(other).search([('id', '=', loan.id)]))
-        self.assertTrue(self.env['om.hr.loan'].with_user(self.manager_user).search([('id', '=', loan.id)]))
+        self.assertFalse(self.env['hr.loan'].with_user(other).search([('id', '=', loan.id)]))
+        self.assertTrue(self.env['hr.loan'].with_user(self.manager_user).search([('id', '=', loan.id)]))

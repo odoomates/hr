@@ -7,10 +7,10 @@ from odoo.exceptions import UserError, ValidationError
 OPEN_STATES = ('to_approve', 'approved', 'running')
 
 
-class OmHrLoan(models.Model):
+class HrLoan(models.Model):
     """ Money lent to an employee, approved along the approval flow of the loans, then repaid in installments. """
-    _name = 'om.hr.loan'
-    _inherit = ['om.approval.mixin']
+    _name = 'hr.loan'
+    _inherit = ['approval.mixin']
     _description = 'Employee Loan'
     _order = 'date desc, id desc'
     _mail_post_access = 'read'
@@ -25,7 +25,7 @@ class OmHrLoan(models.Model):
     currency_id = fields.Many2one(related='company_id.currency_id')
     department_id = fields.Many2one(related='employee_id.department_id', store=True)
     type_id = fields.Many2one(
-        'om.hr.loan.type', string='Type', required=True, tracking=True,
+        'hr.loan.type', string='Type', required=True, tracking=True,
         domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
     type_description = fields.Text(related='type_id.description')
     is_advance = fields.Boolean(related='type_id.is_advance')
@@ -48,7 +48,7 @@ class OmHrLoan(models.Model):
     ], required=True, default='draft', copy=False, index=True, tracking=True,
         help='Approved: the loan waits to be paid out to the employee. Repaying: the installments are due.')
     date_disbursed = fields.Date(string='Paid Out On', copy=False, readonly=True)
-    line_ids = fields.One2many('om.hr.loan.line', 'loan_id', string='Installment Lines', copy=False)
+    line_ids = fields.One2many('hr.loan.line', 'loan_id', string='Installment Lines', copy=False)
     installment_amount = fields.Monetary(compute='_compute_installment_amount', string='Installment')
     amount_paid = fields.Monetary(compute='_compute_amounts', string='Repaid', store=True)
     amount_residual = fields.Monetary(compute='_compute_amounts', string='Still Due', store=True)
@@ -88,7 +88,7 @@ class OmHrLoan(models.Model):
     def create(self, vals_list):
         for vals in vals_list:
             if vals.get('name', _('New')) == _('New'):
-                vals['name'] = self.env['ir.sequence'].next_by_code('om.hr.loan') or _('New')
+                vals['name'] = self.env['ir.sequence'].next_by_code('hr.loan') or _('New')
         return super().create(vals_list)
 
     def write(self, vals):
@@ -249,13 +249,13 @@ class OmHrLoan(models.Model):
                 loan.message_post(body=_('Repaid.'), subtype_xmlid='mail.mt_note')
 
 
-class OmHrLoanLine(models.Model):
+class HrLoanLine(models.Model):
     """ One monthly installment of a loan. """
-    _name = 'om.hr.loan.line'
+    _name = 'hr.loan.line'
     _description = 'Loan Installment'
     _order = 'loan_id, date, id'
 
-    loan_id = fields.Many2one('om.hr.loan', required=True, ondelete='cascade', index=True)
+    loan_id = fields.Many2one('hr.loan', required=True, ondelete='cascade', index=True)
     employee_id = fields.Many2one(related='loan_id.employee_id', store=True)
     company_id = fields.Many2one(related='loan_id.company_id', store=True)
     currency_id = fields.Many2one(related='loan_id.currency_id')
