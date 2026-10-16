@@ -2,8 +2,8 @@
 <odoo>
 
     <record id="om_hr_exit_view_form_om_asset" model="ir.ui.view">
-        <field name="name">om.hr.exit.view.form.om.asset</field>
-        <field name="model">om.hr.exit</field>
+        <field name="name">hr.exit.view.form.om.asset</field>
+        <field name="model">hr.exit</field>
         <field name="inherit_id" ref="om_hr_exit.om_hr_exit_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='clearance_ids']/list/field[@name='name']" position="after">

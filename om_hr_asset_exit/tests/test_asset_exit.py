@@ -12,7 +12,7 @@ class TestAssetExit(TransactionCase):
         super().setUpClass()
         cls.hr_user = new_test_user(cls.env, 'om_asset_exit_hr', groups='base.group_user,hr.group_hr_user')
         cls.it_user = new_test_user(cls.env, 'om_asset_exit_it', groups='base.group_user')
-        cls.env['om.hr.exit.checklist'].search([]).active = False
+        cls.env['hr.exit.checklist'].search([]).active = False
         cls.employee = cls.env['hr.employee'].create({
             'name': 'Leaving Holder', 'date_version': date(2024, 1, 1), 'contract_date_start': date(2024, 1, 1)})
         Equipment = cls.env['maintenance.equipment']
@@ -22,11 +22,11 @@ class TestAssetExit(TransactionCase):
         (cls.laptop | cls.phone).write({'employee_id': cls.employee.id})
 
     def asset_wizard(self, equipment, mode, **values):
-        return self.env['om.hr.asset.wizard'].with_user(self.hr_user).with_context(
+        return self.env['hr.asset.wizard'].with_user(self.hr_user).with_context(
             default_equipment_id=equipment.id, default_mode=mode).create(values)
 
     def test_exit_cleared_by_returning_the_assets(self):
-        exit_ = self.env['om.hr.exit'].create({
+        exit_ = self.env['hr.exit'].create({
             'employee_id': self.employee.id, 'date_notice': date(2026, 6, 1), 'notice_days': 30})
         exit_.write({'state': 'approved', 'approval_state': 'approved'})
         exit_._create_clearance()
