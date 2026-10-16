@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- a monthly allowance running for a year -->
+    <record id="demo_adjustment_allowance" model="hr.payroll.adjustment">
+        <field name="employee_id" ref="hr.employee_qdp"/>
+        <field name="type_id" ref="adjustment_type_allowance"/>
+        <field name="description">Transport allowance</field>
+        <field name="recurrence">months</field>
+        <field name="month_count">12</field>
+        <field name="amount">250</field>
+        <field name="date_start" eval="DateTime.today().replace(day=1).strftime('%Y-%m-%d')"/>
+    </record>
+    <function model="hr.payroll.adjustment" name="action_confirm" eval="[[ref('demo_adjustment_allowance')]]"/>
+
+    <!-- a bonus approved, paid with the next payslip -->
+    <record id="demo_adjustment_bonus" model="hr.payroll.adjustment">
+        <field name="employee_id" ref="hr.employee_admin"/>
+        <field name="type_id" ref="adjustment_type_bonus"/>
+        <field name="description">Project delivery bonus</field>
+        <field name="amount">1200</field>
+        <field name="date_start" eval="DateTime.today().replace(day=1).strftime('%Y-%m-%d')"/>
+    </record>
+    <function model="hr.payroll.adjustment" name="action_confirm" eval="[[ref('demo_adjustment_bonus')]]"/>
+    <function model="hr.payroll.adjustment" name="action_approval_approve" eval="[[ref('demo_adjustment_bonus')]]"/>
+
+    <!-- a deduction still a draft -->
+    <record id="demo_adjustment_deduction" model="hr.payroll.adjustment">
+        <field name="employee_id" ref="hr.employee_al"/>
+        <field name="type_id" ref="adjustment_type_deduction"/>
+        <field name="description">Training cost, shared</field>
+        <field name="recurrence">total</field>
+        <field name="amount">100</field>
+        <field name="total_amount">450</field>
+        <field name="date_start" eval="(DateTime.today() + relativedelta(months=1, day=1)).strftime('%Y-%m-%d')"/>
+    </record>
+
+</odoo>

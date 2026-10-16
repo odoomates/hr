@@ -17,6 +17,7 @@
         'wizard/om_hr_payroll_adjustment_wizard_views.xml',
         'views/menu.xml',
     ],
+    'demo': ['demo/om_hr_payroll_adjustment_demo.xml'],
     'images': ['static/description/banner.gif'],
     'uninstall_hook': 'uninstall_hook',
 }
