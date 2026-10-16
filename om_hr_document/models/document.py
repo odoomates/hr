@@ -7,8 +7,8 @@ EMPLOYEE_NUMBER_FIELDS = {
 }
 
 
-class OmDocument(models.Model):
-    _inherit = 'om.document'
+class Document(models.Model):
+    _inherit = 'document.document'
 
     employee_id = fields.Many2one(
         'hr.employee', string='Employee', compute='_compute_employee_id', store=True, index='btree_not_null',
@@ -23,16 +23,16 @@ class OmDocument(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         documents = super().create(vals_list)
-        documents._om_hr_sync_employee_numbers()
+        documents._hr_sync_employee_numbers()
         return documents
 
     def write(self, vals):
         result = super().write(vals)
         if {'number', 'type_id', 'active'} & set(vals):
-            self._om_hr_sync_employee_numbers()
+            self._hr_sync_employee_numbers()
         return result
 
-    def _om_hr_sync_employee_numbers(self):
+    def _hr_sync_employee_numbers(self):
         """ The number of a National ID or a passport is also set on the employee, where core HR shows it. """
         for document in self.filtered(lambda d: d.active and d.employee_id and d.number):
             field = EMPLOYEE_NUMBER_FIELDS.get(document.type_id.code)

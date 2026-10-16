@@ -2,8 +2,8 @@
 <odoo>
 
     <record id="om_document_view_search_hr" model="ir.ui.view">
-        <field name="name">om.document.view.search.hr</field>
-        <field name="model">om.document</field>
+        <field name="name">document.document.view.search.hr</field>
+        <field name="model">document.document</field>
         <field name="inherit_id" ref="om_document.om_document_view_search"/>
         <field name="arch" type="xml">
             <field name="type_id" position="after">
@@ -19,7 +19,7 @@
 
     <record id="om_document_action_my" model="ir.actions.act_window">
         <field name="name">My Documents</field>
-        <field name="res_model">om.document</field>
+        <field name="res_model">document.document</field>
         <field name="view_mode">kanban,list,form</field>
         <field name="domain">[('employee_id.user_id', '=', uid)]</field>
         <field name="context">{'create': False}</field>
@@ -31,7 +31,7 @@
 
     <record id="om_document_action_hr" model="ir.actions.act_window">
         <field name="name">Employee Documents</field>
-        <field name="res_model">om.document</field>
+        <field name="res_model">document.document</field>
         <field name="view_mode">kanban,list,form</field>
         <field name="domain">[('res_model', '=', 'hr.employee')]</field>
         <field name="context">{'default_res_model': 'hr.employee'}</field>
@@ -43,7 +43,7 @@
 
     <record id="om_document_action_hr_expiring" model="ir.actions.act_window">
         <field name="name">Expiring</field>
-        <field name="res_model">om.document</field>
+        <field name="res_model">document.document</field>
         <field name="view_mode">list,kanban,form</field>
         <field name="domain">[('res_model', '=', 'hr.employee'), ('state', 'in', ['expiring'])]</field>
         <field name="context">{'default_res_model': 'hr.employee'}</field>
@@ -54,7 +54,7 @@
 
     <record id="om_document_action_hr_expired" model="ir.actions.act_window">
         <field name="name">Expired</field>
-        <field name="res_model">om.document</field>
+        <field name="res_model">document.document</field>
         <field name="view_mode">list,kanban,form</field>
         <field name="domain">[('res_model', '=', 'hr.employee'), ('state', 'in', ['expired'])]</field>
         <field name="context">{'default_res_model': 'hr.employee'}</field>
@@ -65,7 +65,7 @@
 
     <record id="om_document_type_action_hr" model="ir.actions.act_window">
         <field name="name">Document Types</field>
-        <field name="res_model">om.document.type</field>
+        <field name="res_model">document.type</field>
         <field name="view_mode">list,form</field>
         <field name="domain">[('res_model', '=', 'hr.employee')]</field>
         <field name="context" eval="{'default_model_id': ref('hr.model_hr_employee')}"/>

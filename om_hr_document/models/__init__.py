@@ -1,2 +1,2 @@
 from . import hr_employee
-from . import om_document
+from . import document

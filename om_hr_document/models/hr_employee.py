@@ -3,7 +3,7 @@ from odoo import models
 
 class HrEmployee(models.Model):
     _name = 'hr.employee'
-    _inherit = ['hr.employee', 'om.document.mixin']
+    _inherit = ['hr.employee', 'document.mixin']
 
     def _document_responsible_users(self):
         """ The HR responsible of the contract, else the HR managers of the company. """
