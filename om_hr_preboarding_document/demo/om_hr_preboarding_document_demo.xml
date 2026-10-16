@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- the new hires upload their passport before their first day -->
+    <record id="demo_step_passport" model="hr.preboarding.step">
+        <field name="name">Upload your passport</field>
+        <field name="sequence">50</field>
+        <field name="kind">document</field>
+        <field name="document_type_id" ref="om_hr_document.document_type_passport"/>
+        <field name="company_id" ref="base.main_company"/>
+    </record>
+
+</odoo>
