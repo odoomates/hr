@@ -8,3 +8,4 @@ access_hr_preboarding_step_hr,hr.preboarding.step.hr,hr.preboarding.step,hr.grou
 access_hr_preboarding_step_manager,hr.preboarding.step.manager,hr.preboarding.step,hr.group_hr_manager,crud,
 hr_preboarding_step_company_rule,Pre-boarding steps: multi-company,hr.preboarding.step,,crud,"[('company_id', 'in', company_ids)]"
 access_hr_preboarding_send_back_hr,hr.preboarding.send.back.hr,hr.preboarding.send.back,hr.group_hr_user,crud,
+hr_preboarding_line_company_rule,Pre-boarding steps: multi-company,hr.preboarding.line,,crud,"[('company_id', 'in', company_ids)]"

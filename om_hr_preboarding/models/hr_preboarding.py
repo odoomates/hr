@@ -12,14 +12,16 @@ class HrPreboarding(models.Model):
     _name = 'hr.preboarding'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Pre-boarding'
+    _check_company_auto = True
     _order = 'date_start, id'
 
-    employee_id = fields.Many2one('hr.employee', required=True, ondelete='cascade', index=True, readonly=True)
+    employee_id = fields.Many2one('hr.employee', required=True, ondelete='cascade', index=True, readonly=True,
+                                  check_company=True)
     company_id = fields.Many2one(related='employee_id.company_id', store=True, index=True)
     department_id = fields.Many2one(related='employee_id.department_id', store=True)
     user_id = fields.Many2one(related='employee_id.user_id')
     date_start = fields.Date(string='First Day', required=True, tracking=True)
-    buddy_id = fields.Many2one('hr.employee', tracking=True,
+    buddy_id = fields.Many2one('hr.employee', tracking=True, check_company=True,
                                help='The colleague who welcomes the new hire and answers their questions.')
     welcome = fields.Html(string='First Day Information', sanitize_style=True,
                           help='Shown to the new hire: when and where to come, whom to ask for.')
@@ -147,6 +149,7 @@ class HrPreboardingLine(models.Model):
     preboarding_id = fields.Many2one('hr.preboarding', required=True, ondelete='cascade', index=True)
     preboarding_state = fields.Selection(related='preboarding_id.state', string='Pre-boarding Status')
     employee_id = fields.Many2one(related='preboarding_id.employee_id', store=True, index=True)
+    company_id = fields.Many2one(related='preboarding_id.company_id', store=True, index=True)
     step_id = fields.Many2one('hr.preboarding.step', ondelete='set null')
     name = fields.Char(required=True)
     sequence = fields.Integer(default=10)
