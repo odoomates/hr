@@ -13,6 +13,7 @@
         'data/om_hr_announcement_data.xml',
         'views/om_hr_announcement_views.xml',
     ],
+    'demo': ['demo/om_hr_announcement_demo.xml'],
     'assets': {
         'web.assets_backend': [
             'om_hr_announcement/static/src/**/*',

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="demo_announcement_welcome" model="hr.announcement">
+        <field name="name">Welcome to our new HR space</field>
+        <field name="body" type="html"><p>Your payslips, time off, requests and documents are now in My HR, on the
+computer and on the phone. Have a look!</p></field>
+        <field name="audience">company</field>
+        <field name="date_start" eval="(DateTime.today() - relativedelta(days=6)).strftime('%Y-%m-%d %H:%M:%S')"/>
+    </record>
+    <function model="hr.announcement" name="action_publish" eval="[ref('demo_announcement_welcome')]"/>
+    <function model="hr.announcement" name="_mark_read" uid="base.user_demo" eval="[ref('demo_announcement_welcome')]"/>
+    <function model="hr.announcement" name="_mark_read" uid="base.user_admin"
+              eval="[ref('demo_announcement_welcome')]"/>
+
+    <record id="demo_announcement_travel" model="hr.announcement">
+        <field name="name">Updated travel policy</field>
+        <field name="body" type="html"><p>From next month, book your business trips through the travel desk at least
+two weeks ahead. Read the new rules and confirm you have read them.</p></field>
+        <field name="audience">company</field>
+        <field name="pinned" eval="True"/>
+        <field name="requires_ack" eval="True"/>
+        <field name="remind_after_days">5</field>
+        <field name="date_start" eval="(DateTime.today() - relativedelta(days=2)).strftime('%Y-%m-%d %H:%M:%S')"/>
+    </record>
+    <function model="hr.announcement" name="action_publish" eval="[ref('demo_announcement_travel')]"/>
+    <function model="hr.announcement" name="action_acknowledge" uid="base.user_admin"
+              eval="[ref('demo_announcement_travel')]"/>
+    <function model="hr.announcement" name="_mark_read" uid="base.user_demo" eval="[ref('demo_announcement_travel')]"/>
+
+    <record id="demo_announcement_party" model="hr.announcement">
+        <field name="name">Team lunch on Friday</field>
+        <field name="body" type="html"><p>R&amp;D lunch on Friday at noon, on the terrace.</p></field>
+        <field name="audience">department</field>
+        <field name="department_ids" eval="[Command.set([ref('hr.dep_rd')])]"/>
+        <field name="date_start" eval="(DateTime.today() + relativedelta(days=3)).strftime('%Y-%m-%d %H:%M:%S')"/>
+    </record>
+    <!-- shows later: scheduled -->
+    <function model="hr.announcement" name="action_publish" eval="[ref('demo_announcement_party')]"/>
+
+</odoo>
