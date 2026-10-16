@@ -44,14 +44,14 @@ class TestExportPayments(AccountTestInvoicingCommon):
         payslip.action_payslip_done()
         self.assertEqual(payslip.payment_state, 'not_paid')
 
-        action = payslip.action_om_export_bank_file()
+        action = payslip.action_export_bank_file()
         with Form(self.env[action['res_model']].with_context(action['context'])) as wizard_form:
             wizard_form.register_payment = True
             wizard_form.journal_id = self.company_data['default_journal_bank']
             wizard_form.payment_date = date(2026, 9, 1)
         wizard_form.record.action_download()
 
-        self.assertTrue(payslip.om_exported)
+        self.assertTrue(payslip.exported)
         self.assertEqual(payslip.payment_ids.amount, 2500.0)
         self.assertEqual(payslip.payment_ids.date, date(2026, 9, 1))
         self.assertIn(payslip.payment_state, ('in_payment', 'paid'))
@@ -64,6 +64,6 @@ class TestExportPayments(AccountTestInvoicingCommon):
             form.journal_id = self.company_data['default_journal_misc']
         payslip = form.record
         payslip.action_payslip_done()
-        action = payslip.action_om_export_bank_file()
+        action = payslip.action_export_bank_file()
         Form(self.env[action['res_model']].with_context(action['context'])).save().action_download()
         self.assertFalse(payslip.payment_ids)

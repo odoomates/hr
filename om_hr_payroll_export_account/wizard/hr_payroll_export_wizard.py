@@ -2,8 +2,8 @@ from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 
-class OmHrPayrollExportWizard(models.TransientModel):
-    _inherit = 'om.hr.payroll.export.wizard'
+class HrPayrollExportWizard(models.TransientModel):
+    _inherit = 'hr.payroll.export.wizard'
 
     register_payment = fields.Boolean(
         string='Register the Payments',
