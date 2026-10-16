@@ -1,16 +1,16 @@
 from odoo import Command
 from odoo.tests import tagged
 
-from odoo.addons.om_hr_portal.tests.common import OmHrPortalCase
+from odoo.addons.om_hr_portal.tests.common import HrPortalCase
 
 
 @tagged('post_install', '-at_install')
-class TestPortalAnnouncement(OmHrPortalCase):
+class TestPortalAnnouncement(HrPortalCase):
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        Announcement = cls.env['om.hr.announcement'].with_user(cls.hr_user)
+        Announcement = cls.env['hr.announcement'].with_user(cls.hr_user)
         cls.mine = Announcement.create({
             'name': 'New leave policy', 'body': '<p>Read the new policy.</p>', 'requires_ack': True,
             'pinned': True, 'audience': 'employee', 'employee_ids': [Command.set(cls.employee.ids)]})
