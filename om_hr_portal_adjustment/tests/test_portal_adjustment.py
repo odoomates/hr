@@ -2,18 +2,18 @@ from datetime import date
 
 from odoo.tests import new_test_user, tagged
 
-from odoo.addons.om_hr_portal.tests.common import OmHrPortalCase
+from odoo.addons.om_hr_portal.tests.common import HrPortalCase
 
 
 @tagged('post_install', '-at_install')
-class TestPortalAdjustment(OmHrPortalCase):
+class TestPortalAdjustment(HrPortalCase):
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         officer = new_test_user(cls.env, 'om_portal_adj_officer',
                                 groups='base.group_user,om_hr_payroll.group_hr_payroll_user')
-        Adjustment = cls.env['om.hr.payroll.adjustment'].with_user(officer)
+        Adjustment = cls.env['hr.payroll.adjustment'].with_user(officer)
         fine = cls.env.ref('om_hr_payroll_adjustment.adjustment_type_court')
         values = {'type_id': fine.id, 'amount': 150.0, 'recurrence': 'months', 'month_count': 2,
                   'date_start': date(2026, 11, 1), 'description': 'Court order 42'}
