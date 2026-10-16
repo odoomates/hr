@@ -2,8 +2,8 @@
 <odoo>
 
     <record id="om_approval_flow_view_list" model="ir.ui.view">
-        <field name="name">om.approval.flow.view.list</field>
-        <field name="model">om.approval.flow</field>
+        <field name="name">approval.rule.view.list</field>
+        <field name="model">approval.rule</field>
         <field name="arch" type="xml">
             <list string="Approval Flows">
                 <field name="sequence" widget="handle"/>
@@ -17,8 +17,8 @@
     </record>
 
     <record id="om_approval_flow_view_search" model="ir.ui.view">
-        <field name="name">om.approval.flow.view.search</field>
-        <field name="model">om.approval.flow</field>
+        <field name="name">approval.rule.view.search</field>
+        <field name="model">approval.rule</field>
         <field name="arch" type="xml">
             <search>
                 <field name="name"/>
@@ -32,8 +32,8 @@
     </record>
 
     <record id="om_approval_flow_view_form" model="ir.ui.view">
-        <field name="name">om.approval.flow.view.form</field>
-        <field name="model">om.approval.flow</field>
+        <field name="name">approval.rule.view.form</field>
+        <field name="model">approval.rule</field>
         <field name="arch" type="xml">
             <form string="Approval Flow">
                 <sheet>
@@ -94,7 +94,7 @@
 
     <record id="om_approval_flow_action" model="ir.actions.act_window">
         <field name="name">Approval Flows</field>
-        <field name="res_model">om.approval.flow</field>
+        <field name="res_model">approval.rule</field>
         <field name="view_mode">list,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">Create an approval flow</p>

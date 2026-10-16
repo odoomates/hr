@@ -1,11 +1,11 @@
 from odoo import fields, models
 
 
-class OmApprovalRefuse(models.TransientModel):
-    _name = 'om.approval.refuse'
+class ApprovalRefuse(models.TransientModel):
+    _name = 'approval.refuse'
     _description = 'Refuse an Approval'
 
-    request_id = fields.Many2one('om.approval.request', required=True, ondelete='cascade')
+    request_id = fields.Many2one('approval.request', required=True, ondelete='cascade')
     reason = fields.Text(required=True)
 
     def action_refuse(self):

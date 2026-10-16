@@ -2,13 +2,13 @@ from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 
-class OmApprovalMixin(models.AbstractModel):
+class ApprovalMixin(models.AbstractModel):
     """ A document with an approval of its own: it is submitted, then approved in steps along its flow.
 
     A model inheriting the mixin reacts to the decisions in ``_on_approval_approved``, ``_on_approval_refused``,
     ``_on_approval_cancelled`` and ``_on_approval_reset``. Without a flow, the approval administrators approve it.
     """
-    _name = 'om.approval.mixin'
+    _name = 'approval.mixin'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Approval Mixin'
 
@@ -20,11 +20,11 @@ class OmApprovalMixin(models.AbstractModel):
         ('cancel', 'Cancelled'),
     ], string='Approval', required=True, default='draft', copy=False, index=True, tracking=True)
     approval_request_ids = fields.One2many(
-        'om.approval.request', 'res_id', string='Approval Requests', copy=False,
+        'approval.request', 'res_id', string='Approval Requests', copy=False,
         domain=lambda self: [('res_model', '=', self._name), ('method', '=', False)])
-    approval_request_id = fields.Many2one('om.approval.request', string='Approval Request',
+    approval_request_id = fields.Many2one('approval.request', string='Approval Request',
                                           compute='_compute_approval_request')
-    approval_line_ids = fields.One2many('om.approval.line', string='Approvals', compute='_compute_approval_request')
+    approval_line_ids = fields.One2many('approval.line', string='Approvals', compute='_compute_approval_request')
     approval_step = fields.Char(string='Waiting For', compute='_compute_approval_request')
     approver_user_ids = fields.Many2many(
         'res.users', string='Approvers', compute='_compute_approval_request', search='_search_approver_user_ids')
@@ -49,8 +49,8 @@ class OmApprovalMixin(models.AbstractModel):
     def _approval_current_request(self):
         self.ensure_one()
         if not self.id:
-            return self.env['om.approval.request']
-        return self.env['om.approval.request'].sudo().search(
+            return self.env['approval.request']
+        return self.env['approval.request'].sudo().search(
             [('res_model', '=', self._name), ('res_id', '=', self.id), ('method', '=', False)],
             order='id desc', limit=1).sudo(False)
 
@@ -86,9 +86,9 @@ class OmApprovalMixin(models.AbstractModel):
                 raise UserError(_('Only a draft can be submitted: %s is not.', document.display_name))
             document._approval_check_requester()
         for document in self:
-            flow = self.env['om.approval.flow']._get_flow(document)
+            flow = self.env['approval.rule']._get_flow(document)
             document.sudo().approval_state = 'to_approve'
-            request = self.env['om.approval.request']._request(document, flow)
+            request = self.env['approval.request']._request(document, flow)
             if request.state == 'to_approve':
                 document._on_approval_submitted(request)
         return True

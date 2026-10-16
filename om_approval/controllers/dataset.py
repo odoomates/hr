@@ -5,7 +5,7 @@ from odoo.http import request
 
 from odoo.addons.web.controllers.dataset import DataSet
 
-from ..models.om_approval_button import NOT_BUTTONS
+from ..models.approval_button import NOT_BUTTONS
 
 
 def _record_ids(args):
@@ -21,12 +21,12 @@ def _gate(model, method, args):
     """ :return: the action replacing the call when the button waits for an approval, else None """
     if method in NOT_BUTTONS or method.startswith('_') or model not in request.env:
         return None
-    if not request.env['om.approval.flow']._has_button_flows(model, method):
+    if not request.env['approval.rule']._has_button_flows(model, method):
         return None
     ids = _record_ids(args)
     if not ids:
         return None
-    return request.env['om.approval.request']._gate_button(model, method, ids)
+    return request.env['approval.request']._gate_button(model, method, ids)
 
 
 class DataSetApproval(DataSet):

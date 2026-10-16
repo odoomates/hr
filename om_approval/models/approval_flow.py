@@ -8,9 +8,9 @@ def _literal_domain(env, domain):
     return Domain(safe_eval(domain or '[]', {'context': env.context, 'user': env.user}))
 
 
-class OmApprovalFlow(models.Model):
+class ApprovalFlow(models.Model):
     """ Who approves, in which order, before a button of a model runs or before a document is approved. """
-    _name = 'om.approval.flow'
+    _name = 'approval.rule'
     _description = 'Approval Flow'
     _order = 'sequence, id'
 
@@ -22,7 +22,7 @@ class OmApprovalFlow(models.Model):
     model = fields.Char(related='model_id.model', store=True, string='Model Name')
     is_document = fields.Boolean(compute='_compute_is_document')
     button_id = fields.Many2one(
-        'om.approval.button', string='Button', ondelete='cascade', domain="[('model_id', '=', model_id)]",
+        'approval.button', string='Button', ondelete='cascade', domain="[('model_id', '=', model_id)]",
         help='The button stopped until the approval is given. Leave it empty on a document approved by its own '
              'Submit button, such as an HR request.')
     method = fields.Char(related='button_id.method', store=True, index=True)
@@ -30,7 +30,7 @@ class OmApprovalFlow(models.Model):
     domain = fields.Char(
         string='Applies To', default='[]',
         help='The records the flow applies to, e.g. the sale orders above 10,000. The first matching flow is used.')
-    step_ids = fields.One2many('om.approval.step', 'flow_id', string='Steps', copy=True)
+    step_ids = fields.One2many('approval.step', 'flow_id', string='Steps', copy=True)
     fallback_group_id = fields.Many2one(
         'res.groups', string='Approvers When Nobody Is Found',
         default=lambda self: self.env.ref('om_approval.group_approval_manager', raise_if_not_found=False),
@@ -48,7 +48,7 @@ class OmApprovalFlow(models.Model):
 
     @api.depends('model')
     def _compute_is_document(self):
-        documents = set(self.env['om.approval.mixin']._inherit_children)
+        documents = set(self.env['approval.mixin']._inherit_children)
         for flow in self:
             flow.is_document = flow.model in documents
 
@@ -65,13 +65,13 @@ class OmApprovalFlow(models.Model):
     @api.onchange('model_id')
     def _onchange_model_id(self):
         if self.model_id:
-            self.env['om.approval.button']._sync(self.model_id.model)
+            self.env['approval.button']._sync(self.model_id.model)
         if self.button_id.model_id != self.model_id:
             self.button_id = False
 
     def action_refresh_buttons(self):
         for flow in self:
-            self.env['om.approval.button']._sync(flow.model)
+            self.env['approval.button']._sync(flow.model)
         return True
 
     @api.model
@@ -100,13 +100,13 @@ class OmApprovalFlow(models.Model):
         return bool(self.sudo().search_count([('model', '=', model), ('method', '=', method)], limit=1))
 
 
-class OmApprovalStep(models.Model):
+class ApprovalStep(models.Model):
     """ One approval of a flow, and who gives it. """
-    _name = 'om.approval.step'
+    _name = 'approval.step'
     _description = 'Approval Step'
     _order = 'sequence, id'
 
-    flow_id = fields.Many2one('om.approval.flow', required=True, ondelete='cascade', index=True)
+    flow_id = fields.Many2one('approval.rule', required=True, ondelete='cascade', index=True)
     model = fields.Char(related='flow_id.model')
     sequence = fields.Integer(default=10)
     name = fields.Char(required=True, translate=True)

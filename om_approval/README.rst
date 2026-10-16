@@ -31,7 +31,7 @@ Features
 * Approvals > To Approve lists what waits for you, from every app; My Requests
   follows the approvals you asked for; All Requests shows them all to the
   approval administrators.
-* For developers: a model inheriting ``om.approval.mixin`` gets an approval of
+* For developers: a model inheriting ``approval.mixin`` gets an approval of
   its own, submitted, approved, refused, cancelled or set back to draft.
 
 Configuration

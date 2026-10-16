@@ -2,8 +2,8 @@
 <odoo>
 
     <record id="om_approval_refuse_view_form" model="ir.ui.view">
-        <field name="name">om.approval.refuse.view.form</field>
-        <field name="model">om.approval.refuse</field>
+        <field name="name">approval.refuse.view.form</field>
+        <field name="model">approval.refuse</field>
         <field name="arch" type="xml">
             <form string="Refuse">
                 <field name="request_id" invisible="1"/>

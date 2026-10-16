@@ -15,9 +15,9 @@ class ApprovalCase(TransactionCase):
         cls.director = new_test_user(cls.env, 'om_director', groups='base.group_user,base.group_partner_manager')
         cls.approvers = cls.env['res.groups'].create({'name': 'Partner Approvers', 'user_ids': [
             Command.link(cls.approver.id)]})
-        cls.button = cls.env['om.approval.button'].create({
+        cls.button = cls.env['approval.button'].create({
             'model_id': cls.env['ir.model']._get_id('res.partner'), 'method': 'action_archive', 'name': 'Archive'})
-        cls.flow = cls.env['om.approval.flow'].create({
+        cls.flow = cls.env['approval.rule'].create({
             'name': 'Archive a partner',
             'model_id': cls.env['ir.model']._get_id('res.partner'),
             'button_id': cls.button.id,
@@ -27,11 +27,11 @@ class ApprovalCase(TransactionCase):
         cls.partner = cls.env['res.partner'].create({'name': 'Big Customer'})
 
     def gate(self, user, partner=None):
-        Request = self.env['om.approval.request'].with_user(user)
+        Request = self.env['approval.request'].with_user(user)
         return Request._gate_button('res.partner', 'action_archive', (partner or self.partner).ids)
 
     def request_of(self, partner=None):
-        return self.env['om.approval.request'].search([
+        return self.env['approval.request'].search([
             ('res_model', '=', 'res.partner'), ('res_id', '=', (partner or self.partner).id)], order='id desc', limit=1)
 
 
@@ -106,7 +106,7 @@ class TestButtonRule(ApprovalCase):
     def test_refuse(self):
         self.gate(self.requester)
         request = self.request_of()
-        self.env['om.approval.refuse'].with_user(self.approver).create(
+        self.env['approval.refuse'].with_user(self.approver).create(
             {'request_id': request.id, 'reason': 'Still has open invoices'}).action_refuse()
         self.assertEqual(request.state, 'refused')
         self.assertEqual(request.line_ids.note, 'Still has open invoices')
@@ -141,20 +141,20 @@ class TestButtonRule(ApprovalCase):
     def test_access(self):
         self.gate(self.requester)
         request = self.request_of()
-        Request = self.env['om.approval.request']
+        Request = self.env['approval.request']
         self.assertIn(request, Request.with_user(self.requester).search([]))
         self.assertIn(request, Request.with_user(self.approver).search([('approver_user_ids', 'in', self.approver.id)]))
         self.assertNotIn(request, Request.with_user(self.director).search([]))
 
     def test_list_buttons(self):
-        buttons = self.env['om.approval.button']._sync('res.users')
+        buttons = self.env['approval.button']._sync('res.users')
         self.assertTrue(buttons)
         for button in buttons:
             self.assertTrue(callable(getattr(self.env['res.users'], button.method)), button.method)
 
     def test_flow_needs_a_button(self):
         with self.assertRaises(ValidationError):
-            self.env['om.approval.flow'].create({
+            self.env['approval.rule'].create({
                 'name': 'No button', 'model_id': self.env['ir.model']._get_id('res.partner')})
 
 
@@ -166,9 +166,9 @@ class TestButtonRuleWebClient(HttpCase):
         user = new_test_user(self.env, 'om_web_requester', password='om_web_requester',
                              groups='base.group_user,base.group_partner_manager')
         approvers = self.env['res.groups'].create({'name': 'Web Approvers'})
-        button = self.env['om.approval.button'].create({
+        button = self.env['approval.button'].create({
             'model_id': self.env['ir.model']._get_id('res.partner'), 'method': 'action_archive', 'name': 'Archive'})
-        self.env['om.approval.flow'].create({
+        self.env['approval.rule'].create({
             'name': 'Archive', 'model_id': button.model_id.id, 'button_id': button.id,
             'step_ids': [Command.create({'name': 'Approvers', 'approver_type': 'group', 'group_id': approvers.id})],
         })
@@ -182,5 +182,5 @@ class TestButtonRuleWebClient(HttpCase):
             self.assertNotIn('error', result, result)
             self.assertEqual(result['result']['tag'], 'display_notification')
         self.assertTrue(partner.active)
-        self.assertEqual(self.env['om.approval.request'].search_count([('res_id', '=', partner.id),
+        self.assertEqual(self.env['approval.request'].search_count([('res_id', '=', partner.id),
                                                                       ('res_model', '=', 'res.partner')]), 1)

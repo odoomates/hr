@@ -8,17 +8,17 @@ _logger = logging.getLogger(__name__)
 ACTIVITY = 'om_approval.mail_act_approval'
 
 
-class OmApprovalRequest(models.Model):
+class ApprovalRequest(models.Model):
     """ The approval a record waits for: for a button of the record, or for the record itself when it is a
         document with an approval of its own. Its lines are the steps of the flow, approved in turn. """
-    _name = 'om.approval.request'
+    _name = 'approval.request'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Approval Request'
     _order = 'id desc'
     _mail_post_access = 'read'
 
     name = fields.Char(string='Reference', required=True, readonly=True, copy=False, default=lambda self: _('New'))
-    flow_id = fields.Many2one('om.approval.flow', string='Flow', readonly=True, ondelete='restrict')
+    flow_id = fields.Many2one('approval.rule', string='Flow', readonly=True, ondelete='restrict')
     res_model = fields.Char(string='Model', required=True, readonly=True, index=True)
     res_id = fields.Many2oneReference(string='Record ID', model_field='res_model', required=True, readonly=True,
                                       index=True)
@@ -37,7 +37,7 @@ class OmApprovalRequest(models.Model):
         ('cancel', 'Cancelled'),
     ], required=True, default='to_approve', readonly=True, index=True, tracking=True,
         help='Done: the button ran once approved.')
-    line_ids = fields.One2many('om.approval.line', 'request_id', string='Approvals', readonly=True)
+    line_ids = fields.One2many('approval.line', 'request_id', string='Approvals', readonly=True)
     approval_step = fields.Char(string='Waiting For', compute='_compute_current')
     approver_user_ids = fields.Many2many('res.users', string='Approvers', compute='_compute_current',
                                          search='_search_approver_user_ids')
@@ -80,14 +80,14 @@ class OmApprovalRequest(models.Model):
         :return: the request, already approved when no step applies or when the requester approves them all
         """
         request = self.sudo().create({
-            'name': self.env['ir.sequence'].sudo().next_by_code('om.approval.request') or _('New'),
+            'name': self.env['ir.sequence'].sudo().next_by_code('approval.request') or _('New'),
             'flow_id': flow.id or False,
             'res_model': record._name,
             'res_id': record.id,
             'method': method,
             'button_name': button_name,
             'requester_id': self.env.user.id,
-            'company_id': self.env['om.approval.flow']._record_company(record).id,
+            'company_id': self.env['approval.rule']._record_company(record).id,
         })
         request._create_lines(record, flow)
         request._message_document(_('Approval asked: %s', request.name))
@@ -103,7 +103,7 @@ class OmApprovalRequest(models.Model):
 
         :return: None when the button may run, or the action telling the user why it did not
         """
-        flows = self.env['om.approval.flow']
+        flows = self.env['approval.rule']
         records = self.env[model].browse(ids).exists()
         blocked = []
         for record in records:
@@ -164,7 +164,7 @@ class OmApprovalRequest(models.Model):
             fallback = self._fallback_approvers(flow.fallback_group_id)
             values.append({'request_id': self.id, 'sequence': 10, 'name': _('Approval'),
                            'approver_user_ids': ((fallback - self._excluded_approvers()) or fallback).ids})
-        self.env['om.approval.line'].sudo().create(values)
+        self.env['approval.line'].sudo().create(values)
 
     def _fallback_approvers(self, group):
         """ The users approving a step finding nobody: `group`, by default the approval administrators. """
@@ -209,7 +209,7 @@ class OmApprovalRequest(models.Model):
         return {
             'type': 'ir.actions.act_window',
             'name': _('Refuse'),
-            'res_model': 'om.approval.refuse',
+            'res_model': 'approval.refuse',
             'view_mode': 'form',
             'target': 'new',
             'context': {'default_request_id': self.id},
@@ -247,7 +247,7 @@ class OmApprovalRequest(models.Model):
     def _pending_line(self):
         self.ensure_one()
         if self.state != 'to_approve':
-            return self.env['om.approval.line']
+            return self.env['approval.line']
         return self.line_ids.filtered(lambda l: l.state == 'pending')[:1]
 
     def _next(self):
@@ -319,14 +319,14 @@ class OmApprovalRequest(models.Model):
             record.message_post(body=body, subtype_xmlid='mail.mt_note')
 
 
-class OmApprovalLine(models.Model):
+class ApprovalLine(models.Model):
     """ One step of a request, and its decision. """
-    _name = 'om.approval.line'
+    _name = 'approval.line'
     _description = 'Approval'
     _order = 'request_id, sequence, id'
 
-    request_id = fields.Many2one('om.approval.request', required=True, ondelete='cascade', index=True)
-    step_id = fields.Many2one('om.approval.step', string='Step', ondelete='set null')
+    request_id = fields.Many2one('approval.request', required=True, ondelete='cascade', index=True)
+    step_id = fields.Many2one('approval.step', string='Step', ondelete='set null')
     sequence = fields.Integer()
     name = fields.Char(string='Approval', required=True)
     approver_user_ids = fields.Many2many('res.users', string='Approvers')

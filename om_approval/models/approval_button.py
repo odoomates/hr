@@ -9,9 +9,9 @@ NOT_BUTTONS = frozenset({
 })
 
 
-class OmApprovalButton(models.Model):
+class ApprovalButton(models.Model):
     """ A button of the views of a model calling a method of the model, which an approval rule can stop. """
-    _name = 'om.approval.button'
+    _name = 'approval.button'
     _description = 'Approval Button'
     _order = 'model, name, method'
     _rec_names_search = ['name', 'method']

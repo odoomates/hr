@@ -7,12 +7,12 @@
             <field name="summary">Approve</field>
             <field name="icon">task_alt</field>
             <field name="delay_count">3</field>
-            <field name="res_model">om.approval.request</field>
+            <field name="res_model">approval.request</field>
         </record>
 
         <record id="seq_om_approval_request" model="ir.sequence">
             <field name="name">Approval Request</field>
-            <field name="code">om.approval.request</field>
+            <field name="code">approval.request</field>
             <field name="prefix">APR/%(year)s/</field>
             <field name="padding">5</field>
             <field name="company_id" eval="False"/>
