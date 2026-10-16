@@ -7,7 +7,7 @@
         <field name="inherit_id" ref="hr_work_entry.hr_work_entry_type_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//group[@name='computation']" position="inside">
-                <field name="om_encashable"/>
+                <field name="encashable"/>
             </xpath>
         </field>
     </record>

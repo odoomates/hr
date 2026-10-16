@@ -5,7 +5,7 @@ class HrSalaryRule(models.Model):
     _inherit = 'hr.salary.rule'
 
     @api.model
-    def _om_hr_exit_add_to_base_structure(self):
+    def _hr_exit_add_to_base_structure(self):
         """ The structures created from now on pay the final settlements. The structures of the user are left
             as they are. """
         structure = self.env.ref('om_hr_payroll.structure_base', raise_if_not_found=False)

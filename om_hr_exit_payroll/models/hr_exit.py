@@ -2,8 +2,8 @@ from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 
-class OmHrExit(models.Model):
-    _inherit = 'om.hr.exit'
+class HrExit(models.Model):
+    _inherit = 'hr.exit'
 
     settlement_payslip_id = fields.Many2one('hr.payslip', string='Final Settlement', readonly=True, copy=False,
                                             groups='hr.group_hr_user')
@@ -15,13 +15,13 @@ class OmHrExit(models.Model):
     @api.depends('employee_id', 'last_working_day')
     def _compute_encashment(self):
         for exit_ in self:
-            exit_.encashment_days = exit_._om_hr_encashment_days()
-            exit_.encashment_amount = exit_._om_hr_encashment_amount()
+            exit_.encashment_days = exit_._hr_encashment_days()
+            exit_.encashment_amount = exit_._hr_encashment_amount()
 
-    def _om_hr_encashment_days(self):
+    def _hr_encashment_days(self):
         """ The days left on the allocations of the time off paid out at the exit, on the last working day. """
         self.ensure_one()
-        types = self.env['hr.work.entry.type'].sudo().search([('om_encashable', '=', True)])
+        types = self.env['hr.work.entry.type'].sudo().search([('encashable', '=', True)])
         employee = self.employee_id.sudo()
         if not types or not employee or not self.last_working_day:
             return 0.0
@@ -33,7 +33,7 @@ class OmHrExit(models.Model):
                     days += data.get('days_virtual_remaining_leaves', 0.0)
         return max(days, 0.0)
 
-    def _om_hr_encashment_amount(self):
+    def _hr_encashment_amount(self):
         """ A day of time off is paid the daily wage: the monthly wage over the days per month of the payroll. """
         self.ensure_one()
         employee = self.employee_id.sudo()
@@ -41,7 +41,7 @@ class OmHrExit(models.Model):
             return 0.0
         version = employee._get_version(self.last_working_day) or employee.version_id
         days = self.company_id.om_payroll_month_days or 30.0
-        return self.company_id.currency_id.round(self._om_hr_encashment_days() * version.wage / days)
+        return self.company_id.currency_id.round(self._hr_encashment_days() * version.wage / days)
 
     def action_final_settlement(self):
         """ The payslip of the last month, up to the last working day, with what the exit pays and deducts. """

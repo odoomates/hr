@@ -7,12 +7,12 @@ GRATUITY = 'GRATUITY'
 class HrPayslip(models.Model):
     _inherit = 'hr.payslip'
 
-    exit_id = fields.Many2one('om.hr.exit', string='Final Settlement Of', index=True, copy=False, readonly=True,
+    exit_id = fields.Many2one('hr.exit', string='Final Settlement Of', index=True, copy=False, readonly=True,
                               help='The exit the payslip settles.')
 
     def compute_sheet(self):
         for payslip in self.filtered(lambda p: p.exit_id and p.state not in ('done', 'cancel')):
-            payslip._om_hr_exit_set_inputs()
+            payslip._hr_exit_set_inputs()
         return super().compute_sheet()
 
     def _get_contract_end(self, version):
@@ -23,15 +23,15 @@ class HrPayslip(models.Model):
             return last_day
         return contract_end
 
-    def _om_hr_exit_set_inputs(self):
+    def _hr_exit_set_inputs(self):
         """ The amounts of the final settlement, read again at each computation. """
         self.ensure_one()
         exit_ = self.exit_id.sudo()
-        self._om_hr_exit_set_input(ENCASHMENT, _('Unused Time Off'), exit_._om_hr_encashment_amount())
+        self._hr_exit_set_input(ENCASHMENT, _('Unused Time Off'), exit_._hr_encashment_amount())
         gratuity = exit_.gratuity_amount if 'gratuity_amount' in exit_._fields else 0.0
-        self._om_hr_exit_set_input(GRATUITY, _('End of Service Gratuity'), gratuity)
+        self._hr_exit_set_input(GRATUITY, _('End of Service Gratuity'), gratuity)
 
-    def _om_hr_exit_set_input(self, code, name, amount):
+    def _hr_exit_set_input(self, code, name, amount):
         inputs = self.input_line_ids.filtered(lambda line: line.code == code)
         if inputs:
             inputs[0].amount = amount

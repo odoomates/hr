@@ -30,7 +30,7 @@ result = inputs.GRATUITY.amount</field>
             <field name="company_id" eval="False"/>
         </record>
 
-        <function model="hr.salary.rule" name="_om_hr_exit_add_to_base_structure"/>
+        <function model="hr.salary.rule" name="_hr_exit_add_to_base_structure"/>
 
     </data>
 </odoo>

@@ -37,12 +37,12 @@ class TestFinalSettlement(TransactionCase):
             'contract_date_start': date(2026, 1, 1), 'wage': 3000.0, 'struct_id': structure.id})
         annual = cls.env['hr.work.entry.type'].create({
             'name': 'Annual Leave', 'code': 'OMANNUAL', 'count_as': 'absence', 'requires_allocation': True,
-            'request_unit': 'day', 'unit_of_measure': 'day', 'om_encashable': True})
+            'request_unit': 'day', 'unit_of_measure': 'day', 'encashable': True})
         allocation = cls.env['hr.leave.allocation'].create({
             'name': 'Annual 2026', 'employee_id': cls.employee.id, 'work_entry_type_id': annual.id,
             'number_of_days': 10, 'date_from': date(2026, 1, 1)})
         allocation.action_approve()
-        cls.exit = cls.env['om.hr.exit'].create({
+        cls.exit = cls.env['hr.exit'].create({
             'employee_id': cls.employee.id, 'date_notice': date(2026, 7, 21), 'notice_days': 30})
         cls.exit.write({'state': 'approved', 'approval_state': 'approved'})
 
@@ -58,8 +58,8 @@ class TestFinalSettlement(TransactionCase):
             self.exit.gratuity_amount = 750
         loan = None
         if self.loan_rule:
-            loan_type = self.env['om.hr.loan.type'].create({'name': 'Exit Loan'})
-            loan = self.env['om.hr.loan'].create({
+            loan_type = self.env['hr.loan.type'].create({'name': 'Exit Loan'})
+            loan = self.env['hr.loan'].create({
                 'employee_id': self.employee.id, 'type_id': loan_type.id, 'amount': 600, 'installment_count': 3,
                 'date': date(2026, 6, 1), 'date_start': date(2026, 8, 1)})
             loan._compute_installments()
