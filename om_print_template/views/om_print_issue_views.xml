@@ -2,8 +2,8 @@
 <odoo>
 
     <record id="om_print_issue_view_form" model="ir.ui.view">
-        <field name="name">om.print.issue.view.form</field>
-        <field name="model">om.print.issue</field>
+        <field name="name">print.issue.view.form</field>
+        <field name="model">print.issue</field>
         <field name="arch" type="xml">
             <form string="Issued Print">
                 <header>
@@ -55,8 +55,8 @@
     </record>
 
     <record id="om_print_issue_view_list" model="ir.ui.view">
-        <field name="name">om.print.issue.view.list</field>
-        <field name="model">om.print.issue</field>
+        <field name="name">print.issue.view.list</field>
+        <field name="model">print.issue</field>
         <field name="arch" type="xml">
             <list string="Issued Prints" create="0" decoration-muted="state == 'cancelled'"
                   decoration-info="state == 'draft'">
@@ -76,8 +76,8 @@
     </record>
 
     <record id="om_print_issue_view_search" model="ir.ui.view">
-        <field name="name">om.print.issue.view.search</field>
-        <field name="model">om.print.issue</field>
+        <field name="name">print.issue.view.search</field>
+        <field name="model">print.issue</field>
         <field name="arch" type="xml">
             <search>
                 <field name="name"/>
@@ -100,7 +100,7 @@
 
     <record id="om_print_issue_action" model="ir.actions.act_window">
         <field name="name">Issued Prints</field>
-        <field name="res_model">om.print.issue</field>
+        <field name="res_model">print.issue</field>
         <field name="view_mode">list,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">Nothing printed yet</p>

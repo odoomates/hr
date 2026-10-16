@@ -1,1 +1,1 @@
-from . import om_print_wizard
+from . import print_wizard

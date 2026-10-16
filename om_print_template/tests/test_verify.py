@@ -6,10 +6,10 @@ class TestVerify(HttpCase):
 
     def test_verify_page(self):
         partner = self.env['res.partner'].create({'name': 'Verified Holder'})
-        template = self.env['om.print.template'].create({
+        template = self.env['print.template'].create({
             'name': 'Confirmation', 'model_id': self.env['ir.model']._get_id('res.partner'),
             'body_html': '<p>Hello</p>', 'show_qr': True})
-        issue = self.env['om.print.issue']._create_from_template(template, partner.ids)
+        issue = self.env['print.issue']._create_from_template(template, partner.ids)
         issue.action_issue()
         url = '/print/verify/%s' % issue.access_token
 
@@ -25,6 +25,6 @@ class TestVerify(HttpCase):
         template.show_qr = False
         self.assertIn('Not found', self.url_open(url).text, 'only prints offering the QR are verified')
         self.assertIn('Not found', self.url_open('/print/verify/nothing').text)
-        draft = self.env['om.print.issue']._create_from_template(template, partner.ids)
+        draft = self.env['print.issue']._create_from_template(template, partner.ids)
         template.show_qr = True
         self.assertIn('Not found', self.url_open('/print/verify/%s' % draft.access_token).text)

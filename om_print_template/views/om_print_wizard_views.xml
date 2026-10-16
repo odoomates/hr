@@ -2,8 +2,8 @@
 <odoo>
 
     <record id="om_print_wizard_view_form" model="ir.ui.view">
-        <field name="name">om.print.wizard.view.form</field>
-        <field name="model">om.print.wizard</field>
+        <field name="name">print.wizard.view.form</field>
+        <field name="model">print.wizard</field>
         <field name="arch" type="xml">
             <form string="Print">
                 <field name="res_model" invisible="1"/>

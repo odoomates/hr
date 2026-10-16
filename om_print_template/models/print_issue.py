@@ -9,20 +9,20 @@ from odoo.exceptions import UserError
 FROZEN_FIELDS = {'template_id', 'res_model', 'res_id', 'date', 'addressee', 'subject', 'body_html', 'lang'}
 
 
-class OmPrintIssue(models.Model):
+class PrintIssue(models.Model):
     """ A print of a template for a record: drafted, then issued with a reference and its PDF.
 
     The text is rendered when the print is drafted and may be adjusted until it is issued; from then on it stays as
     printed, so that printing it again gives the same PDF, whatever changed on the record since.
     """
-    _name = 'om.print.issue'
+    _name = 'print.issue'
     _inherit = ['mail.thread']
     _description = 'Issued Print'
     _order = 'date desc, id desc'
     _mail_post_access = 'read'
 
     name = fields.Char(string='Reference', required=True, readonly=True, copy=False, default=lambda self: _('Draft'))
-    template_id = fields.Many2one('om.print.template', string='Template', required=True, ondelete='restrict',
+    template_id = fields.Many2one('print.template', string='Template', required=True, ondelete='restrict',
                                  index=True, tracking=True)
     res_model = fields.Char(string='Model', required=True, index=True)
     res_id = fields.Many2oneReference(string='Record ID', model_field='res_model', required=True, index=True)

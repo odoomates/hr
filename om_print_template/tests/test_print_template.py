@@ -12,7 +12,7 @@ class TestPrintTemplate(TransactionCase):
         cls.user = new_test_user(cls.env, 'om_print_user', groups='base.group_user,base.group_partner_manager')
         cls.other_user = new_test_user(cls.env, 'om_print_other', groups='base.group_user')
         cls.partner = cls.env['res.partner'].create({'name': 'Acme Supplies'})
-        cls.template = cls.env['om.print.template'].create({
+        cls.template = cls.env['print.template'].create({
             'name': 'Balance Confirmation',
             'model_id': cls.env['ir.model']._get_id('res.partner'),
             'code': 'CONF/',
@@ -24,12 +24,12 @@ class TestPrintTemplate(TransactionCase):
     def wizard(self, records, user=None):
         context = {'active_model': records._name, 'active_ids': records.ids,
                    'default_template_id': self.template.id}
-        return Form(self.env['om.print.wizard'].with_user(user or self.user).with_context(context))
+        return Form(self.env['print.wizard'].with_user(user or self.user).with_context(context))
 
     def issue(self, user=None):
         wizard = self.wizard(self.partner, user=user).save()
         action = wizard.action_issue()
-        return self.env['om.print.issue'].search([('res_id', '=', self.partner.id)], limit=1), action
+        return self.env['print.issue'].search([('res_id', '=', self.partner.id)], limit=1), action
 
     def test_print_menu(self):
         action = self.template.ref_ir_act_window
@@ -69,7 +69,7 @@ class TestPrintTemplate(TransactionCase):
 
     def test_edit_before_issuing(self):
         wizard = self.wizard(self.partner).save()
-        draft = self.env['om.print.issue'].browse(wizard.action_draft()['res_id'])
+        draft = self.env['print.issue'].browse(wizard.action_draft()['res_id'])
         self.assertEqual(draft.state, 'draft')
         draft.with_user(self.user).body_html = '<p>Adjusted for the bank.</p>'
         draft.with_user(self.user).action_issue()
@@ -79,7 +79,7 @@ class TestPrintTemplate(TransactionCase):
         partners = self.partner | self.env['res.partner'].create({'name': 'Beta Trading'})
         action = self.wizard(partners).save().action_issue()
         self.assertEqual(action['type'], 'ir.actions.report')
-        self.assertEqual(self.env['om.print.issue'].search_count([('res_id', 'in', partners.ids)]), 2)
+        self.assertEqual(self.env['print.issue'].search_count([('res_id', 'in', partners.ids)]), 2)
 
     def test_cancel_and_access(self):
         issue, _action = self.issue()

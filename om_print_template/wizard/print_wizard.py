@@ -2,16 +2,16 @@ from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 
-class OmPrintWizard(models.TransientModel):
+class PrintWizard(models.TransientModel):
     """ Print a template for the records selected, from their Print menu. """
-    _name = 'om.print.wizard'
+    _name = 'print.wizard'
     _description = 'Print a Template'
 
     res_model = fields.Char(required=True)
     res_ids = fields.Json(required=True)
     record_count = fields.Integer(compute='_compute_preview')
     template_id = fields.Many2one(
-        'om.print.template', string='Template', required=True,
+        'print.template', string='Template', required=True,
         domain="[('model', '=', res_model)]")
     addressee = fields.Char(help='Leave as it is to use the addressee of the template.')
     preview = fields.Html(compute='_compute_preview', sanitize='email_outgoing')
@@ -47,7 +47,7 @@ class OmPrintWizard(models.TransientModel):
         if self.template_id.model != self.res_model:
             raise UserError(_('%s does not print these records.', self.template_id.name))
         self.env[self.res_model].browse(self.res_ids).check_access('read')
-        Issue = self.env['om.print.issue']
+        Issue = self.env['print.issue']
         issues = Issue._create_from_template(self.template_id, self.res_ids)
         if len(self.res_ids) == 1 and self.addressee:
             issues.addressee = self.addressee
@@ -64,7 +64,7 @@ class OmPrintWizard(models.TransientModel):
         issues = self._create_drafts()
         action = {
             'type': 'ir.actions.act_window',
-            'res_model': 'om.print.issue',
+            'res_model': 'print.issue',
             'name': _('Draft Prints'),
         }
         if len(issues) == 1:

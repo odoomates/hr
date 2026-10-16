@@ -1,3 +1,3 @@
-from . import om_print_template
-from . import om_print_issue
-from . import om_print_mixin
+from . import print_template
+from . import print_issue
+from . import print_mixin

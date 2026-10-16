@@ -1,14 +1,14 @@
 from odoo import _, api, fields, models
 
 
-class OmPrintTemplate(models.Model):
+class PrintTemplate(models.Model):
     """ A PDF any user prints from a record, written in the editor with the fields of the record, e.g. a salary
     certificate of an employee or a balance confirmation of a customer.
 
     Each template adds an entry to the Print menu of its model. What is printed is kept as an issued print, with a
     reference number and the text frozen as it was printed.
     """
-    _name = 'om.print.template'
+    _name = 'print.template'
     _inherit = ['mail.render.mixin']
     _description = 'Print Template'
     _order = 'sequence, name, id'
@@ -47,7 +47,7 @@ class OmPrintTemplate(models.Model):
                                         copy=False)
     company_id = fields.Many2one('res.company', string='Company',
                                  help='Leave empty to share the template with all the companies.')
-    issue_ids = fields.One2many('om.print.issue', 'template_id', string='Issued Prints')
+    issue_ids = fields.One2many('print.issue', 'template_id', string='Issued Prints')
     issue_count = fields.Integer(compute='_compute_issue_count', string='Issued')
 
     @api.depends('model')
@@ -56,7 +56,7 @@ class OmPrintTemplate(models.Model):
             template.render_model = template.model
 
     def _compute_issue_count(self):
-        counts = dict(self.env['om.print.issue']._read_group(
+        counts = dict(self.env['print.issue']._read_group(
             [('template_id', 'in', self.ids)], ['template_id'], ['__count']))
         for template in self:
             template.issue_count = counts.get(template, 0)
@@ -109,7 +109,7 @@ class OmPrintTemplate(models.Model):
                 continue
             values = {
                 'name': template.name,
-                'res_model': 'om.print.wizard',
+                'res_model': 'print.wizard',
                 'view_mode': 'form',
                 'target': 'new',
                 'context': repr({'default_template_id': template.id}),
@@ -140,7 +140,7 @@ class OmPrintTemplate(models.Model):
         return {
             'type': 'ir.actions.act_window',
             'name': _('Issued Prints'),
-            'res_model': 'om.print.issue',
+            'res_model': 'print.issue',
             'view_mode': 'list,form',
             'domain': [('template_id', '=', self.id)],
         }
