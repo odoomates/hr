@@ -19,7 +19,7 @@ runs:
       run: git clone --depth 1 --branch 20.0 https://github.com/odoo/odoo.git odoo
     - name: System libraries
       shell: bash
-      run: sudo apt-get update -q && sudo apt-get install -yq libldap2-dev libsasl2-dev libpq-dev postgresql-client
+      run: sudo apt-get update -q && sudo apt-get install -yq libldap2-dev libsasl2-dev libpq-dev libcairo2-dev pkg-config postgresql-client
     - uses: actions/setup-python@v7
       with:
         python-version: '3.13'
