@@ -13,10 +13,10 @@ AUDIENCES = [
 ]
 
 
-class OmHrAnnouncement(models.Model):
+class HrAnnouncement(models.Model):
     """ A notice to the employees of a company, of departments, of job positions, of tags, or to some employees:
     published, it reaches each of them, who read it and, when asked, acknowledge it. """
-    _name = 'om.hr.announcement'
+    _name = 'hr.announcement'
     _inherit = ['mail.thread']
     _description = 'Announcement'
     _order = 'pinned desc, date_start desc, id desc'
@@ -50,7 +50,7 @@ class OmHrAnnouncement(models.Model):
     job_ids = fields.Many2many('hr.job', string='Job Positions')
     category_ids = fields.Many2many('hr.employee.category', string='Employee Tags')
     employee_ids = fields.Many2many('hr.employee', string='Employees')
-    recipient_ids = fields.One2many('om.hr.announcement.read', 'announcement_id', string='Recipients', copy=False)
+    recipient_ids = fields.One2many('hr.announcement.read', 'announcement_id', string='Recipients', copy=False)
     audience_count = fields.Integer(compute='_compute_audience_count', string='Employees Reached')
     recipient_count = fields.Integer(compute='_compute_rates', string='Number of Recipients')
     read_count = fields.Integer(compute='_compute_rates', string='Read')
@@ -63,7 +63,7 @@ class OmHrAnnouncement(models.Model):
     @api.depends('audience', 'department_ids', 'job_ids', 'category_ids', 'employee_ids', 'company_id')
     def _compute_audience_count(self):
         for announcement in self:
-            announcement.audience_count = len(announcement._om_audience())
+            announcement.audience_count = len(announcement._audience())
 
     @api.depends('recipient_ids.read_date', 'recipient_ids.ack_date')
     def _compute_rates(self):
@@ -76,13 +76,13 @@ class OmHrAnnouncement(models.Model):
             announcement.read_rate = announcement.read_count / count * 100 if count else 0.0
             announcement.ack_rate = announcement.ack_count / count * 100 if count else 0.0
 
-    def _om_my_lines(self):
-        return self.env['om.hr.announcement.read'].sudo().search(
+    def _my_lines(self):
+        return self.env['hr.announcement.read'].sudo().search(
             [('announcement_id', 'in', self.ids), ('employee_id.user_id', '=', self.env.uid)])
 
     @api.depends_context('uid')
     def _compute_my_state(self):
-        lines = {line.announcement_id: line for line in self._om_my_lines()}
+        lines = {line.announcement_id: line for line in self._my_lines()}
         for announcement in self:
             line = lines.get(announcement)
             announcement.my_state = (line.ack_date and 'acknowledged') or (line.read_date and 'read') or \
@@ -100,7 +100,7 @@ class OmHrAnnouncement(models.Model):
         wanted = [states[state] for state in values if state in states]
         if not wanted:
             return [('id', '=', False)]
-        lines = self.env['om.hr.announcement.read'].sudo().search(
+        lines = self.env['hr.announcement.read'].sudo().search(
             Domain('employee_id.user_id', '=', self.env.uid) & Domain.OR(wanted))
         return [('id', 'in', lines.announcement_id.ids)]
 
@@ -116,7 +116,7 @@ class OmHrAnnouncement(models.Model):
         # constraints run as the super user: the rights of the user decide, not the sudo
         if self.env.user._is_superuser() or self.env.user.has_group('hr.group_hr_user'):
             return
-        managed = self._om_managed_departments()
+        managed = self._managed_departments()
         for announcement in self:
             if announcement.audience != 'department' or not announcement.department_ids or \
                     announcement.department_ids - managed:
@@ -124,7 +124,7 @@ class OmHrAnnouncement(models.Model):
                                         'manage: %s.', ', '.join(managed.mapped('name')) or _('none')))
 
     @api.model
-    def _om_managed_departments(self):
+    def _managed_departments(self):
         managed = self.env['hr.department'].sudo().search([('manager_id.user_id', '=', self.env.uid)])
         return self.env['hr.department'].sudo().search([('id', 'child_of', managed.ids)])
 
@@ -132,7 +132,7 @@ class OmHrAnnouncement(models.Model):
     # Audience
     # ------------------------------------------------------------------
 
-    def _om_audience(self):
+    def _audience(self):
         """ :return: the employees the announcement is for """
         self.ensure_one()
         Employee = self.env['hr.employee'].sudo()
@@ -159,21 +159,21 @@ class OmHrAnnouncement(models.Model):
             if announcement.state != 'draft':
                 raise UserError(_('Only a draft is published: %s is not.', announcement.name))
             announcement._check_publisher()
-            if not announcement._om_audience():
+            if not announcement._audience():
                 raise UserError(_('The announcement %s reaches no employee.', announcement.name))
         now = fields.Datetime.now()
         self.filtered(lambda a: a.date_start > now).write({'state': 'scheduled'})
-        self.filtered(lambda a: a.date_start <= now)._om_publish()
+        self.filtered(lambda a: a.date_start <= now)._publish()
         return True
 
-    def _om_publish(self):
+    def _publish(self):
         for announcement in self.sudo():
-            employees = announcement._om_audience()
+            employees = announcement._audience()
             announcement.write({'state': 'published', 'date_published': fields.Datetime.now(),
                                 'recipient_ids': [(0, 0, {'employee_id': employee.id}) for employee in employees]})
-            announcement._om_notify(employees, _('Announcement: %s', announcement.name))
+            announcement._notify(employees, _('Announcement: %s', announcement.name))
 
-    def _om_notify(self, employees, subject):
+    def _notify(self, employees, subject):
         """ The recipients get it in their inbox, or by email, as they prefer. """
         self.ensure_one()
         partners = employees.sudo().user_id.partner_id
@@ -194,7 +194,7 @@ class OmHrAnnouncement(models.Model):
             if announcement.state != 'published' or not announcement.requires_ack:
                 raise UserError(_('Only a published announcement asking for an acknowledgement is reminded.'))
             pending = announcement.sudo().recipient_ids.filtered(lambda line: not line.ack_date).employee_id
-            announcement._om_notify(pending, _('Reminder: %s', announcement.name))
+            announcement._notify(pending, _('Reminder: %s', announcement.name))
             announcement.sudo().date_reminded = fields.Datetime.now()
             announcement.message_post(body=_('%s employees reminded.', len(pending)), subtype_xmlid='mail.mt_note')
         return True
@@ -204,17 +204,17 @@ class OmHrAnnouncement(models.Model):
         return {
             'type': 'ir.actions.act_window',
             'name': _('Recipients'),
-            'res_model': 'om.hr.announcement.read',
+            'res_model': 'hr.announcement.read',
             'view_mode': 'list,pivot',
             'domain': [('announcement_id', '=', self.id)],
             'context': dict(self.env.context),
         }
 
     @api.model
-    def _cron_om_announcements(self):
+    def _cron_announcements(self):
         """ Publish what is due, expire what ended, remind once after the days asked for. """
         now = fields.Datetime.now()
-        self.search([('state', '=', 'scheduled'), ('date_start', '<=', now)])._om_publish()
+        self.search([('state', '=', 'scheduled'), ('date_start', '<=', now)])._publish()
         self.search([('state', '=', 'published'), ('date_end', '<', fields.Date.context_today(self))]).write(
             {'state': 'expired'})
         for announcement in self.search([('state', '=', 'published'), ('requires_ack', '=', True),
@@ -231,14 +231,14 @@ class OmHrAnnouncement(models.Model):
         """ Opening the announcement marks it read for its recipient. """
         result = super().web_read(specification)
         if len(self) == 1 and 'body' in specification:
-            self._om_mark_read()
+            self._mark_read()
         return result
 
-    def _om_mark_read(self):
-        self._om_my_lines().filtered(lambda line: not line.read_date).write({'read_date': fields.Datetime.now()})
+    def _mark_read(self):
+        self._my_lines().filtered(lambda line: not line.read_date).write({'read_date': fields.Datetime.now()})
 
     def action_acknowledge(self):
-        lines = self._om_my_lines()
+        lines = self._my_lines()
         if not lines:
             raise UserError(_('This announcement is not addressed to you.'))
         now = fields.Datetime.now()
@@ -247,10 +247,10 @@ class OmHrAnnouncement(models.Model):
         return True
 
     @api.model
-    def om_systray_data(self):
+    def systray_data(self):
         """ The announcements of the user waiting for them: unread, or to acknowledge. """
         mine = self.search([('state', '=', 'published')])
-        lines = {line.announcement_id: line for line in mine._om_my_lines()}
+        lines = {line.announcement_id: line for line in mine._my_lines()}
         waiting = mine.filtered(lambda a: a in lines and (
             not lines[a].read_date or (a.requires_ack and not lines[a].ack_date)))
         return {
@@ -263,13 +263,13 @@ class OmHrAnnouncement(models.Model):
         }
 
 
-class OmHrAnnouncementRead(models.Model):
+class HrAnnouncementRead(models.Model):
     """ An employee an announcement reached: when they read it, when they acknowledged it. """
-    _name = 'om.hr.announcement.read'
+    _name = 'hr.announcement.read'
     _description = 'Announcement Recipient'
     _order = 'announcement_id, employee_id'
 
-    announcement_id = fields.Many2one('om.hr.announcement', required=True, ondelete='cascade', index=True)
+    announcement_id = fields.Many2one('hr.announcement', required=True, ondelete='cascade', index=True)
     employee_id = fields.Many2one('hr.employee', string='Employee', required=True, ondelete='cascade', index=True)
     department_id = fields.Many2one(related='employee_id.department_id', store=True)
     company_id = fields.Many2one(related='announcement_id.company_id', store=True)

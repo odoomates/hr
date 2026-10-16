@@ -4,7 +4,7 @@ import { useDropdownState } from "@web/core/dropdown/dropdown_hooks";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 
-const MODEL = "om.hr.announcement";
+const MODEL = "hr.announcement";
 const { DateTime } = luxon;
 
 /**
@@ -25,7 +25,7 @@ export class AnnouncementMenu extends Component {
     }
 
     async load() {
-        Object.assign(this.state, await this.orm.call(MODEL, "om_systray_data", []));
+        Object.assign(this.state, await this.orm.call(MODEL, "systray_data", []));
     }
 
     async open(item) {

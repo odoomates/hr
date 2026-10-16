@@ -1,8 +1,8 @@
 id,name,model_id,group_id/id,operation,domain
-access_announcement_recipient,om.hr.announcement.recipient,om.hr.announcement,base.group_user,r,"[('state', 'in', ('published', 'expired')), ('recipient_ids.employee_id.user_id', '=', user.id)]"
-access_announcement_author,om.hr.announcement.author,om.hr.announcement,base.group_user,crud,"[('create_uid', '=', user.id)]"
-access_announcement_hr,om.hr.announcement.hr,om.hr.announcement,hr.group_hr_user,crud,
-announcement_company_rule,Announcements: multi-company,om.hr.announcement,,crud,"[('company_id', 'in', company_ids)]"
-access_read_own,om.hr.announcement.read.own,om.hr.announcement.read,base.group_user,r,"['|', ('employee_id.user_id', '=', user.id), ('announcement_id.create_uid', '=', user.id)]"
-access_read_hr,om.hr.announcement.read.hr,om.hr.announcement.read,hr.group_hr_user,crud,
-read_company_rule,Announcement recipients: multi-company,om.hr.announcement.read,,crud,"[('company_id', 'in', company_ids)]"
+access_announcement_recipient,hr.announcement.recipient,hr.announcement,base.group_user,r,"[('state', 'in', ('published', 'expired')), ('recipient_ids.employee_id.user_id', '=', user.id)]"
+access_announcement_author,hr.announcement.author,hr.announcement,base.group_user,crud,"[('create_uid', '=', user.id)]"
+access_announcement_hr,hr.announcement.hr,hr.announcement,hr.group_hr_user,crud,
+announcement_company_rule,Announcements: multi-company,hr.announcement,,crud,"[('company_id', 'in', company_ids)]"
+access_read_own,hr.announcement.read.own,hr.announcement.read,base.group_user,r,"['|', ('employee_id.user_id', '=', user.id), ('announcement_id.create_uid', '=', user.id)]"
+access_read_hr,hr.announcement.read.hr,hr.announcement.read,hr.group_hr_user,crud,
+read_company_rule,Announcement recipients: multi-company,hr.announcement.read,,crud,"[('company_id', 'in', company_ids)]"

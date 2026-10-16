@@ -1,1 +1,1 @@
-from . import om_hr_announcement
+from . import hr_announcement
