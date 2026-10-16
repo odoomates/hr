@@ -13,6 +13,7 @@ class HrExit(models.Model):
     _name = 'hr.exit'
     _inherit = ['approval.mixin']
     _description = 'Employee Exit'
+    _check_company_auto = True
     _order = 'date_notice desc, id desc'
     _mail_post_access = 'read'
 
@@ -20,7 +21,7 @@ class HrExit(models.Model):
                        default=lambda self: self.env._('New'))
     employee_id = fields.Many2one(
         'hr.employee', required=True, index=True, tracking=True,
-        default=lambda self: self.env.user.employee_id)
+        default=lambda self: self.env.user.employee_id, check_company=True)
     company_id = fields.Many2one(
         'res.company', required=True, index=True,
         compute='_compute_company_id', store=True, readonly=False, precompute=True)
@@ -223,13 +224,15 @@ class HrExitClearance(models.Model):
     """ One item of the checklist an exit is cleared with. """
     _name = 'hr.exit.clearance'
     _description = 'Exit Clearance'
+    _check_company_auto = True
     _order = 'exit_id, sequence, id'
 
-    exit_id = fields.Many2one('hr.exit', required=True, ondelete='cascade', index=True)
+    exit_id = fields.Many2one('hr.exit', required=True, ondelete='cascade', index=True, check_company=True)
     employee_id = fields.Many2one(related='exit_id.employee_id', store=True)
     company_id = fields.Many2one(related='exit_id.company_id', store=True)
     last_working_day = fields.Date(related='exit_id.last_working_day')
-    checklist_id = fields.Many2one('hr.exit.checklist', string='Checklist Item', ondelete='set null')
+    checklist_id = fields.Many2one('hr.exit.checklist', string='Checklist Item', ondelete='set null',
+                                   check_company=True)
     sequence = fields.Integer()
     name = fields.Char(required=True)
     description = fields.Text()
