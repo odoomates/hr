@@ -8,6 +8,7 @@ class HrCertificate(models.Model):
     _name = 'hr.certificate'
     _inherit = ['approval.mixin']
     _description = 'Certificate Request'
+    _check_company_auto = True
     _order = 'date desc, id desc'
     _mail_post_access = 'read'
 
@@ -15,15 +16,14 @@ class HrCertificate(models.Model):
                        default=lambda self: self.env._('New'))
     employee_id = fields.Many2one(
         'hr.employee', required=True, index=True, tracking=True,
-        default=lambda self: self.env.user.employee_id)
+        default=lambda self: self.env.user.employee_id, check_company=True)
     company_id = fields.Many2one(
         'res.company', required=True, index=True,
         compute='_compute_company_id', store=True, readonly=False, precompute=True)
     department_id = fields.Many2one(related='employee_id.department_id', store=True)
     template_id = fields.Many2one(
         'print.template', string='Certificate', required=True, tracking=True,
-        domain="[('model', '=', 'hr.employee'), ('employee_request', '=', True), "
-               "'|', ('company_id', '=', False), ('company_id', '=', company_id)]")
+        domain="[('model', '=', 'hr.employee'), ('employee_request', '=', True)]", check_company=True)
     addressee = fields.Char(help='Who the certificate is for, e.g. the name of a bank or an embassy. '
                                  'Leave empty for "To Whom It May Concern".')
     purpose = fields.Text(help='Why the certificate is needed.')
@@ -35,7 +35,7 @@ class HrCertificate(models.Model):
         ('refused', 'Refused'),
         ('cancel', 'Cancelled'),
     ], required=True, default='draft', copy=False, index=True, tracking=True)
-    issue_id = fields.Many2one('print.issue', string='Print', readonly=True, copy=False)
+    issue_id = fields.Many2one('print.issue', string='Print', readonly=True, copy=False, check_company=True)
     issue_name = fields.Char(related='issue_id.name', string='Certificate Reference')
 
     @api.depends('employee_id')
