@@ -45,6 +45,8 @@ What it installs:
   printed, with an optional verification QR code.
 * ``om_print_template_document`` Print Templates: Documents: files a print as
   an expiring document of the record, e.g. an NOC valid for 30 days.
+* ``om_sign`` Sign: prints and PDF files signed from an email link, in order,
+  with a signature certificate.
 * ``om_hr_certificate`` HR Certificates: salary, employment and experience
   certificates and NOC, requested by the employees and approved.
 * ``om_hr_appraisal`` HR Appraisals: self assessment, manager review and

@@ -34,6 +34,7 @@
         'om_hr_document',
         'om_print_template',
         'om_print_template_document',
+        'om_sign',
         'om_hr_certificate',
         'om_hr_appraisal',
         'om_hr_overtime_payroll',
