@@ -3,11 +3,11 @@ from datetime import date
 from odoo import Command
 from odoo.tests import Form, tagged
 
-from odoo.addons.om_hr_portal.tests.common import OmHrPortalCase
+from odoo.addons.om_hr_portal.tests.common import HrPortalCase
 
 
 @tagged('post_install', '-at_install')
-class TestPortalPayslip(OmHrPortalCase):
+class TestPortalPayslip(HrPortalCase):
 
     @classmethod
     def setUpClass(cls):
