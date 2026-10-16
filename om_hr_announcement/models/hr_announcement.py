@@ -227,10 +227,12 @@ class HrAnnouncementRead(models.Model):
     """ An employee an announcement reached: when they read it, when they acknowledged it. """
     _name = 'hr.announcement.read'
     _description = 'Announcement Recipient'
+    _check_company_auto = True
     _order = 'announcement_id, employee_id'
 
-    announcement_id = fields.Many2one('hr.announcement', required=True, ondelete='cascade', index=True)
-    employee_id = fields.Many2one('hr.employee', required=True, ondelete='cascade', index=True)
+    announcement_id = fields.Many2one('hr.announcement', required=True, ondelete='cascade', index=True,
+                                      check_company=True)
+    employee_id = fields.Many2one('hr.employee', required=True, ondelete='cascade', index=True, check_company=True)
     department_id = fields.Many2one(related='employee_id.department_id', store=True)
     company_id = fields.Many2one(related='announcement_id.company_id', store=True)
     read_date = fields.Datetime(string='Read On')
