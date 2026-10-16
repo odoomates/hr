@@ -12,7 +12,7 @@ class Document(models.Model):
 
     employee_id = fields.Many2one(
         'hr.employee', compute='_compute_employee_id', store=True, index='btree_not_null',
-        ondelete='cascade')
+        ondelete='cascade', check_company=True)
     department_id = fields.Many2one(related='employee_id.department_id', store=True, string='Department')
 
     @api.depends('res_model', 'res_id')
