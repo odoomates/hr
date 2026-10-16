@@ -1,10 +1,8 @@
-from datetime import date
 
+from odoo import Command
 from odoo.tests import tagged
 
 from odoo.addons.om_hr_portal.tests.common import HrPortalCase
-
-from odoo import Command
 
 
 @tagged('post_install', '-at_install')

@@ -24,7 +24,7 @@ class TestPrintTemplate(TransactionCase):
     def wizard(self, records, user=None):
         context = {'active_model': records._name, 'active_ids': records.ids,
                    'default_template_id': self.template.id}
-        return Form(self.env['print.wizard'].with_user(user or self.user).with_context(context))
+        return Form(self.env['print.wizard'].with_user(user or self.user).with_context(**context))
 
     def issue(self, user=None):
         wizard = self.wizard(self.partner, user=user).save()
@@ -103,7 +103,8 @@ class TestPrintTemplate(TransactionCase):
 
     def test_any_user_prints_a_trusted_template(self):
         """ The template editors write the expressions; the users printing need not be editors. """
-        self.template.body_html = '<p>On <t t-out="format_date(object.create_date)"/> for <t t-out="object.name.upper()"/>.</p>'
+        self.template.body_html = ('<p>On <t t-out="format_date(object.create_date)"/> '
+                                   'for <t t-out="object.name.upper()"/>.</p>')
         printer = new_test_user(self.env, 'om_print_plain', groups='base.group_user,base.group_partner_manager')
         printer.group_ids -= self.env.ref('mail.group_mail_template_editor')
         self.assertFalse(printer.has_group('mail.group_mail_template_editor'))

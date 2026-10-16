@@ -1,14 +1,9 @@
 {
     'name': 'Payroll Adjustments',
-    'version': '1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Human Resources/Payroll',
     'summary': 'Payroll bonuses, commissions, fines and deductions: once, monthly or until a total, taken by the '
                'payslips',
-    'description': 'Additions to and deductions from the pay of an employee besides the contract: a bonus, a '
-                   'commission, a fine, a court deduction. Once, for a number of months, or every month until a '
-                   'total; a fixed amount or a percentage of the wage or of the gross. Approved when the type asks '
-                   'for it, then taken by the payslips month after month, each type on its own payslip line. '
-                   'Part of Odoo Mates HR.',
     'author': 'Odoo Mates',
     'maintainer': 'Odoo Mates',
     'support': 'odoomates@gmail.com',

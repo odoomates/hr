@@ -163,8 +163,8 @@ class TestButtonRuleWebClient(HttpCase):
     """ The button clicked in the web client is stopped by the server. """
 
     def test_call_button(self):
-        user = new_test_user(self.env, 'om_web_requester', password='om_web_requester',
-                             groups='base.group_user,base.group_partner_manager')
+        new_test_user(self.env, 'om_web_requester', password='om_web_requester',
+                      groups='base.group_user,base.group_partner_manager')
         approvers = self.env['res.groups'].create({'name': 'Web Approvers'})
         button = self.env['approval.button'].create({
             'model_id': self.env['ir.model']._get_id('res.partner'), 'method': 'action_archive', 'name': 'Archive'})

@@ -1,12 +1,8 @@
 {
     'name': 'HR Loans in Payroll',
-    'version': '1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Human Resources',
     'summary': 'Deduct the employee loan installments from the payslips, and mark them repaid with the payslip',
-    'description': 'Adds the Loan Installments salary rule (code LOAN, a deduction). Computing a payslip gives it '
-                   'the installments due by the end of its period and not deducted yet, those of earlier months '
-                   'included. Confirming the payslip marks them repaid; cancelling or refunding it makes them due '
-                   'again. Part of Odoo Mates HR.',
     'author': 'Odoo Mates',
     'maintainer': 'Odoo Mates',
     'support': 'odoomates@gmail.com',

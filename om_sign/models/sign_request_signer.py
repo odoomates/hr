@@ -5,7 +5,7 @@ import secrets
 import uuid
 from datetime import timedelta
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 from odoo.tools import consteq
 from odoo.tools.binary import BinaryBytes
@@ -65,7 +65,7 @@ class SignRequestSigner(models.Model):
     def create(self, vals_list):
         requests = self.env['sign.request'].browse({vals.get('request_id') for vals in vals_list} - {None})
         if not self.env.su and any(request.state != 'draft' for request in requests):
-            raise UserError(_('The request is sent: cancel it and send another one to change its signers.'))
+            raise UserError(self.env._('The request is sent: cancel it and send another one to change its signers.'))
         signers = super().create(vals_list)
         for signer in signers.sudo():
             signer.access_token = uuid.uuid4().hex
@@ -74,15 +74,16 @@ class SignRequestSigner(models.Model):
     def write(self, vals):
         if not self.env.su:
             if PROTECTED_FIELDS & set(vals):
-                raise UserError(_('A signature is given by its signer, not changed by hand.'))
+                raise UserError(self.env._('A signature is given by its signer, not changed by hand.'))
             if any(signer.request_id.state != 'draft' for signer in self):
-                raise UserError(_('The request is sent: cancel it and send another one to change its signers.'))
+                raise UserError(self.env._('The request is sent: cancel it and send another one to change its '
+                                           'signers.'))
         return super().write(vals)
 
-    def unlink(self):
+    @api.ondelete(at_uninstall=False)
+    def _unlink_except_sent(self):
         if not self.env.su and any(signer.request_id.state != 'draft' for signer in self):
-            raise UserError(_('The request is sent: cancel it and send another one to change its signers.'))
-        return super().unlink()
+            raise UserError(self.env._('The request is sent: cancel it and send another one to change its signers.'))
 
     def _get_sign_url(self):
         self.ensure_one()
@@ -106,8 +107,8 @@ class SignRequestSigner(models.Model):
 
     def _send_invitation(self, reminder=False):
         self.ensure_one()
-        subject = _('Reminder: please sign %s', self.request_id.name) if reminder \
-            else _('Please sign %s', self.request_id.name)
+        subject = self.env._('Reminder: please sign %s', self.request_id.name) if reminder \
+            else self.env._('Please sign %s', self.request_id.name)
         self._notify('om_sign.mail_sign_invitation', subject, reminder=reminder)
         self.env['sign.log']._log(self.request_id, 'reminded' if reminder else 'invited', signer=self)
 
@@ -118,10 +119,10 @@ class SignRequestSigner(models.Model):
     def _check_can_sign(self):
         self.ensure_one()
         if self.request_id.state != 'sent':
-            raise UserError(_('This request is no longer waiting for signatures.'))
+            raise UserError(self.env._('This request is no longer waiting for signatures.'))
         if self.state != 'to_sign':
-            raise UserError(_('It is not your turn to sign yet.') if self.state == 'waiting'
-                            else _('You already answered this request.'))
+            raise UserError(self.env._('It is not your turn to sign yet.') if self.state == 'waiting'
+                            else self.env._('You already answered this request.'))
 
     def _opened(self):
         """ The signer opened the signing page; the first time is logged. """
@@ -153,7 +154,7 @@ class SignRequestSigner(models.Model):
         code = self._generate_code()
         me.write({'code_hash': self._hash_code(code), 'code_attempts': 0,
                   'code_expiry': now + timedelta(minutes=CODE_MINUTES)})
-        self._notify('om_sign.mail_sign_code', _('Your code to sign %s', self.request_id.name), code=code,
+        self._notify('om_sign.mail_sign_code', self.env._('Your code to sign %s', self.request_id.name), code=code,
                      minutes=CODE_MINUTES)
         self.env['sign.log']._log(self.request_id, 'code_sent', signer=self)
         return True
@@ -178,15 +179,15 @@ class SignRequestSigner(models.Model):
         self.ensure_one()
         self._check_can_sign()
         if self._needs_code():
-            raise UserError(_('Enter the code sent to your email first.'))
+            raise UserError(self.env._('Enter the code sent to your email first.'))
         if not (name or '').strip() or not signature:
-            raise UserError(_('Write your name and sign.'))
+            raise UserError(self.env._('Write your name and sign.'))
         try:
             image = base64.b64decode(signature, validate=True)
         except (binascii.Error, ValueError, TypeError):
             image = b''
         if guess_mimetype(image) not in SIGNATURE_TYPES:
-            raise UserError(_('The signature could not be read. Sign again.'))
+            raise UserError(self.env._('The signature could not be read. Sign again.'))
         self.sudo().write({
             'signed_name': name.strip(),
             'signature': BinaryBytes(image),
@@ -201,13 +202,14 @@ class SignRequestSigner(models.Model):
         self.ensure_one()
         self._check_can_sign()
         if not (reason or '').strip():
-            raise UserError(_('Tell why you decline to sign.'))
+            raise UserError(self.env._('Tell why you decline to sign.'))
         request = self.request_id
         self.sudo().write({'state': 'declined', 'decline_reason': reason.strip()})
         request.sudo().write({'state': 'declined'})
         self.env['sign.log']._log(request, 'declined', signer=self, note=reason.strip())
         request.sudo().message_post(
-            body=_('%(signer)s declined to sign: %(reason)s', signer=self.partner_id.name, reason=reason.strip()),
+            body=self.env._('%(signer)s declined to sign: %(reason)s', signer=self.partner_id.name,
+                            reason=reason.strip()),
             subtype_xmlid='mail.mt_note', partner_ids=request.requested_by_id.partner_id.ids)
         request._call_host('_on_sign_declined')
 
@@ -219,7 +221,7 @@ class SignRequestSigner(models.Model):
         """ Open the signing page, for a signer who is a user of the backend. """
         self.ensure_one()
         if not self.is_me:
-            raise UserError(_('Only %s signs here.', self.partner_id.name))
+            raise UserError(self.env._('Only %s signs here.', self.partner_id.name))
         return {'type': 'ir.actions.act_url', 'url': self._get_sign_url(), 'target': 'new'}
 
     def action_send_again(self):

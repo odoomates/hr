@@ -1,4 +1,4 @@
-from odoo import _, fields, models
+from odoo import fields, models
 
 
 class HrEmployee(models.Model):
@@ -28,7 +28,7 @@ class HrEmployee(models.Model):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Appraisals of %s', self.name),
+            'name': self.env._('Appraisals of %s', self.name),
             'res_model': 'hr.appraisal',
             'view_mode': 'list,kanban,form',
             'domain': [('employee_id', '=', self.id)],

@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -32,7 +32,7 @@ class HrPayrollExportWizard(models.TransientModel):
             payroll accounting. """
         self.ensure_one()
         if not self.journal_id:
-            raise UserError(_('Choose the bank journal paying the salaries.'))
+            raise UserError(self.env._('Choose the bank journal paying the salaries.'))
         payslips = self._get_records().filtered(lambda slip: slip._can_register_payment())
         if not payslips:
             return

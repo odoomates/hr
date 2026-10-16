@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 from odoo.http import request as http_request
 
@@ -30,7 +30,7 @@ class SignLog(models.Model):
     event = fields.Selection(EVENTS, required=True, readonly=True)
     date = fields.Datetime(required=True, default=fields.Datetime.now, readonly=True)
     partner_id = fields.Many2one('res.partner', string='By', readonly=True)
-    user_id = fields.Many2one('res.users', string='User', readonly=True)
+    user_id = fields.Many2one('res.users', readonly=True)
     ip = fields.Char(string='IP Address', readonly=True)
     user_agent = fields.Char(string='Browser', readonly=True)
     document_hash = fields.Char(string='Fingerprint', readonly=True)
@@ -55,11 +55,14 @@ class SignLog(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         if not self.env.su:
-            raise UserError(_('The evidence of a signature is written as it happens, not by hand.'))
+            raise UserError(self.env._('The evidence of a signature is written as it happens, not by hand.'))
         return super().create(vals_list)
 
     def write(self, vals):
-        raise UserError(_('The evidence of a signature is kept as it was written.'))
+        if not self.env.su:
+            raise UserError(self.env._('The evidence of a signature is kept as it was written.'))
+        return super().write(vals)
 
-    def unlink(self):
-        raise UserError(_('The evidence of a signature is kept as it was written.'))
+    @api.ondelete(at_uninstall=False)
+    def _unlink_except_evidence(self):
+        raise UserError(self.env._('The evidence of a signature is kept as it was written.'))

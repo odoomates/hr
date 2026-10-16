@@ -11,7 +11,8 @@ class HrAttendance(models.Model):
     def _overtime_domain(self):
         """ :return: the attendances that are overtime: what the time rules create, and the attendances of the
             types the time rules set the excess to, e.g. entered by hand. """
-        excess_types = self.env['hr.time.rule'].sudo().with_context(active_test=False).search([]).work_entry_type_id
+        excess_types = self.env['hr.time.rule'].sudo().with_context(active_test=False).search(
+            [('work_entry_type_id', '!=', False)]).work_entry_type_id
         return ['|', ('time_rule_id', '!=', False), ('work_entry_type_id', 'in', excess_types.ids)]
 
     def _overtime_rate(self):

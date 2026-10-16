@@ -11,7 +11,7 @@ class HrExitChecklist(models.Model):
     name = fields.Char(required=True, translate=True)
     sequence = fields.Integer(default=10)
     active = fields.Boolean(default=True)
-    company_id = fields.Many2one('res.company', string='Company')
+    company_id = fields.Many2one('res.company')
     description = fields.Text(translate=True)
     responsible_type = fields.Selection([
         ('manager', 'Manager of the Employee'),
@@ -20,7 +20,7 @@ class HrExitChecklist(models.Model):
         ('group', 'Users of a Group'),
         ('user', 'Given Users'),
     ], string='Cleared By', required=True, default='manager')
-    group_id = fields.Many2one('res.groups', string='Group')
+    group_id = fields.Many2one('res.groups')
     user_ids = fields.Many2many('res.users', string='Users')
     departure_reason_ids = fields.Many2many(
         'hr.departure.reason', string='Only For', help='The departure reasons the item applies to. Empty: all.')

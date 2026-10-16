@@ -1,13 +1,8 @@
 {
     'name': 'HR Assets',
-    'version': '1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Human Resources',
     'summary': 'Employee assets and equipment: handover with a signed form, return, loss, charges and history',
-    'description': 'The laptops, phones and tools of the company, as the equipment of the Maintenance app, '
-                   'handed over to the employees with a signed handover form, returned with their condition or '
-                   'reported lost, with an optional charge to the employee and the history of who held each '
-                   'asset. Employees see the assets in their hands in My HR. '
-                   'Part of Odoo Mates HR.',
     'author': 'Odoo Mates',
     'maintainer': 'Odoo Mates',
     'support': 'odoomates@gmail.com',

@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -10,7 +10,7 @@ class HrRequestCategory(models.Model):
     name = fields.Char(required=True, translate=True)
     sequence = fields.Integer(default=10)
     active = fields.Boolean(default=True)
-    company_id = fields.Many2one('res.company', string='Company')
+    company_id = fields.Many2one('res.company')
     description = fields.Text(translate=True, help='Shown to the employee writing a request of the category.')
 
 
@@ -22,16 +22,17 @@ class HrRequest(models.Model):
     _order = 'date desc, id desc'
     _mail_post_access = 'read'
 
-    name = fields.Char(string='Reference', required=True, readonly=True, copy=False, default=lambda self: _('New'))
+    name = fields.Char(string='Reference', required=True, readonly=True, copy=False,
+                       default=lambda self: self.env._('New'))
     employee_id = fields.Many2one(
-        'hr.employee', string='Employee', required=True, index=True, tracking=True,
+        'hr.employee', required=True, index=True, tracking=True,
         default=lambda self: self.env.user.employee_id)
     company_id = fields.Many2one(
-        'res.company', string='Company', required=True, index=True,
+        'res.company', required=True, index=True,
         compute='_compute_company_id', store=True, readonly=False, precompute=True)
     department_id = fields.Many2one(related='employee_id.department_id', store=True)
     category_id = fields.Many2one(
-        'hr.request.category', string='Category', required=True, tracking=True,
+        'hr.request.category', required=True, tracking=True,
         domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
     category_description = fields.Text(related='category_id.description')
     date = fields.Date(required=True, default=fields.Date.context_today)
@@ -45,14 +46,14 @@ class HrRequest(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
-            if vals.get('name', _('New')) == _('New'):
-                vals['name'] = self.env['ir.sequence'].next_by_code('hr.request') or _('New')
+            if vals.get('name', self.env._('New')) == self.env._('New'):
+                vals['name'] = self.env['ir.sequence'].next_by_code('hr.request') or self.env._('New')
         return super().create(vals_list)
 
-    def unlink(self):
+    @api.ondelete(at_uninstall=False)
+    def _unlink_except_submitted(self):
         if any(request.approval_state not in ('draft', 'cancel') for request in self):
-            raise UserError(_('Only a draft or a cancelled request can be deleted.'))
-        return super().unlink()
+            raise UserError(self.env._('Only a draft or a cancelled request can be deleted.'))
 
     def _approval_employee(self):
         self.ensure_one()
@@ -61,5 +62,5 @@ class HrRequest(models.Model):
     def _approval_check_requester(self):
         self.ensure_one()
         if self.employee_id.user_id != self.env.user and not self.env.user.has_group('hr.group_hr_user'):
-            raise UserError(_('Only %(employee)s or HR can change %(request)s.',
-                              employee=self.employee_id.name, request=self.name))
+            raise UserError(self.env._('Only %(employee)s or HR can change %(request)s.',
+                                       employee=self.employee_id.name, request=self.name))

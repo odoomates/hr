@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
 
@@ -8,7 +8,7 @@ class HrShiftUnavailability(models.Model):
     _description = 'Unavailability'
     _order = 'date_from desc'
 
-    employee_id = fields.Many2one('hr.employee', string='Employee', required=True, index=True, ondelete='cascade',
+    employee_id = fields.Many2one('hr.employee', required=True, index=True, ondelete='cascade',
                                   default=lambda self: self.env.user.employee_id)
     company_id = fields.Many2one(related='employee_id.company_id', store=True)
     date_from = fields.Date(string='From', required=True, default=fields.Date.context_today)
@@ -19,4 +19,4 @@ class HrShiftUnavailability(models.Model):
     def _check_dates(self):
         for unavailability in self:
             if unavailability.date_to < unavailability.date_from:
-                raise ValidationError(_('An unavailability ends after it starts.'))
+                raise ValidationError(self.env._('An unavailability ends after it starts.'))

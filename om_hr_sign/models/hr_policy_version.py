@@ -1,6 +1,6 @@
 import hashlib
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 # what a published version keeps as it was published
@@ -31,7 +31,7 @@ class HrPolicyVersion(models.Model):
         ('superseded', 'Replaced'),
     ], required=True, default='draft', readonly=True, copy=False, index=True)
     date_published = fields.Datetime(string='Published On', readonly=True, copy=False)
-    published_by_id = fields.Many2one('res.users', string='Published By', readonly=True, copy=False)
+    published_by_id = fields.Many2one('res.users', readonly=True, copy=False)
     document_hash = fields.Char(string='Fingerprint', readonly=True, copy=False,
                                 help='SHA-256 of the version as published.')
     assignment_ids = fields.One2many('hr.policy.assignment', 'version_id', string='Answers')
@@ -40,7 +40,8 @@ class HrPolicyVersion(models.Model):
     @api.depends('policy_id.name', 'number')
     def _compute_name(self):
         for version in self:
-            version.name = _('%(policy)s, version %(number)s', policy=version.policy_id.name, number=version.number)
+            version.name = self.env._('%(policy)s, version %(number)s', policy=version.policy_id.name,
+                                      number=version.number)
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -52,13 +53,13 @@ class HrPolicyVersion(models.Model):
 
     def write(self, vals):
         if FROZEN_FIELDS & set(vals) and not self.env.su and any(v.state != 'draft' for v in self):
-            raise UserError(_('A published version stays as it was published: write a new version instead.'))
+            raise UserError(self.env._('A published version stays as it was published: write a new version instead.'))
         return super().write(vals)
 
-    def unlink(self):
+    @api.ondelete(at_uninstall=False)
+    def _unlink_except_published(self):
         if any(version.state != 'draft' for version in self):
-            raise UserError(_('Only a draft version can be deleted.'))
-        return super().unlink()
+            raise UserError(self.env._('Only a draft version can be deleted.'))
 
     def _get_pdf(self):
         """ :return: the version as a PDF, to sign """
@@ -80,12 +81,12 @@ class HrPolicyVersion(models.Model):
         """ Replace the current version and ask everyone the policy reaches. """
         for version in self:
             if version.state != 'draft':
-                raise UserError(_('%s is already published.', version.name))
+                raise UserError(self.env._('%s is already published.', version.name))
             content = version._get_content_bytes()
             if version.content_type == 'pdf' and not content.startswith(b'%PDF'):
-                raise UserError(_('Upload the PDF of %s.', version.name))
+                raise UserError(self.env._('Upload the PDF of %s.', version.name))
             if version.content_type == 'text' and not version.body:
-                raise UserError(_('Write the text of %s.', version.name))
+                raise UserError(self.env._('Write the text of %s.', version.name))
             previous = version.policy_id.version_ids.filtered(lambda v: v.state == 'published')
             previous.sudo().write({'state': 'superseded'})
             previous.assignment_ids.filtered(lambda a: a.state == 'pending')._cancel()
@@ -97,8 +98,8 @@ class HrPolicyVersion(models.Model):
             })
             version._assign(version.policy_id._audience())
             version.policy_id.message_post(
-                body=_('%(version)s published: %(count)s employees asked.', version=version.name,
-                       count=len(version.assignment_ids)),
+                body=self.env._('%(version)s published: %(count)s employees asked.', version=version.name,
+                                count=len(version.assignment_ids)),
                 subtype_xmlid='mail.mt_note')
         return True
 

@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -29,10 +29,10 @@ class HrLoan(models.Model):
             return self.env['account.payment']
         partner = self.employee_id.sudo().work_contact_id
         if not partner:
-            raise UserError(_('%s has no contact to pay.', self.employee_id.name))
+            raise UserError(self.env._('%s has no contact to pay.', self.employee_id.name))
         method = journal._get_available_payment_method_lines(payment_type)[:1]
         if not method:
-            raise UserError(_('The journal %s has no payment method for this payment.', journal.name))
+            raise UserError(self.env._('The journal %s has no payment method for this payment.', journal.name))
         payment = self.env['account.payment'].sudo().create({
             'payment_type': payment_type,
             'partner_type': 'customer',
@@ -68,7 +68,7 @@ class HrLoan(models.Model):
     def action_disburse(self):
         result = super().action_disburse()
         for loan in self:
-            loan._pay(loan.amount, 'outbound', _('%s paid out', loan.name), loan.date_disbursed)
+            loan._pay(loan.amount, 'outbound', self.env._('%s paid out', loan.name), loan.date_disbursed)
         return result
 
     def action_settle(self):
@@ -77,14 +77,14 @@ class HrLoan(models.Model):
         result = super().action_settle()
         for loan, amount in due.items():
             if loan.currency_id.compare_amounts(amount, 0) > 0:
-                loan._pay(amount, 'inbound', _('%s settled', loan.name))
+                loan._pay(amount, 'inbound', self.env._('%s settled', loan.name))
         return result
 
     def action_open_payments(self):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Payments of %s', self.name),
+            'name': self.env._('Payments of %s', self.name),
             'res_model': 'account.payment',
             'view_mode': 'list,form',
             'domain': [('loan_id', '=', self.id)],
@@ -98,8 +98,9 @@ class HrLoanLine(models.Model):
     def action_mark_paid(self):
         result = super().action_mark_paid()
         for line in self:
-            line.loan_id._pay(line.amount, 'inbound', _('%(loan)s: installment of %(month)s', loan=line.loan_id.name,
-                                                           month=line.date.strftime('%B %Y')))
+            memo = self.env._('%(loan)s: installment of %(month)s', loan=line.loan_id.name,
+                              month=line.date.strftime('%B %Y'))
+            line.loan_id._pay(line.amount, 'inbound', memo)
         return result
 
 

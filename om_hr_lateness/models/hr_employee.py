@@ -1,4 +1,4 @@
-from datetime import datetime, time, timedelta, timezone
+from datetime import UTC, datetime, time, timedelta
 from zoneinfo import ZoneInfo
 
 from odoo import api, fields, models
@@ -7,7 +7,7 @@ from odoo import api, fields, models
 class ResCompany(models.Model):
     _inherit = 'res.company'
 
-    lateness_policy_id = fields.Many2one('hr.lateness.policy', string='Lateness Policy',
+    lateness_policy_id = fields.Many2one('hr.lateness.policy',
                                             help='The policy of the employees with none of their own.')
 
 
@@ -21,7 +21,7 @@ class HrEmployee(models.Model):
     _inherit = 'hr.employee'
 
     lateness_policy_id = fields.Many2one(
-        'hr.lateness.policy', string='Lateness Policy', groups='hr.group_hr_user',
+        'hr.lateness.policy', groups='hr.group_hr_user',
         help='Leave empty for the policy of the company.')
 
     def _lateness_policy(self):
@@ -61,7 +61,7 @@ class HrEmployee(models.Model):
                 found = employee._find_lateness(policy, date_from, date_to)
             done = Lateness
             for (day, kind), values in found.items():
-                lateness = existing.filtered(lambda l: l.date == day and l.kind == kind)
+                lateness = existing.filtered(lambda entry: entry.date == day and entry.kind == kind)
                 values = dict(values, policy_id=policy.id)
                 if lateness:
                     lateness.write(values)
@@ -104,19 +104,19 @@ class HrEmployee(models.Model):
             scheduled_in, scheduled_out = schedule
             of_day = attendances.filtered(lambda attendance: attendance.date == day)
             first = of_day.sorted('check_in')[0]
-            check_in = first.check_in.replace(tzinfo=timezone.utc)
+            check_in = first.check_in.replace(tzinfo=UTC)
             late = int((check_in - scheduled_in).total_seconds() // 60)
             if late > policy.grace_in:
                 found[(day, 'late_in')] = {
-                    'scheduled_at': scheduled_in.astimezone(timezone.utc).replace(tzinfo=None),
+                    'scheduled_at': scheduled_in.astimezone(UTC).replace(tzinfo=None),
                     'actual_at': first.check_in, 'minutes': late, 'attendance_id': first.id}
             if policy.early_out and all(of_day.mapped('check_out')):
                 last = of_day.sorted('check_out')[-1]
-                check_out = last.check_out.replace(tzinfo=timezone.utc)
+                check_out = last.check_out.replace(tzinfo=UTC)
                 early = int((scheduled_out - check_out).total_seconds() // 60)
                 if early > policy.grace_out:
                     found[(day, 'early_out')] = {
-                        'scheduled_at': scheduled_out.astimezone(timezone.utc).replace(tzinfo=None),
+                        'scheduled_at': scheduled_out.astimezone(UTC).replace(tzinfo=None),
                         'actual_at': last.check_out, 'minutes': early, 'attendance_id': last.id}
         return found
 

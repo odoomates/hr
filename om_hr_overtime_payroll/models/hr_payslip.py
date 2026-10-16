@@ -1,4 +1,4 @@
-from odoo import _, fields, models
+from odoo import fields, models
 
 OVERTIME_CODE = 'OVERTIME'
 
@@ -6,8 +6,8 @@ OVERTIME_CODE = 'OVERTIME'
 class HrPayslip(models.Model):
     _inherit = 'hr.payslip'
 
-    overtime_ids = fields.One2many('hr.attendance', 'payslip_id', string='Overtime')
-    overtime_hours = fields.Float(string='Overtime Hours', compute='_compute_overtime_hours')
+    overtime_ids = fields.One2many('hr.attendance', 'payslip_id')
+    overtime_hours = fields.Float(compute='_compute_overtime_hours')
 
     def _compute_overtime_hours(self):
         for payslip in self:
@@ -45,7 +45,7 @@ class HrPayslip(models.Model):
             hourly = payslip._overtime_hourly_wage(version) if version else 0.0
             amount = payslip.company_id.currency_id.round(
                 sum(attendance.worked_hours * hourly * attendance._overtime_rate() for attendance in overtime))
-            name = _('Overtime (%s h)', round(sum(overtime.mapped('worked_hours')), 2))
+            name = self.env._('Overtime (%s h)', round(sum(overtime.mapped('worked_hours')), 2))
             inputs = payslip.input_line_ids.filtered(lambda line: line.code == OVERTIME_CODE)
             if inputs:
                 inputs[0].write({'amount': amount, 'name': name})

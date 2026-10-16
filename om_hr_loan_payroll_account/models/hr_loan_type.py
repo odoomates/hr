@@ -7,7 +7,8 @@ class HrLoanType(models.Model):
     @api.model
     def _loan_accounts(self, company):
         """ :return: the loan accounts of the loan types in the company """
-        return self.with_company(company).with_context(active_test=False).search([]).account_id
+        return self.with_company(company).with_context(active_test=False).search(
+            [('account_id', '!=', False)]).account_id
 
     @api.model_create_multi
     def create(self, vals_list):

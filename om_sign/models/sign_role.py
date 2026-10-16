@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
 
@@ -35,7 +35,7 @@ class SignRole(models.Model):
     def _check_signer(self):
         for role in self:
             if role.signer_type == 'partner' and not role.partner_id:
-                raise ValidationError(_('Choose the contact signing as %s.', role.name))
+                raise ValidationError(self.env._('Choose the contact signing as %s.', role.name))
             if role.signer_type == 'field':
                 role._check_field_path()
 
@@ -46,10 +46,10 @@ class SignRole(models.Model):
             for name in filter(None, (self.field_path or '').split('.')):
                 model = self.env[model._fields[name].comodel_name]
         except (KeyError, AttributeError):
-            raise ValidationError(_('%(path)s is not a field path of %(model)s.',
-                                    path=self.field_path, model=self.template_id.model_id.name)) from None
+            raise ValidationError(self.env._('%(path)s is not a field path of %(model)s.',
+                                             path=self.field_path, model=self.template_id.model_id.name)) from None
         if model._name not in self._partners_models():
-            raise ValidationError(_('The signer of %s must be a contact or a user.', self.name))
+            raise ValidationError(self.env._('The signer of %s must be a contact or a user.', self.name))
 
     @api.model
     def _partners_models(self):

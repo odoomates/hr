@@ -1,8 +1,6 @@
 from datetime import date
 
-from dateutil.relativedelta import relativedelta
-
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 
 
 def next_yearly(day, today, after=None):
@@ -24,7 +22,7 @@ class HrEmployee(models.Model):
     _inherit = 'hr.employee'
 
     # stored, so that the Automation Rules can remind on them; kept up to date by a daily job
-    next_birthday = fields.Date(string='Next Birthday', readonly=True, copy=False, index=True,
+    next_birthday = fields.Date(readonly=True, copy=False, index=True,
                                    help='Only for the employees who let their birthday be shown.')
     next_anniversary = fields.Date(string='Next Work Anniversary', readonly=True, copy=False, index=True)
     service_years = fields.Integer(string='Years of Service at the Anniversary', readonly=True, copy=False)
@@ -50,7 +48,7 @@ class HrEmployee(models.Model):
             values = employee._reminder_dates(today)
             changed = {name: value for name, value in values.items() if employee[name] != value}
             if changed:
-                super(HrEmployee, employee.with_context(tracking_disable=True)).write(changed)
+                employee.with_context(tracking_disable=True).write(changed)
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -66,7 +64,8 @@ class HrEmployee(models.Model):
 
     @api.model
     def _cron_update_reminder_dates(self):
-        self.search([])._update_reminder_dates()
+        self.search(['|', '|', ('birthday', '!=', False), ('contract_date_start', '!=', False),
+                     ('trial_date_end', '!=', False)])._update_reminder_dates()
 
     # ------------------------------------------------------------------
     # Reminders, called by the Automation Rules
@@ -89,17 +88,17 @@ class HrEmployee(models.Model):
         """ A to-do for the people the employee's kind of reminder is for. """
         for employee in self.sudo():
             if kind == 'birthday':
-                summary = _('Birthday of %s', employee.name)
+                summary = self.env._('Birthday of %s', employee.name)
                 deadline, users = employee.next_birthday, employee._reminder_users()
             elif kind == 'anniversary':
-                summary = _('%(years)s years of service of %(employee)s', years=employee.service_years,
-                            employee=employee.name)
+                summary = self.env._('%(years)s years of service of %(employee)s', years=employee.service_years,
+                                     employee=employee.name)
                 deadline, users = employee.next_anniversary, employee._reminder_users(with_hr=True)
             elif kind == 'probation':
                 if 'hr.appraisal' in self.env:
                     # HR Appraisals already creates the probation review for the manager
                     continue
-                summary = _('The probation of %s ends', employee.name)
+                summary = self.env._('The probation of %s ends', employee.name)
                 deadline, users = employee.probation_end, employee._reminder_users()
             else:
                 raise ValueError(kind)
@@ -112,6 +111,6 @@ class HrEmployeePublic(models.Model):
     _inherit = 'hr.employee.public'
 
     # the celebrations the employees see: read from the employee table by the public view
-    next_birthday = fields.Date(string='Next Birthday', readonly=True)
+    next_birthday = fields.Date(readonly=True)
     next_anniversary = fields.Date(string='Next Work Anniversary', readonly=True)
     service_years = fields.Integer(string='Years of Service at the Anniversary', readonly=True)

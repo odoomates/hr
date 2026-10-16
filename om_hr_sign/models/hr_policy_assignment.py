@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 from odoo.http import request as http_request
 from odoo.tools.binary import BinaryBytes
@@ -60,7 +60,7 @@ class HrPolicyAssignment(models.Model):
 
     def _search_is_overdue(self, operator, value):
         if operator not in ('=', '!=') or not isinstance(value, bool):
-            raise UserError(_('Search Overdue with = or != and a boolean.'))
+            raise UserError(self.env._('Search Overdue with = or != and a boolean.'))
         today = fields.Date.context_today(self)
         if (operator == '=') == value:
             return [('state', '=', 'pending'), ('date_due', '<', today)]
@@ -68,7 +68,7 @@ class HrPolicyAssignment(models.Model):
 
     def write(self, vals):
         if PROTECTED_FIELDS & set(vals) and not self.env.su:
-            raise UserError(_('An answer to a policy is given by the employee, not changed by hand.'))
+            raise UserError(self.env._('An answer to a policy is given by the employee, not changed by hand.'))
         return super().write(vals)
 
     # ------------------------------------------------------------------
@@ -87,7 +87,8 @@ class HrPolicyAssignment(models.Model):
         self.ensure_one()
         partner = self.employee_id.work_contact_id
         if not partner.email:
-            self.sudo().problem = _('%s has no work email to receive the signature request.', self.employee_id.name)
+            self.sudo().problem = self.env._('%s has no work email to receive the signature request.',
+                                             self.employee_id.name)
             return
         version = self.version_id
         sign_request = self.env['sign.request'].sudo().create({
@@ -99,7 +100,7 @@ class HrPolicyAssignment(models.Model):
             'reminder_days': self.policy_id.remind_days,
             'date_deadline': self.date_due,
             'company_id': self.company_id.id,
-            'signer_ids': [(0, 0, {'role_name': _('Employee'), 'partner_id': partner.id})],
+            'signer_ids': [(0, 0, {'role_name': self.env._('Employee'), 'partner_id': partner.id})],
         })
         sign_request.action_send()
         self.sudo().write({'sign_request_id': sign_request.id, 'problem': False, 'state': 'pending'})
@@ -118,7 +119,7 @@ class HrPolicyAssignment(models.Model):
         if not partner:
             return
         name = self.policy_id.name
-        subject = _('Reminder: %s', name) if reminder else _('To read and agree: %s', name)
+        subject = self.env._('Reminder: %s', name) if reminder else self.env._('To read and agree: %s', name)
         body = self.env['ir.qweb']._render('om_hr_sign.mail_policy_assigned', {
             'assignment': self, 'reminder': reminder, 'url': self._get_my_url()})
         self.policy_id.sudo().message_notify(partner_ids=partner.ids, subject=subject, body=body,
@@ -149,11 +150,11 @@ class HrPolicyAssignment(models.Model):
         """ The employee agrees to the policy. """
         for assignment in self:
             if not self.env.su and assignment.employee_id.user_id != self.env.user:
-                raise UserError(_('Only %s answers this policy.', assignment.employee_id.name))
+                raise UserError(self.env._('Only %s answers this policy.', assignment.employee_id.name))
             if assignment.answer_type != 'acknowledge':
-                raise UserError(_('%s is to be signed.', assignment.policy_id.name))
+                raise UserError(self.env._('%s is to be signed.', assignment.policy_id.name))
             if assignment.state != 'pending':
-                raise UserError(_('This policy is no longer waiting for your answer.'))
+                raise UserError(self.env._('This policy is no longer waiting for your answer.'))
             values = {'state': 'done', 'date_done': fields.Datetime.now(), 'done_by_id': self.env.uid}
             if http_request:
                 values.update(ip=http_request.httprequest.remote_addr,
@@ -170,10 +171,10 @@ class HrPolicyAssignment(models.Model):
         """ Open the signing page, for an employee who is a user of the backend. """
         self.ensure_one()
         if self.employee_id.user_id != self.env.user:
-            raise UserError(_('Only %s signs this policy.', self.employee_id.name))
+            raise UserError(self.env._('Only %s signs this policy.', self.employee_id.name))
         signer = self._get_signer()
         if self.state != 'pending' or self.sign_request_id.state != 'sent' or not signer:
-            raise UserError(_('This policy is not waiting for your signature.'))
+            raise UserError(self.env._('This policy is not waiting for your signature.'))
         return {'type': 'ir.actions.act_url', 'url': signer.sudo()._get_sign_url(), 'target': 'new'}
 
     def action_send_again(self):
@@ -181,7 +182,8 @@ class HrPolicyAssignment(models.Model):
         for assignment in self:
             if assignment.answer_type != 'sign' or assignment.state not in ('pending', 'declined') or \
                     assignment.sign_request_id.state in ('sent', 'signed'):
-                raise UserError(_('%s is already waiting for a signature or answered.', assignment.display_name))
+                raise UserError(self.env._('%s is already waiting for a signature or answered.',
+                                           assignment.display_name))
             assignment._send_sign_request()
         return True
 

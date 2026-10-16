@@ -5,7 +5,7 @@ class PrintIssue(models.Model):
     _inherit = 'print.issue'
 
     employee_id = fields.Many2one(
-        'hr.employee', string='Employee', compute='_compute_employee_id', store=True, index='btree_not_null')
+        'hr.employee', compute='_compute_employee_id', store=True, index='btree_not_null')
 
     @api.depends('res_model', 'res_id')
     def _compute_employee_id(self):

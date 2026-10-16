@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
 
@@ -16,7 +16,7 @@ class PrintTemplate(models.Model):
     def _check_document_type(self):
         for template in self:
             if template.document_type_id and template.document_type_id.res_model != template.model:
-                raise ValidationError(_('%(template)s prints %(model)s: its documents must be of that kind too.',
-                                        template=template.name, model=template.model_id.name))
+                raise ValidationError(self.env._('%(template)s prints %(model)s: its documents must be of that kind '
+                                                 'too.', template=template.name, model=template.model_id.name))
             if template.validity_days < 0:
-                raise ValidationError(_('The validity of %s cannot be negative.', template.name))
+                raise ValidationError(self.env._('The validity of %s cannot be negative.', template.name))

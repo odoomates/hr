@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
 
@@ -25,7 +25,7 @@ class HrOvertimeRequest(models.Model):
     _order = 'date desc, id desc'
     _mail_post_access = 'read'
 
-    employee_id = fields.Many2one('hr.employee', string='Employee', required=True, index=True,
+    employee_id = fields.Many2one('hr.employee', required=True, index=True,
                                   default=lambda self: self.env.user.employee_id)
     company_id = fields.Many2one(related='employee_id.company_id', store=True)
     department_id = fields.Many2one(related='employee_id.department_id', store=True)
@@ -40,14 +40,14 @@ class HrOvertimeRequest(models.Model):
     @api.depends('employee_id', 'date', 'hours')
     def _compute_display_name(self):
         for request in self:
-            request.display_name = _('%(employee)s, %(hours)s h on %(date)s', employee=request.employee_id.name,
-                                     hours=request.hours, date=request.date)
+            request.display_name = self.env._('%(employee)s, %(hours)s h on %(date)s',
+                                              employee=request.employee_id.name, hours=request.hours, date=request.date)
 
     @api.constrains('hours')
     def _check_hours(self):
         for request in self:
             if not 0 < request.hours <= 24:
-                raise ValidationError(_('The overtime asked for is between 0 and 24 hours.'))
+                raise ValidationError(self.env._('The overtime asked for is between 0 and 24 hours.'))
 
     def action_submit(self):
         return self.action_approval_submit()
@@ -61,24 +61,27 @@ class HrOvertimeRequest(models.Model):
             employee = request.sudo().employee_id
             if employee.user_id != self.env.user and employee.parent_id.user_id != self.env.user and \
                     not self.env.user.has_group('hr_attendance.group_hr_attendance_officer'):
-                raise UserError(_('Only %s, their manager or the attendance officers ask for their overtime.',
-                                  employee.name))
+                raise UserError(self.env._('Only %s, their manager or the attendance officers ask for their overtime.',
+                                           employee.name))
 
     def _on_approval_submitted(self, request):
         self.sudo().state = 'to_approve'
 
     def _on_approval_approved(self, request):
-        super()._on_approval_approved(request)
+        result = super()._on_approval_approved(request)
         self.sudo().state = 'approved'
         self.env['hr.attendance']._overtime_review({(r.employee_id, r.date) for r in self.sudo()})
+        return result
 
     def _on_approval_refused(self, request):
-        super()._on_approval_refused(request)
+        result = super()._on_approval_refused(request)
         self.sudo().state = 'refused'
+        return result
 
     def _on_approval_cancelled(self, request):
-        super()._on_approval_cancelled(request)
+        result = super()._on_approval_cancelled(request)
         self.sudo().state = 'cancel'
+        return result
 
     def _on_approval_reset(self):
         self.sudo().state = 'draft'
@@ -87,7 +90,7 @@ class HrOvertimeRequest(models.Model):
         approved = self.filtered(lambda request: request.state == 'approved')
         if approved:
             if not self.env.user.has_group('hr_attendance.group_hr_attendance_officer'):
-                raise UserError(_('An approved overtime is withdrawn by the attendance officers.'))
+                raise UserError(self.env._('An approved overtime is withdrawn by the attendance officers.'))
             approved.sudo().write({'state': 'cancel', 'approval_state': 'cancel'})
             self.env['hr.attendance']._overtime_review({(r.employee_id, r.date) for r in approved.sudo()})
         others = self - approved

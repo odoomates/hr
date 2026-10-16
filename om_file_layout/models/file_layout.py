@@ -2,7 +2,7 @@ import csv
 import io
 from datetime import date, datetime
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 from odoo.tools import float_round
 from odoo.tools.safe_eval import safe_eval
@@ -36,7 +36,7 @@ class FileLayout(models.Model):
     csv_separator = fields.Char(string='Separator', default=',', size=1)
     csv_quoting = fields.Selection([('minimal', 'When Needed'), ('all', 'Always'), ('none', 'Never')],
                                    string='Quotes', default='minimal')
-    column_titles = fields.Boolean(string='Column Titles', default=True,
+    column_titles = fields.Boolean(default=True,
                                    help='Start the lines with a row of the titles of the columns.')
     encoding = fields.Selection([
         ('utf-8', 'UTF-8'),
@@ -47,7 +47,7 @@ class FileLayout(models.Model):
     line_ending = fields.Selection([('crlf', 'Windows (CRLF)'), ('lf', 'Unix (LF)')], required=True,
                                    default='crlf')
     file_name = fields.Char(
-        string='File Name', required=True, default='{layout}_{date}',
+        required=True, default='{layout}_{date}',
         help='{layout}, {date} (20260630), {datetime} (20260630_1530) and {company} are replaced. The extension '
              'follows the format.')
     extension = fields.Char(help='Leave empty for .csv, .txt or .xlsx.')
@@ -60,8 +60,7 @@ class FileLayout(models.Model):
                                         domain=[('section', '=', 'footer')], context={'default_section': 'footer'})
     action_menu = fields.Boolean(string='In the Action Menu', default=True)
     ref_ir_act_window = fields.Many2one('ir.actions.act_window', readonly=True, copy=False)
-    company_id = fields.Many2one('res.company', string='Company',
-                                 help='Leave empty to share the layout with all the companies.')
+    company_id = fields.Many2one('res.company', help='Leave empty to share the layout with all the companies.')
     export_ids = fields.One2many('file.export', 'layout_id', string='Exports')
     export_count = fields.Integer(compute='_compute_export_count')
 
@@ -75,7 +74,7 @@ class FileLayout(models.Model):
     def _check_separator(self):
         for layout in self:
             if layout.file_format == 'csv' and not layout.csv_separator:
-                raise ValidationError(_('The CSV layout %s needs a separator.', layout.name))
+                raise ValidationError(self.env._('The CSV layout %s needs a separator.', layout.name))
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -102,7 +101,7 @@ class FileLayout(models.Model):
                 layout.ref_ir_act_window.unlink()
                 continue
             values = {
-                'name': _('Export: %s', layout.name),
+                'name': self.env._('Export: %s', layout.name),
                 'res_model': 'file.export.wizard',
                 'view_mode': 'form',
                 'target': 'new',
@@ -150,17 +149,17 @@ class FileLayout(models.Model):
         columns = {section: self.column_ids.filtered(lambda c, s=section: c.section == s).sorted('sequence')
                    for section, _label in SECTIONS}
         if columns['header']:
-            rows.append(self._render_row(columns['header'], base, _('Header'), problems))
+            rows.append(self._render_row(columns['header'], base, self.env._('Header'), problems))
         if columns['line'] and self.column_titles and self.file_format != 'fixed':
             rows.append([(column, column.name, column.name) for column in columns['line']])
         for index, line in enumerate(lines, start=1):
             problems.extend(line.get('problems', []))
             context = dict(base, **line, index=index)
-            label = _('Line %(index)s (%(record)s)', index=index,
-                      record=(line.get('record') or line.get('object') or records[:0]).display_name or index)
+            label = self.env._('Line %(index)s (%(record)s)', index=index,
+                               record=(line.get('record') or line.get('object') or records[:0]).display_name or index)
             rows.append(self._render_row(columns['line'], context, label, problems))
         if columns['footer']:
-            rows.append(self._render_row(columns['footer'], base, _('Footer'), problems))
+            rows.append(self._render_row(columns['footer'], base, self.env._('Footer'), problems))
         content = self._write(rows)
         preview = '\n'.join(self._row_text(row) for row in rows[:30])
         return {'content': content, 'preview': preview, 'problems': problems, 'line_count': len(lines),
@@ -171,13 +170,14 @@ class FileLayout(models.Model):
         for column in columns:
             try:
                 value = safe_eval(column.expression or "''", dict(context))
-            except Exception as error:  # noqa: BLE001 - shown to the user as a problem of the file
-                problems.append(_('%(where)s, %(column)s: %(error)s', where=label, column=column.name, error=error))
+            except Exception as error:  # shown to the user as a problem of the file
+                problems.append(self.env._('%(where)s, %(column)s: %(error)s', where=label, column=column.name,
+                                           error=error))
                 value = False
             text, problem = column._format(value, self.file_format == 'fixed')
             if problem:
-                problems.append(_('%(where)s, %(column)s: %(problem)s', where=label, column=column.name,
-                                  problem=problem))
+                problems.append(self.env._('%(where)s, %(column)s: %(problem)s', where=label, column=column.name,
+                                           problem=problem))
             row.append((column, value, text))
         return row
 
@@ -205,7 +205,7 @@ class FileLayout(models.Model):
         return text.encode(self.encoding, errors='replace')
 
     def _write_xlsx(self, rows):
-        import xlsxwriter  # noqa: PLC0415 - only needed for this format
+        import xlsxwriter  # only needed for this format
         buffer = io.BytesIO()
         workbook = xlsxwriter.Workbook(buffer, {'in_memory': True})
         sheet = workbook.add_worksheet((self.name or 'Sheet')[:31])
@@ -233,7 +233,7 @@ class FileLayout(models.Model):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Exports'),
+            'name': self.env._('Exports'),
             'res_model': 'file.export',
             'view_mode': 'list,form',
             'domain': [('layout_id', '=', self.id)],
@@ -274,12 +274,12 @@ class FileLayoutColumn(models.Model):
         if empty:
             text = ''
             if self.required:
-                problem = _('empty')
+                problem = self.env._('empty')
         elif self.value_type in ('integer', 'decimal'):
             try:
                 number = float(value)
             except (TypeError, ValueError):
-                return str(value), _('%s is not a number', value)
+                return str(value), self.env._('%s is not a number', value)
             if self.value_type == 'integer':
                 text = str(int(float_round(number, precision_digits=0)))
             elif self.implied_decimals:
@@ -297,7 +297,7 @@ class FileLayoutColumn(models.Model):
             text = text.upper()
         if self.width:
             if len(text) > self.width:
-                problem = problem or _('%(value)s is longer than %(width)s', value=text, width=self.width)
+                problem = problem or self.env._('%(value)s is longer than %(width)s', value=text, width=self.width)
                 text = text[:self.width]
             if fixed:
                 pad = self.pad_char or ' '

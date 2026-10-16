@@ -1,15 +1,9 @@
 {
     'name': 'HR Appraisals',
-    'version': '1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Human Resources',
     'summary': 'Employee appraisals: self assessment, manager review, rating, goals, probation reviews and '
                'review cycles',
-    'description': 'Appraise the employees: they assess themselves, their manager reviews and rates them, and '
-                   'they set goals for the next period. Each side reads the feedback of the other only when it is '
-                   'their turn. Probation reviews are created before the trial period ends, appraisals are planned '
-                   'at a regular interval, and review cycles create them for whole departments. A raise or a '
-                   'promotion decided is recorded as a new version of the contract. '
-                   'Part of Odoo Mates HR.',
     'author': 'Odoo Mates',
     'maintainer': 'Odoo Mates',
     'support': 'odoomates@gmail.com',

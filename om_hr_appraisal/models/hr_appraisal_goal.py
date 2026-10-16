@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import AccessError
 
 
@@ -10,10 +10,10 @@ class HrAppraisalGoal(models.Model):
     _order = 'date_deadline, id'
 
     name = fields.Char(string='Goal', required=True, tracking=True)
-    employee_id = fields.Many2one('hr.employee', string='Employee', required=True, index=True, tracking=True)
+    employee_id = fields.Many2one('hr.employee', required=True, index=True, tracking=True)
     manager_id = fields.Many2one(related='employee_id.parent_id', string='Manager')
     company_id = fields.Many2one(related='employee_id.company_id', store=True)
-    appraisal_id = fields.Many2one('hr.appraisal', string='Appraisal', index=True, ondelete='set null')
+    appraisal_id = fields.Many2one('hr.appraisal', index=True, ondelete='set null')
     description = fields.Html()
     target = fields.Char(help='How to tell the goal is reached, e.g. Close 20 deals a quarter.')
     date_deadline = fields.Date(string='Due Date', tracking=True)
@@ -32,5 +32,5 @@ class HrAppraisalGoal(models.Model):
         # an employee only updates how far their own goals are reached
         if not self.env.su and not self.env.user.has_group('hr.group_hr_user') and set(vals) - {'progress'}:
             if any(goal.employee_id.parent_id.user_id != self.env.user for goal in self):
-                raise AccessError(_('You update the progress of your goals; your manager sets them.'))
+                raise AccessError(self.env._('You update the progress of your goals; your manager sets them.'))
         return super().write(vals)

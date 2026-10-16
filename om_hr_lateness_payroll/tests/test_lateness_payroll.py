@@ -90,7 +90,7 @@ class TestLatenessPayroll(TransactionCase):
         self.assertIn('3 late arrivals', adjustment.description)
         self.assertEqual(self.compute(), adjustment, 'computed again: the same adjustment')
         payslip = self.payslip()
-        self.assertEqual(sum(payslip.line_ids.filtered(lambda l: l.code == 'ADJ_LATE').mapped('total')), -55)
+        self.assertEqual(sum(payslip.line_ids.filtered(lambda line: line.code == 'ADJ_LATE').mapped('total')), -55)
 
     def test_excuse_follows(self):
         adjustment = self.compute()

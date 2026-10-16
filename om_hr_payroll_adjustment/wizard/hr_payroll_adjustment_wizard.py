@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -7,12 +7,11 @@ class HrPayrollAdjustmentWizard(models.TransientModel):
     _name = 'hr.payroll.adjustment.wizard'
     _description = 'Add Payroll Adjustments'
 
-    department_id = fields.Many2one('hr.department', string='Department',
-                                    help='Adds the employees of the department.')
+    department_id = fields.Many2one('hr.department', help='Adds the employees of the department.')
     employee_ids = fields.Many2many('hr.employee', string='Employees', required=True)
     company_id = fields.Many2one('res.company', default=lambda self: self.env.company)
     currency_id = fields.Many2one(related='company_id.currency_id')
-    type_id = fields.Many2one('hr.payroll.adjustment.type', string='Type', required=True)
+    type_id = fields.Many2one('hr.payroll.adjustment.type', required=True)
     kind = fields.Selection(related='type_id.kind')
     description = fields.Char()
     recurrence = fields.Selection([
@@ -20,7 +19,7 @@ class HrPayrollAdjustmentWizard(models.TransientModel):
         ('months', 'Monthly, for a number of months'),
         ('total', 'Monthly, until a total'),
     ], required=True, default='once')
-    amount_type = fields.Selection([('fixed', 'Fixed Amount'), ('percent', 'Percentage')], string='Amount Type',
+    amount_type = fields.Selection([('fixed', 'Fixed Amount'), ('percent', 'Percentage')],
                                    required=True, default='fixed')
     amount = fields.Monetary(string='Amount per Month')
     percent = fields.Float(string='Percentage', digits=(16, 2))
@@ -41,7 +40,7 @@ class HrPayrollAdjustmentWizard(models.TransientModel):
     def action_create(self):
         self.ensure_one()
         if not self.employee_ids:
-            raise UserError(_('Choose the employees.'))
+            raise UserError(self.env._('Choose the employees.'))
         adjustments = self.env['hr.payroll.adjustment'].create([{
             'employee_id': employee.id,
             'type_id': self.type_id.id,
@@ -59,7 +58,7 @@ class HrPayrollAdjustmentWizard(models.TransientModel):
             adjustments.action_confirm()
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Payroll Adjustments'),
+            'name': self.env._('Payroll Adjustments'),
             'res_model': 'hr.payroll.adjustment',
             'view_mode': 'list,form',
             'domain': [('id', 'in', adjustments.ids)],

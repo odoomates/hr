@@ -15,8 +15,7 @@ class HrAppraisalTemplate(models.Model):
     department_ids = fields.Many2many(
         'hr.department', string='Departments',
         help='Used for the employees of these departments. Leave empty to use it for everyone else.')
-    company_id = fields.Many2one('res.company', string='Company',
-                                 help='Leave empty to share the template with all the companies.')
+    company_id = fields.Many2one('res.company', help='Leave empty to share the template with all the companies.')
 
     @api.model
     def _get_for_employee(self, employee):

@@ -1,4 +1,4 @@
-from odoo import _, fields, models
+from odoo import fields, models
 
 
 class HrPayslip(models.Model):
@@ -34,7 +34,7 @@ class HrPayslip(models.Model):
         Line = self.env['hr.payroll.adjustment.line'].sudo()
         Adjustment = self.env['hr.payroll.adjustment'].sudo()
         codes = set(self.env['hr.payroll.adjustment.type'].sudo().with_context(active_test=False)
-                    .search([]).mapped('code'))
+                    .search([('code', '!=', False)]).mapped('code'))
         for payslip in self.filtered(lambda p: not p.credit_note and p.state not in ('done', 'cancel')):
             Line.search([('payslip_id', '=', payslip.id), ('state', '=', 'to_pay')]).payslip_id = False
             settles = payslip._adjustment_settles_all()
@@ -72,7 +72,7 @@ class HrPayslip(models.Model):
             if adjustment.recurrence == 'total':
                 left = adjustment.total_amount - sum(
                     adjustment.line_ids.filtered(lambda line: line.state == 'paid').mapped('amount'))
-            for line in lines.filtered(lambda l: l.adjustment_id == adjustment).sorted('date'):
+            for line in lines.filtered(lambda item: item.adjustment_id == adjustment).sorted('date'):
                 amount = line.amount
                 if adjustment.amount_type == 'percent':
                     base = gross if adjustment.percent_base == 'gross' else wage
@@ -123,7 +123,7 @@ class HrPayslip(models.Model):
         result = super().action_payslip_done()
         for payslip in self.filtered(lambda p: p.state == 'done' and not p.credit_note):
             payslip._adjustment_lines().filtered(lambda line: line.state == 'to_pay')._mark_paid(
-                _('Taken by %s', payslip.number or payslip.name), date=payslip.date_to)
+                self.env._('Taken by %s', payslip.number or payslip.name), date=payslip.date_to)
         return result
 
     def action_payslip_draft(self):

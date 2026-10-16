@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -22,8 +22,7 @@ class ApprovalMixin(models.AbstractModel):
     approval_request_ids = fields.One2many(
         'approval.request', 'res_id', string='Approval Requests', copy=False,
         domain=lambda self: [('res_model', '=', self._name), ('method', '=', False)])
-    approval_request_id = fields.Many2one('approval.request', string='Approval Request',
-                                          compute='_compute_approval_request')
+    approval_request_id = fields.Many2one('approval.request', compute='_compute_approval_request')
     approval_line_ids = fields.One2many('approval.line', string='Approvals', compute='_compute_approval_request')
     approval_step = fields.Char(string='Waiting For', compute='_compute_approval_request')
     approver_user_ids = fields.Many2many(
@@ -83,7 +82,7 @@ class ApprovalMixin(models.AbstractModel):
     def action_approval_submit(self):
         for document in self:
             if document.approval_state != 'draft':
-                raise UserError(_('Only a draft can be submitted: %s is not.', document.display_name))
+                raise UserError(self.env._('Only a draft can be submitted: %s is not.', document.display_name))
             document._approval_check_requester()
         for document in self:
             flow = self.env['approval.rule']._get_flow(document)
@@ -112,7 +111,7 @@ class ApprovalMixin(models.AbstractModel):
             history of the request, cancelled. """
         for document in self:
             if document.approval_state not in ('to_approve', 'refused', 'cancel'):
-                raise UserError(_('%s cannot be set back to draft.', document.display_name))
+                raise UserError(self.env._('%s cannot be set back to draft.', document.display_name))
             document._approval_check_requester()
             request = document._approval_current_request()
             if request.state == 'to_approve':
@@ -124,7 +123,7 @@ class ApprovalMixin(models.AbstractModel):
     def action_approval_cancel(self):
         for document in self:
             if document.approval_state not in ('draft', 'to_approve'):
-                raise UserError(_('%s can no longer be cancelled.', document.display_name))
+                raise UserError(self.env._('%s can no longer be cancelled.', document.display_name))
             document._approval_check_requester()
             request = document._approval_current_request()
             if request.state == 'to_approve':
@@ -136,5 +135,5 @@ class ApprovalMixin(models.AbstractModel):
         self.ensure_one()
         request = self._approval_current_request()
         if self.approval_state != 'to_approve' or request.state != 'to_approve':
-            raise UserError(_('%s is not waiting for an approval.', self.display_name))
+            raise UserError(self.env._('%s is not waiting for an approval.', self.display_name))
         return request

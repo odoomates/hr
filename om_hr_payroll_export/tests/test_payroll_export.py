@@ -45,7 +45,7 @@ class TestPayrollExport(TransactionCase):
 
     def export(self, payslips):
         action = payslips.action_export_bank_file()
-        return Form(self.env[action['res_model']].with_context(action['context'])).save()
+        return Form(self.env[action['res_model']].with_context(**action['context'])).save()
 
     def test_net_split_by_salary_distribution(self):
         payslip = self.confirmed_payslip(self.employee)

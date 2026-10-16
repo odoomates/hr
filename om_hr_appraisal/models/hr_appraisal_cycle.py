@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -21,7 +21,7 @@ class HrAppraisalCycle(models.Model):
     department_ids = fields.Many2many('hr.department', string='Departments')
     employee_ids = fields.Many2many('hr.employee', string='Employees',
                                     help='Taking part besides the employees of the departments.')
-    company_id = fields.Many2one('res.company', string='Company', required=True,
+    company_id = fields.Many2one('res.company', required=True,
                                  default=lambda self: self.env.company)
     state = fields.Selection([('draft', 'Draft'), ('running', 'Running'), ('done', 'Closed')],
                              required=True, default='draft', tracking=True)
@@ -50,10 +50,10 @@ class HrAppraisalCycle(models.Model):
         """ One appraisal, started, for each employee taking part who has none in the cycle yet. """
         for cycle in self:
             if cycle.state == 'done':
-                raise UserError(_('%s is closed.', cycle.name))
+                raise UserError(self.env._('%s is closed.', cycle.name))
             employees = cycle._get_employees() - cycle.appraisal_ids.employee_id
             if not employees and not cycle.appraisal_ids:
-                raise UserError(_('Choose the departments or the employees of %s first.', cycle.name))
+                raise UserError(self.env._('Choose the departments or the employees of %s first.', cycle.name))
             appraisals = self.env['hr.appraisal'].create([{
                 'employee_id': employee.id,
                 'cycle_id': cycle.id,

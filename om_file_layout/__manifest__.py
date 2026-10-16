@@ -1,12 +1,9 @@
 {
     'name': 'File Layouts',
-    'version': '1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Productivity',
     'summary': 'Design the CSV, fixed width or Excel files you send out of Odoo and export them from the Action '
                'menu',
-    'description': 'Describe a file a bank or an office asks for, column by column: CSV, fixed width or Excel, with '
-                   'a header, one line per record and a footer. Export it from the Action menu of the records, '
-                   'check its problems first, and keep every file exported. Part of Odoo Mates HR.',
     'author': 'Odoo Mates',
     'maintainer': 'Odoo Mates',
     'support': 'odoomates@gmail.com',

@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 EPSILON = 1 / 3600
@@ -77,7 +77,7 @@ class HrAttendance(models.Model):
                 attendance.sudo().employee_id.attendance_manager_id == user
                 or attendance.sudo().employee_id.parent_id.user_id == user for attendance in self):
             return
-        raise UserError(_('Only the manager or the attendance officers accept or reject overtime.'))
+        raise UserError(self.env._('Only the manager or the attendance officers accept or reject overtime.'))
 
     def action_overtime_accept(self):
         self._check_reviewer()

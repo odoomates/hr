@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -47,21 +47,21 @@ class HrExit(models.Model):
         """ The payslip of the last month, up to the last working day, with what the exit pays and deducts. """
         self.ensure_one()
         if not self.env.user.has_group('om_hr_payroll.group_hr_payroll_user'):
-            raise UserError(_('Only the payroll officers create the final settlement.'))
+            raise UserError(self.env._('Only the payroll officers create the final settlement.'))
         if self.state not in ('approved', 'done'):
-            raise UserError(_('The final settlement of %s waits for the exit to be approved.', self.name))
+            raise UserError(self.env._('The final settlement of %s waits for the exit to be approved.', self.name))
         if self.settlement_payslip_id and self.settlement_payslip_id.state != 'cancel':
             return self.action_open_settlement()
         Payslip = self.env['hr.payslip']
         date_from = self.last_working_day.replace(day=1)
         values = Payslip.onchange_employee_id(date_from, self.last_working_day, self.employee_id.id)['value']
         if not values.get('version_id'):
-            raise UserError(_('%s has no contract running in the last month.', self.employee_id.name))
+            raise UserError(self.env._('%s has no contract running in the last month.', self.employee_id.name))
         payslip = Payslip.create({
             'employee_id': self.employee_id.id,
             'date_from': date_from,
             'date_to': self.last_working_day,
-            'name': _('Final Settlement of %s', self.employee_id.name),
+            'name': self.env._('Final Settlement of %s', self.employee_id.name),
             'company_id': values.get('company_id'),
             'version_id': values['version_id'],
             'struct_id': values.get('struct_id'),

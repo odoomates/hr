@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 
 
 class HrEmployee(models.Model):
@@ -32,13 +32,13 @@ class HrEmployee(models.Model):
         return action
 
     def _sign_default_signers(self):
-        return [(10, _('Employee'), self.work_contact_id)] if self.work_contact_id else []
+        return [(10, self.env._('Employee'), self.work_contact_id)] if self.work_contact_id else []
 
     def action_open_policy_assignments(self):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Policies'),
+            'name': self.env._('Policies'),
             'res_model': 'hr.policy.assignment',
             'view_mode': 'list,form',
             'domain': [('employee_id', '=', self.id)],

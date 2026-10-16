@@ -1,0 +1,16 @@
+# pylint --rcfile=.pylintrc om_*  (pip install pylint-odoo)
+[MASTER]
+load-plugins=pylint_odoo
+score=n
+# the payroll modules keep their code as it is for their existing users
+ignore=om_hr_payroll,om_hr_payroll_account
+
+[ODOOLINT]
+valid-odoo-versions=20.0
+manifest-required-authors=Odoo Mates
+manifest-required-keys=license
+manifest-deprecated-keys=description,active
+
+[MESSAGES CONTROL]
+disable=all
+enable=odoolint

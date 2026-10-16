@@ -10,7 +10,7 @@ class HrLoanType(models.Model):
     name = fields.Char(required=True, translate=True)
     sequence = fields.Integer(default=10)
     active = fields.Boolean(default=True)
-    company_id = fields.Many2one('res.company', string='Company')
+    company_id = fields.Many2one('res.company')
     is_advance = fields.Boolean(
         string='Salary Advance', help='Repaid at once, from the next salary: a single installment.')
     max_amount = fields.Float(string='Maximum Amount', help='0: no maximum.')
@@ -19,7 +19,8 @@ class HrLoanType(models.Model):
         string='Maximum Installment (% of Wage)',
         help='An installment cannot take more than this part of the wage, e.g. 50. 0: no maximum.')
     min_service_months = fields.Integer(
-        string='Minimum Service (Months)', help='How long the employee must have worked for the company. 0: no minimum.')
+        string='Minimum Service (Months)',
+        help='How long the employee must have worked for the company. 0: no minimum.')
     single_running = fields.Boolean(
         string='One at a Time', default=True,
         help='An employee asks for a new loan of this type once the previous one is repaid.')

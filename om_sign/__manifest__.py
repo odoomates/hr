@@ -1,15 +1,9 @@
 {
     'name': 'Sign',
-    'version': '1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Productivity',
     'summary': 'Send prints and PDF files for electronic signature: signed in order from an email link, with a '
                'signature certificate',
-    'description': 'Send an issued print or any PDF to the people who sign it. Each one gets a link by email, signs '
-                   'by drawing, typing or uploading a signature, without an account, and in the order set: the '
-                   'templates name who signs, e.g. the employee and then the manager. An optional code sent by '
-                   'email confirms the signer. Once everyone signed, they all get the signed PDF, closed by a '
-                   'certificate page with who signed, when, from where and the fingerprint of the document. Part '
-                   'of Odoo Mates HR.',
     'author': 'Odoo Mates',
     'maintainer': 'Odoo Mates',
     'support': 'odoomates@gmail.com',

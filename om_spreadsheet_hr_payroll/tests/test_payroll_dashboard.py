@@ -12,7 +12,8 @@ class TestPayrollDashboard(HttpCase):
         rules = self.env.ref('om_hr_payroll.hr_rule_basic') | self.env.ref('om_hr_payroll.hr_rule_taxable') \
             | self.env.ref('om_hr_payroll.hr_rule_net')
         structure = self.env['hr.payroll.structure'].create({
-            'name': 'Dashboard Structure', 'code': 'DASHTEST', 'parent_id': False, 'rule_ids': [Command.set(rules.ids)]})
+            'name': 'Dashboard Structure', 'code': 'DASHTEST', 'parent_id': False,
+            'rule_ids': [Command.set(rules.ids)]})
         employee = self.env['hr.employee'].create({
             'name': 'Dashboard Payee', 'date_version': date(today.year, 1, 1),
             'contract_date_start': date(today.year, 1, 1), 'wage': 5000.0, 'struct_id': structure.id})

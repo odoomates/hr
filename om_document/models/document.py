@@ -1,7 +1,7 @@
 import base64
 from datetime import timedelta
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
 from odoo.fields import Domain
 from odoo.tools.misc import format_date
@@ -26,7 +26,7 @@ class Document(models.Model):
     record_ref = fields.Reference(selection='_selection_record_ref', string='Belongs To',
                                   compute='_compute_record_ref', inverse='_inverse_record_ref')
     type_id = fields.Many2one(
-        'document.type', string='Type', required=True, tracking=True, index=True,
+        'document.type', required=True, tracking=True, index=True,
         domain="[('res_model', '=', res_model), '|', ('company_id', '=', False), ('company_id', '=', company_id)]")
     has_number = fields.Boolean(related='type_id.has_number')
     has_issue_date = fields.Boolean(related='type_id.has_issue_date')
@@ -40,7 +40,7 @@ class Document(models.Model):
     preview_url = fields.Char(compute='_compute_preview')
     attachment_count = fields.Integer(string='File Count', compute='_compute_preview')
     note = fields.Text()
-    company_id = fields.Many2one('res.company', string='Company', required=True, index=True,
+    company_id = fields.Many2one('res.company', required=True, index=True,
                                  default=lambda self: self.env.company)
     state = fields.Selection([
         ('none', 'No Expiry'),
@@ -49,7 +49,7 @@ class Document(models.Model):
         ('expired', 'Expired'),
     ], compute='_compute_state', search='_search_state',
         help='Expiring: the first reminder of its type is due.')
-    days_left = fields.Integer(string='Days Left', compute='_compute_state')
+    days_left = fields.Integer(compute='_compute_state')
     last_reminder = fields.Integer(
         copy=False, default=-1,
         help='The reminder sent last, in days before the expiry date, -1 for none: each one is sent once.')
@@ -79,7 +79,8 @@ class Document(models.Model):
     @api.model
     def _selection_record_ref(self):
         """ The kinds of record a document type is kept on. """
-        models_ = self.env['document.type'].sudo().with_context(active_test=False).search([]).model_id
+        models_ = self.env['document.type'].sudo().with_context(active_test=False).search(
+            [('model_id', '!=', False)]).model_id
         return [(model.model, model.name) for model in models_]
 
     @api.depends('res_model', 'res_id')
@@ -142,14 +143,14 @@ class Document(models.Model):
     def _check_dates(self):
         for document in self:
             if document.date_issue and document.date_expiry and document.date_expiry < document.date_issue:
-                raise ValidationError(_('%s expires before it is issued.', document.name))
+                raise ValidationError(self.env._('%s expires before it is issued.', document.name))
 
     @api.constrains('res_model', 'type_id')
     def _check_type(self):
         for document in self:
             if document.type_id.res_model != document.res_model:
-                raise ValidationError(_('A %(type)s is not kept on a %(model)s.', type=document.type_id.name,
-                                        model=self.env['ir.model']._get(document.res_model).name))
+                raise ValidationError(self.env._('A %(type)s is not kept on a %(model)s.', type=document.type_id.name,
+                                                 model=self.env['ir.model']._get(document.res_model).name))
 
     # ------------------------------------------------------------------
     # Record holding the document
@@ -210,11 +211,11 @@ class Document(models.Model):
         """ Open the document renewing this one: saving it archives this one. """
         self.ensure_one()
         if self.next_id:
-            raise UserError(_('%(document)s is already renewed by %(renewal)s.', document=self.name,
-                              renewal=self.next_id.name))
+            raise UserError(self.env._('%(document)s is already renewed by %(renewal)s.', document=self.name,
+                                       renewal=self.next_id.name))
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Renew %s', self.name),
+            'name': self.env._('Renew %s', self.name),
             'res_model': 'document.document',
             'view_mode': 'form',
             'views': [(False, 'form')],
@@ -233,7 +234,7 @@ class Document(models.Model):
         self.ensure_one()
         record = self._get_record()
         if not record:
-            raise UserError(_('The record of %s no longer exists.', self.name))
+            raise UserError(self.env._('The record of %s no longer exists.', self.name))
         return {
             'type': 'ir.actions.act_window',
             'res_model': self.res_model,
@@ -325,11 +326,11 @@ class Document(models.Model):
         self.ensure_one()
         days_left = (self.date_expiry - fields.Date.context_today(self)).days
         if days_left < 0:
-            summary = _('%s has expired', self.name)
+            summary = self.env._('%s has expired', self.name)
         elif days_left == 0:
-            summary = _('%s expires today', self.name)
+            summary = self.env._('%s expires today', self.name)
         else:
-            summary = _('%(document)s expires in %(days)s days', document=self.name, days=days_left)
+            summary = self.env._('%(document)s expires in %(days)s days', document=self.name, days=days_left)
         if self.res_name:
             summary = '%s: %s' % (self.res_name, summary)
         for user in self._get_responsible_users():
@@ -339,7 +340,7 @@ class Document(models.Model):
             partner = self._get_holder_partner()
             if partner.email:
                 self.message_post(
-                    body=_('%(summary)s. Please renew it and send the new one.', summary=summary),
+                    body=self.env._('%(summary)s. Please renew it and send the new one.', summary=summary),
                     subject=summary, partner_ids=partner.ids, message_type='comment',
                     subtype_xmlid='mail.mt_comment')
         self.sudo().last_reminder = reminder

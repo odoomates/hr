@@ -2,7 +2,7 @@ import re
 
 from markupsafe import Markup
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 # where a signature goes in the text of a template, e.g. [signature: Employee]
@@ -52,7 +52,7 @@ class PrintIssue(models.Model):
     def action_request_signature(self):
         self.ensure_one()
         if not self.template_id.sign_role_ids:
-            raise UserError(_('Add the signers to the template %s first.', self.template_id.name))
+            raise UserError(self.env._('Add the signers to the template %s first.', self.template_id.name))
         request = self.env['sign.request']._create_for_issue(self)
         return {
             'type': 'ir.actions.act_window',
@@ -66,7 +66,7 @@ class PrintIssue(models.Model):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Signatures'),
+            'name': self.env._('Signatures'),
             'res_model': 'sign.request',
             'view_mode': 'list,form',
             'domain': [('issue_id', '=', self.id)],

@@ -1,4 +1,4 @@
-from datetime import date, datetime, time, timedelta, timezone
+from datetime import UTC, date, datetime, time, timedelta
 
 from odoo import Command
 from odoo.exceptions import AccessError, UserError
@@ -7,7 +7,7 @@ from odoo.tests import HttpCase, TransactionCase, new_test_user, tagged
 from odoo.addons.om_hr_shift.models.hr_shift_template import shift_segments
 
 MONDAY = date(2026, 9, 7)
-UTC = timezone.utc
+UTC = UTC
 
 
 @tagged('post_install', '-at_install')
@@ -16,7 +16,8 @@ class TestShift(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.planner = new_test_user(cls.env, 'om_shift_planner', groups='base.group_user,om_hr_shift.group_shift_planner')
+        cls.planner = new_test_user(cls.env, 'om_shift_planner',
+                                    groups='base.group_user,om_hr_shift.group_shift_planner')
         cls.manager_user = new_test_user(cls.env, 'om_shift_manager', groups='base.group_user')
         cls.user_a = new_test_user(cls.env, 'om_shift_a', groups='base.group_user')
         cls.user_b = new_test_user(cls.env, 'om_shift_b', groups='base.group_user')
@@ -136,7 +137,8 @@ class TestShift(TransactionCase):
         self.shift(self.night, day=MONDAY)
         count = self.Shift.roster_copy_previous(MONDAY, 7)
         self.assertEqual(count, 1, 'the employee planned on that day already is left as is')
-        copied = self.env['hr.shift'].search([('employee_id', '=', self.employee_b.id), ('date', '=', date(2026, 9, 8))])
+        copied = self.env['hr.shift'].search(
+            [('employee_id', '=', self.employee_b.id), ('date', '=', date(2026, 9, 8))])
         self.assertEqual((copied.template_id, copied.state), (self.evening, 'draft'))
 
     def test_roster_data(self):

@@ -234,7 +234,7 @@ class TestSign(SignCommon, TransactionCase):
     def test_print_wizard_issue_and_send(self):
         context = {'active_model': 'res.partner', 'active_ids': self.customer.ids,
                    'default_template_id': self.template.id}
-        wizard = Form(self.env['print.wizard'].with_user(self.sender).with_context(context)).save()
+        wizard = Form(self.env['print.wizard'].with_user(self.sender).with_context(**context)).save()
         self.assertTrue(wizard.has_sign_roles)
         action = wizard.action_issue_sign()
         sign_request = self.env['sign.request'].browse(action['res_id'])

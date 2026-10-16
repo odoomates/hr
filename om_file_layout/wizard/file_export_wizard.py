@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -7,7 +7,7 @@ class FileExportWizard(models.TransientModel):
     _name = 'file.export.wizard'
     _description = 'Export a File'
 
-    layout_id = fields.Many2one('file.layout', string='Layout', required=True,
+    layout_id = fields.Many2one('file.layout', required=True,
                                 domain="[('model', '=', res_model)]")
     res_model = fields.Char(required=True)
     res_ids = fields.Json(required=True)
@@ -54,7 +54,7 @@ class FileExportWizard(models.TransientModel):
         """ :return: the export of the file, kept with its records """
         self.ensure_one()
         if not self.res_ids:
-            raise UserError(_('Select the records to export first.'))
+            raise UserError(self.env._('Select the records to export first.'))
         records = self._get_records()
         layout = self.layout_id
         result = layout._render(records)

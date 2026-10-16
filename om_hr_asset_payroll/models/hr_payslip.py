@@ -1,4 +1,4 @@
-from odoo import _, fields, models
+from odoo import fields, models
 
 ASSET_CODE = 'ASSET'
 
@@ -44,7 +44,7 @@ class HrPayslip(models.Model):
                     self.get_versions(payslip.employee_id, payslip.date_from, payslip.date_to)[:1])
                 if version:
                     payslip.input_line_ids = [(0, 0, {
-                        'name': _('Asset Charges'), 'code': ASSET_CODE, 'amount': amount,
+                        'name': self.env._('Asset Charges'), 'code': ASSET_CODE, 'amount': amount,
                         'version_id': version.id, 'sequence': 91,
                     })]
 

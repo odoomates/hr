@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
 
@@ -30,8 +30,7 @@ class DocumentType(models.Model):
     user_ids = fields.Many2many(
         'res.users', string='Responsible Users', domain=[('share', '=', False)],
         help='Reminded when the record of the document names no one responsible.')
-    company_id = fields.Many2one('res.company', string='Company',
-                                 help='Leave empty to share the type with all the companies.')
+    company_id = fields.Many2one('res.company', help='Leave empty to share the type with all the companies.')
     description = fields.Text(help='Explains the document to the people filling it in.')
 
     _code_uniq = models.Constraint('UNIQUE(code, model_id, company_id)',
@@ -43,7 +42,7 @@ class DocumentType(models.Model):
             try:
                 doc_type._get_reminder_days()
             except ValueError:
-                raise ValidationError(_(
+                raise ValidationError(self.env._(
                     'Remind of %s takes numbers of days separated by commas, e.g. 30,7,0.', doc_type.name)) from None
 
     def _get_reminder_days(self):

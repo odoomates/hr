@@ -1,13 +1,9 @@
 {
     'name': 'Approvals',
-    'version': '1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Productivity',
     'summary': 'Approval flows for any app: a button waits for its approval before it runs, e.g. confirming a '
                'sale order above an amount',
-    'description': 'Approval rules on the buttons of any model, approved in steps by given users, the users of a '
-                   'group or the user a field of the record names, with an inbox of what waits for your '
-                   'approval. Other modules use the same flows to approve their own documents. Part of Odoo '
-                   'Mates HR.',
     'author': 'Odoo Mates',
     'maintainer': 'Odoo Mates',
     'support': 'odoomates@gmail.com',

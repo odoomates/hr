@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -11,12 +11,13 @@ class HrCertificate(models.Model):
     _order = 'date desc, id desc'
     _mail_post_access = 'read'
 
-    name = fields.Char(string='Reference', required=True, readonly=True, copy=False, default=lambda self: _('New'))
+    name = fields.Char(string='Reference', required=True, readonly=True, copy=False,
+                       default=lambda self: self.env._('New'))
     employee_id = fields.Many2one(
-        'hr.employee', string='Employee', required=True, index=True, tracking=True,
+        'hr.employee', required=True, index=True, tracking=True,
         default=lambda self: self.env.user.employee_id)
     company_id = fields.Many2one(
-        'res.company', string='Company', required=True, index=True,
+        'res.company', required=True, index=True,
         compute='_compute_company_id', store=True, readonly=False, precompute=True)
     department_id = fields.Many2one(related='employee_id.department_id', store=True)
     template_id = fields.Many2one(
@@ -46,21 +47,21 @@ class HrCertificate(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
-            if vals.get('name', _('New')) == _('New'):
-                vals['name'] = self.env['ir.sequence'].next_by_code('hr.certificate') or _('New')
+            if vals.get('name', self.env._('New')) == self.env._('New'):
+                vals['name'] = self.env['ir.sequence'].next_by_code('hr.certificate') or self.env._('New')
         return super().create(vals_list)
 
-    def unlink(self):
+    @api.ondelete(at_uninstall=False)
+    def _unlink_except_submitted(self):
         if any(certificate.state not in ('draft', 'cancel') for certificate in self):
-            raise UserError(_('Only a draft or a cancelled certificate request can be deleted.'))
-        return super().unlink()
+            raise UserError(self.env._('Only a draft or a cancelled certificate request can be deleted.'))
 
     def action_submit(self):
         for certificate in self:
             if certificate.state != 'draft':
-                raise UserError(_('Only a draft can be submitted: %s is not.', certificate.name))
+                raise UserError(self.env._('Only a draft can be submitted: %s is not.', certificate.name))
             if not certificate.template_id.employee_request:
-                raise UserError(_('%s is not a certificate employees request.', certificate.template_id.name))
+                raise UserError(self.env._('%s is not a certificate employees request.', certificate.template_id.name))
         return self.action_approval_submit()
 
     def _approval_employee(self):
@@ -70,23 +71,26 @@ class HrCertificate(models.Model):
     def _approval_check_requester(self):
         self.ensure_one()
         if self.employee_id.user_id != self.env.user and not self.env.user.has_group('hr.group_hr_user'):
-            raise UserError(_('Only %(employee)s or HR can change %(request)s.',
-                              employee=self.employee_id.name, request=self.name))
+            raise UserError(self.env._('Only %(employee)s or HR can change %(request)s.',
+                                       employee=self.employee_id.name, request=self.name))
 
     def _on_approval_submitted(self, request):
         self.sudo().state = 'to_approve'
 
     def _on_approval_approved(self, request):
-        super()._on_approval_approved(request)
+        result = super()._on_approval_approved(request)
         self._issue()
+        return result
 
     def _on_approval_refused(self, request):
-        super()._on_approval_refused(request)
+        result = super()._on_approval_refused(request)
         self.sudo().state = 'refused'
+        return result
 
     def _on_approval_cancelled(self, request):
-        super()._on_approval_cancelled(request)
+        result = super()._on_approval_cancelled(request)
         self.sudo().state = 'cancel'
+        return result
 
     def _on_approval_reset(self):
         self.sudo().state = 'draft'
@@ -103,13 +107,13 @@ class HrCertificate(models.Model):
             issue.action_issue()
             certificate.write({'issue_id': issue.id, 'state': 'issued'})
             certificate.message_post(
-                body=_('%(certificate)s is ready: %(reference)s.', certificate=certificate.template_id.name,
-                       reference=issue.name),
+                body=self.env._('%(certificate)s is ready: %(reference)s.', certificate=certificate.template_id.name,
+                                reference=issue.name),
                 partner_ids=certificate.employee_id.user_id.partner_id.ids,
                 message_type='comment', subtype_xmlid='mail.mt_comment')
 
     def action_download(self):
         self.ensure_one()
         if not self.issue_id:
-            raise UserError(_('%s is not printed yet.', self.name))
+            raise UserError(self.env._('%s is not printed yet.', self.name))
         return self.issue_id.action_download()

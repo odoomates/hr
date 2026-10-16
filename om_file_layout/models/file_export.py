@@ -1,4 +1,4 @@
-from odoo import _, fields, models
+from odoo import fields, models
 
 
 class FileExport(models.Model):
@@ -8,7 +8,7 @@ class FileExport(models.Model):
     _order = 'create_date desc, id desc'
 
     name = fields.Char(string='File', required=True, readonly=True)
-    layout_id = fields.Many2one('file.layout', string='Layout', required=True, readonly=True, index=True,
+    layout_id = fields.Many2one('file.layout', required=True, readonly=True, index=True,
                                 ondelete='restrict')
     res_model = fields.Char(string='Model', readonly=True)
     res_ids = fields.Json(string='Records', readonly=True)
@@ -31,7 +31,7 @@ class FileExport(models.Model):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Records of %s', self.name),
+            'name': self.env._('Records of %s', self.name),
             'res_model': self.res_model,
             'view_mode': 'list,form',
             'domain': [('id', 'in', self.res_ids or [])],

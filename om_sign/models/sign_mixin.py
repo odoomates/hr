@@ -1,4 +1,4 @@
-from odoo import _, fields, models
+from odoo import fields, models
 
 
 class SignMixin(models.AbstractModel):
@@ -22,7 +22,7 @@ class SignMixin(models.AbstractModel):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Signatures'),
+            'name': self.env._('Signatures'),
             'res_model': 'sign.request',
             'view_mode': 'list,form',
             'domain': [('res_model', '=', self._name), ('res_id', '=', self.id)],

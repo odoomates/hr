@@ -17,7 +17,7 @@ class HrPortalAnnouncement(HrPortal):
                           -line.announcement_id.date_start.timestamp()))
 
     def _announcement_line(self, announcement_id):
-        line = self._announcement_lines().filtered(lambda l: l.announcement_id.id == announcement_id)
+        line = self._announcement_lines().filtered(lambda item: item.announcement_id.id == announcement_id)
         if not line:
             raise NotFound()
         return line

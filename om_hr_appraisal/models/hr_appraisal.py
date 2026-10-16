@@ -2,7 +2,7 @@ from datetime import timedelta
 
 from dateutil.relativedelta import relativedelta
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import AccessError, UserError
 
 # open appraisals: one at a time per employee is planned
@@ -26,15 +26,15 @@ class HrAppraisal(models.Model):
     _order = 'date_deadline desc, id desc'
 
     name = fields.Char(compute='_compute_name', store=True)
-    employee_id = fields.Many2one('hr.employee', string='Employee', required=True, index=True, tracking=True)
+    employee_id = fields.Many2one('hr.employee', required=True, index=True, tracking=True)
     manager_id = fields.Many2one(
-        'hr.employee', string='Manager', index=True, tracking=True,
+        'hr.employee', index=True, tracking=True,
         compute='_compute_manager_id', store=True, readonly=False, precompute=True)
     company_id = fields.Many2one(related='employee_id.company_id', store=True, index=True)
     department_id = fields.Many2one(related='employee_id.department_id', store=True)
     kind = fields.Selection([('regular', 'Appraisal'), ('probation', 'Probation Review')],
-                            string='Kind', required=True, default='regular')
-    cycle_id = fields.Many2one('hr.appraisal.cycle', string='Cycle', index=True, ondelete='set null')
+                            required=True, default='regular')
+    cycle_id = fields.Many2one('hr.appraisal.cycle', index=True, ondelete='set null')
     date_deadline = fields.Date(string='Deadline', required=True, tracking=True,
                                 default=lambda self: fields.Date.context_today(self) + timedelta(days=30))
     date_done = fields.Date(string='Done On', readonly=True, copy=False)
@@ -47,7 +47,7 @@ class HrAppraisal(models.Model):
         ('done', 'Done'),
         ('cancel', 'Cancelled'),
     ], required=True, default='new', copy=False, index=True, tracking=True)
-    rating_id = fields.Many2one('hr.appraisal.rating', string='Rating', tracking=True)
+    rating_id = fields.Many2one('hr.appraisal.rating', tracking=True)
     goal_ids = fields.One2many('hr.appraisal.goal', 'appraisal_id', string='Goals')
 
     employee_feedback_html = fields.Html(groups='base.group_system', copy=False, prefetch=False)
@@ -67,7 +67,8 @@ class HrAppraisal(models.Model):
     @api.depends('employee_id', 'kind')
     def _compute_name(self):
         for appraisal in self:
-            label = _('Probation Review of %s') if appraisal.kind == 'probation' else _('Appraisal of %s')
+            label = self.env._('Probation Review of '
+                               '%s') if appraisal.kind == 'probation' else self.env._('Appraisal of %s')
             appraisal.name = label % (appraisal.employee_id.name or '')
 
     @api.depends('employee_id')
@@ -131,13 +132,13 @@ class HrAppraisal(models.Model):
     def _inverse_employee_feedback(self):
         for appraisal in self:
             if not appraisal._can_write_feedback('employee'):
-                raise AccessError(_('The self assessment of %s cannot be changed now.', appraisal.name))
+                raise AccessError(self.env._('The self assessment of %s cannot be changed now.', appraisal.name))
             appraisal.sudo().employee_feedback_html = appraisal.employee_feedback
 
     def _inverse_manager_feedback(self):
         for appraisal in self:
             if not appraisal._can_write_feedback('manager'):
-                raise AccessError(_('The review of %s cannot be changed now.', appraisal.name))
+                raise AccessError(self.env._('The review of %s cannot be changed now.', appraisal.name))
             appraisal.sudo().manager_feedback_html = appraisal.manager_feedback
 
     # ------------------------------------------------------------------
@@ -170,14 +171,15 @@ class HrAppraisal(models.Model):
                 if 'manager' in roles and appraisal.state != 'done':
                     allowed |= MANAGER_WRITABLE
                 if set(vals) - allowed:
-                    raise AccessError(_('You cannot change %(fields)s of %(appraisal)s.',
-                                        fields=', '.join(sorted(set(vals) - allowed)), appraisal=appraisal.name))
+                    raise AccessError(self.env._('You cannot change %(fields)s of %(appraisal)s.',
+                                                 fields=', '.join(sorted(set(vals) - allowed)),
+                                                 appraisal=appraisal.name))
         return super().write(vals)
 
-    def unlink(self):
+    @api.ondelete(at_uninstall=False)
+    def _unlink_except_started(self):
         if any(appraisal.state not in ('new', 'cancel') for appraisal in self):
-            raise UserError(_('Only an appraisal to start or cancelled can be deleted.'))
-        return super().unlink()
+            raise UserError(self.env._('Only an appraisal to start or cancelled can be deleted.'))
 
     # ------------------------------------------------------------------
     # Steps
@@ -186,7 +188,7 @@ class HrAppraisal(models.Model):
     def _check_roles(self, *allowed):
         for appraisal in self:
             if not appraisal._roles() & set(allowed):
-                raise UserError(_('This step of %s is not yours to take.', appraisal.name))
+                raise UserError(self.env._('This step of %s is not yours to take.', appraisal.name))
 
     def _todo(self, user, summary):
         """ A to-do for the user whose turn it is, replacing the to-dos of the previous step. """
@@ -206,22 +208,22 @@ class HrAppraisal(models.Model):
         self._check_roles('hr', 'manager')
         for appraisal in self:
             if appraisal.state != 'new':
-                raise UserError(_('%s is already started.', appraisal.name))
+                raise UserError(self.env._('%s is already started.', appraisal.name))
             if appraisal.employee_id.user_id and appraisal.kind != 'probation':
                 appraisal.sudo().state = 'self'
-                appraisal._todo(appraisal.employee_id.user_id, _('Fill in your self assessment'))
+                appraisal._todo(appraisal.employee_id.user_id, self.env._('Fill in your self assessment'))
             else:
                 appraisal.sudo().state = 'review'
-                appraisal._todo(appraisal._manager_user(), _('Review %s', appraisal.employee_id.name))
+                appraisal._todo(appraisal._manager_user(), self.env._('Review %s', appraisal.employee_id.name))
         return True
 
     def action_submit_self(self):
         self._check_roles('hr', 'employee')
         for appraisal in self:
             if appraisal.state != 'self':
-                raise UserError(_('%s is not waiting for a self assessment.', appraisal.name))
+                raise UserError(self.env._('%s is not waiting for a self assessment.', appraisal.name))
             appraisal.sudo().state = 'review'
-            appraisal._todo(appraisal._manager_user(), _('Review %s', appraisal.employee_id.name))
+            appraisal._todo(appraisal._manager_user(), self.env._('Review %s', appraisal.employee_id.name))
         return True
 
     def action_back_to_self(self):
@@ -229,23 +231,23 @@ class HrAppraisal(models.Model):
         self._check_roles('hr', 'manager')
         for appraisal in self:
             if appraisal.state != 'review' or not appraisal.employee_id.user_id:
-                raise UserError(_('%s cannot go back to the employee.', appraisal.name))
+                raise UserError(self.env._('%s cannot go back to the employee.', appraisal.name))
             appraisal.sudo().state = 'self'
-            appraisal._todo(appraisal.employee_id.user_id, _('Complete your self assessment'))
+            appraisal._todo(appraisal.employee_id.user_id, self.env._('Complete your self assessment'))
         return True
 
     def action_done(self):
         self._check_roles('hr', 'manager')
         for appraisal in self:
             if appraisal.state != 'review':
-                raise UserError(_('%s is not in review.', appraisal.name))
+                raise UserError(self.env._('%s is not in review.', appraisal.name))
             if not appraisal.rating_id:
-                raise UserError(_('Rate %s before closing the appraisal.', appraisal.employee_id.name))
+                raise UserError(self.env._('Rate %s before closing the appraisal.', appraisal.employee_id.name))
             appraisal.sudo().write({'state': 'done', 'date_done': fields.Date.context_today(appraisal)})
             appraisal.sudo().activity_unlink(['mail.mail_activity_data_todo'])
             if appraisal.employee_id.user_id:
                 appraisal.message_post(
-                    body=_('Your appraisal is done: you can read the review of your manager.'),
+                    body=self.env._('Your appraisal is done: you can read the review of your manager.'),
                     partner_ids=appraisal.employee_id.user_id.partner_id.ids,
                     message_type='comment', subtype_xmlid='mail.mt_comment')
         return True
@@ -254,7 +256,7 @@ class HrAppraisal(models.Model):
         for appraisal in self:
             roles = appraisal._roles()
             if 'hr' not in roles and not ('manager' in roles and appraisal.state == 'new'):
-                raise UserError(_('HR cancels a started appraisal.'))
+                raise UserError(self.env._('HR cancels a started appraisal.'))
             appraisal.sudo().state = 'cancel'
             appraisal.sudo().activity_unlink(['mail.mail_activity_data_todo'])
         return True
@@ -270,7 +272,7 @@ class HrAppraisal(models.Model):
         self._check_roles('hr')
         return {
             'type': 'ir.actions.act_window',
-            'name': _('New Contract Version'),
+            'name': self.env._('New Contract Version'),
             'res_model': 'hr.appraisal.version',
             'view_mode': 'form',
             'target': 'new',
@@ -284,7 +286,9 @@ class HrAppraisal(models.Model):
     @api.model
     def _cron_plan_appraisals(self):
         today = fields.Date.context_today(self)
-        for company in self.env['res.company'].search([]):
+        companies = self.env['res.company'].search(
+            ['|', ('appraisal_probation', '=', True), ('appraisal_auto', '=', True)])
+        for company in companies:
             employees = self.env['hr.employee'].search([('company_id', '=', company.id)])
             if company.appraisal_probation:
                 self._plan_probation_reviews(employees, today, company)

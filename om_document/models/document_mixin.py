@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 
 
 class DocumentMixin(models.AbstractModel):
@@ -13,7 +13,7 @@ class DocumentMixin(models.AbstractModel):
     document_ids = fields.One2many(
         'document.document', 'res_id', string='Documents',
         domain=lambda self: [('res_model', '=', self._name)])
-    document_count = fields.Integer(string='Document Count', compute='_compute_document_count')
+    document_count = fields.Integer(compute='_compute_document_count')
     document_alert_count = fields.Integer(string='Documents to Renew', compute='_compute_document_count',
                                              help='The documents expiring or expired.')
 
@@ -40,7 +40,7 @@ class DocumentMixin(models.AbstractModel):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Documents of %s', self.display_name),
+            'name': self.env._('Documents of %s', self.display_name),
             'res_model': 'document.document',
             'view_mode': 'list,form',
             'domain': [('res_model', '=', self._name), ('res_id', '=', self.id)],

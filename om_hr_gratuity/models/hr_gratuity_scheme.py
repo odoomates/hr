@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
 
@@ -12,7 +12,7 @@ class HrGratuityScheme(models.Model):
     name = fields.Char(required=True, translate=True)
     sequence = fields.Integer(default=10)
     active = fields.Boolean(default=True)
-    company_id = fields.Many2one('res.company', string='Company')
+    company_id = fields.Many2one('res.company')
     days_per_month = fields.Float(
         string='Days in a Month of Pay', default=30.0, required=True,
         help='The daily pay is the monthly wage divided by this number, e.g. 30, or 26 working days.')
@@ -29,7 +29,7 @@ class HrGratuityScheme(models.Model):
         self.ensure_one()
         explanation = []
         if years < self.min_years:
-            return {'days': 0.0, 'factor': 0.0, 'amount': 0.0, 'explanation': _(
+            return {'days': 0.0, 'factor': 0.0, 'amount': 0.0, 'explanation': self.env._(
                 '%(years).2f years of service, below the minimum of %(min)s.', years=years, min=self.min_years)}
         days = 0.0
         for band in self.band_ids.sorted('from_years'):
@@ -37,15 +37,16 @@ class HrGratuityScheme(models.Model):
             in_band = max(0.0, min(years, top) - band.from_years)
             if in_band:
                 days += in_band * band.days_per_year
-                explanation.append(_('%(years).2f years × %(days)s days', years=in_band, days=band.days_per_year))
+                explanation.append(self.env._('%(years).2f years × %(days)s days', years=in_band,
+                                              days=band.days_per_year))
         amount = days * wage / self.days_per_month
         factor = self.factor_ids._factor_for(years, reason)
         amount = amount * factor / 100.0
         if factor != 100.0:
-            explanation.append(_('%(factor)s%% kept for %(reason)s', factor=factor, reason=reason.name))
+            explanation.append(self.env._('%(factor)s%% kept for %(reason)s', factor=factor, reason=reason.name))
         if self.max_months and amount > self.max_months * wage:
             amount = self.max_months * wage
-            explanation.append(_('capped at %s months of wage', self.max_months))
+            explanation.append(self.env._('capped at %s months of wage', self.max_months))
         return {'days': days, 'factor': factor, 'amount': amount, 'explanation': ', '.join(explanation)}
 
 
@@ -63,7 +64,7 @@ class HrGratuityBand(models.Model):
     def _check_years(self):
         for band in self:
             if band.to_years and band.to_years <= band.from_years:
-                raise ValidationError(_('A band of years ends after it starts.'))
+                raise ValidationError(self.env._('A band of years ends after it starts.'))
 
 
 class HrGratuityFactor(models.Model):

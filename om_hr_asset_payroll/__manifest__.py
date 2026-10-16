@@ -1,12 +1,8 @@
 {
     'name': 'HR Assets in Payroll',
-    'version': '1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Human Resources',
     'summary': 'Deduct from the payslip what an employee is charged for an asset lost or damaged',
-    'description': 'The charge set when an asset is returned damaged or reported lost is deducted by the Asset '
-                   'Charges salary rule from the next payslip of the employee, or from their final settlement. '
-                   'Each charge is deducted once, and again only if its payslip is cancelled or refunded. '
-                   'Part of Odoo Mates HR.',
     'author': 'Odoo Mates',
     'maintainer': 'Odoo Mates',
     'support': 'odoomates@gmail.com',

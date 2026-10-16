@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -50,16 +50,16 @@ class HrPayslip(models.Model):
             if payslip.state != 'done' or payslip.credit_note:
                 continue
             if payslip.file_export_ids:
-                problems.append(_('%(employee)s: the payslip %(payslip)s is already in %(file)s.',
-                                  employee=name, payslip=payslip.number,
-                                  file=', '.join(payslip.file_export_ids.mapped('name'))))
+                problems.append(self.env._('%(employee)s: the payslip %(payslip)s is already in %(file)s.',
+                                           employee=name, payslip=payslip.number,
+                                           file=', '.join(payslip.file_export_ids.mapped('name'))))
             net = payslip._net()
             for bank, amount in payslip._bank_split(net):
                 if not bank:
-                    problems.append(_('%s has no bank account.', name))
+                    problems.append(self.env._('%s has no bank account.', name))
                 elif not bank.allow_out_payment:
-                    problems.append(_('%(employee)s: the account %(account)s is not trusted for payments.',
-                                      employee=name, account=bank.account_number))
+                    problems.append(self.env._('%(employee)s: the account %(account)s is not trusted for payments.',
+                                               employee=name, account=bank.account_number))
                 lines.append({
                     'record': payslip,
                     'object': payslip,
@@ -91,11 +91,11 @@ class HrPayslip(models.Model):
     def action_export_bank_file(self):
         payslips = self.filtered(lambda slip: slip.state == 'done' and not slip.credit_note)
         if not payslips:
-            raise UserError(_('Only the confirmed payslips are paid by bank: confirm them first.'))
+            raise UserError(self.env._('Only the confirmed payslips are paid by bank: confirm them first.'))
         layout = self.env['file.layout'].search([('model', '=', 'hr.payslip')], limit=1)
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Export Bank File'),
+            'name': self.env._('Export Bank File'),
             'res_model': 'hr.payroll.export.wizard',
             'view_mode': 'form',
             'target': 'new',

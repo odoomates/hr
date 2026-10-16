@@ -1,21 +1,9 @@
 {
     'name': 'Odoo Mates HR',
-    'version': '1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Human Resources',
     'summary': 'HRMS for Odoo 20 Community: Payroll, Loans, Exit, Gratuity, Documents, Appraisals, Shifts, '
                'Approvals, Employee Portal',
-    'description': 'Odoo Mates HR, the HR suite for Odoo 20 Community, with or without Accounting: '
-                   'payroll, paid on the schedule or on the attendances, employee loans and salary advances, '
-                   'bonuses, commissions and fines, overtime pay and pre-approval, lateness penalties, shift '
-                   'planning with rosters, rotations, open shifts and swaps, approval flows for HR documents and '
-                   'for the buttons of any app, HR requests, resignations and terminations with their clearance, '
-                   'end of service gratuity and final settlement with leave encashment, employee documents such '
-                   'as passports and visas with expiry reminders, salary and experience certificates and NOC '
-                   'printed from templates, appraisals and probation reviews, employee assets, bank transfer '
-                   'files, HR and payroll dashboards, birthday and anniversary reminders, and self-service for '
-                   'the employees in My HR and on the portal. '
-                   'Installing this module installs all of them. '
-                   'Part of Odoo Mates HR.',
     'author': 'Odoo Mates',
     'maintainer': 'Odoo Mates',
     'support': 'odoomates@gmail.com',

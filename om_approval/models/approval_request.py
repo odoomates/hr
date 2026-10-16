@@ -1,6 +1,6 @@
 import logging
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
@@ -17,8 +17,9 @@ class ApprovalRequest(models.Model):
     _order = 'id desc'
     _mail_post_access = 'read'
 
-    name = fields.Char(string='Reference', required=True, readonly=True, copy=False, default=lambda self: _('New'))
-    flow_id = fields.Many2one('approval.rule', string='Flow', readonly=True, ondelete='restrict')
+    name = fields.Char(string='Reference', required=True, readonly=True, copy=False,
+                       default=lambda self: self.env._('New'))
+    flow_id = fields.Many2one('approval.rule', readonly=True, ondelete='restrict')
     res_model = fields.Char(string='Model', required=True, readonly=True, index=True)
     res_id = fields.Many2oneReference(string='Record ID', model_field='res_model', required=True, readonly=True,
                                       index=True)
@@ -28,7 +29,7 @@ class ApprovalRequest(models.Model):
     button_name = fields.Char(string='Button', readonly=True)
     requester_id = fields.Many2one('res.users', string='Requested By', required=True, readonly=True, index=True,
                                    default=lambda self: self.env.user)
-    company_id = fields.Many2one('res.company', string='Company', readonly=True, index=True)
+    company_id = fields.Many2one('res.company', readonly=True, index=True)
     state = fields.Selection([
         ('to_approve', 'To Approve'),
         ('approved', 'Approved'),
@@ -53,7 +54,7 @@ class ApprovalRequest(models.Model):
     def _compute_document_name(self):
         for request in self:
             record = request._record()
-            request.document_name = record.display_name if record else _('Deleted record')
+            request.document_name = record.display_name if record else self.env._('Deleted record')
 
     @api.depends('state', 'line_ids.state', 'line_ids.approver_user_ids')
     @api.depends_context('uid')
@@ -80,7 +81,7 @@ class ApprovalRequest(models.Model):
         :return: the request, already approved when no step applies or when the requester approves them all
         """
         request = self.sudo().create({
-            'name': self.env['ir.sequence'].sudo().next_by_code('approval.request') or _('New'),
+            'name': self.env['ir.sequence'].sudo().next_by_code('approval.request') or self.env._('New'),
             'flow_id': flow.id or False,
             'res_model': record._name,
             'res_id': record.id,
@@ -90,7 +91,7 @@ class ApprovalRequest(models.Model):
             'company_id': self.env['approval.rule']._record_company(record).id,
         })
         request._create_lines(record, flow)
-        request._message_document(_('Approval asked: %s', request.name))
+        request._message_document(self.env._('Approval asked: %s', request.name))
         request._next()
         return request
 
@@ -130,8 +131,8 @@ class ApprovalRequest(models.Model):
             return None
         lines = []
         for record, request, new in blocked:
-            line = _('%(record)s: approval asked (%(request)s), waiting for %(step)s.') if new \
-                else _('%(record)s: still waiting for %(step)s (%(request)s).')
+            line = self.env._('%(record)s: approval asked (%(request)s), waiting for %(step)s.') if new \
+                else self.env._('%(record)s: still waiting for %(step)s (%(request)s).')
             lines.append(line % {'record': record.display_name, 'request': request.name,
                                  'step': request.approval_step})
         note = blocked[0][1].flow_id.note
@@ -139,7 +140,7 @@ class ApprovalRequest(models.Model):
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
-                'title': _('Approval needed'),
+                'title': self.env._('Approval needed'),
                 'message': '\n'.join(([note] if note else []) + lines),
                 'type': 'warning',
                 'sticky': False,
@@ -158,11 +159,11 @@ class ApprovalRequest(models.Model):
                     'approver_user_ids': approvers.ids}
             if flow.self_approve and self.requester_id in approvers:
                 vals.update(state='approved', user_id=self.requester_id.id, date=fields.Datetime.now(),
-                            note=_('Approved by the requester, an approver of the step.'))
+                            note=self.env._('Approved by the requester, an approver of the step.'))
             values.append(vals)
         if not flow.step_ids:
             fallback = self._fallback_approvers(flow.fallback_group_id)
-            values.append({'request_id': self.id, 'sequence': 10, 'name': _('Approval'),
+            values.append({'request_id': self.id, 'sequence': 10, 'name': self.env._('Approval'),
                            'approver_user_ids': ((fallback - self._excluded_approvers()) or fallback).ids})
         self.env['approval.line'].sudo().create(values)
 
@@ -184,7 +185,7 @@ class ApprovalRequest(models.Model):
         for request in self:
             line = request._check_approver()
             line.sudo().write({'state': 'approved', 'user_id': self.env.user.id, 'date': fields.Datetime.now()})
-            request.sudo().activity_feedback([ACTIVITY], feedback=_('Approved'))
+            request.sudo().activity_feedback([ACTIVITY], feedback=self.env._('Approved'))
             request._next()
         return True
 
@@ -193,11 +194,11 @@ class ApprovalRequest(models.Model):
             line = request._check_approver()
             line.sudo().write({'state': 'refused', 'user_id': self.env.user.id, 'date': fields.Datetime.now(),
                                'note': reason})
-            request.line_ids.filtered(lambda l: l.state == 'waiting').sudo().state = 'cancel'
+            request.line_ids.filtered(lambda line: line.state == 'waiting').sudo().state = 'cancel'
             request.sudo().activity_unlink([ACTIVITY])
             request.sudo().state = 'refused'
-            message = _('Refused by %(user)s at the step %(step)s: %(reason)s', user=self.env.user.name,
-                        step=line.name, reason=reason or _('no reason given'))
+            message = self.env._('Refused by %(user)s at the step %(step)s: %(reason)s', user=self.env.user.name,
+                                 step=line.name, reason=reason or self.env._('no reason given'))
             request.sudo().message_post(body=message, partner_ids=request.requester_id.partner_id.ids)
             request._message_document(message)
             request._call_document('_on_approval_refused')
@@ -208,7 +209,7 @@ class ApprovalRequest(models.Model):
         self._check_approver()
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Refuse'),
+            'name': self.env._('Refuse'),
             'res_model': 'approval.refuse',
             'view_mode': 'form',
             'target': 'new',
@@ -219,12 +220,12 @@ class ApprovalRequest(models.Model):
         """ Withdraw the request. The approvals given so far stay, cancelled. """
         for request in self:
             if request.state not in ('to_approve', 'approved'):
-                raise UserError(_('%s can no longer be cancelled.', request.name))
+                raise UserError(self.env._('%s can no longer be cancelled.', request.name))
             if self.env.user != request.requester_id and not self.env.user.has_group(
                     'om_approval.group_approval_manager'):
-                raise UserError(_('Only %(user)s, who asked, can cancel %(request)s.',
-                                  user=request.requester_id.name, request=request.name))
-            request.line_ids.filtered(lambda l: l.state in ('waiting', 'pending')).sudo().state = 'cancel'
+                raise UserError(self.env._('Only %(user)s, who asked, can cancel %(request)s.',
+                                           user=request.requester_id.name, request=request.name))
+            request.line_ids.filtered(lambda line: line.state in ('waiting', 'pending')).sudo().state = 'cancel'
             request.sudo().activity_unlink([ACTIVITY])
             request.sudo().state = 'cancel'
             request._call_document('_on_approval_cancelled')
@@ -248,21 +249,22 @@ class ApprovalRequest(models.Model):
         self.ensure_one()
         if self.state != 'to_approve':
             return self.env['approval.line']
-        return self.line_ids.filtered(lambda l: l.state == 'pending')[:1]
+        return self.line_ids.filtered(lambda line: line.state == 'pending')[:1]
 
     def _next(self):
         """ Ask the approvers of the next step, or approve the request when no step is left. """
         self.ensure_one()
-        line = self.line_ids.sorted(lambda l: (l.sequence, l.id)).filtered(lambda l: l.state == 'waiting')[:1]
+        lines = self.line_ids.sorted(lambda line: (line.sequence, line.id))
+        line = lines.filtered(lambda line: line.state == 'waiting')[:1]
         if line:
             line.sudo().state = 'pending'
             for user in line.approver_user_ids:
-                self.sudo().activity_schedule(ACTIVITY, summary=_('Approve: %s', self.document_name),
+                self.sudo().activity_schedule(ACTIVITY, summary=self.env._('Approve: %s', self.document_name),
                                               user_id=user.id)
             return
         self.sudo().state = 'approved'
-        self.sudo().message_post(body=_('Approved.'), partner_ids=self.requester_id.partner_id.ids)
-        self._message_document(_('Approved: %s', self.name))
+        self.sudo().message_post(body=self.env._('Approved.'), partner_ids=self.requester_id.partner_id.ids)
+        self._message_document(self.env._('Approved: %s', self.name))
         self._call_document('_on_approval_approved')
         if self.method and self.flow_id.run_on_approval and self.requester_id != self.env.user:
             self._run_button()
@@ -279,22 +281,22 @@ class ApprovalRequest(models.Model):
                 self.sudo().state = 'done'
                 getattr(record.with_user(self.requester_id).with_company(self.company_id or self.env.company),
                         self.method)()
-        except Exception as error:  # noqa: BLE001 whatever the button raises is reported to the requester
+        except Exception as error:  # whatever the button raises is reported to the requester
             _logger.info('om_approval: %s could not run %s on %s: %s', self.name, self.method, record, error)
             self.sudo().message_post(
-                body=_('Approved, but %(button)s could not run: %(error)s. Click the button again.',
-                       button=self.button_name or self.method, error=error),
+                body=self.env._('Approved, but %(button)s could not run: %(error)s. Click the button again.',
+                                button=self.button_name or self.method, error=error),
                 partner_ids=self.requester_id.partner_id.ids)
 
     def _check_approver(self):
         self.ensure_one()
         line = self._pending_line()
         if not line:
-            raise UserError(_('%s is not waiting for an approval.', self.name))
+            raise UserError(self.env._('%s is not waiting for an approval.', self.name))
         if self.env.user not in line.approver_user_ids and not self.env.user.has_group(
                 'om_approval.group_approval_manager'):
-            raise UserError(_('You are not an approver of %(request)s at the step %(step)s.',
-                              request=self.name, step=line.name))
+            raise UserError(self.env._('You are not an approver of %(request)s at the step %(step)s.',
+                                       request=self.name, step=line.name))
         return line
 
     # ------------------------------------------------------------------
@@ -326,7 +328,7 @@ class ApprovalLine(models.Model):
     _order = 'request_id, sequence, id'
 
     request_id = fields.Many2one('approval.request', required=True, ondelete='cascade', index=True)
-    step_id = fields.Many2one('approval.step', string='Step', ondelete='set null')
+    step_id = fields.Many2one('approval.step', ondelete='set null')
     sequence = fields.Integer()
     name = fields.Char(string='Approval', required=True)
     approver_user_ids = fields.Many2many('res.users', string='Approvers')

@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
 from odoo.fields import Domain
 
@@ -68,7 +68,7 @@ class HrAnnouncement(models.Model):
 
     def _search_my_state(self, operator, value):
         if operator not in ('=', 'in'):
-            raise UserError(_('Search My Status with = or in.'))
+            raise UserError(self.env._('Search My Status with = or in.'))
         values = [value] if operator == '=' else value
         states = {
             'unread': Domain('read_date', '=', False),
@@ -86,7 +86,7 @@ class HrAnnouncement(models.Model):
     def _check_dates(self):
         for announcement in self:
             if announcement.date_end and announcement.date_end < announcement.date_start.date():
-                raise ValidationError(_('The announcement %s ends after it starts.', announcement.name))
+                raise ValidationError(self.env._('The announcement %s ends after it starts.', announcement.name))
 
     @api.constrains('audience', 'department_ids', 'job_ids', 'category_ids', 'employee_ids')
     def _check_publisher(self):
@@ -98,8 +98,9 @@ class HrAnnouncement(models.Model):
         for announcement in self:
             if announcement.audience != 'department' or not announcement.department_ids or \
                     announcement.department_ids - managed:
-                raise ValidationError(_('As a department manager, address your announcements to the departments you '
-                                        'manage: %s.', ', '.join(managed.mapped('name')) or _('none')))
+                names = ', '.join(managed.mapped('name')) or self.env._('none')
+                raise ValidationError(self.env._('As a department manager, address your announcements to the '
+                                                 'departments you manage: %s.', names))
 
     @api.model
     def _managed_departments(self):
@@ -114,10 +115,10 @@ class HrAnnouncement(models.Model):
         """ Published now, or scheduled until the day it shows from. """
         for announcement in self:
             if announcement.state != 'draft':
-                raise UserError(_('Only a draft is published: %s is not.', announcement.name))
+                raise UserError(self.env._('Only a draft is published: %s is not.', announcement.name))
             announcement._check_publisher()
             if not announcement._audience():
-                raise UserError(_('The announcement %s reaches no employee.', announcement.name))
+                raise UserError(self.env._('The announcement %s reaches no employee.', announcement.name))
         now = fields.Datetime.now()
         self.filtered(lambda a: a.date_start > now).write({'state': 'scheduled'})
         self.filtered(lambda a: a.date_start <= now)._publish()
@@ -128,7 +129,7 @@ class HrAnnouncement(models.Model):
             employees = announcement._audience()
             announcement.write({'state': 'published', 'date_published': fields.Datetime.now(),
                                 'recipient_ids': [(0, 0, {'employee_id': employee.id}) for employee in employees]})
-            announcement._notify(employees, _('Announcement: %s', announcement.name))
+            announcement._notify(employees, self.env._('Announcement: %s', announcement.name))
 
     def _notify(self, employees, subject):
         """ The recipients get it in their inbox, or by email, as they prefer. """
@@ -141,7 +142,8 @@ class HrAnnouncement(models.Model):
     def action_draft(self):
         """ Back to draft, before it is published. """
         if any(announcement.state != 'scheduled' for announcement in self):
-            raise UserError(_('Only a scheduled announcement goes back to draft: a published one is archived.'))
+            raise UserError(self.env._('Only a scheduled announcement goes back to draft: a published one is '
+                                       'archived.'))
         self.write({'state': 'draft'})
         return True
 
@@ -149,18 +151,19 @@ class HrAnnouncement(models.Model):
         """ Remind the recipients who have not acknowledged it yet. """
         for announcement in self:
             if announcement.state != 'published' or not announcement.requires_ack:
-                raise UserError(_('Only a published announcement asking for an acknowledgement is reminded.'))
+                raise UserError(self.env._('Only a published announcement asking for an acknowledgement is reminded.'))
             pending = announcement.sudo().recipient_ids.filtered(lambda line: not line.ack_date).employee_id
-            announcement._notify(pending, _('Reminder: %s', announcement.name))
+            announcement._notify(pending, self.env._('Reminder: %s', announcement.name))
             announcement.sudo().date_reminded = fields.Datetime.now()
-            announcement.message_post(body=_('%s employees reminded.', len(pending)), subtype_xmlid='mail.mt_note')
+            announcement.message_post(body=self.env._('%s employees reminded.',
+                                                      len(pending)), subtype_xmlid='mail.mt_note')
         return True
 
     def action_open_recipients(self):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Recipients'),
+            'name': self.env._('Recipients'),
             'res_model': 'hr.announcement.read',
             'view_mode': 'list,pivot',
             'domain': [('announcement_id', '=', self.id)],
@@ -197,7 +200,7 @@ class HrAnnouncement(models.Model):
     def action_acknowledge(self):
         lines = self._my_lines()
         if not lines:
-            raise UserError(_('This announcement is not addressed to you.'))
+            raise UserError(self.env._('This announcement is not addressed to you.'))
         now = fields.Datetime.now()
         lines.filtered(lambda line: not line.read_date).write({'read_date': now})
         lines.filtered(lambda line: not line.ack_date).write({'ack_date': now})
@@ -227,7 +230,7 @@ class HrAnnouncementRead(models.Model):
     _order = 'announcement_id, employee_id'
 
     announcement_id = fields.Many2one('hr.announcement', required=True, ondelete='cascade', index=True)
-    employee_id = fields.Many2one('hr.employee', string='Employee', required=True, ondelete='cascade', index=True)
+    employee_id = fields.Many2one('hr.employee', required=True, ondelete='cascade', index=True)
     department_id = fields.Many2one(related='employee_id.department_id', store=True)
     company_id = fields.Many2one(related='announcement_id.company_id', store=True)
     read_date = fields.Datetime(string='Read On')

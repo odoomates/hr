@@ -2,7 +2,7 @@ import uuid
 
 from werkzeug.urls import url_encode
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 # what an issued print keeps as it was printed
@@ -21,8 +21,9 @@ class PrintIssue(models.Model):
     _order = 'date desc, id desc'
     _mail_post_access = 'read'
 
-    name = fields.Char(string='Reference', required=True, readonly=True, copy=False, default=lambda self: _('Draft'))
-    template_id = fields.Many2one('print.template', string='Template', required=True, ondelete='restrict',
+    name = fields.Char(string='Reference', required=True, readonly=True, copy=False,
+                       default=lambda self: self.env._('Draft'))
+    template_id = fields.Many2one('print.template', required=True, ondelete='restrict',
                                  index=True, tracking=True)
     res_model = fields.Char(string='Model', required=True, index=True)
     res_id = fields.Many2oneReference(string='Record ID', model_field='res_model', required=True, index=True)
@@ -37,7 +38,7 @@ class PrintIssue(models.Model):
         ('issued', 'Issued'),
         ('cancelled', 'Cancelled'),
     ], required=True, default='draft', copy=False, index=True, tracking=True)
-    issued_by_id = fields.Many2one('res.users', string='Issued By', readonly=True, copy=False)
+    issued_by_id = fields.Many2one('res.users', readonly=True, copy=False)
     date_issued = fields.Datetime(string='Issued On', readonly=True, copy=False)
     attachment_id = fields.Many2one('ir.attachment', string='PDF', readonly=True, copy=False)
     cancel_reason = fields.Text(readonly=True, copy=False)
@@ -48,7 +49,7 @@ class PrintIssue(models.Model):
     signatory_name = fields.Char(related='template_id.signatory_name')
     signatory_title = fields.Char(related='template_id.signatory_title')
     signature = fields.Image(related='template_id.signature')
-    company_id = fields.Many2one('res.company', string='Company', required=True, index=True,
+    company_id = fields.Many2one('res.company', required=True, index=True,
                                  default=lambda self: self.env.company)
 
     @api.depends('res_model', 'res_id')
@@ -107,13 +108,14 @@ class PrintIssue(models.Model):
 
     def write(self, vals):
         if FROZEN_FIELDS & set(vals) and any(issue.state != 'draft' for issue in self):
-            raise UserError(_('An issued print stays as it was printed: cancel it and print it again instead.'))
+            raise UserError(self.env._('An issued print stays as it was printed: cancel it and print it again '
+                                       'instead.'))
         return super().write(vals)
 
-    def unlink(self):
+    @api.ondelete(at_uninstall=False)
+    def _unlink_except_issued(self):
         if any(issue.state != 'draft' for issue in self):
-            raise UserError(_('Only a draft print can be deleted: cancel an issued one instead.'))
-        return super().unlink()
+            raise UserError(self.env._('Only a draft print can be deleted: cancel an issued one instead.'))
 
     # ------------------------------------------------------------------
     # Issuing
@@ -123,7 +125,7 @@ class PrintIssue(models.Model):
         """ Number the drafts, print their PDF and keep it. """
         for issue in self:
             if issue.state != 'draft':
-                raise UserError(_('%s is already issued.', issue.name))
+                raise UserError(self.env._('%s is already issued.', issue.name))
             sequence = issue.template_id.sudo().sequence_id
             issue.write({
                 'name': sequence.next_by_id(issue.date) if sequence else issue.name,
@@ -163,7 +165,7 @@ class PrintIssue(models.Model):
     def _check_can_cancel(self):
         """ Raise unless the current user may cancel the prints: the print administrators. """
         if not self.env.su and not self.env.user.has_group('om_print_template.group_print_manager'):
-            raise UserError(_('Only the print administrators cancel an issued print.'))
+            raise UserError(self.env._('Only the print administrators cancel an issued print.'))
 
     def action_cancel(self, reason=False):
         self._check_can_cancel()
@@ -191,7 +193,7 @@ class PrintIssue(models.Model):
     def action_open_record(self):
         self.ensure_one()
         if not self._get_record():
-            raise UserError(_('The record of %s no longer exists.', self.name))
+            raise UserError(self.env._('The record of %s no longer exists.', self.name))
         return {
             'type': 'ir.actions.act_window',
             'res_model': self.res_model,

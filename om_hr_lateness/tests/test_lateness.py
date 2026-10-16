@@ -139,8 +139,9 @@ class TestLateness(TransactionCase):
 
     def test_access(self):
         self.attend(MONDAY, 8.5, 17)
-        other = self.env['hr.employee'].create({'name': 'Someone', 'tz': 'UTC', 'resource_calendar_id': self.calendar.id,
-                                                'lateness_policy_id': self.policy.id})
+        other = self.env['hr.employee'].create({
+            'name': 'Someone', 'tz': 'UTC', 'resource_calendar_id': self.calendar.id,
+            'lateness_policy_id': self.policy.id})
         self.attend(MONDAY, 8.5, 17, employee=other)
         self.assertEqual(self.env['hr.lateness'].with_user(self.employee_user).search([]).employee_id,
                          self.employee, 'an employee sees their own')

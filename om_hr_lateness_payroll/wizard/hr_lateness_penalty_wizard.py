@@ -1,4 +1,4 @@
-from odoo import _, fields, models
+from odoo import fields, models
 
 
 class HrLatenessPenaltyWizard(models.TransientModel):
@@ -16,7 +16,7 @@ class HrLatenessPenaltyWizard(models.TransientModel):
         adjustments = self.env['hr.lateness']._compute_penalties(self.month, employees)
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Lateness Penalties'),
+            'name': self.env._('Lateness Penalties'),
             'res_model': 'hr.payroll.adjustment',
             'view_mode': 'list,form',
             'domain': [('id', 'in', adjustments.ids)],

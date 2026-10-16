@@ -1,6 +1,6 @@
 from dateutil.relativedelta import relativedelta
 
-from odoo import _, fields, models
+from odoo import fields, models
 
 
 class HrAppraisalVersion(models.TransientModel):
@@ -20,6 +20,6 @@ class HrAppraisalVersion(models.TransientModel):
         self.ensure_one()
         self.appraisal_id._check_roles('hr')
         version = self.employee_id.create_version({'date_version': self.date_version})
-        self.appraisal_id.message_post(body=_('New contract version from %s.', fields.Date.to_string(
+        self.appraisal_id.message_post(body=self.env._('New contract version from %s.', fields.Date.to_string(
             self.date_version)))
         return version.action_open_version()

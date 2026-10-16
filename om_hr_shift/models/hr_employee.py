@@ -1,4 +1,4 @@
-from odoo import SUPERUSER_ID, _, fields, models
+from odoo import SUPERUSER_ID, fields, models
 from odoo.exceptions import UserError
 
 
@@ -21,7 +21,7 @@ class HrEmployee(models.Model):
             previous = version.resource_calendar_id or employee.resource_calendar_id or \
                 employee.company_id.resource_calendar_id
             calendar = self.env['resource.calendar'].create({
-                'name': _('Roster: %s', employee.name),
+                'name': self.env._('Roster: %s', employee.name),
                 'calendar_type': 'variable',
                 'company_id': employee.company_id.id,
                 'attendance_ids': [],
@@ -31,20 +31,21 @@ class HrEmployee(models.Model):
             })
             employee._set_schedule_from(date, version, calendar)
             employee.write({'roster_calendar_id': calendar.id, 'roster_date_start': date})
-            employee.message_post(body=_('Rostered from %s: the published shifts are the working schedule.', date),
-                                  subtype_xmlid='mail.mt_note')
+            employee.message_post(
+                body=self.env._('Rostered from %s: the published shifts are the working schedule.', date),
+                subtype_xmlid='mail.mt_note')
 
     def _stop_rostering(self, date, calendar):
         """ From `date`, the employee works `calendar` again; the shifts from then on are dropped. """
         for employee in self.sudo():
             if not employee.roster_calendar_id:
-                raise UserError(_('%s is not rostered.', employee.name))
+                raise UserError(self.env._('%s is not rostered.', employee.name))
             employee.shift_ids.filtered(lambda shift: shift.date >= date).unlink()
             version = employee._get_version(date) or employee.version_id
             employee._set_schedule_from(date, version, calendar)
             employee.write({'roster_calendar_id': False, 'roster_date_start': False})
-            employee.message_post(body=_('No longer rostered from %(date)s: works %(calendar)s.', date=date,
-                                         calendar=calendar.name), subtype_xmlid='mail.mt_note')
+            employee.message_post(body=self.env._('No longer rostered from %(date)s: works %(calendar)s.', date=date,
+                                                  calendar=calendar.name), subtype_xmlid='mail.mt_note')
 
     def _set_schedule_from(self, date, version, calendar):
         """ `calendar` from `date` on: on the version of that day, or on a new version from then. Core writes the
@@ -59,7 +60,7 @@ class HrEmployee(models.Model):
     def action_open_rostering(self):
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Rostering'),
+            'name': self.env._('Rostering'),
             'res_model': 'hr.shift.rostering.wizard',
             'view_mode': 'form',
             'target': 'new',

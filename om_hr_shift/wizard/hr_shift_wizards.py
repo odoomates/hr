@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -26,7 +26,7 @@ class HrShiftRosteringWizard(models.TransientModel):
             employees._start_rostering(self.date)
         else:
             if not self.calendar_id:
-                raise UserError(_('Choose the working schedule of the employees from then on.'))
+                raise UserError(self.env._('Choose the working schedule of the employees from then on.'))
             employees._stop_rostering(self.date, self.calendar_id)
         return {'type': 'ir.actions.act_window_close'}
 
@@ -36,7 +36,7 @@ class HrShiftRotationWizard(models.TransientModel):
     _name = 'hr.shift.rotation.wizard'
     _description = 'Apply a Shift Rotation'
 
-    rotation_id = fields.Many2one('hr.shift.rotation', string='Rotation', required=True)
+    rotation_id = fields.Many2one('hr.shift.rotation', required=True)
     employee_ids = fields.Many2many('hr.employee.public', string='Employees', required=True)
     date_from = fields.Date(string='From', required=True, default=fields.Date.context_today)
     date_to = fields.Date(string='To', required=True,
@@ -51,7 +51,7 @@ class HrShiftRotationWizard(models.TransientModel):
         self.ensure_one()
         self.env['hr.shift']._check_planner()
         if self.date_to < self.date_from:
-            raise UserError(_('The rotation ends after it starts.'))
+            raise UserError(self.env._('The rotation ends after it starts.'))
         lines = self.rotation_id.line_ids
         Shift = self.env['hr.shift']
         existing = {(shift.employee_id.id, shift.date) for shift in Shift.search([
@@ -69,7 +69,7 @@ class HrShiftRotationWizard(models.TransientModel):
         shifts = Shift.create(values)
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Shifts'),
+            'name': self.env._('Shifts'),
             'res_model': 'hr.shift',
             'view_mode': 'list,form',
             'domain': [('id', 'in', shifts.ids)],

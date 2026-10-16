@@ -1,4 +1,4 @@
-from odoo import _, fields, models
+from odoo import fields, models
 
 ENCASHMENT = 'LEAVE_ENCASH'
 GRATUITY = 'GRATUITY'
@@ -27,9 +27,9 @@ class HrPayslip(models.Model):
         """ The amounts of the final settlement, read again at each computation. """
         self.ensure_one()
         exit_ = self.exit_id.sudo()
-        self._hr_exit_set_input(ENCASHMENT, _('Unused Time Off'), exit_._hr_encashment_amount())
+        self._hr_exit_set_input(ENCASHMENT, self.env._('Unused Time Off'), exit_._hr_encashment_amount())
         gratuity = exit_.gratuity_amount if 'gratuity_amount' in exit_._fields else 0.0
-        self._hr_exit_set_input(GRATUITY, _('End of Service Gratuity'), gratuity)
+        self._hr_exit_set_input(GRATUITY, self.env._('End of Service Gratuity'), gratuity)
 
     def _hr_exit_set_input(self, code, name, amount):
         inputs = self.input_line_ids.filtered(lambda line: line.code == code)

@@ -2,6 +2,7 @@ from collections import defaultdict
 
 from odoo import api, fields, models
 from odoo.exceptions import AccessError
+
 from odoo.addons.spreadsheet.utils.helpers import spreadsheet_safe_batch
 
 

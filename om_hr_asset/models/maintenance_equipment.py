@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 
 
 class MaintenanceEquipment(models.Model):
@@ -6,7 +6,7 @@ class MaintenanceEquipment(models.Model):
 
     assignment_ids = fields.One2many('hr.asset.assignment', 'equipment_id', string='Assignments')
     assignment_count = fields.Integer(compute='_compute_assignment_count')
-    lost = fields.Boolean(string='Lost', copy=False, tracking=True)
+    lost = fields.Boolean(copy=False, tracking=True)
     asset_state = fields.Selection([
         ('available', 'Available'),
         ('assigned', 'Assigned'),
@@ -38,7 +38,7 @@ class MaintenanceEquipment(models.Model):
         for equipment, previous in holders.items():
             if equipment.employee_id == previous:
                 continue
-            equipment._open_assignments().sudo()._close(note=_('Unassigned from the asset.'))
+            equipment._open_assignments().sudo()._close(note=self.env._('Unassigned from the asset.'))
             if equipment.employee_id:
                 equipment._open_assignment()
         return result
@@ -57,8 +57,8 @@ class MaintenanceEquipment(models.Model):
 
     def _open_wizard(self, mode):
         self.ensure_one()
-        titles = {'assign': _('Assign %s', self.name), 'return': _('Return %s', self.name),
-                  'lost': _('Report %s Lost', self.name)}
+        titles = {'assign': self.env._('Assign %s', self.name), 'return': self.env._('Return %s', self.name),
+                  'lost': self.env._('Report %s Lost', self.name)}
         return {
             'type': 'ir.actions.act_window',
             'name': titles[mode],
@@ -86,7 +86,7 @@ class MaintenanceEquipment(models.Model):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': _('History of %s', self.name),
+            'name': self.env._('History of %s', self.name),
             'res_model': 'hr.asset.assignment',
             'view_mode': 'list,form',
             'domain': [('equipment_id', '=', self.id)],

@@ -15,7 +15,7 @@ class HrAudienceMixin(models.AbstractModel):
     _name = 'hr.audience.mixin'
     _description = 'Employees Reached'
 
-    company_id = fields.Many2one('res.company', string='Company', required=True, index=True,
+    company_id = fields.Many2one('res.company', required=True, index=True,
                                  default=lambda self: self.env.company)
     audience = fields.Selection(AUDIENCES, required=True, default='company')
     department_ids = fields.Many2many('hr.department', string='Departments',

@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 
 SHIFT_CODE = 'SHIFT_ALW'
 
@@ -19,8 +19,8 @@ class HrShift(models.Model):
                 ('date_from', '<=', shift.start), ('date_to', '>=', shift.stop),
                 '|', ('resource_id', '=', shift.employee_id.resource_id.id),
                 '&', ('resource_id', '=', False), ('company_id', 'in', [shift.company_id.id, False])])
-            if leaves.filtered(lambda l: l.resource_id or not l.calendar_id
-                               or l.calendar_id == shift.employee_id.sudo().roster_calendar_id):
+            if leaves.filtered(lambda time_off: time_off.resource_id or not time_off.calendar_id
+                               or time_off.calendar_id == shift.employee_id.sudo().roster_calendar_id):
                 off |= shift
         return off
 
@@ -60,7 +60,7 @@ class HrPayslip(models.Model):
             shifts -= shifts._on_time_off()
             shifts.payslip_id = payslip
             amount = payslip.company_id.currency_id.round(sum(shifts.mapped('allowance')))
-            name = _('Shift Allowances (%s shifts)', len(shifts))
+            name = self.env._('Shift Allowances (%s shifts)', len(shifts))
             version = payslip.version_id or self.env['hr.version'].browse(
                 self.get_versions(payslip.employee_id, payslip.date_from, payslip.date_to)[:1])
             inputs = payslip.input_line_ids.filtered(lambda line: line.code == SHIFT_CODE)

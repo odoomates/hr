@@ -22,7 +22,7 @@ class TestFileLayout(TransactionCase):
     def wizard(self, layout, records=None):
         records = records or self.partners
         context = {'active_model': 'res.partner', 'active_ids': records.ids, 'default_layout_id': layout.id}
-        return Form(self.env['file.export.wizard'].with_user(self.user).with_context(context)).save()
+        return Form(self.env['file.export.wizard'].with_user(self.user).with_context(**context)).save()
 
     def test_csv(self):
         layout = self.layout(file_format='csv', csv_separator=';', line_ending='lf', column_ids=[

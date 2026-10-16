@@ -1,4 +1,4 @@
-from odoo import _, models
+from odoo import models
 from odoo.exceptions import UserError
 
 
@@ -10,20 +10,21 @@ class HrEmployee(models.Model):
             being a user of the backend. """
         self.ensure_one()
         if not self.env.user.has_group('hr.group_hr_user'):
-            raise UserError(_('Only HR gives the employees their portal access.'))
+            raise UserError(self.env._('Only HR gives the employees their portal access.'))
         if self.user_id:
-            raise UserError(_('%(employee)s already has the user %(user)s.', employee=self.name,
-                              user=self.user_id.login))
+            raise UserError(self.env._('%(employee)s already has the user %(user)s.', employee=self.name,
+                                       user=self.user_id.login))
         email = self.work_email or self.private_email
         if not email:
-            raise UserError(_('Set the work email of %s first: the invitation is sent there.', self.name))
+            raise UserError(self.env._('Set the work email of %s first: the invitation is sent there.', self.name))
         Users = self.env['res.users'].sudo()
         user = Users.with_context(active_test=False).search([('login', '=', email)], limit=1)
         if user and not user.share:
-            raise UserError(_('%s is already the login of a user of the backend: link that user instead.', email))
+            raise UserError(self.env._('%s is already the login of a user of the backend: link that user instead.',
+                                       email))
         if user and user.employee_ids:
-            raise UserError(_('The portal user %(login)s already belongs to %(employee)s.', login=email,
-                              employee=user.employee_ids[0].name))
+            raise UserError(self.env._('The portal user %(login)s already belongs to %(employee)s.', login=email,
+                                       employee=user.employee_ids[0].name))
         if not user:
             partner = self.sudo().work_contact_id
             user = Users.with_context(no_reset_password=True).create({
@@ -38,5 +39,5 @@ class HrEmployee(models.Model):
         user.active = True
         self.sudo().user_id = user
         user.action_reset_password()
-        self.message_post(body=_('Portal access granted: an invitation was sent to %s.', email))
+        self.message_post(body=self.env._('Portal access granted: an invitation was sent to %s.', email))
         return True

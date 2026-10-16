@@ -1,4 +1,4 @@
-from odoo import _, models
+from odoo import models
 
 LOAN_CODE = 'LOAN'
 
@@ -35,7 +35,7 @@ class HrPayslip(models.Model):
                     self.get_versions(payslip.employee_id, payslip.date_from, payslip.date_to)[:1])
                 if version:
                     payslip.input_line_ids = [(0, 0, {
-                        'name': _('Loan Installments'), 'code': LOAN_CODE, 'amount': amount,
+                        'name': self.env._('Loan Installments'), 'code': LOAN_CODE, 'amount': amount,
                         'version_id': version.id, 'sequence': 90,
                     })]
 
@@ -51,8 +51,8 @@ class HrPayslip(models.Model):
     def action_payslip_done(self):
         result = super().action_payslip_done()
         for payslip in self.filtered(lambda p: p.state == 'done' and not p.credit_note):
-            payslip._hr_loan_lines().filtered(lambda l: l.state == 'to_pay')._mark_paid(
-                _('Deducted from %s', payslip.number or payslip.name), date=payslip.date_to)
+            payslip._hr_loan_lines().filtered(lambda installment: installment.state == 'to_pay')._mark_paid(
+                self.env._('Deducted from %s', payslip.number or payslip.name), date=payslip.date_to)
         return result
 
     def action_payslip_draft(self):

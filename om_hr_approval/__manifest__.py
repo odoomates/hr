@@ -1,11 +1,8 @@
 {
     'name': 'HR Approvals',
-    'version': '1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Human Resources',
     'summary': 'Approvals by the manager, the department manager, the coach or HR, and HR requests of the employees',
-    'description': 'Adds the approvers of the employee to the approval flows, for the HR documents and for the '
-                   'buttons of any app, and lets employees send HR requests approved along a flow. Part of Odoo '
-                   'Mates HR.',
     'author': 'Odoo Mates',
     'maintainer': 'Odoo Mates',
     'support': 'odoomates@gmail.com',

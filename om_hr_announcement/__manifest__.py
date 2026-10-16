@@ -1,14 +1,8 @@
 {
     'name': 'HR Announcements',
-    'version': '1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Human Resources',
     'summary': 'Company, department and job position announcements, read and acknowledged by the employees',
-    'description': 'Announcements to the whole company, to departments, job positions, employee tags or chosen '
-                   'employees, published now or on a date and shown until another. Each employee gets it in their '
-                   'inbox or by email, reads it in My HR or from the megaphone of the top bar, and acknowledges it '
-                   'when asked; the authors follow who read and acknowledged it, and remind the others. HR '
-                   'publishes to anyone, a department manager to the departments they manage. '
-                   'Part of Odoo Mates HR.',
     'author': 'Odoo Mates',
     'maintainer': 'Odoo Mates',
     'support': 'odoomates@gmail.com',

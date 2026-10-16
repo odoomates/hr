@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 
 
 class PrintTemplate(models.Model):
@@ -26,7 +26,7 @@ class PrintTemplate(models.Model):
     model = fields.Char(related='model_id.model', store=True, index=True)
     subject = fields.Char(translate=True, help='The title of the print, e.g. Salary Certificate. Fields of the '
                                                'record may be used, e.g. {{ object.name }}.')
-    addressee = fields.Char(translate=True, default=lambda self: _('To Whom It May Concern'),
+    addressee = fields.Char(translate=True, default=lambda self: self.env._('To Whom It May Concern'),
                             help='Who the print is addressed to. It can be changed when printing.')
     body_html = fields.Html(
         string='Body', render_engine='qweb', render_options={'post_process': True}, prefetch=True,
@@ -45,8 +45,7 @@ class PrintTemplate(models.Model):
         help='Offer the template in the Print menu of the records it applies to.')
     ref_ir_act_window = fields.Many2one('ir.actions.act_window', string='Print Menu Action', readonly=True,
                                         copy=False)
-    company_id = fields.Many2one('res.company', string='Company',
-                                 help='Leave empty to share the template with all the companies.')
+    company_id = fields.Many2one('res.company', help='Leave empty to share the template with all the companies.')
     issue_ids = fields.One2many('print.issue', 'template_id', string='Issued Prints')
     issue_count = fields.Integer(compute='_compute_issue_count', string='Issued')
 
@@ -88,12 +87,13 @@ class PrintTemplate(models.Model):
 
     def copy_data(self, default=None):
         vals_list = super().copy_data(default=default)
-        return [dict(vals, name=_('%s (copy)', template.name)) for template, vals in zip(self, vals_list)]
+        return [dict(vals, name=self.env._('%s (copy)',
+                                           template.name)) for template, vals in zip(self, vals_list, strict=True)]
 
     def _sequence_values(self):
         self.ensure_one()
         return {
-            'name': _('Print Template: %s', self.name),
+            'name': self.env._('Print Template: %s', self.name),
             'code': False,
             'prefix': self.code or '%(year)s/',
             'padding': 4,
@@ -139,7 +139,7 @@ class PrintTemplate(models.Model):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Issued Prints'),
+            'name': self.env._('Issued Prints'),
             'res_model': 'print.issue',
             'view_mode': 'list,form',
             'domain': [('template_id', '=', self.id)],

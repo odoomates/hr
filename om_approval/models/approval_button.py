@@ -53,7 +53,7 @@ class ApprovalButton(models.Model):
         for view in views:
             try:
                 arch = self.env[model_name].sudo().get_view(view.id, view.type)['arch']
-            except Exception:  # noqa: BLE001 a broken view of another module must not stop the listing
+            except Exception:  # a broken view of another module must not stop the listing
                 continue
             for node in etree.fromstring(arch).iter('button'):
                 method = node.get('name')

@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 
 CONDITIONS = [('new', 'New'), ('good', 'Good'), ('fair', 'Fair'), ('damaged', 'Damaged')]
 
@@ -19,9 +19,9 @@ class HrAssetAssignment(models.Model):
                                    ondelete='cascade', tracking=True)
     category_id = fields.Many2one(related='equipment_id.category_id', store=True, string='Category')
     serial_no = fields.Char(related='equipment_id.serial_no', string='Serial Number')
-    employee_id = fields.Many2one('hr.employee', string='Employee', required=True, index=True, tracking=True)
+    employee_id = fields.Many2one('hr.employee', required=True, index=True, tracking=True)
     department_id = fields.Many2one(related='employee_id.department_id', store=True)
-    company_id = fields.Many2one('res.company', string='Company', required=True, index=True,
+    company_id = fields.Many2one('res.company', required=True, index=True,
                                  default=lambda self: self.env.company)
     currency_id = fields.Many2one(related='company_id.currency_id')
     date_from = fields.Date(string='Handed Over On', required=True, default=fields.Date.context_today,
@@ -32,7 +32,7 @@ class HrAssetAssignment(models.Model):
     condition_out_label = fields.Char(compute='_compute_condition_labels')
     condition_in_label = fields.Char(compute='_compute_condition_labels')
     handed_by_id = fields.Many2one('res.users', string='Handed Over By', default=lambda self: self.env.user)
-    received_by_id = fields.Many2one('res.users', string='Received By')
+    received_by_id = fields.Many2one('res.users')
     state = fields.Selection([
         ('assigned', 'Assigned'),
         ('returned', 'Returned'),

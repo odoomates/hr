@@ -1,13 +1,8 @@
 {
     'name': 'HR Exit in Payroll',
-    'version': '1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Human Resources',
     'summary': 'Final settlement payslip of an exit: last salary, leave encashment, gratuity, loans still due',
-    'description': 'Creates the final settlement payslip of an exit, up to the last working day, with the unused '
-                   'time off paid out, the end of service gratuity when HR Gratuity is installed, and the loan '
-                   'installments still due deducted when HR Loans in Payroll is installed. The last salary is '
-                   'prorated by the Partial Period rule of the payroll: add it to the salary structure, '
-                   'otherwise the whole wage of the last month is paid. Part of Odoo Mates HR.',
     'author': 'Odoo Mates',
     'maintainer': 'Odoo Mates',
     'support': 'odoomates@gmail.com',

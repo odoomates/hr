@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -21,7 +21,7 @@ class ResConfigSettings(models.TransientModel):
 class HrPayrollAdjustment(models.Model):
     _inherit = 'hr.payroll.adjustment'
 
-    lateness_ids = fields.One2many('hr.lateness', 'adjustment_id', string='Lateness')
+    lateness_ids = fields.One2many('hr.lateness', 'adjustment_id')
 
 
 class HrLateness(models.Model):
@@ -30,7 +30,7 @@ class HrLateness(models.Model):
     adjustment_id = fields.Many2one('hr.payroll.adjustment', string='Payroll Adjustment', ondelete='set null',
                                     index=True, copy=False)
     currency_id = fields.Many2one(related='company_id.currency_id')
-    penalty_amount = fields.Monetary(string='Penalty Amount', copy=False,
+    penalty_amount = fields.Monetary(copy=False,
                                      help='Set when the penalties of the month become a payroll adjustment.')
 
     # ------------------------------------------------------------------
@@ -41,8 +41,8 @@ class HrLateness(models.Model):
         paid = self.filtered(lambda lateness: lateness.sudo().adjustment_id.line_ids.filtered(
             lambda line: line.state == 'paid'))
         if paid:
-            raise UserError(_('The penalty of %s is taken off a payslip already: refund the payslip first.',
-                              paid[0].display_name))
+            raise UserError(self.env._('The penalty of %s is taken off a payslip already: refund the payslip first.',
+                                       paid[0].display_name))
 
     def _excuse(self, reason):
         self._check_not_paid()
@@ -112,7 +112,7 @@ class HrLateness(models.Model):
             adjustment = existing.filtered(lambda a: a.employee_id == employee)[:1]
             if adjustment.line_ids.filtered(lambda line: line.state == 'paid'):
                 continue
-            of_employee = latenesses.filtered(lambda l: l.employee_id == employee)
+            of_employee = latenesses.filtered(lambda entry: entry.employee_id == employee)
             version = employee.version_id
             rates = payslip.new({})._om_wage_rates(version) if version else {'daily_wage': 0.0, 'hourly_wage': 0.0}
             attendance_based = 'attendance_based' in version._fields and version.attendance_based
@@ -143,17 +143,18 @@ class HrLateness(models.Model):
                                                     recurrence='once', amount_type='fixed', date_start=month))
             adjustment._compute_lines()
             adjustment.write({'state': 'running', 'approval_state': 'approved'})
-            of_employee.filtered(lambda l: amounts[l]).adjustment_id = adjustment
+            of_employee.filtered(lambda entry: amounts[entry]).adjustment_id = adjustment
             result |= adjustment
         return result
 
     @api.model
     def _penalty_description(self, latenesses, month):
-        counted = latenesses.filtered(lambda l: l.state == 'counted' and l.penalty and l.penalty != 'warning')
-        late = len(counted.filtered(lambda l: l.kind == 'late_in'))
+        counted = latenesses.filtered(
+            lambda entry: entry.state == 'counted' and entry.penalty and entry.penalty != 'warning')
+        late = len(counted.filtered(lambda entry: entry.kind == 'late_in'))
         early = len(counted) - late
-        return _('Lateness of %(month)s: %(late)s late arrivals, %(early)s early departures',
-                 month=month.strftime('%B %Y'), late=late, early=early)
+        return self.env._('Lateness of %(month)s: %(late)s late arrivals, %(early)s early departures',
+                          month=month.strftime('%B %Y'), late=late, early=early)
 
     @api.model
     def _cron_lateness_penalties(self):

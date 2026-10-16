@@ -1,6 +1,6 @@
 from dateutil.relativedelta import relativedelta
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
 # states of a loan the employee still owes, or may still owe once approved
@@ -15,17 +15,18 @@ class HrLoan(models.Model):
     _order = 'date desc, id desc'
     _mail_post_access = 'read'
 
-    name = fields.Char(string='Reference', required=True, readonly=True, copy=False, default=lambda self: _('New'))
+    name = fields.Char(string='Reference', required=True, readonly=True, copy=False,
+                       default=lambda self: self.env._('New'))
     employee_id = fields.Many2one(
-        'hr.employee', string='Employee', required=True, index=True, tracking=True,
+        'hr.employee', required=True, index=True, tracking=True,
         default=lambda self: self.env.user.employee_id)
     company_id = fields.Many2one(
-        'res.company', string='Company', required=True, index=True,
+        'res.company', required=True, index=True,
         compute='_compute_company_id', store=True, readonly=False, precompute=True)
     currency_id = fields.Many2one(related='company_id.currency_id')
     department_id = fields.Many2one(related='employee_id.department_id', store=True)
     type_id = fields.Many2one(
-        'hr.loan.type', string='Type', required=True, tracking=True,
+        'hr.loan.type', required=True, tracking=True,
         domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
     type_description = fields.Text(related='type_id.description')
     is_advance = fields.Boolean(related='type_id.is_advance')
@@ -61,7 +62,7 @@ class HrLoan(models.Model):
     @api.depends('amount', 'state', 'line_ids.amount', 'line_ids.state')
     def _compute_amounts(self):
         for loan in self:
-            paid = sum(loan.line_ids.filtered(lambda l: l.state == 'paid').mapped('amount'))
+            paid = sum(loan.line_ids.filtered(lambda installment: installment.state == 'paid').mapped('amount'))
             loan.amount_paid = paid
             loan.amount_residual = loan.amount - paid if loan.state not in ('draft', 'refused', 'cancel') else 0.0
 
@@ -80,30 +81,30 @@ class HrLoan(models.Model):
     def _check_amounts(self):
         for loan in self:
             if loan.amount <= 0:
-                raise ValidationError(_('The amount of the loan %s must be positive.', loan.name))
+                raise ValidationError(self.env._('The amount of the loan %s must be positive.', loan.name))
             if loan.installment_count < 1:
-                raise ValidationError(_('The loan %s needs at least one installment.', loan.name))
+                raise ValidationError(self.env._('The loan %s needs at least one installment.', loan.name))
 
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
-            if vals.get('name', _('New')) == _('New'):
-                vals['name'] = self.env['ir.sequence'].next_by_code('hr.loan') or _('New')
+            if vals.get('name', self.env._('New')) == self.env._('New'):
+                vals['name'] = self.env['ir.sequence'].next_by_code('hr.loan') or self.env._('New')
         return super().create(vals_list)
 
     def write(self, vals):
         schedule = {'amount', 'installment_count', 'date_start'}
         if schedule & set(vals) and any(loan.state != 'draft' for loan in self):
-            raise UserError(_('The amount and the installments of a loan only change while it is a draft.'))
+            raise UserError(self.env._('The amount and the installments of a loan only change while it is a draft.'))
         result = super().write(vals)
         if schedule & set(vals):
             self.filtered(lambda loan: loan.line_ids)._compute_installments()
         return result
 
-    def unlink(self):
+    @api.ondelete(at_uninstall=False)
+    def _unlink_except_submitted(self):
         if any(loan.state not in ('draft', 'cancel') for loan in self):
-            raise UserError(_('Only a draft or a cancelled loan can be deleted.'))
-        return super().unlink()
+            raise UserError(self.env._('Only a draft or a cancelled loan can be deleted.'))
 
     # ------------------------------------------------------------------
     # Installments
@@ -114,7 +115,7 @@ class HrLoan(models.Model):
             what the rounding leaves, so that they add up to the amount. """
         for loan in self:
             if loan.state != 'draft':
-                raise UserError(_('The installments of %s are set once it is submitted.', loan.name))
+                raise UserError(self.env._('The installments of %s are set once it is submitted.', loan.name))
             count = 1 if loan.is_advance else loan.installment_count
             installment = loan.currency_id.round(loan.amount / count)
             first = loan.date_start.replace(day=1)
@@ -135,29 +136,30 @@ class HrLoan(models.Model):
         loan_type = self.type_id
         count = len(self.line_ids)
         if loan_type.max_amount and self.amount > loan_type.max_amount:
-            raise UserError(_('A %(type)s is %(max)s at most.', type=loan_type.name,
-                              max=self.currency_id.format(loan_type.max_amount)))
+            raise UserError(self.env._('A %(type)s is %(max)s at most.', type=loan_type.name,
+                                       max=self.currency_id.format(loan_type.max_amount)))
         if loan_type.max_installments and count > loan_type.max_installments:
-            raise UserError(_('A %(type)s is repaid in %(max)s installments at most.', type=loan_type.name,
-                              max=loan_type.max_installments))
+            raise UserError(self.env._('A %(type)s is repaid in %(max)s installments at most.', type=loan_type.name,
+                                       max=loan_type.max_installments))
         employee = self.employee_id.sudo()
         if loan_type.min_service_months:
             start = employee.first_contract_date
             if not start or start + relativedelta(months=loan_type.min_service_months) > self.date:
-                raise UserError(_('%(employee)s needs %(months)s months of service for a %(type)s.',
-                                  employee=employee.name, months=loan_type.min_service_months, type=loan_type.name))
+                raise UserError(self.env._('%(employee)s needs %(months)s months of service for a %(type)s.',
+                                           employee=employee.name, months=loan_type.min_service_months,
+                                           type=loan_type.name))
         if loan_type.max_wage_percent:
             wage = employee.version_id.wage
             limit = wage * loan_type.max_wage_percent / 100
             if max(self.line_ids.mapped('amount')) > limit:
-                raise UserError(_('An installment of a %(type)s is %(percent)s%% of the wage at most, %(limit)s: '
-                                  'spread the loan over more installments.', type=loan_type.name,
-                                  percent=loan_type.max_wage_percent, limit=self.currency_id.format(limit)))
+                raise UserError(self.env._('An installment of a %(type)s is %(percent)s%% of the wage at most, '
+                                           '%(limit)s: spread the loan over more installments.', type=loan_type.name,
+                                           percent=loan_type.max_wage_percent, limit=self.currency_id.format(limit)))
         if loan_type.single_running and self.search_count([
                 ('id', '!=', self.id), ('employee_id', '=', self.employee_id.id),
                 ('type_id', '=', loan_type.id), ('state', 'in', OPEN_STATES)], limit=1):
-            raise UserError(_('%(employee)s already has a %(type)s to repay or to approve.',
-                              employee=employee.name, type=loan_type.name))
+            raise UserError(self.env._('%(employee)s already has a %(type)s to repay or to approve.',
+                                       employee=employee.name, type=loan_type.name))
 
     # ------------------------------------------------------------------
     # Approval
@@ -166,7 +168,7 @@ class HrLoan(models.Model):
     def action_submit(self):
         for loan in self:
             if loan.state != 'draft':
-                raise UserError(_('Only a draft can be submitted: %s is not.', loan.name))
+                raise UserError(self.env._('Only a draft can be submitted: %s is not.', loan.name))
             if not loan.line_ids:
                 loan._compute_installments()
             loan._check_limits()
@@ -179,30 +181,33 @@ class HrLoan(models.Model):
     def _approval_check_requester(self):
         self.ensure_one()
         if self.employee_id.user_id != self.env.user and not self.env.user.has_group('hr.group_hr_user'):
-            raise UserError(_('Only %(employee)s or HR can change %(loan)s.',
-                              employee=self.employee_id.name, loan=self.name))
+            raise UserError(self.env._('Only %(employee)s or HR can change %(loan)s.',
+                                       employee=self.employee_id.name, loan=self.name))
 
     def _on_approval_submitted(self, request):
         self.sudo().state = 'to_approve'
 
     def _on_approval_approved(self, request):
-        super()._on_approval_approved(request)
+        result = super()._on_approval_approved(request)
         self.sudo().state = 'approved'
+        return result
 
     def _on_approval_refused(self, request):
-        super()._on_approval_refused(request)
+        result = super()._on_approval_refused(request)
         self.sudo().state = 'refused'
+        return result
 
     def _on_approval_cancelled(self, request):
-        super()._on_approval_cancelled(request)
+        result = super()._on_approval_cancelled(request)
         self.sudo().state = 'cancel'
+        return result
 
     def _on_approval_reset(self):
         self.sudo().state = 'draft'
 
     def action_approval_cancel(self):
         if any(loan.state not in ('draft', 'to_approve') for loan in self):
-            raise UserError(_('An approved loan is cancelled by HR, before it is paid out.'))
+            raise UserError(self.env._('An approved loan is cancelled by HR, before it is paid out.'))
         result = super().action_approval_cancel()
         self.sudo().state = 'cancel'
         return result
@@ -216,7 +221,7 @@ class HrLoan(models.Model):
         self._check_hr()
         for loan in self:
             if loan.state != 'approved':
-                raise UserError(_('Only an approved loan is paid out: %s is not.', loan.name))
+                raise UserError(self.env._('Only an approved loan is paid out: %s is not.', loan.name))
             loan.write({'state': 'running', 'date_disbursed': fields.Date.context_today(self)})
         return True
 
@@ -225,7 +230,8 @@ class HrLoan(models.Model):
         self._check_hr()
         for loan in self:
             if loan.state != 'approved':
-                raise UserError(_('Only an approved loan not paid out yet is cancelled this way: %s.', loan.name))
+                raise UserError(self.env._('Only an approved loan not paid out yet is cancelled this way: %s.',
+                                           loan.name))
             loan.write({'state': 'cancel', 'approval_state': 'cancel'})
         return True
 
@@ -234,19 +240,20 @@ class HrLoan(models.Model):
         self._check_hr()
         for loan in self:
             if loan.state != 'running':
-                raise UserError(_('Only a loan being repaid is settled: %s is not.', loan.name))
-            loan.line_ids.filtered(lambda l: l.state == 'to_pay')._mark_paid(_('Settled at once'))
+                raise UserError(self.env._('Only a loan being repaid is settled: %s is not.', loan.name))
+            loan.line_ids.filtered(lambda installment: installment.state == 'to_pay')._mark_paid(self.env._('Settled '
+                                                                                                            'at once'))
         return True
 
     def _check_hr(self):
         if not self.env.user.has_group('hr.group_hr_user'):
-            raise UserError(_('Only HR pays out, cancels or settles a loan.'))
+            raise UserError(self.env._('Only HR pays out, cancels or settles a loan.'))
 
     def _check_repaid(self):
         for loan in self.filtered(lambda loan: loan.state == 'running'):
             if loan.line_ids and all(line.state == 'paid' for line in loan.line_ids):
                 loan.state = 'paid'
-                loan.message_post(body=_('Repaid.'), subtype_xmlid='mail.mt_note')
+                loan.message_post(body=self.env._('Repaid.'), subtype_xmlid='mail.mt_note')
 
 
 class HrLoanLine(models.Model):
@@ -275,8 +282,8 @@ class HrLoanLine(models.Model):
     def action_mark_paid(self):
         self.loan_id._check_hr()
         if any(line.loan_id.state != 'running' or line.state != 'to_pay' for line in self):
-            raise UserError(_('Only an installment due on a loan being repaid is marked as repaid.'))
-        self._mark_paid(_('Repaid outside the payroll'))
+            raise UserError(self.env._('Only an installment due on a loan being repaid is marked as repaid.'))
+        self._mark_paid(self.env._('Repaid outside the payroll'))
         return True
 
     def action_postpone(self):
@@ -284,11 +291,12 @@ class HrLoanLine(models.Model):
         self.loan_id._check_hr()
         for line in self:
             if line.state != 'to_pay' or line.loan_id.state not in ('approved', 'running'):
-                raise UserError(_('Only an installment still due is postponed.'))
-            later = line.loan_id.line_ids.filtered(lambda l: l.state == 'to_pay' and l.date >= line.date)
+                raise UserError(self.env._('Only an installment still due is postponed.'))
+            later = line.loan_id.line_ids.filtered(
+                lambda installment: installment.state == 'to_pay' and installment.date >= line.date)
             for installment in later.sorted('date', reverse=True):
                 installment.date += relativedelta(months=1)
-            line.loan_id.message_post(body=_('Installment of %(month)s postponed by one month.',
-                                             month=(line.date - relativedelta(months=1)).strftime('%B %Y')),
+            line.loan_id.message_post(body=self.env._('Installment of %(month)s postponed by one month.',
+                                                      month=(line.date - relativedelta(months=1)).strftime('%B %Y')),
                                       subtype_xmlid='mail.mt_note')
         return True

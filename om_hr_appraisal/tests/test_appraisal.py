@@ -1,6 +1,5 @@
-from datetime import date, timedelta
+from datetime import date
 
-from dateutil.relativedelta import relativedelta
 from freezegun import freeze_time
 
 from odoo.exceptions import AccessError, UserError
@@ -157,7 +156,7 @@ class TestAppraisal(TransactionCase):
         with self.assertRaises(UserError):
             appraisal.with_user(self.manager_user).action_new_contract_version()
         action = appraisal.with_user(self.hr_user).action_new_contract_version()
-        wizard = self.env['hr.appraisal.version'].with_user(self.hr_user).with_context(action['context']).create({})
+        wizard = self.env['hr.appraisal.version'].with_user(self.hr_user).with_context(**action['context']).create({})
         self.assertEqual(wizard.date_version, date(2026, 7, 1))
         result = wizard.action_create()
         version = self.env['hr.version'].browse(result['context']['version_id'])

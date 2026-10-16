@@ -1,8 +1,8 @@
-from datetime import date
 
 from odoo.tests import tagged
 
 from odoo.addons.om_hr_portal.tests.common import HrPortalCase
+
 
 @tagged('post_install', '-at_install')
 class TestPortalAsset(HrPortalCase):

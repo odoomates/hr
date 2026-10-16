@@ -11,7 +11,7 @@ class Document(models.Model):
     _inherit = 'document.document'
 
     employee_id = fields.Many2one(
-        'hr.employee', string='Employee', compute='_compute_employee_id', store=True, index='btree_not_null',
+        'hr.employee', compute='_compute_employee_id', store=True, index='btree_not_null',
         ondelete='cascade')
     department_id = fields.Many2one(related='employee_id.department_id', store=True, string='Department')
 

@@ -1,0 +1,24 @@
+# ruff check .
+target-version = "py312"
+line-length = 120
+# the payroll modules keep their code as it is for their existing users
+extend-exclude = ["om_hr_payroll", "om_hr_payroll_account", "tools"]
+
+[lint]
+select = ["E", "F", "W", "B", "C90", "I", "UP", "RUF100"]
+# Odoo code formats its strings with %, and filters records with lambdas run inside the loop
+ignore = ["UP031", "B023"]
+
+[lint.per-file-ignores]
+"__init__.py" = ["F401", "I001"]
+"__manifest__.py" = ["B018"]
+
+[lint.isort]
+section-order = ["future", "standard-library", "third-party", "odoo", "odoo-addons", "first-party", "local-folder"]
+
+[lint.isort.sections]
+"odoo" = ["odoo"]
+"odoo-addons" = ["odoo.addons"]
+
+[lint.mccabe]
+max-complexity = 16

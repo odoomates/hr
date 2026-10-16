@@ -1,4 +1,4 @@
-from odoo import _, fields, models
+from odoo import fields, models
 
 
 class HrApplicant(models.Model):
@@ -47,7 +47,7 @@ class HrApplicant(models.Model):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': _('New Offer'),
+            'name': self.env._('New Offer'),
             'res_model': 'hr.applicant.offer',
             'view_mode': 'form',
             'views': [(False, 'form')],
@@ -64,7 +64,7 @@ class HrApplicant(models.Model):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Offers'),
+            'name': self.env._('Offers'),
             'res_model': 'hr.applicant.offer',
             'view_mode': 'list,form',
             'domain': [('applicant_id', '=', self.id)],

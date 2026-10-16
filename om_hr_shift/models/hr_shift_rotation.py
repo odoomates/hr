@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
 
@@ -10,7 +10,7 @@ class HrShiftRotation(models.Model):
 
     name = fields.Char(required=True, translate=True)
     active = fields.Boolean(default=True)
-    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company)
+    company_id = fields.Many2one('res.company', default=lambda self: self.env.company)
     line_ids = fields.One2many('hr.shift.rotation.line', 'rotation_id', string='Days', copy=True)
     cycle_days = fields.Integer(compute='_compute_cycle_days', string='Days in the Cycle')
     pattern = fields.Char(compute='_compute_cycle_days')
@@ -25,7 +25,7 @@ class HrShiftRotation(models.Model):
     def _check_lines(self):
         for rotation in self:
             if not rotation.line_ids.template_id:
-                raise ValidationError(_('The rotation %s works one shift at least.', rotation.name))
+                raise ValidationError(self.env._('The rotation %s works one shift at least.', rotation.name))
 
 
 class HrShiftRotationLine(models.Model):

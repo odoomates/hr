@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 from odoo.fields import Domain
 from odoo.tools.safe_eval import safe_eval
@@ -17,16 +17,16 @@ class ApprovalFlow(models.Model):
     name = fields.Char(required=True, translate=True)
     sequence = fields.Integer(default=10)
     active = fields.Boolean(default=True)
-    model_id = fields.Many2one('ir.model', string='Model', required=True, ondelete='cascade', index=True,
+    model_id = fields.Many2one('ir.model', required=True, ondelete='cascade', index=True,
                                domain=[('transient', '=', False)])
     model = fields.Char(related='model_id.model', store=True, string='Model Name')
     is_document = fields.Boolean(compute='_compute_is_document')
     button_id = fields.Many2one(
-        'approval.button', string='Button', ondelete='cascade', domain="[('model_id', '=', model_id)]",
+        'approval.button', ondelete='cascade', domain="[('model_id', '=', model_id)]",
         help='The button stopped until the approval is given. Leave it empty on a document approved by its own '
              'Submit button, such as an HR request.')
     method = fields.Char(related='button_id.method', store=True, index=True)
-    company_id = fields.Many2one('res.company', string='Company', help='Empty: the flow applies to every company.')
+    company_id = fields.Many2one('res.company', help='Empty: the flow applies to every company.')
     domain = fields.Char(
         string='Applies To', default='[]',
         help='The records the flow applies to, e.g. the sale orders above 10,000. The first matching flow is used.')
@@ -56,9 +56,9 @@ class ApprovalFlow(models.Model):
     def _check_button_model(self):
         for flow in self:
             if flow.button_id and flow.button_id.model_id != flow.model_id:
-                raise ValidationError(_('The button of the flow %s belongs to another model.', flow.name))
+                raise ValidationError(self.env._('The button of the flow %s belongs to another model.', flow.name))
             if not flow.button_id and not flow.is_document:
-                raise ValidationError(_(
+                raise ValidationError(self.env._(
                     'Choose the button the flow %(flow)s stops: %(model)s has no approval of its own.',
                     flow=flow.name, model=flow.model_id.name))
 
@@ -115,7 +115,7 @@ class ApprovalStep(models.Model):
         ('group', 'Users of a Group'),
         ('field', 'User of a Field'),
     ], string='Approver', required=True, default='group')
-    group_id = fields.Many2one('res.groups', string='Group')
+    group_id = fields.Many2one('res.groups')
     user_ids = fields.Many2many('res.users', string='Users')
     field_path = fields.Char(
         string='Field', help='The field of the record naming the approver, e.g. user_id for the salesperson of a sale '
@@ -128,9 +128,9 @@ class ApprovalStep(models.Model):
     def _check_approver(self):
         for step in self:
             if step.approver_type == 'group' and not step.group_id:
-                raise ValidationError(_('Choose the group approving the step %s.', step.name))
+                raise ValidationError(self.env._('Choose the group approving the step %s.', step.name))
             if step.approver_type == 'user' and not step.user_ids:
-                raise ValidationError(_('Choose the users approving the step %s.', step.name))
+                raise ValidationError(self.env._('Choose the users approving the step %s.', step.name))
             if step.approver_type == 'field':
                 step._check_field_path()
 
@@ -141,10 +141,11 @@ class ApprovalStep(models.Model):
             for name in (self.field_path or '').split('.'):
                 model = self.env[model._fields[name].comodel_name]
         except (KeyError, AttributeError):
-            raise ValidationError(_('%(path)s is not a field path of %(model)s.',
-                                    path=self.field_path, model=self.flow_id.model_id.name)) from None
+            raise ValidationError(self.env._('%(path)s is not a field path of %(model)s.',
+                                             path=self.field_path, model=self.flow_id.model_id.name)) from None
         if model._name not in self._users_models():
-            raise ValidationError(_('The field %s must lead to users, employees or contacts.', self.field_path))
+            raise ValidationError(self.env._('The field %s must lead to users, employees or contacts.',
+                                             self.field_path))
 
     @api.model
     def _users_models(self):

@@ -99,7 +99,7 @@ class TestDocument(TransactionCase):
     def test_renew(self):
         document = self.new_document(date(2026, 6, 20))
         context = document.action_renew()['context']
-        renewal = self.env['document.document'].with_context(context).create({
+        renewal = self.env['document.document'].with_context(**context).create({
             'number': 'INS-2', 'date_expiry': date(2027, 6, 20)})
         self.assertEqual((renewal.res_model, renewal.res_id, renewal.type_id),
                          ('res.partner', self.partner.id, self.doc_type))

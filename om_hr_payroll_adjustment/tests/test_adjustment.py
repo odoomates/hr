@@ -14,7 +14,8 @@ class TestAdjustment(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.officer = new_test_user(cls.env, 'om_adj_officer', groups='base.group_user,om_hr_payroll.group_hr_payroll_user')
+        cls.officer = new_test_user(cls.env, 'om_adj_officer',
+                                    groups='base.group_user,om_hr_payroll.group_hr_payroll_user')
         cls.manager = new_test_user(cls.env, 'om_adj_manager',
                                     groups='base.group_user,om_hr_payroll.group_hr_payroll_manager')
         cls.employee_user = new_test_user(cls.env, 'om_adj_employee', groups='base.group_user')

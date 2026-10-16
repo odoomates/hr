@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
 
@@ -16,7 +16,7 @@ class HrPayrollAdjustmentType(models.Model):
     kind = fields.Selection([('addition', 'Addition'), ('deduction', 'Deduction')], required=True,
                             default='addition')
     category_id = fields.Many2one(
-        'hr.salary.rule.category', string='Category', required=True,
+        'hr.salary.rule.category', required=True,
         default=lambda self: self.env.ref('om_hr_payroll.ALW', raise_if_not_found=False),
         help='Where the payslip counts it: an allowance is part of the gross, a deduction comes off it.')
     structure_ids = fields.Many2many(
@@ -28,8 +28,7 @@ class HrPayrollAdjustmentType(models.Model):
     settle_at_exit = fields.Boolean(
         string='Settle at Exit', help='The final settlement of an employee leaving takes everything still due.')
     rule_id = fields.Many2one('hr.salary.rule', string='Salary Rule', readonly=True, copy=False)
-    company_id = fields.Many2one('res.company', string='Company',
-                                 help='Leave empty to share the type with all the companies.')
+    company_id = fields.Many2one('res.company', help='Leave empty to share the type with all the companies.')
     description = fields.Text(translate=True)
 
     _code_uniq = models.Constraint('UNIQUE(code)', 'Each adjustment type has its own code.')
@@ -44,8 +43,8 @@ class HrPayrollAdjustmentType(models.Model):
     def _check_code(self):
         for adjustment_type in self:
             if not adjustment_type.code.replace('_', '').isalnum() or adjustment_type.code[0].isdigit():
-                raise ValidationError(_('The code %s is used in the salary rules: letters, digits and _ only, '
-                                        'not starting with a digit.', adjustment_type.code))
+                raise ValidationError(self.env._('The code %s is used in the salary rules: letters, digits and _ only, '
+                                                 'not starting with a digit.', adjustment_type.code))
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -93,7 +92,8 @@ class HrPayrollAdjustmentType(models.Model):
                                      'result = %sinputs.%s.amount' % (sign, self.code),
             'active': self.active,
             'company_id': self.company_id.id,
-            'note': _('Pays the payroll adjustments of type %s. Kept in sync by the adjustment type.', self.name),
+            'note': self.env._('Pays the payroll adjustments of type %s. Kept in sync by the adjustment type.',
+                               self.name),
         }
 
     def _sync_rule(self, old_structures=None):
@@ -108,7 +108,7 @@ class HrPayrollAdjustmentType(models.Model):
             else:
                 rule = Rule.create(dict(values, input_ids=[(0, 0, {
                     'name': adjustment_type.name, 'code': adjustment_type.code})]))
-                super(HrPayrollAdjustmentType, adjustment_type).write({'rule_id': rule.id})
+                adjustment_type.rule_id = rule
             previous = (old_structures or {}).get(adjustment_type, self.env['hr.payroll.structure'])
             for structure in (previous - adjustment_type.structure_ids).sudo():
                 structure.rule_ids = [(3, rule.id)]

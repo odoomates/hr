@@ -22,7 +22,7 @@ class TestAsset(TransactionCase):
 
     def wizard(self, mode, **values):
         context = {'default_equipment_id': self.laptop.id, 'default_mode': mode}
-        return self.env['hr.asset.wizard'].with_user(self.hr_user).with_context(context).create(values)
+        return self.env['hr.asset.wizard'].with_user(self.hr_user).with_context(**context).create(values)
 
     def assign(self, employee=None):
         return self.wizard('assign', employee_id=(employee or self.employee).id, condition='new',
@@ -93,7 +93,7 @@ class TestAsset(TransactionCase):
 
     def test_handover_form(self):
         action = self.assign()
-        wizard = Form(self.env['print.wizard'].with_user(self.hr_user).with_context(action['context'])).save()
+        wizard = Form(self.env['print.wizard'].with_user(self.hr_user).with_context(**action['context'])).save()
         wizard.action_issue()
         issue = self.env['print.issue'].search([('res_model', '=', 'hr.asset.assignment')], limit=1)
         self.assertIn('SN-OM-123', issue.body_html)

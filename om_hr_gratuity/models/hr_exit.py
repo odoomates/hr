@@ -1,6 +1,6 @@
 from dateutil.relativedelta import relativedelta
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -8,7 +8,7 @@ class HrExit(models.Model):
     _inherit = 'hr.exit'
 
     gratuity_scheme_id = fields.Many2one(
-        'hr.gratuity.scheme', string='Gratuity Scheme', groups='hr.group_hr_user',
+        'hr.gratuity.scheme', groups='hr.group_hr_user',
         compute='_compute_gratuity_scheme_id', store=True, readonly=False,
         domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
     gratuity_date_start = fields.Date(string='Service From', groups='hr.group_hr_user',
@@ -36,9 +36,9 @@ class HrExit(models.Model):
     def action_compute_gratuity(self):
         for exit_ in self:
             if not exit_.gratuity_scheme_id:
-                raise UserError(_('Choose the gratuity scheme of %s.', exit_.name))
+                raise UserError(self.env._('Choose the gratuity scheme of %s.', exit_.name))
             if not exit_.gratuity_date_start:
-                raise UserError(_('Set the date the service of %s started.', exit_.employee_id.name))
+                raise UserError(self.env._('Set the date the service of %s started.', exit_.employee_id.name))
             exit_.write(exit_._gratuity_values())
         return True
 

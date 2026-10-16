@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 from odoo.tools import format_duration
 
@@ -38,11 +38,11 @@ class HrShiftTemplate(models.Model):
     hour_from = fields.Float(string='From', required=True, default=8.0)
     hour_to = fields.Float(string='To', required=True, default=16.0,
                            help='At or before the start, the shift ends the next day.')
-    break_from = fields.Float(string='Break From')
-    break_to = fields.Float(string='Break To', help='The unpaid break; the same as Break From for none.')
+    break_from = fields.Float()
+    break_to = fields.Float(help='The unpaid break; the same as Break From for none.')
     hours = fields.Float(compute='_compute_hours', string='Hours Worked')
     color = fields.Integer(default=1)
-    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company,
+    company_id = fields.Many2one('res.company', default=lambda self: self.env.company,
                                  help='Leave empty to share the template with all the companies.')
     department_ids = fields.Many2many('hr.department', string='Departments',
                                       help='The departments planning this shift; empty for all.')
@@ -72,11 +72,11 @@ class HrShiftTemplate(models.Model):
         for template in self:
             hours = (template.hour_from, template.hour_to, template.break_from, template.break_to)
             if any(not 0 <= hour <= 24 for hour in hours):
-                raise ValidationError(_('The hours of %s are between 00:00 and 24:00.', template.name))
+                raise ValidationError(self.env._('The hours of %s are between 00:00 and 24:00.', template.name))
             if template.hour_from == template.hour_to:
-                raise ValidationError(_('The shift %s starts and ends at the same time.', template.name))
+                raise ValidationError(self.env._('The shift %s starts and ends at the same time.', template.name))
             if template.break_from != template.break_to and template.hours >= template._raw_hours():
-                raise ValidationError(_('The break of %s is not within the shift.', template.name))
+                raise ValidationError(self.env._('The break of %s is not within the shift.', template.name))
 
     def _raw_hours(self):
         self.ensure_one()

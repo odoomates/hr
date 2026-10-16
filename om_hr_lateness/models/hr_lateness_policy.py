@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
 PENALTIES = [
@@ -18,7 +18,7 @@ class HrLatenessPolicy(models.Model):
 
     name = fields.Char(required=True, translate=True)
     active = fields.Boolean(default=True)
-    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company,
+    company_id = fields.Many2one('res.company', default=lambda self: self.env.company,
                                  help='Leave empty to share the policy with all the companies.')
     grace_in = fields.Integer(string='Grace on Arrival (Minutes)', default=10,
                               help='An arrival up to this late is not counted.')
@@ -35,7 +35,8 @@ class HrLatenessPolicy(models.Model):
     def _check_values(self):
         for policy in self:
             if policy.grace_in < 0 or policy.grace_out < 0 or policy.monthly_cap_days < 0:
-                raise ValidationError(_('The grace minutes and the cap of %s cannot be negative.', policy.name))
+                raise ValidationError(self.env._('The grace minutes and the cap of %s cannot be negative.',
+                                                 policy.name))
 
     def _line_for(self, kind, minutes, occurrence):
         """ :return: the penalty of the `occurrence`-th time in the month an employee is `minutes` late, or early
@@ -70,16 +71,16 @@ class HrLatenessPolicyLine(models.Model):
     def _check_values(self):
         for line in self:
             if line.minutes_from < 0 or line.occurrence < 1:
-                raise ValidationError(_('A lateness penalty starts from 0 minutes and the first occurrence.'))
+                raise ValidationError(self.env._('A lateness penalty starts from 0 minutes and the first occurrence.'))
             if line.minutes_to and line.minutes_to < line.minutes_from:
-                raise ValidationError(_('The band of minutes of a lateness penalty ends after it starts.'))
+                raise ValidationError(self.env._('The band of minutes of a lateness penalty ends after it starts.'))
             if min(line.amount, line.percent, line.factor) < 0:
-                raise ValidationError(_('A lateness penalty is not negative.'))
+                raise ValidationError(self.env._('A lateness penalty is not negative.'))
 
     @api.depends('minutes_from', 'minutes_to', 'occurrence', 'penalty')
     def _compute_display_name(self):
         penalties = dict(PENALTIES)
         for line in self:
             band = '%s-%s' % (line.minutes_from, line.minutes_to) if line.minutes_to else '%s+' % line.minutes_from
-            line.display_name = _('%(band)s min, #%(occurrence)s: %(penalty)s', band=band,
-                                  occurrence=line.occurrence, penalty=penalties.get(line.penalty))
+            line.display_name = self.env._('%(band)s min, #%(occurrence)s: %(penalty)s', band=band,
+                                           occurrence=line.occurrence, penalty=penalties.get(line.penalty))

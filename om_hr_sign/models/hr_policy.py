@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -56,7 +56,7 @@ class HrPolicy(models.Model):
         """ A draft of the next version, its content copied from the current one. """
         self.ensure_one()
         if self.version_ids.filtered(lambda version: version.state == 'draft'):
-            raise UserError(_('%s already has a draft version: publish it or delete it first.', self.name))
+            raise UserError(self.env._('%s already has a draft version: publish it or delete it first.', self.name))
         current = self.version_id
         version = self.env['hr.policy.version'].create({
             'policy_id': self.id,
@@ -71,7 +71,7 @@ class HrPolicy(models.Model):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Answers'),
+            'name': self.env._('Answers'),
             'res_model': 'hr.policy.assignment',
             'view_mode': 'list,pivot,form',
             'domain': [('policy_id', '=', self.id)],

@@ -1,6 +1,6 @@
 from dateutil.relativedelta import relativedelta
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
 
@@ -14,15 +14,16 @@ class HrPayrollAdjustment(models.Model):
     _order = 'date_start desc, id desc'
     _mail_post_access = 'read'
 
-    name = fields.Char(string='Reference', required=True, readonly=True, copy=False, default=lambda self: _('New'))
-    employee_id = fields.Many2one('hr.employee', string='Employee', required=True, index=True, tracking=True)
+    name = fields.Char(string='Reference', required=True, readonly=True, copy=False,
+                       default=lambda self: self.env._('New'))
+    employee_id = fields.Many2one('hr.employee', required=True, index=True, tracking=True)
     company_id = fields.Many2one(
-        'res.company', string='Company', required=True, index=True,
+        'res.company', required=True, index=True,
         compute='_compute_company_id', store=True, readonly=False, precompute=True)
     currency_id = fields.Many2one(related='company_id.currency_id')
     department_id = fields.Many2one(related='employee_id.department_id', store=True)
     type_id = fields.Many2one(
-        'hr.payroll.adjustment.type', string='Type', required=True, tracking=True,
+        'hr.payroll.adjustment.type', required=True, tracking=True,
         domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
     kind = fields.Selection(related='type_id.kind', store=True)
     description = fields.Char(help='Shown to the employee, e.g. "Q3 sales commission".')
@@ -32,7 +33,7 @@ class HrPayrollAdjustment(models.Model):
         ('months', 'Monthly, for a number of months'),
         ('total', 'Monthly, until a total'),
     ], required=True, default='once', tracking=True)
-    amount_type = fields.Selection([('fixed', 'Fixed Amount'), ('percent', 'Percentage')], string='Amount Type',
+    amount_type = fields.Selection([('fixed', 'Fixed Amount'), ('percent', 'Percentage')],
                                    required=True, default='fixed', tracking=True)
     amount = fields.Monetary(string='Amount per Month', tracking=True,
                              help='The amount paid or deducted each month.')
@@ -99,37 +100,38 @@ class HrPayrollAdjustment(models.Model):
     def _check_amounts(self):
         for adjustment in self:
             if adjustment.amount_type == 'fixed' and adjustment.amount <= 0:
-                raise ValidationError(_('The amount of %s must be positive.', adjustment.display_name))
+                raise ValidationError(self.env._('The amount of %s must be positive.', adjustment.display_name))
             if adjustment.amount_type == 'percent':
                 if not 0 < adjustment.percent <= 100:
-                    raise ValidationError(_('The percentage of %s is between 0 and 100.', adjustment.display_name))
+                    raise ValidationError(self.env._('The percentage of %s is between 0 and 100.',
+                                                     adjustment.display_name))
                 if adjustment.percent_base == 'gross' and adjustment.kind != 'deduction':
-                    raise ValidationError(_('Only a deduction is a percentage of the gross: an addition is part of '
-                                            'the gross itself. Take a percentage of the wage for %s.',
-                                            adjustment.display_name))
+                    raise ValidationError(self.env._('Only a deduction is a percentage of the gross: an addition is '
+                                                     'part of the gross itself. Take a percentage of the wage for %s.',
+                                                     adjustment.display_name))
             if adjustment.recurrence == 'months' and adjustment.month_count < 1:
-                raise ValidationError(_('%s runs for one month at least.', adjustment.display_name))
+                raise ValidationError(self.env._('%s runs for one month at least.', adjustment.display_name))
             if adjustment.recurrence == 'total' and adjustment.total_amount <= 0:
-                raise ValidationError(_('The total of %s must be positive.', adjustment.display_name))
+                raise ValidationError(self.env._('The total of %s must be positive.', adjustment.display_name))
 
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
-            if vals.get('name', _('New')) == _('New'):
-                vals['name'] = self.env['ir.sequence'].next_by_code('hr.payroll.adjustment') or _('New')
+            if vals.get('name', self.env._('New')) == self.env._('New'):
+                vals['name'] = self.env['ir.sequence'].next_by_code('hr.payroll.adjustment') or self.env._('New')
         return super().create(vals_list)
 
     def write(self, vals):
         schedule = {'type_id', 'employee_id', 'recurrence', 'amount_type', 'amount', 'percent', 'percent_base',
                     'month_count', 'total_amount', 'date_start'}
         if schedule & set(vals) and any(adjustment.state != 'draft' for adjustment in self):
-            raise UserError(_('An adjustment only changes while it is a draft: stop it and add a new one.'))
+            raise UserError(self.env._('An adjustment only changes while it is a draft: stop it and add a new one.'))
         return super().write(vals)
 
-    def unlink(self):
+    @api.ondelete(at_uninstall=False)
+    def _unlink_except_submitted(self):
         if any(adjustment.state not in ('draft', 'cancel') for adjustment in self):
-            raise UserError(_('Only a draft or a cancelled adjustment can be deleted.'))
-        return super().unlink()
+            raise UserError(self.env._('Only a draft or a cancelled adjustment can be deleted.'))
 
     # ------------------------------------------------------------------
     # Monthly lines
@@ -170,7 +172,7 @@ class HrPayrollAdjustment(models.Model):
         self._check_payroll()
         for adjustment in self:
             if adjustment.state != 'draft':
-                raise UserError(_('Only a draft is confirmed: %s is not.', adjustment.display_name))
+                raise UserError(self.env._('Only a draft is confirmed: %s is not.', adjustment.display_name))
             adjustment._compute_lines()
         to_approve = self.filtered('type_id.require_approval')
         (self - to_approve).sudo().write({'state': 'running', 'approval_state': 'approved'})
@@ -189,16 +191,19 @@ class HrPayrollAdjustment(models.Model):
         self.sudo().state = 'to_approve'
 
     def _on_approval_approved(self, request):
-        super()._on_approval_approved(request)
+        result = super()._on_approval_approved(request)
         self.sudo().state = 'running'
+        return result
 
     def _on_approval_refused(self, request):
-        super()._on_approval_refused(request)
+        result = super()._on_approval_refused(request)
         self.sudo().state = 'refused'
+        return result
 
     def _on_approval_cancelled(self, request):
-        super()._on_approval_cancelled(request)
+        result = super()._on_approval_cancelled(request)
         self.sudo().state = 'cancel'
+        return result
 
     def _on_approval_reset(self):
         self.sudo().state = 'draft'
@@ -206,7 +211,7 @@ class HrPayrollAdjustment(models.Model):
 
     def action_approval_cancel(self):
         if any(adjustment.state not in ('draft', 'to_approve') for adjustment in self):
-            raise UserError(_('A running adjustment is stopped, not cancelled.'))
+            raise UserError(self.env._('A running adjustment is stopped, not cancelled.'))
         result = super().action_approval_cancel()
         self.sudo().state = 'cancel'
         return result
@@ -220,15 +225,15 @@ class HrPayrollAdjustment(models.Model):
         self._check_payroll()
         for adjustment in self:
             if adjustment.state != 'running':
-                raise UserError(_('Only a running adjustment is stopped: %s is not.', adjustment.display_name))
+                raise UserError(self.env._('Only a running adjustment is stopped: %s is not.', adjustment.display_name))
             adjustment.line_ids.filtered(lambda line: line.state == 'to_pay').unlink()
             adjustment.state = 'done' if adjustment.line_ids else 'cancel'
-            adjustment.message_post(body=_('Stopped.'), subtype_xmlid='mail.mt_note')
+            adjustment.message_post(body=self.env._('Stopped.'), subtype_xmlid='mail.mt_note')
         return True
 
     def _check_payroll(self):
         if not self.env.user.has_group('om_hr_payroll.group_hr_payroll_user'):
-            raise UserError(_('Only the payroll officers manage the payroll adjustments.'))
+            raise UserError(self.env._('Only the payroll officers manage the payroll adjustments.'))
 
     def _check_done(self):
         """ Done once every line is paid, and the total reached for an adjustment until a total. """
@@ -261,7 +266,7 @@ class HrPayrollAdjustmentLine(models.Model):
     amount = fields.Monetary(help='Positive: the type of the adjustment says whether it is paid or deducted. A '
                                   'percentage is set by the payslip taking the line.')
     state = fields.Selection([('to_pay', 'Due'), ('paid', 'Done')], required=True, default='to_pay', index=True)
-    payslip_id = fields.Many2one('hr.payslip', string='Payslip', ondelete='set null', index=True, copy=False)
+    payslip_id = fields.Many2one('hr.payslip', ondelete='set null', index=True, copy=False)
     date_paid = fields.Date(string='Done On')
     note = fields.Char()
 
@@ -274,16 +279,17 @@ class HrPayrollAdjustmentLine(models.Model):
         self.adjustment_id._check_payroll()
         for line in self:
             if line.state != 'to_pay' or line.adjustment_id.state != 'running':
-                raise UserError(_('Only a line still due on a running adjustment is postponed.'))
+                raise UserError(self.env._('Only a line still due on a running adjustment is postponed.'))
             if line.payslip_id and line.payslip_id.state not in ('draft', 'verify', 'cancel'):
-                raise UserError(_('The payslip %s takes the line already.', line.payslip_id.display_name))
-            later = line.adjustment_id.line_ids.filtered(lambda l: l.state == 'to_pay' and l.date >= line.date)
+                raise UserError(self.env._('The payslip %s takes the line already.', line.payslip_id.display_name))
+            later = line.adjustment_id.line_ids.filtered(
+                lambda other: other.state == 'to_pay' and other.date >= line.date)
             later.payslip_id = False
             for other in later.sorted('date', reverse=True):
                 other.date += relativedelta(months=1)
             line.adjustment_id.message_post(
-                body=_('The month of %(month)s postponed by one month.',
-                       month=(line.date - relativedelta(months=1)).strftime('%B %Y')),
+                body=self.env._('The month of %(month)s postponed by one month.',
+                                month=(line.date - relativedelta(months=1)).strftime('%B %Y')),
                 subtype_xmlid='mail.mt_note')
         return True
 
@@ -291,8 +297,8 @@ class HrPayrollAdjustmentLine(models.Model):
         """ Paid or deducted outside the payroll. """
         self.adjustment_id._check_payroll()
         if any(line.state != 'to_pay' or line.adjustment_id.state != 'running' for line in self):
-            raise UserError(_('Only a line still due on a running adjustment is marked as done.'))
+            raise UserError(self.env._('Only a line still due on a running adjustment is marked as done.'))
         if any(line.adjustment_id.amount_type == 'percent' and not line.amount for line in self):
-            raise UserError(_('Set the amount of a percentage before marking it as done.'))
-        self._mark_paid(_('Done outside the payroll'))
+            raise UserError(self.env._('Set the amount of a percentage before marking it as done.'))
+        self._mark_paid(self.env._('Done outside the payroll'))
         return True

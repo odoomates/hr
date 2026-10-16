@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -9,7 +9,7 @@ class HrLateness(models.Model):
     _description = 'Lateness'
     _order = 'date desc, employee_id, kind'
 
-    employee_id = fields.Many2one('hr.employee', string='Employee', required=True, index=True, ondelete='cascade')
+    employee_id = fields.Many2one('hr.employee', required=True, index=True, ondelete='cascade')
     company_id = fields.Many2one(related='employee_id.company_id', store=True, index=True)
     department_id = fields.Many2one(related='employee_id.department_id', store=True)
     date = fields.Date(required=True, index=True)
@@ -17,8 +17,8 @@ class HrLateness(models.Model):
     scheduled_at = fields.Datetime(string='Scheduled', required=True)
     actual_at = fields.Datetime(string='Actual', required=True)
     minutes = fields.Integer(required=True, aggregator='sum')
-    attendance_id = fields.Many2one('hr.attendance', string='Attendance', ondelete='set null')
-    policy_id = fields.Many2one('hr.lateness.policy', string='Policy', ondelete='set null')
+    attendance_id = fields.Many2one('hr.attendance', ondelete='set null')
+    policy_id = fields.Many2one('hr.lateness.policy', ondelete='set null')
     state = fields.Selection([('counted', 'Counted'), ('excused', 'Excused')], required=True, default='counted',
                              index=True)
     excuse_reason = fields.Char(string='Excuse')
@@ -35,9 +35,9 @@ class HrLateness(models.Model):
     def _compute_display_name(self):
         kinds = dict(self._fields['kind'].selection)
         for lateness in self:
-            lateness.display_name = _('%(employee)s, %(kind)s of %(minutes)s min on %(date)s',
-                                      employee=lateness.employee_id.name, kind=kinds.get(lateness.kind),
-                                      minutes=lateness.minutes, date=lateness.date)
+            lateness.display_name = self.env._('%(employee)s, %(kind)s of %(minutes)s min on %(date)s',
+                                               employee=lateness.employee_id.name, kind=kinds.get(lateness.kind),
+                                               minutes=lateness.minutes, date=lateness.date)
 
     # ------------------------------------------------------------------
     # Review
@@ -50,13 +50,13 @@ class HrLateness(models.Model):
         if user.has_group('hr_attendance.group_hr_attendance_officer') and all(
                 lateness.sudo().employee_id.attendance_manager_id == user for lateness in self):
             return
-        raise UserError(_('Only the attendance manager of the employee, or the attendance officers, excuse a '
-                          'lateness.'))
+        raise UserError(self.env._('Only the attendance manager of the employee, or the attendance officers, excuse a '
+                                   'lateness.'))
 
     def _excuse(self, reason):
         self._check_can_review()
         if not reason:
-            raise UserError(_('Give the reason of the excuse.'))
+            raise UserError(self.env._('Give the reason of the excuse.'))
         self.sudo().write({'state': 'excused', 'excuse_reason': reason})
         self.sudo()._evaluate_months()
         return True
@@ -64,7 +64,7 @@ class HrLateness(models.Model):
     def action_open_excuse(self):
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Excuse'),
+            'name': self.env._('Excuse'),
             'res_model': 'hr.lateness.excuse',
             'view_mode': 'form',
             'target': 'new',
@@ -103,7 +103,7 @@ class HrLateness(models.Model):
             if any(lateness[name] != (value if name != 'policy_line_id' else lateness.policy_line_id.browse(value))
                    for name, value in values.items()):
                 lateness.write(values)
-        latenesses.filtered(lambda l: l.penalty == 'warning' and not l.warned)._warn()
+        latenesses.filtered(lambda entry: entry.penalty == 'warning' and not entry.warned)._warn()
 
     def _warn(self):
         """ A message to the employee, on their own chatter of the lateness. """
@@ -111,6 +111,7 @@ class HrLateness(models.Model):
             partner = lateness.employee_id.user_id.partner_id
             if partner:
                 lateness.employee_id.message_post(
-                    body=_('Warning: %(lateness)s. Please keep to your working hours.', lateness=lateness.display_name),
+                    body=self.env._('Warning: %(lateness)s. Please keep to your working hours.',
+                                    lateness=lateness.display_name),
                     partner_ids=partner.ids, subtype_xmlid='mail.mt_note')
             lateness.warned = True

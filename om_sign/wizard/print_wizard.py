@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -15,7 +15,7 @@ class PrintWizard(models.TransientModel):
     def action_issue_sign(self):
         """ Issue the print and open its signature request, to check the signers before sending it. """
         if len(self.res_ids or []) != 1:
-            raise UserError(_('Send one record at a time for signature.'))
+            raise UserError(self.env._('Send one record at a time for signature.'))
         issues = self._create_drafts()
         issues.action_issue()
         return issues.action_request_signature()

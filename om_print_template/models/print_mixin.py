@@ -1,4 +1,4 @@
-from odoo import _, fields, models
+from odoo import fields, models
 
 
 class PrintMixin(models.AbstractModel):
@@ -19,7 +19,7 @@ class PrintMixin(models.AbstractModel):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Prints of %s', self.display_name),
+            'name': self.env._('Prints of %s', self.display_name),
             'res_model': 'print.issue',
             'view_mode': 'list,form',
             'domain': [('res_model', '=', self._name), ('res_id', '=', self.id)],

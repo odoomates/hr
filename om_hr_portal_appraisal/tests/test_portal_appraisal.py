@@ -1,8 +1,8 @@
-from datetime import date
 
 from odoo.tests import tagged
 
 from odoo.addons.om_hr_portal.tests.common import HrPortalCase
+
 
 @tagged('post_install', '-at_install')
 class TestPortalAppraisal(HrPortalCase):
@@ -34,7 +34,8 @@ class TestPortalAppraisal(HrPortalCase):
 
     def test_goals_and_privacy(self):
         self.login_employee()
-        self.url_open('/my/hr/goals/%s/progress' % self.goal.id, data={'csrf_token': self.csrf_token(), 'progress': '70'})
+        self.url_open('/my/hr/goals/%s/progress' % self.goal.id,
+                      data={'csrf_token': self.csrf_token(), 'progress': '70'})
         self.assertEqual(self.goal.progress, 70)
         self.assertEqual(self.url_open('/my/hr/goals/%s/progress' % self.their_goal.id,
                                        data={'csrf_token': self.csrf_token(), 'progress': '5'}).status_code, 404)

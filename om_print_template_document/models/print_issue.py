@@ -6,7 +6,7 @@ from odoo import fields, models
 class PrintIssue(models.Model):
     _inherit = 'print.issue'
 
-    document_id = fields.Many2one('document.document', string='Document', readonly=True, copy=False)
+    document_id = fields.Many2one('document.document', readonly=True, copy=False)
 
     def _on_issued(self):
         super()._on_issued()
@@ -30,5 +30,6 @@ class PrintIssue(models.Model):
         self.document_id = document
 
     def _on_cancelled(self):
-        super()._on_cancelled()
+        result = super()._on_cancelled()
         self.document_id.sudo().active = False
+        return result

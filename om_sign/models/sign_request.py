@@ -2,7 +2,7 @@ import hashlib
 import uuid
 from datetime import timedelta
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 from odoo.fields import Command
 from odoo.tools.binary import BinaryBytes
@@ -31,7 +31,7 @@ class SignRequest(models.Model):
     _order = 'id desc'
 
     name = fields.Char(string='Document', required=True, tracking=True)
-    reference = fields.Char(readonly=True, copy=False, default=lambda self: _('New'))
+    reference = fields.Char(readonly=True, copy=False, default=lambda self: self.env._('New'))
     issue_id = fields.Many2one('print.issue', string='Issued Print', ondelete='restrict', index='btree_not_null',
                                readonly=True)
     res_model = fields.Char(string='Model', index=True, readonly=True)
@@ -63,12 +63,12 @@ class SignRequest(models.Model):
     date_deadline = fields.Date(string='Sign By', tracking=True)
     reminder_days = fields.Integer(string='Remind Every', default=3,
                                    help='Days between the reminders to a signer. 0 for no reminder.')
-    requested_by_id = fields.Many2one('res.users', string='Requested By', default=lambda self: self.env.user,
+    requested_by_id = fields.Many2one('res.users', default=lambda self: self.env.user,
                                       readonly=True, index=True)
     date_sent = fields.Datetime(string='Sent On', readonly=True, copy=False)
     date_signed = fields.Datetime(string='Completed On', readonly=True, copy=False)
     access_token = fields.Char(copy=False, readonly=True, index='btree_not_null', groups='base.group_user')
-    company_id = fields.Many2one('res.company', string='Company', required=True, index=True,
+    company_id = fields.Many2one('res.company', required=True, index=True,
                                  default=lambda self: self.env.company)
 
     @api.depends('res_model', 'res_id')
@@ -94,22 +94,22 @@ class SignRequest(models.Model):
     def create(self, vals_list):
         for vals in vals_list:
             vals['access_token'] = uuid.uuid4().hex
-            vals['reference'] = self.env['ir.sequence'].sudo().next_by_code('sign.request') or _('New')
+            vals['reference'] = self.env['ir.sequence'].sudo().next_by_code('sign.request') or self.env._('New')
         return super().create(vals_list)
 
     def write(self, vals):
         if not self.env.su:
             if PROTECTED_FIELDS & set(vals):
-                raise UserError(_('A signature request changes as it is signed, not by hand.'))
+                raise UserError(self.env._('A signature request changes as it is signed, not by hand.'))
             if any(request.state != 'draft' for request in self) and \
                     {'document_file', 'signer_ids', 'name', 'email_code'} & set(vals):
-                raise UserError(_('The request is sent: cancel it and send another one to change it.'))
+                raise UserError(self.env._('The request is sent: cancel it and send another one to change it.'))
         return super().write(vals)
 
-    def unlink(self):
+    @api.ondelete(at_uninstall=False)
+    def _unlink_except_sent(self):
         if any(request.state != 'draft' for request in self):
-            raise UserError(_('Only a draft request can be deleted: cancel a sent one instead.'))
-        return super().unlink()
+            raise UserError(self.env._('Only a draft request can be deleted: cancel a sent one instead.'))
 
     # ------------------------------------------------------------------
     # Creating
@@ -120,7 +120,7 @@ class SignRequest(models.Model):
         """ :return: a draft request to sign the issued print, its signers found from the roles of its template """
         issue.ensure_one()
         if issue.state != 'issued':
-            raise UserError(_('Issue %s before sending it for signature.', issue.name))
+            raise UserError(self.env._('Issue %s before sending it for signature.', issue.name))
         template = issue.template_id
         record = issue._get_record()
         signers = [Command.create({
@@ -173,21 +173,21 @@ class SignRequest(models.Model):
     def action_send(self):
         for request in self:
             if request.state != 'draft':
-                raise UserError(_('%s is already sent.', request.name))
+                raise UserError(self.env._('%s is already sent.', request.name))
             if not request.signer_ids:
-                raise UserError(_('Add the people signing %s.', request.name))
+                raise UserError(self.env._('Add the people signing %s.', request.name))
             missing = request.signer_ids.filtered(lambda signer: not signer.partner_id)
             if missing:
-                raise UserError(_('Choose who signs as %s.', missing[0].role_name or _('signer')))
+                raise UserError(self.env._('Choose who signs as %s.', missing[0].role_name or self.env._('signer')))
             no_email = request.signer_ids.filtered(lambda signer: not signer.partner_id.email)
             if no_email:
-                raise UserError(_('%s has no email address to receive the request.',
-                                  no_email[0].partner_id.display_name))
+                raise UserError(self.env._('%s has no email address to receive the request.',
+                                           no_email[0].partner_id.display_name))
             document = request._get_document()
             if not document:
-                raise UserError(_('Add the PDF to sign.'))
+                raise UserError(self.env._('Add the PDF to sign.'))
             if not request.issue_id and not document.startswith(b'%PDF'):
-                raise UserError(_('Only a PDF file can be sent for signature.'))
+                raise UserError(self.env._('Only a PDF file can be sent for signature.'))
             values = {'state': 'sent', 'date_sent': fields.Datetime.now(), 'document_hash': sha256(document)}
             if request.issue_id:
                 values.update(document_file=BinaryBytes(document),
@@ -215,7 +215,7 @@ class SignRequest(models.Model):
         self.sudo().write({'state': 'signed', 'date_signed': fields.Datetime.now()})
         pdf = self._build_signed_pdf()
         attachment = self.env['ir.attachment'].sudo().create({
-            'name': _('%s (signed).pdf', (self.document_filename or self.name).removesuffix('.pdf')),
+            'name': self.env._('%s (signed).pdf', (self.document_filename or self.name).removesuffix('.pdf')),
             'raw': pdf,
             'mimetype': 'application/pdf',
             'res_model': self._name,
@@ -225,10 +225,10 @@ class SignRequest(models.Model):
         self.env['sign.log']._log(self, 'completed', document_hash=self.signed_hash)
         partners = self.signer_ids.partner_id | self.requested_by_id.partner_id
         self.sudo().message_notify(
-            partner_ids=partners.ids, subject=_('Signed: %s', self.name), attachment_ids=attachment.ids,
+            partner_ids=partners.ids, subject=self.env._('Signed: %s', self.name), attachment_ids=attachment.ids,
             body=self.env['ir.qweb']._render('om_sign.mail_sign_completed', {'sign_request': self}),
             email_layout_xmlid='mail.mail_notification_light')
-        self.sudo().message_post(body=_('Everyone signed. The signed PDF is sent to the signers.'),
+        self.sudo().message_post(body=self.env._('Everyone signed. The signed PDF is sent to the signers.'),
                                  subtype_xmlid='mail.mt_note')
         self._call_host('_on_sign_completed')
         return True
@@ -255,13 +255,13 @@ class SignRequest(models.Model):
     def action_cancel(self):
         for request in self:
             if request.state not in ('draft', 'sent'):
-                raise UserError(_('%s can no longer be cancelled.', request.name))
+                raise UserError(self.env._('%s can no longer be cancelled.', request.name))
             invited = request.signer_ids.filtered(lambda signer: signer.state == 'to_sign')
             request.sudo().write({'state': 'cancelled'})
             if request.date_sent:
                 self.env['sign.log']._log(request, 'cancelled')
             for signer in invited:
-                signer._notify('om_sign.mail_sign_cancelled', _('No longer to sign: %s', request.name))
+                signer._notify('om_sign.mail_sign_cancelled', self.env._('No longer to sign: %s', request.name))
             request._call_host('_on_sign_cancelled')
         return True
 
@@ -275,7 +275,7 @@ class SignRequest(models.Model):
             request.sudo().write({'state': 'expired'})
             self.env['sign.log']._log(request, 'expired')
             request.sudo().message_post(
-                body=_('The request expired before everyone signed.'), subtype_xmlid='mail.mt_note',
+                body=self.env._('The request expired before everyone signed.'), subtype_xmlid='mail.mt_note',
                 partner_ids=request.requested_by_id.partner_id.ids)
             request._call_host('_on_sign_cancelled')
         now = fields.Datetime.now()
@@ -323,7 +323,7 @@ class SignRequest(models.Model):
     def action_download_signed(self):
         self.ensure_one()
         if not self.signed_attachment_id:
-            raise UserError(_('%s is not signed by everyone yet.', self.name))
+            raise UserError(self.env._('%s is not signed by everyone yet.', self.name))
         return {
             'type': 'ir.actions.act_url',
             'url': '/web/content/%s?download=true' % self.signed_attachment_id.id,
@@ -334,7 +334,7 @@ class SignRequest(models.Model):
         self.ensure_one()
         record = self.issue_id or self._get_record()
         if not record:
-            raise UserError(_('The record of %s no longer exists.', self.name))
+            raise UserError(self.env._('The record of %s no longer exists.', self.name))
         return {
             'type': 'ir.actions.act_window',
             'res_model': record._name,
