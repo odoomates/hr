@@ -19,6 +19,7 @@
         'views/print_views.xml',
         'views/menu.xml',
     ],
+    'demo': ['demo/om_sign_demo.xml'],
     'images': ['static/description/banner.gif'],
     'application': True,
 }
