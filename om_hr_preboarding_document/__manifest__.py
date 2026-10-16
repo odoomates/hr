@@ -1,0 +1,14 @@
+{
+    'name': 'HR Pre-boarding: Documents',
+    'version': '20.0.1.0.0',
+    'category': 'Human Resources',
+    'summary': 'New hires upload their passport, ID or permits as steps of their pre-boarding',
+    'author': 'Odoo Mates',
+    'maintainer': 'Odoo Mates',
+    'support': 'odoomates@gmail.com',
+    'license': 'LGPL-3',
+    'depends': ['om_hr_preboarding', 'om_hr_portal_document'],
+    'data': ['views/preboarding_views.xml'],
+    'images': ['static/description/banner.gif'],
+    'auto_install': True,
+}
