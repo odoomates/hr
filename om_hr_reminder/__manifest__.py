@@ -13,5 +13,6 @@
         'data/om_hr_reminder_data.xml',
         'views/hr_employee_views.xml',
     ],
+    'demo': ['demo/om_hr_reminder_demo.xml'],
     'images': ['static/description/banner.gif'],
 }

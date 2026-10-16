@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- birthdays of the core demo employees: two this month, shown in My HR > Celebrations, one kept private -->
+    <record id="hr.employee_fpi" model="hr.employee">
+        <field name="birthday" eval="(DateTime.today() + relativedelta(years=-31)).strftime('%Y-%m-%d')"/>
+        <field name="birthday_public_display" eval="True"/>
+    </record>
+    <record id="hr.employee_jth" model="hr.employee">
+        <field name="birthday" eval="(DateTime.today() + relativedelta(day=31, years=-27)).strftime('%Y-%m-%d')"/>
+        <field name="birthday_public_display" eval="True"/>
+    </record>
+    <record id="hr.employee_niv" model="hr.employee">
+        <field name="birthday" eval="(DateTime.today() + relativedelta(days=10, years=-36)).strftime('%Y-%m-%d')"/>
+        <field name="birthday_public_display" eval="False"/>
+    </record>
+
+</odoo>
