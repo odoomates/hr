@@ -7,7 +7,7 @@ class HrShift(models.Model):
     _inherit = 'hr.shift'
 
     payslip_id = fields.Many2one('hr.payslip', string='Allowance Paid On', readonly=True, copy=False,
-                                    index='btree_not_null', ondelete='set null')
+                                    index='btree_not_null', ondelete='set null', check_company=True)
     allowance = fields.Monetary(related='template_id.allowance', string='Allowance')
     currency_id = fields.Many2one(related='template_id.currency_id')
 
