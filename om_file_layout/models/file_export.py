@@ -5,11 +5,12 @@ class FileExport(models.Model):
     """ A file exported with a layout, kept as it was sent: who exported it, when, and for which records. """
     _name = 'file.export'
     _description = 'File Export'
+    _check_company_auto = True
     _order = 'create_date desc, id desc'
 
     name = fields.Char(string='File', required=True, readonly=True)
     layout_id = fields.Many2one('file.layout', required=True, readonly=True, index=True,
-                                ondelete='restrict')
+                                ondelete='restrict', check_company=True)
     res_model = fields.Char(string='Model', readonly=True)
     res_ids = fields.Json(string='Records', readonly=True)
     record_count = fields.Integer(string='Records Exported', readonly=True)
