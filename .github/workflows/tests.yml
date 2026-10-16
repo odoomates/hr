@@ -18,8 +18,8 @@ jobs:
   lint:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.13'
       - run: pip install ruff pylint-odoo
@@ -58,7 +58,7 @@ jobs:
       ODOO_PATH: ${{ github.workspace }}/odoo
       LOG_DIR: ${{ github.workspace }}/logs
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           path: hr
       - uses: ./hr/.github/actions/setup-odoo
@@ -66,7 +66,7 @@ jobs:
         run: hr/.github/scripts/run_odoo_tests.sh test_suite "${{ matrix.modules }}"
       - name: Log
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: log-${{ strategy.job-index }}
           path: logs/
