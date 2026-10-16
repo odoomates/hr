@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="sign_request_view_form" model="ir.ui.view">
+        <field name="name">sign.request.view.form</field>
+        <field name="model">sign.request</field>
+        <field name="arch" type="xml">
+            <form string="Signature Request">
+                <header>
+                    <button name="action_send" string="Send" type="object" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_download_signed" string="Download Signed PDF" type="object"
+                            class="btn-primary" invisible="state != 'signed'"/>
+                    <button name="action_cancel" string="Cancel" type="object" invisible="state not in ('draft', 'sent')"
+                            confirm="The signers can no longer sign it. Cancel the request?"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,sent,signed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_record" type="object" class="oe_stat_button" icon="open_in_new"
+                                invisible="not issue_id and not res_name">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text"><field name="res_name"/></span>
+                            </div>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Declined" bg_color="text-bg-warning" invisible="state != 'declined'"/>
+                    <widget name="web_ribbon" title="Cancelled" bg_color="text-bg-danger" invisible="state != 'cancelled'"/>
+                    <widget name="web_ribbon" title="Expired" bg_color="text-bg-secondary" invisible="state != 'expired'"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="state != 'draft'" placeholder="e.g. Employment Contract"/></h1>
+                        <field name="reference" class="text-muted"/>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="issue_id" invisible="not issue_id"/>
+                            <field name="document_file" filename="document_filename" readonly="state != 'draft' or issue_id"
+                                   invisible="issue_id and state == 'draft'"/>
+                            <field name="document_filename" invisible="1"/>
+                            <field name="progress" invisible="state == 'draft'"/>
+                            <field name="signed_attachment_id" invisible="not signed_attachment_id"/>
+                        </group>
+                        <group>
+                            <field name="date_deadline" readonly="state != 'draft'"/>
+                            <field name="reminder_days" readonly="state != 'draft'"/>
+                            <field name="email_code" readonly="state != 'draft'"/>
+                            <field name="requested_by_id"/>
+                            <field name="date_sent" invisible="not date_sent"/>
+                            <field name="date_signed" invisible="not date_signed"/>
+                            <field name="company_id" groups="base.group_multi_company" readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Signers" name="signers">
+                            <field name="signer_ids" readonly="state != 'draft'">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="role_name" placeholder="e.g. Employee"/>
+                                    <field name="partner_id" required="1"/>
+                                    <field name="email"/>
+                                    <field name="state" widget="badge" decoration-success="state == 'signed'"
+                                           decoration-warning="state == 'to_sign'" decoration-danger="state == 'declined'"
+                                           column_invisible="parent.state == 'draft'"/>
+                                    <field name="date_signed" column_invisible="parent.state == 'draft'"/>
+                                    <field name="is_me" column_invisible="1"/>
+                                    <field name="request_state" column_invisible="1"/>
+                                    <button name="action_sign" type="object" string="Sign" class="btn-primary"
+                                            invisible="not is_me or state != 'to_sign' or request_state != 'sent'"/>
+                                    <button name="action_send_again" type="object" string="Send Again"
+                                            invisible="state != 'to_sign' or request_state != 'sent'"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Message" name="message">
+                            <field name="message" readonly="state != 'draft'"
+                                   placeholder="A note for the signers, shown in the email and on the signing page."/>
+                        </page>
+                        <page string="Evidence" name="evidence" invisible="state == 'draft'">
+                            <group>
+                                <field name="document_hash"/>
+                                <field name="signed_hash" invisible="not signed_hash"/>
+                            </group>
+                            <field name="log_ids">
+                                <list>
+                                    <field name="date"/>
+                                    <field name="event"/>
+                                    <field name="partner_id"/>
+                                    <field name="ip"/>
+                                    <field name="user_agent" optional="hide"/>
+                                    <field name="note" optional="show"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="sign_request_view_list" model="ir.ui.view">
+        <field name="name">sign.request.view.list</field>
+        <field name="model">sign.request</field>
+        <field name="arch" type="xml">
+            <list string="Signature Requests">
+                <field name="reference" optional="show"/>
+                <field name="name"/>
+                <field name="res_name" optional="show"/>
+                <field name="requested_by_id" widget="many2one_avatar_user" optional="show"/>
+                <field name="date_sent" optional="show"/>
+                <field name="date_deadline" optional="show"/>
+                <field name="progress"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-warning="state == 'sent'"
+                       decoration-success="state == 'signed'" decoration-danger="state in ('declined', 'cancelled')"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="sign_request_view_search" model="ir.ui.view">
+        <field name="name">sign.request.view.search</field>
+        <field name="model">sign.request</field>
+        <field name="arch" type="xml">
+            <search string="Signature Requests">
+                <field name="name"/>
+                <field name="reference"/>
+                <field name="signer_ids" string="Signer" filter_domain="[('signer_ids.partner_id', 'ilike', self)]"/>
+                <filter name="to_sign" string="To Sign by Me"
+                        domain="[('state', '=', 'sent'), ('signer_ids', 'any', [('partner_id.user_ids', 'in', [uid]), ('state', '=', 'to_sign')])]"/>
+                <filter name="my_requests" string="Sent by Me" domain="[('requested_by_id', '=', uid)]"/>
+                <separator/>
+                <filter name="waiting" string="Waiting for Signatures" domain="[('state', '=', 'sent')]"/>
+                <filter name="signed" string="Signed" domain="[('state', '=', 'signed')]"/>
+                <filter name="closed" string="Declined, Cancelled or Expired"
+                        domain="[('state', 'in', ('declined', 'cancelled', 'expired'))]"/>
+                <group>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_requested_by" string="Requested By" context="{'group_by': 'requested_by_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="sign_request_action" model="ir.actions.act_window">
+        <field name="name">Signature Requests</field>
+        <field name="res_model">sign.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_my_requests': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Send a document for signature</p>
+            <p>Upload a PDF and add the people signing it, or send a print from its form: they sign from the link
+                emailed to them, in their order, and everyone gets the signed PDF.</p>
+        </field>
+    </record>
+
+    <record id="sign_request_action_to_sign" model="ir.actions.act_window">
+        <field name="name">To Sign</field>
+        <field name="res_model">sign.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_to_sign': 1, 'create': False}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Nothing to sign</p>
+            <p>The documents sent to you for signature show here.</p>
+        </field>
+    </record>
+
+</odoo>

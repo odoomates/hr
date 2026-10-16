@@ -1,0 +1,13 @@
+id,name,model_id,group_id/id,operation,domain
+access_sign_role_user,sign.role.user,sign.role,base.group_user,r,
+access_sign_role_manager,sign.role.manager,sign.role,om_print_template.group_print_manager,crud,
+access_sign_request_signed_by,sign.request.signed.by,sign.request,base.group_user,r,"[('signer_ids.partner_id', '=', user.partner_id.id), ('state', '!=', 'draft')]"
+access_sign_request_user,sign.request.user,sign.request,om_sign.group_sign_user,crud,"[('requested_by_id', '=', user.id)]"
+access_sign_request_manager,sign.request.manager,sign.request,om_sign.group_sign_manager,crud,
+sign_request_company_rule,Signature requests: multi-company,sign.request,,crud,"[('company_id', 'in', company_ids)]"
+access_sign_request_signer_signer,sign.request.signer.signer,sign.request.signer,base.group_user,r,"[('request_id.signer_ids.partner_id', '=', user.partner_id.id), ('request_id.state', '!=', 'draft')]"
+access_sign_request_signer_user,sign.request.signer.user,sign.request.signer,om_sign.group_sign_user,crud,"[('request_id.requested_by_id', '=', user.id)]"
+access_sign_request_signer_manager,sign.request.signer.manager,sign.request.signer,om_sign.group_sign_manager,crud,
+access_sign_log_signer,sign.log.signer,sign.log,base.group_user,r,"[('request_id.signer_ids.partner_id', '=', user.partner_id.id), ('request_id.state', '!=', 'draft')]"
+access_sign_log_user,sign.log.user,sign.log,om_sign.group_sign_user,r,"[('request_id.requested_by_id', '=', user.id)]"
+access_sign_log_manager,sign.log.manager,sign.log,om_sign.group_sign_manager,r,
