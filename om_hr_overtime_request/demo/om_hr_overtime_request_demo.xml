@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- overtime asked in advance: one waiting for the manager, one approved -->
+    <record id="demo_overtime_closing" model="hr.overtime.request">
+        <field name="employee_id" ref="hr.employee_qdp"/>
+        <field name="date" eval="(DateTime.today() + relativedelta(days=2)).strftime('%Y-%m-%d')"/>
+        <field name="hours">2</field>
+        <field name="reason">Month-end closing</field>
+    </record>
+
+    <record id="demo_overtime_release" model="hr.overtime.request">
+        <field name="employee_id" ref="hr.employee_light"/>
+        <field name="date" eval="(DateTime.today() + relativedelta(days=-3)).strftime('%Y-%m-%d')"/>
+        <field name="hours">1.5</field>
+        <field name="reason">Release of the new version to the customers</field>
+    </record>
+
+    <record id="demo_overtime_inventory" model="hr.overtime.request">
+        <field name="employee_id" ref="hr.employee_al"/>
+        <field name="date" eval="(DateTime.today() + relativedelta(days=5)).strftime('%Y-%m-%d')"/>
+        <field name="hours">4</field>
+        <field name="reason">Stock count on Saturday</field>
+    </record>
+
+    <function model="hr.overtime.request" name="action_submit"
+              eval="[[ref('demo_overtime_closing'), ref('demo_overtime_release')]]"/>
+    <function model="hr.overtime.request" name="action_approval_approve" eval="[[ref('demo_overtime_release')]]"/>
+
+</odoo>

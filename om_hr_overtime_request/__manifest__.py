@@ -13,5 +13,6 @@
         'data/om_hr_overtime_request_data.xml',
         'views/om_hr_overtime_request_views.xml',
     ],
+    'demo': ['demo/om_hr_overtime_request_demo.xml'],
     'images': ['static/description/banner.gif'],
 }
