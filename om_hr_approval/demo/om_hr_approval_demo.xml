@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Marc Demo asks HR: a change still in draft, a document waiting for approval, a document approved -->
+    <record id="demo_request_update" model="hr.request">
+        <field name="employee_id" ref="hr.employee_qdp"/>
+        <field name="category_id" ref="request_category_update"/>
+        <field name="description">I moved: please update my private address.</field>
+    </record>
+
+    <record id="demo_request_waiting" model="hr.request">
+        <field name="employee_id" ref="hr.employee_qdp"/>
+        <field name="category_id" ref="request_category_document"/>
+        <field name="description">A letter for my visa application.</field>
+    </record>
+    <function model="hr.request" name="action_approval_submit" uid="base.user_demo"
+              eval="[ref('demo_request_waiting')]"/>
+
+    <record id="demo_request_approved" model="hr.request">
+        <field name="employee_id" ref="hr.employee_qdp"/>
+        <field name="category_id" ref="request_category_other"/>
+        <field name="date" eval="(DateTime.today() - relativedelta(days=10)).strftime('%Y-%m-%d')"/>
+        <field name="description">A parking badge for my new car.</field>
+    </record>
+    <function model="hr.request" name="action_approval_submit" uid="base.user_demo"
+              eval="[ref('demo_request_approved')]"/>
+    <!-- the manager, then HR -->
+    <function model="hr.request" name="action_approval_approve" uid="base.user_admin"
+              eval="[ref('demo_request_approved')]"/>
+    <function model="hr.request" name="action_approval_approve" uid="base.user_admin"
+              eval="[ref('demo_request_approved')]"/>
+
+</odoo>

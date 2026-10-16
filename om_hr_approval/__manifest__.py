@@ -15,6 +15,7 @@
         'views/om_hr_request_views.xml',
         'views/menu.xml',
     ],
+    'demo': ['demo/om_hr_approval_demo.xml'],
     'images': ['static/description/banner.gif'],
     'auto_install': True,
 }
