@@ -6,7 +6,7 @@ from odoo import fields, models
 class PrintIssue(models.Model):
     _inherit = 'print.issue'
 
-    document_id = fields.Many2one('document.document', readonly=True, copy=False)
+    document_id = fields.Many2one('document.document', readonly=True, copy=False, check_company=True)
 
     def _on_issued(self):
         super()._on_issued()
