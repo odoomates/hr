@@ -18,6 +18,7 @@
         'views/om_print_wizard_views.xml',
         'views/menu.xml',
     ],
+    'demo': ['demo/om_print_template_demo.xml'],
     'images': ['static/description/banner.gif'],
     'application': True,
 }
