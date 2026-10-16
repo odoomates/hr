@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- a new hire starting in two weeks, getting ready: their emergency contact waits for HR, the first day read -->
+    <record id="demo_new_hire" model="hr.employee">
+        <field name="name">Nora Newman</field>
+        <field name="private_email">nora.newman@example.com</field>
+        <field name="job_id" ref="hr.job_developer"/>
+        <field name="job_title">Developer</field>
+        <field name="department_id" ref="hr.dep_rd"/>
+        <field name="parent_id" ref="hr.employee_qdp"/>
+        <field name="date_version" eval="(DateTime.today() + relativedelta(days=14)).strftime('%Y-%m-%d')"/>
+        <field name="contract_date_start" eval="(DateTime.today() + relativedelta(days=14)).strftime('%Y-%m-%d')"/>
+    </record>
+
+    <function model="hr.employee" name="action_start_preboarding" eval="[[ref('demo_new_hire')]]"/>
+
+    <function model="hr.preboarding.line" name="_submit">
+        <value model="hr.preboarding.line"
+               search="[('preboarding_id.employee_id', '=', ref('demo_new_hire')), ('step_id', '=', ref('step_emergency'))]"/>
+        <value eval="{'emergency_contact': 'Paul Newman', 'emergency_phone': '+1 555 0100'}"/>
+    </function>
+
+    <function model="hr.preboarding.line" name="_submit">
+        <value model="hr.preboarding.line"
+               search="[('preboarding_id.employee_id', '=', ref('demo_new_hire')), ('step_id', '=', ref('step_first_day'))]"/>
+    </function>
+
+</odoo>

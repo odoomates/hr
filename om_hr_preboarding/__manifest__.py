@@ -14,5 +14,6 @@
         'views/portal_templates.xml',
         'views/hr_preboarding_views.xml',
     ],
+    'demo': ['demo/om_hr_preboarding_demo.xml'],
     'images': ['static/description/banner.gif'],
 }
