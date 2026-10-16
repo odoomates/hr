@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- two rostered developers: this week published, next week in draft; an open shift to claim, a swap asked -->
+
+    <record id="demo_shift_stw_mon" model="hr.shift">
+        <field name="employee_id" ref="hr.employee_stw"/>
+        <field name="template_id" ref="template_morning"/>
+        <field name="date" eval="(DateTime.today() + relativedelta(days=-6, weekday=0)).strftime('%Y-%m-%d')"/>
+        <field name="hour_from">6</field>
+        <field name="hour_to">14</field>
+        <field name="break_from">10</field>
+        <field name="break_to">10.5</field>
+    </record>
+    <record id="demo_shift_stw_tue" model="hr.shift">
+        <field name="employee_id" ref="hr.employee_stw"/>
+        <field name="template_id" ref="template_morning"/>
+        <field name="date" eval="(DateTime.today() + relativedelta(days=-6, weekday=0) + relativedelta(days=1)).strftime('%Y-%m-%d')"/>
+        <field name="hour_from">6</field>
+        <field name="hour_to">14</field>
+        <field name="break_from">10</field>
+        <field name="break_to">10.5</field>
+    </record>
+    <record id="demo_shift_stw_wed" model="hr.shift">
+        <field name="employee_id" ref="hr.employee_stw"/>
+        <field name="template_id" ref="template_morning"/>
+        <field name="date" eval="(DateTime.today() + relativedelta(days=-6, weekday=0) + relativedelta(days=2)).strftime('%Y-%m-%d')"/>
+        <field name="hour_from">6</field>
+        <field name="hour_to">14</field>
+        <field name="break_from">10</field>
+        <field name="break_to">10.5</field>
+    </record>
+    <record id="demo_shift_mit_mon" model="hr.shift">
+        <field name="employee_id" ref="hr.employee_mit"/>
+        <field name="template_id" ref="template_evening"/>
+        <field name="date" eval="(DateTime.today() + relativedelta(days=-6, weekday=0)).strftime('%Y-%m-%d')"/>
+        <field name="hour_from">14</field>
+        <field name="hour_to">22</field>
+        <field name="break_from">18</field>
+        <field name="break_to">18.5</field>
+    </record>
+    <record id="demo_shift_mit_wed" model="hr.shift">
+        <field name="employee_id" ref="hr.employee_mit"/>
+        <field name="template_id" ref="template_evening"/>
+        <field name="date" eval="(DateTime.today() + relativedelta(days=-6, weekday=0) + relativedelta(days=2)).strftime('%Y-%m-%d')"/>
+        <field name="hour_from">14</field>
+        <field name="hour_to">22</field>
+        <field name="break_from">18</field>
+        <field name="break_to">18.5</field>
+    </record>
+    <record id="demo_shift_mit_thu" model="hr.shift">
+        <field name="employee_id" ref="hr.employee_mit"/>
+        <field name="template_id" ref="template_evening"/>
+        <field name="date" eval="(DateTime.today() + relativedelta(days=-6, weekday=0) + relativedelta(days=3)).strftime('%Y-%m-%d')"/>
+        <field name="hour_from">14</field>
+        <field name="hour_to">22</field>
+        <field name="break_from">18</field>
+        <field name="break_to">18.5</field>
+    </record>
+
+    <!-- next week, still in draft -->
+    <record id="demo_shift_stw_next_mon" model="hr.shift">
+        <field name="employee_id" ref="hr.employee_stw"/>
+        <field name="template_id" ref="template_morning"/>
+        <field name="date" eval="(DateTime.today() + relativedelta(days=1, weekday=0)).strftime('%Y-%m-%d')"/>
+        <field name="hour_from">6</field>
+        <field name="hour_to">14</field>
+        <field name="break_from">10</field>
+        <field name="break_to">10.5</field>
+    </record>
+    <record id="demo_shift_mit_next_mon" model="hr.shift">
+        <field name="employee_id" ref="hr.employee_mit"/>
+        <field name="template_id" ref="template_evening"/>
+        <field name="date" eval="(DateTime.today() + relativedelta(days=1, weekday=0)).strftime('%Y-%m-%d')"/>
+        <field name="hour_from">14</field>
+        <field name="hour_to">22</field>
+        <field name="break_from">18</field>
+        <field name="break_to">18.5</field>
+    </record>
+
+    <!-- an open shift next week, published for the employees to claim -->
+    <record id="demo_shift_open" model="hr.shift">
+        <field name="template_id" ref="template_morning"/>
+        <field name="date" eval="(DateTime.today() + relativedelta(days=1, weekday=0) + relativedelta(days=3)).strftime('%Y-%m-%d')"/>
+        <field name="hour_from">6</field>
+        <field name="hour_to">14</field>
+        <field name="break_from">10</field>
+        <field name="break_to">10.5</field>
+        <field name="note">Cover for the stock count.</field>
+    </record>
+
+    <function model="hr.shift" name="action_publish" context="{'om_shift_override': True}"
+              eval="[[ref('demo_shift_stw_mon'), ref('demo_shift_stw_tue'), ref('demo_shift_stw_wed'),
+                      ref('demo_shift_mit_mon'), ref('demo_shift_mit_wed'), ref('demo_shift_mit_thu'),
+                      ref('demo_shift_open')]]"/>
+
+    <record id="demo_unavailability_stw" model="hr.shift.unavailability">
+        <field name="employee_id" ref="hr.employee_stw"/>
+        <field name="date_from" eval="(DateTime.today() + relativedelta(days=1, weekday=0) + relativedelta(days=4)).strftime('%Y-%m-%d')"/>
+        <field name="date_to" eval="(DateTime.today() + relativedelta(days=1, weekday=0) + relativedelta(days=4)).strftime('%Y-%m-%d')"/>
+        <field name="reason">Medical appointment</field>
+    </record>
+
+    <!-- Sharlene claims the open shift: it waits for its approval -->
+    <record id="demo_request_claim" model="hr.shift.request">
+        <field name="kind">claim</field>
+        <field name="employee_id" ref="hr.employee_niv"/>
+        <field name="shift_id" ref="demo_shift_open"/>
+        <field name="note">I can take it.</field>
+    </record>
+    <function model="hr.shift.request" name="action_submit" eval="[[ref('demo_request_claim')]]"/>
+
+    <!-- Anita asks Randall to swap their Wednesday shifts: it waits for Randall -->
+    <record id="demo_request_swap" model="hr.shift.request">
+        <field name="kind">swap</field>
+        <field name="employee_id" ref="hr.employee_mit"/>
+        <field name="shift_id" ref="demo_shift_mit_wed"/>
+        <field name="target_shift_id" ref="demo_shift_stw_wed"/>
+        <field name="note">A family dinner on Wednesday evening.</field>
+    </record>
+    <function model="hr.shift.request" name="action_submit" eval="[[ref('demo_request_swap')]]"/>
+
+</odoo>

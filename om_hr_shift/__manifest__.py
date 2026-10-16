@@ -15,6 +15,7 @@
         'data/om_hr_shift_data.xml',
         'views/om_hr_shift_views.xml',
     ],
+    'demo': ['demo/om_hr_shift_demo.xml'],
     'assets': {
         'web.assets_backend': [
             'om_hr_shift/static/src/**/*',

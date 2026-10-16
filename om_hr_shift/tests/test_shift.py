@@ -208,7 +208,9 @@ class TestShift(TransactionCase):
         theirs.action_publish()
         open_shift = self.shift(self.night, employee=self.env['hr.employee'])
         open_shift.action_publish()
-        seen = self.env['hr.shift'].with_user(self.user_a).search([])
+        # among the shifts of the test: the database may hold others, e.g. the open shifts of the demo
+        mine = published | draft | theirs | open_shift
+        seen = self.env['hr.shift'].with_user(self.user_a).search([('id', 'in', mine.ids)])
         self.assertEqual(seen, published | open_shift)
         with self.assertRaises(AccessError):
             draft.with_user(self.user_a).read(['date'])
