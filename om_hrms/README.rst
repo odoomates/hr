@@ -52,6 +52,10 @@ What it installs:
 * ``om_hr_recruitment_offer`` HR Job Offers: offers made from the applicant,
   approved, signed by the company and the candidate, and turned into the
   contract of the new employee (installs Recruitment).
+* ``om_hr_preboarding`` HR Pre-boarding: new hires get ready before their first
+  day on the website, their details reviewed by HR, with the bridges for
+  documents to upload (``om_hr_preboarding_document``), policies and signatures
+  (``om_hr_preboarding_sign``) and accepted job offers (``om_hr_preboarding_offer``).
 * ``om_hr_certificate`` HR Certificates: salary, employment and experience
   certificates and NOC, requested by the employees and approved.
 * ``om_hr_appraisal`` HR Appraisals: self assessment, manager review and
