@@ -14,6 +14,7 @@
         'data/offer_data.xml',
         'views/offer_views.xml',
     ],
+    'demo': ['demo/om_hr_recruitment_offer_demo.xml'],
     'images': ['static/description/banner.gif'],
     'auto_install': True,
 }

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- offers to the demo applicants: one waiting for its approval, one approved and ready to send, one draft -->
+    <record id="demo_offer_cto" model="hr.applicant.offer">
+        <field name="applicant_id" ref="hr_recruitment.hr_case_cto3"/>
+        <field name="job_id" ref="hr.job_cto"/>
+        <field name="department_id" ref="hr.dep_rd"/>
+        <field name="employee_type_id" ref="hr.contract_type_employee"/>
+        <field name="wage">7500</field>
+        <field name="date_start" eval="(DateTime.today() + relativedelta(months=1, day=1)).strftime('%Y-%m-%d')"/>
+        <field name="trial_date_end" eval="(DateTime.today() + relativedelta(months=4, day=1)).strftime('%Y-%m-%d')"/>
+        <field name="benefits">A company car and 30 days of leave a year.</field>
+    </record>
+
+    <record id="demo_offer_developer" model="hr.applicant.offer">
+        <field name="applicant_id" ref="hr_recruitment.hr_case_programmer"/>
+        <field name="job_id" ref="hr.job_developer"/>
+        <field name="department_id" ref="hr.dep_rd"/>
+        <field name="employee_type_id" ref="hr.contract_type_employee"/>
+        <field name="wage">4200</field>
+        <field name="date_start" eval="(DateTime.today() + relativedelta(days=21)).strftime('%Y-%m-%d')"/>
+        <field name="trial_date_end" eval="(DateTime.today() + relativedelta(days=21, months=3)).strftime('%Y-%m-%d')"/>
+        <field name="benefits">A laptop of your choice and a training budget.</field>
+    </record>
+
+    <record id="demo_offer_consultant" model="hr.applicant.offer">
+        <field name="applicant_id" ref="hr_recruitment.hr_case_advertisement4"/>
+        <field name="job_id" ref="hr.job_consultant"/>
+        <field name="department_id" ref="hr.dep_ps"/>
+        <field name="wage">3600</field>
+        <field name="date_start" eval="(DateTime.today() + relativedelta(months=2, day=1)).strftime('%Y-%m-%d')"/>
+    </record>
+
+    <function model="hr.applicant.offer" name="action_submit"
+              eval="[[ref('demo_offer_cto'), ref('demo_offer_developer')]]"/>
+    <function model="hr.applicant.offer" name="action_approval_approve" eval="[[ref('demo_offer_developer')]]"/>
+
+</odoo>
