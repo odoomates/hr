@@ -2,27 +2,27 @@ from odoo import http
 from odoo.http import request
 from odoo.tools import html2plaintext, plaintext2html
 
-from odoo.addons.om_hr_portal.controllers.portal import OmHrPortal
+from odoo.addons.om_hr_portal.controllers.portal import HrPortal
 
 
-class OmHrPortalAppraisal(OmHrPortal):
+class HrPortalAppraisal(HrPortal):
 
     @http.route('/my/hr/appraisals', type='http', auth='user', website=True)
-    def om_hr_appraisals(self, **kwargs):
-        employee = self._om_employee()
-        appraisals = request.env['om.hr.appraisal'].sudo().search(
+    def hr_appraisals(self, **kwargs):
+        employee = self._employee()
+        appraisals = request.env['hr.appraisal'].sudo().search(
             [('employee_id', '=', employee.id), ('state', '!=', 'cancel')])
-        goals = request.env['om.hr.appraisal.goal'].sudo().search([('employee_id', '=', employee.id)])
-        return request.render('om_hr_portal_appraisal.portal_my_appraisals', self._om_values(
-            'om_hr_appraisals', appraisals=appraisals, goals=goals, om_section='Appraisals'))
+        goals = request.env['hr.appraisal.goal'].sudo().search([('employee_id', '=', employee.id)])
+        return request.render('om_hr_portal_appraisal.portal_my_appraisals', self._values(
+            'hr_appraisals', appraisals=appraisals, goals=goals, om_section='Appraisals'))
 
     @http.route('/my/hr/appraisals/<int:appraisal_id>', type='http', auth='user', website=True)
-    def om_hr_appraisal(self, appraisal_id, saved=None, **kwargs):
-        appraisal = self._om_own('om.hr.appraisal', appraisal_id)
+    def hr_appraisal(self, appraisal_id, saved=None, **kwargs):
+        appraisal = self._own('hr.appraisal', appraisal_id)
         if appraisal.state == 'cancel':
             raise request.not_found()
         # what the employee may read: their own assessment, and the review of the manager once it is done
-        return request.render('om_hr_portal_appraisal.portal_my_appraisal', self._om_values(
+        return request.render('om_hr_portal_appraisal.portal_my_appraisal', self._values(
             'om_hr_appraisal', appraisal=appraisal, saved=saved,
             self_text=html2plaintext(appraisal.employee_feedback_html or ''),
             manager_feedback=appraisal.manager_feedback_html if appraisal.state == 'done' else False,
@@ -30,8 +30,8 @@ class OmHrPortalAppraisal(OmHrPortal):
 
     @http.route('/my/hr/appraisals/<int:appraisal_id>/save', type='http', auth='user', website=True,
                 methods=['POST'])
-    def om_hr_appraisal_save(self, appraisal_id, **post):
-        appraisal = self._om_own('om.hr.appraisal', appraisal_id)
+    def hr_appraisal_save(self, appraisal_id, **post):
+        appraisal = self._own('hr.appraisal', appraisal_id)
         if appraisal.state != 'self':
             raise request.not_found()
         appraisal.employee_feedback_html = plaintext2html(post.get('feedback') or '')
@@ -41,8 +41,8 @@ class OmHrPortalAppraisal(OmHrPortal):
         return request.redirect('/my/hr/appraisals/%s?saved=1' % appraisal.id)
 
     @http.route('/my/hr/goals/<int:goal_id>/progress', type='http', auth='user', website=True, methods=['POST'])
-    def om_hr_goal_progress(self, goal_id, **post):
-        goal = self._om_own('om.hr.appraisal.goal', goal_id)
+    def hr_goal_progress(self, goal_id, **post):
+        goal = self._own('hr.appraisal.goal', goal_id)
         progress = max(0, min(100, int(float(post.get('progress') or 0))))
         goal.progress = progress
         return request.redirect('/my/hr/appraisals')

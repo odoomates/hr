@@ -2,19 +2,19 @@ from datetime import date
 
 from odoo.tests import tagged
 
-from odoo.addons.om_hr_portal.tests.common import OmHrPortalCase
+from odoo.addons.om_hr_portal.tests.common import HrPortalCase
 
 @tagged('post_install', '-at_install')
-class TestPortalAppraisal(OmHrPortalCase):
+class TestPortalAppraisal(HrPortalCase):
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        Appraisal = cls.env['om.hr.appraisal']
+        Appraisal = cls.env['hr.appraisal']
         cls.appraisal = Appraisal.create({'employee_id': cls.employee.id})
         cls.appraisal.action_start()
         cls.theirs = Appraisal.create({'employee_id': cls.colleague.id})
-        Goal = cls.env['om.hr.appraisal.goal']
+        Goal = cls.env['hr.appraisal.goal']
         cls.goal = Goal.create({'name': 'Portal Goal', 'employee_id': cls.employee.id})
         cls.their_goal = Goal.create({'name': 'Their Goal', 'employee_id': cls.colleague.id})
 
