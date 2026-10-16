@@ -33,8 +33,8 @@ class TestShiftPayroll(TransactionCase):
         cls.employee = cls.env['hr.employee'].create({
             'name': 'Night Worker', 'tz': 'UTC', 'date_version': date(2026, 1, 1),
             'contract_date_start': date(2026, 1, 1), 'wage': 3000.0, 'struct_id': cls.structure.id})
-        cls.employee._om_start_rostering(date(2026, 9, 1))
-        cls.shifts = cls.env['om.hr.shift'].create([
+        cls.employee._start_rostering(date(2026, 9, 1))
+        cls.shifts = cls.env['hr.shift'].create([
             dict(cls.night._shift_values(), employee_id=cls.employee.id, date=date(2026, 9, day)) for day in (7, 8, 9)])
         cls.shifts.with_context(om_shift_override=True).action_publish()
 
@@ -60,7 +60,7 @@ class TestShiftPayroll(TransactionCase):
             'date_from': datetime(2026, 9, 8, 0, 0), 'date_to': datetime(2026, 9, 10, 0, 0)})
         september = self.payslip(9)
         self.assertEqual(self.total(september), 40, 'the night on time off is not paid')
-        self.assertEqual(september.om_shift_ids, self.shifts[0] | self.shifts[2])
+        self.assertEqual(september.shift_ids, self.shifts[0] | self.shifts[2])
         september.action_payslip_done()
         self.assertEqual(self.total(self.payslip(10)), 0, 'paid once')
 
@@ -69,5 +69,5 @@ class TestShiftPayroll(TransactionCase):
         self.assertEqual(self.total(september), 60)
         september.action_payslip_done()
         september.action_payslip_cancel()
-        self.assertFalse(self.shifts.om_payslip_id)
+        self.assertFalse(self.shifts.payslip_id)
         self.assertEqual(self.total(self.payslip(10)), 60, 'due again on the next payslip')
