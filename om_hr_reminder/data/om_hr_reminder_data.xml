@@ -5,7 +5,7 @@
         <field name="name">HR Reminders: next birthdays, work anniversaries and probation ends</field>
         <field name="model_id" ref="hr.model_hr_employee"/>
         <field name="state">code</field>
-        <field name="code">model._cron_om_update_reminder_dates()</field>
+        <field name="code">model._cron_update_reminder_dates()</field>
         <field name="interval_number">1</field>
         <field name="interval_type">days</field>
     </record>
@@ -17,7 +17,7 @@
             <field name="name">HR: birthday of an employee, to the manager</field>
             <field name="model_id" ref="hr.model_hr_employee"/>
             <field name="trigger">on_time</field>
-            <field name="trg_date_id" ref="om_hr_reminder.field_hr_employee__om_next_birthday"/>
+            <field name="trg_date_id" ref="om_hr_reminder.field_hr_employee__next_birthday"/>
             <field name="trg_date_range">0</field>
             <field name="trg_date_range_mode">after</field>
             <field name="trg_date_range_type">day</field>
@@ -28,14 +28,14 @@
             <field name="base_automation_id" ref="automation_birthday"/>
             <field name="usage">base_automation</field>
             <field name="state">code</field>
-            <field name="code">records._om_remind('birthday')</field>
+            <field name="code">records._remind('birthday')</field>
         </record>
 
         <record id="automation_anniversary" model="base.automation">
             <field name="name">HR: work anniversary of an employee, to the manager and HR</field>
             <field name="model_id" ref="hr.model_hr_employee"/>
             <field name="trigger">on_time</field>
-            <field name="trg_date_id" ref="om_hr_reminder.field_hr_employee__om_next_anniversary"/>
+            <field name="trg_date_id" ref="om_hr_reminder.field_hr_employee__next_anniversary"/>
             <field name="trg_date_range">0</field>
             <field name="trg_date_range_mode">after</field>
             <field name="trg_date_range_type">day</field>
@@ -46,14 +46,14 @@
             <field name="base_automation_id" ref="automation_anniversary"/>
             <field name="usage">base_automation</field>
             <field name="state">code</field>
-            <field name="code">records._om_remind('anniversary')</field>
+            <field name="code">records._remind('anniversary')</field>
         </record>
 
         <record id="automation_probation" model="base.automation">
             <field name="name">HR: probation ending, to the manager</field>
             <field name="model_id" ref="hr.model_hr_employee"/>
             <field name="trigger">on_time</field>
-            <field name="trg_date_id" ref="om_hr_reminder.field_hr_employee__om_probation_end"/>
+            <field name="trg_date_id" ref="om_hr_reminder.field_hr_employee__probation_end"/>
             <field name="trg_date_range">14</field>
             <field name="trg_date_range_mode">before</field>
             <field name="trg_date_range_type">day</field>
@@ -64,7 +64,7 @@
             <field name="base_automation_id" ref="automation_probation"/>
             <field name="usage">base_automation</field>
             <field name="state">code</field>
-            <field name="code">records._om_remind('probation')</field>
+            <field name="code">records._remind('probation')</field>
         </record>
 
     </data>

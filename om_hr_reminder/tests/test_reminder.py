@@ -39,23 +39,23 @@ class TestReminder(TransactionCase):
     @freeze_time('2026-06-01')
     def test_dates_on_the_employee(self):
         employee = self.employee(trial_date_end=date(2026, 6, 30))
-        self.assertEqual(employee.om_next_birthday, date(2026, 6, 20))
-        self.assertEqual((employee.om_next_anniversary, employee.om_service_years), (date(2026, 6, 25), 6))
-        self.assertEqual(employee.om_probation_end, date(2026, 6, 30))
+        self.assertEqual(employee.next_birthday, date(2026, 6, 20))
+        self.assertEqual((employee.next_anniversary, employee.service_years), (date(2026, 6, 25), 6))
+        self.assertEqual(employee.probation_end, date(2026, 6, 30))
         employee.birthday_public_display = False
-        self.assertFalse(employee.om_next_birthday, 'a birthday not shown is not reminded')
+        self.assertFalse(employee.next_birthday, 'a birthday not shown is not reminded')
         with freeze_time('2026-06-26'):
-            self.env['hr.employee']._cron_om_update_reminder_dates()
-            self.assertEqual((employee.om_next_anniversary, employee.om_service_years), (date(2027, 6, 25), 7))
+            self.env['hr.employee']._cron_update_reminder_dates()
+            self.assertEqual((employee.next_anniversary, employee.service_years), (date(2027, 6, 25), 7))
 
     @freeze_time('2026-06-01')
     def test_reminders(self):
         employee = self.employee()
         employee.version_id.hr_responsible_id = self.hr_user
-        employee._om_remind('birthday')
+        employee._remind('birthday')
         self.assertEqual(employee.activity_ids.user_id, self.manager_user)
         employee.activity_ids.unlink()
-        employee._om_remind('anniversary')
+        employee._remind('anniversary')
         self.assertEqual(employee.activity_ids.user_id, self.manager_user | self.hr_user)
         self.assertIn('6 years of service', employee.activity_ids[0].summary)
 
@@ -75,12 +75,12 @@ class TestReminder(TransactionCase):
         action = self.env.ref('om_hr_reminder.hr_employee_public_action_celebrations')
         domain = [
             '|',
-            '&', ('om_next_birthday', '>=', today + relativedelta(day=1)),
-            ('om_next_birthday', '<=', today + relativedelta(day=31)),
-            '&', ('om_next_anniversary', '>=', today + relativedelta(day=1)),
-            ('om_next_anniversary', '<=', today + relativedelta(day=31)),
+            '&', ('next_birthday', '>=', today + relativedelta(day=1)),
+            ('next_birthday', '<=', today + relativedelta(day=31)),
+            '&', ('next_anniversary', '>=', today + relativedelta(day=1)),
+            ('next_anniversary', '<=', today + relativedelta(day=31)),
         ]
-        self.assertIn('om_next_anniversary', action.domain)
+        self.assertIn('next_anniversary', action.domain)
         # the public employees are a view of the database: what is written is flushed first
         self.env.flush_all()
         found = self.env['hr.employee.public'].with_user(self.colleague_user).search(domain)
