@@ -2,10 +2,10 @@ from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
 
 
-class OmHrGratuityScheme(models.Model):
+class HrGratuityScheme(models.Model):
     """ How the end of service gratuity is computed: days of pay per year of service, by band of years, part of it
         kept by reason of leaving. """
-    _name = 'om.hr.gratuity.scheme'
+    _name = 'hr.gratuity.scheme'
     _description = 'Gratuity Scheme'
     _order = 'sequence, id'
 
@@ -20,8 +20,8 @@ class OmHrGratuityScheme(models.Model):
                              help='No gratuity below this service. 0: no minimum.')
     max_months = fields.Float(string='Cap (Months of Wage)', help='The gratuity is at most this many monthly wages. '
                                                                    '0: no cap.')
-    band_ids = fields.One2many('om.hr.gratuity.band', 'scheme_id', string='Days per Year of Service', copy=True)
-    factor_ids = fields.One2many('om.hr.gratuity.factor', 'scheme_id', string='Part Kept by Reason', copy=True)
+    band_ids = fields.One2many('hr.gratuity.band', 'scheme_id', string='Days per Year of Service', copy=True)
+    factor_ids = fields.One2many('hr.gratuity.factor', 'scheme_id', string='Part Kept by Reason', copy=True)
     note = fields.Text(translate=True)
 
     def _compute_gratuity(self, years, wage, reason):
@@ -49,12 +49,12 @@ class OmHrGratuityScheme(models.Model):
         return {'days': days, 'factor': factor, 'amount': amount, 'explanation': ', '.join(explanation)}
 
 
-class OmHrGratuityBand(models.Model):
-    _name = 'om.hr.gratuity.band'
+class HrGratuityBand(models.Model):
+    _name = 'hr.gratuity.band'
     _description = 'Gratuity Band'
     _order = 'scheme_id, from_years'
 
-    scheme_id = fields.Many2one('om.hr.gratuity.scheme', required=True, ondelete='cascade', index=True)
+    scheme_id = fields.Many2one('hr.gratuity.scheme', required=True, ondelete='cascade', index=True)
     from_years = fields.Float(string='From (Years)', required=True)
     to_years = fields.Float(string='To (Years)', help='0: every year beyond.')
     days_per_year = fields.Float(string='Days of Pay per Year', required=True)
@@ -66,12 +66,12 @@ class OmHrGratuityBand(models.Model):
                 raise ValidationError(_('A band of years ends after it starts.'))
 
 
-class OmHrGratuityFactor(models.Model):
-    _name = 'om.hr.gratuity.factor'
+class HrGratuityFactor(models.Model):
+    _name = 'hr.gratuity.factor'
     _description = 'Gratuity Part Kept'
     _order = 'scheme_id, from_years'
 
-    scheme_id = fields.Many2one('om.hr.gratuity.scheme', required=True, ondelete='cascade', index=True)
+    scheme_id = fields.Many2one('hr.gratuity.scheme', required=True, ondelete='cascade', index=True)
     departure_reason_ids = fields.Many2many('hr.departure.reason', string='Reasons', required=True)
     from_years = fields.Float(string='From (Years)')
     to_years = fields.Float(string='To (Years)', help='0: every year beyond.')

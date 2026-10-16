@@ -12,7 +12,7 @@ class TestGratuity(TransactionCase):
         super().setUpClass()
         cls.resigned = cls.env.ref('hr.departure_resigned')
         cls.fired = cls.env.ref('hr.departure_fired')
-        cls.scheme = cls.env['om.hr.gratuity.scheme'].create({
+        cls.scheme = cls.env['hr.gratuity.scheme'].create({
             'name': 'Test Scheme', 'sequence': 0, 'min_years': 1, 'days_per_month': 30,
             'band_ids': [Command.create({'from_years': 0, 'to_years': 5, 'days_per_year': 21}),
                          Command.create({'from_years': 5, 'days_per_year': 30})],
@@ -28,7 +28,7 @@ class TestGratuity(TransactionCase):
             'wage': 3000.0})
 
     def exit_(self, last_day, reason, start=date(2019, 1, 1)):
-        exit_ = self.env['om.hr.exit'].create({
+        exit_ = self.env['hr.exit'].create({
             'employee_id': self.employee.id, 'departure_reason_id': reason.id,
             'date_notice': last_day, 'notice_days': 0, 'gratuity_scheme_id': self.scheme.id,
             'gratuity_date_start': start})
@@ -58,6 +58,6 @@ class TestGratuity(TransactionCase):
         self.assertEqual(self.exit_(date(2025, 12, 31), self.fired).gratuity_amount, 6000.0)
 
     def test_default_scheme(self):
-        exit_ = self.env['om.hr.exit'].create({'employee_id': self.employee.id})
+        exit_ = self.env['hr.exit'].create({'employee_id': self.employee.id})
         self.assertEqual(exit_.gratuity_scheme_id, self.scheme)
         self.assertEqual(exit_.gratuity_date_start, date(2019, 1, 1))

@@ -1,2 +1,2 @@
-from . import om_hr_gratuity_scheme
-from . import om_hr_exit
+from . import hr_gratuity_scheme
+from . import hr_exit

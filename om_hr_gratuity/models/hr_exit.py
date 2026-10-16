@@ -4,11 +4,11 @@ from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 
-class OmHrExit(models.Model):
-    _inherit = 'om.hr.exit'
+class HrExit(models.Model):
+    _inherit = 'hr.exit'
 
     gratuity_scheme_id = fields.Many2one(
-        'om.hr.gratuity.scheme', string='Gratuity Scheme', groups='hr.group_hr_user',
+        'hr.gratuity.scheme', string='Gratuity Scheme', groups='hr.group_hr_user',
         compute='_compute_gratuity_scheme_id', store=True, readonly=False,
         domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
     gratuity_date_start = fields.Date(string='Service From', groups='hr.group_hr_user',
@@ -25,7 +25,7 @@ class OmHrExit(models.Model):
     def _compute_gratuity_scheme_id(self):
         for exit_ in self:
             if not exit_.gratuity_scheme_id:
-                exit_.gratuity_scheme_id = self.env['om.hr.gratuity.scheme'].search(
+                exit_.gratuity_scheme_id = self.env['hr.gratuity.scheme'].search(
                     [('company_id', 'in', [False, exit_.company_id.id])], limit=1)
 
     @api.depends('employee_id')
