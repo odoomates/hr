@@ -2,13 +2,13 @@ from datetime import date
 
 from odoo.tests import tagged
 
-from odoo.addons.om_hr_portal.tests.common import OmHrPortalCase
+from odoo.addons.om_hr_portal.tests.common import HrPortalCase
 
 from odoo import Command
 
 
 @tagged('post_install', '-at_install')
-class TestPortalCertificate(OmHrPortalCase):
+class TestPortalCertificate(HrPortalCase):
 
     def test_request_approved_and_downloaded(self):
         self.env.ref('om_hr_certificate.flow_om_hr_certificate_hr').group_id = self.env['res.groups'].create({
@@ -19,7 +19,7 @@ class TestPortalCertificate(OmHrPortalCase):
         self.url_open('/my/hr/certificates/new', data={
             'csrf_token': self.csrf_token(), 'template_id': salary.id, 'addressee': 'Portal Bank',
             'purpose': 'Account'})
-        certificate = self.env['om.hr.certificate'].search([('employee_id', '=', self.employee.id)])
+        certificate = self.env['hr.certificate'].search([('employee_id', '=', self.employee.id)])
         self.assertEqual(certificate.state, 'to_approve')
         self.assertEqual(self.get('/my/hr/certificates/%s/pdf' % certificate.id).status_code, 404, 'not yet')
 
