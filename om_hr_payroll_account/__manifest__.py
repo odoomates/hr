@@ -27,4 +27,5 @@
     'sequence': 1,
     'live_test_url': 'https://www.youtube.com/watch?v=0kaHMTtn7oY',
     'application': True,
+    'auto_install': True,
 }
