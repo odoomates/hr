@@ -15,5 +15,6 @@
         'views/om_hr_certificate_views.xml',
         'views/menu.xml',
     ],
+    'demo': ['demo/om_hr_certificate_demo.xml'],
     'images': ['static/description/banner.gif'],
 }

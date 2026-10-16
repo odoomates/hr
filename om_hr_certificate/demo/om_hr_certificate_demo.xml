@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Marc Demo: an employment certificate approved and issued, a salary certificate waiting -->
+    <record id="demo_certificate_employment" model="hr.certificate">
+        <field name="employee_id" ref="hr.employee_qdp"/>
+        <field name="template_id" ref="template_employment_certificate"/>
+        <field name="addressee">City Bank</field>
+        <field name="purpose">Opening a bank account.</field>
+        <field name="date" eval="(DateTime.today() - relativedelta(days=12)).strftime('%Y-%m-%d')"/>
+    </record>
+    <function model="hr.certificate" name="action_submit" uid="base.user_demo"
+              eval="[ref('demo_certificate_employment')]"/>
+    <!-- the manager, then HR -->
+    <function model="hr.certificate" name="action_approval_approve" uid="base.user_admin"
+              eval="[ref('demo_certificate_employment')]"/>
+    <function model="hr.certificate" name="action_approval_approve" uid="base.user_admin"
+              eval="[ref('demo_certificate_employment')]"/>
+
+    <record id="demo_certificate_salary" model="hr.certificate">
+        <field name="employee_id" ref="hr.employee_qdp"/>
+        <field name="template_id" ref="template_salary_certificate"/>
+        <field name="addressee">Embassy</field>
+        <field name="purpose">Visa application.</field>
+    </record>
+    <function model="hr.certificate" name="action_submit" uid="base.user_demo"
+              eval="[ref('demo_certificate_salary')]"/>
+
+</odoo>
