@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="demo_asset_laptop" model="maintenance.equipment">
+        <field name="name">Laptop 14"</field>
+        <field name="category_id" ref="maintenance.equipment_computer"/>
+        <field name="serial_no">LT-2291-0457</field>
+        <field name="cost">1450</field>
+    </record>
+    <record id="demo_asset_phone" model="maintenance.equipment">
+        <field name="name">Mobile Phone</field>
+        <field name="category_id" ref="maintenance.equipment_phone"/>
+        <field name="serial_no">PH-77310</field>
+        <field name="cost">690</field>
+    </record>
+    <record id="demo_asset_car" model="maintenance.equipment">
+        <field name="name">Company Car</field>
+        <field name="serial_no">CAR-0042</field>
+        <field name="cost">24000</field>
+    </record>
+
+    <!-- the laptop and the phone in the hands of employees, the car returned -->
+    <record id="demo_assignment_laptop" model="hr.asset.assignment">
+        <field name="equipment_id" ref="demo_asset_laptop"/>
+        <field name="employee_id" ref="hr.employee_qdp"/>
+        <field name="date_from" eval="(DateTime.today() - relativedelta(months=4)).strftime('%Y-%m-%d')"/>
+        <field name="condition_out">new</field>
+    </record>
+    <function model="maintenance.equipment" name="write">
+        <value eval="[ref('demo_asset_laptop')]"/>
+        <value eval="{'employee_id': ref('hr.employee_qdp'), 'equipment_assign_to': 'employee'}"/>
+        <value name="context" eval="{'om_asset_no_log': True}"/>
+    </function>
+
+    <record id="demo_assignment_phone" model="hr.asset.assignment">
+        <field name="equipment_id" ref="demo_asset_phone"/>
+        <field name="employee_id" ref="hr.employee_admin"/>
+        <field name="date_from" eval="(DateTime.today() - relativedelta(years=1)).strftime('%Y-%m-%d')"/>
+        <field name="condition_out">good</field>
+    </record>
+    <function model="maintenance.equipment" name="write">
+        <value eval="[ref('demo_asset_phone')]"/>
+        <value eval="{'employee_id': ref('hr.employee_admin'), 'equipment_assign_to': 'employee'}"/>
+        <value name="context" eval="{'om_asset_no_log': True}"/>
+    </function>
+
+    <record id="demo_assignment_car" model="hr.asset.assignment">
+        <field name="equipment_id" ref="demo_asset_car"/>
+        <field name="employee_id" ref="hr.employee_al"/>
+        <field name="date_from" eval="(DateTime.today() - relativedelta(months=8)).strftime('%Y-%m-%d')"/>
+        <field name="date_to" eval="(DateTime.today() - relativedelta(months=2)).strftime('%Y-%m-%d')"/>
+        <field name="condition_out">good</field>
+        <field name="condition_in">good</field>
+        <field name="state">returned</field>
+        <field name="received_by_id" ref="base.user_admin"/>
+    </record>
+
+</odoo>

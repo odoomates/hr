@@ -16,5 +16,6 @@
         'views/hr_employee_views.xml',
         'views/menu.xml',
     ],
+    'demo': ['demo/om_hr_asset_demo.xml'],
     'images': ['static/description/banner.gif'],
 }
