@@ -52,6 +52,8 @@ from the payslips, install by themselves once both sides are there.
 | `om_document`, `om_hr_document` | Documents with expiry dates and reminders: passports, visas, permits, IDs |
 | `om_print_template`, `om_hr_certificate` | Certificates and letters from templates: salary, employment, experience, NOC, with an optional verification QR code |
 | `om_sign` | Prints and PDF files signed from an email link, in order, with a signature certificate |
+| `om_hr_recruitment_offer` | Job offers approved, signed by the company and the candidate, turned into the contract (installs Recruitment) |
+| `om_hr_sign` | Contracts signed by the employee and the manager; policies read and agreed, or signed, version after version |
 | `om_approval`, `om_hr_approval` | Multi-step approval flows for any app, and HR requests |
 
 ### Self-service and dashboards

@@ -47,6 +47,11 @@ What it installs:
   an expiring document of the record, e.g. an NOC valid for 30 days.
 * ``om_sign`` Sign: prints and PDF files signed from an email link, in order,
   with a signature certificate.
+* ``om_hr_sign`` HR Sign: documents signed by the employee and the manager, and
+  the company policies read and agreed or signed, version after version.
+* ``om_hr_recruitment_offer`` HR Job Offers: offers made from the applicant,
+  approved, signed by the company and the candidate, and turned into the
+  contract of the new employee (installs Recruitment).
 * ``om_hr_certificate`` HR Certificates: salary, employment and experience
   certificates and NOC, requested by the employees and approved.
 * ``om_hr_appraisal`` HR Appraisals: self assessment, manager review and
@@ -99,7 +104,8 @@ What it installs:
   * resignation (``om_hr_portal_exit``);
   * pay adjustments (``om_hr_portal_adjustment``);
   * shifts (``om_hr_portal_shift``);
-  * announcements (``om_hr_portal_announcement``).
+  * announcements (``om_hr_portal_announcement``);
+  * policies (``om_hr_portal_sign``).
 
 * ``om_spreadsheet_hr`` HR Dashboards, ``om_spreadsheet_hr_payroll`` Payroll
   Dashboard, ``om_spreadsheet_hr_time`` Time Off and Attendance Dashboard and
