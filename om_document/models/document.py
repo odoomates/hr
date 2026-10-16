@@ -15,6 +15,7 @@ class Document(models.Model):
     _name = 'document.document'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Document'
+    _check_company_auto = True
     _order = 'date_expiry, id desc'
     _mail_post_access = 'read'
 
@@ -26,8 +27,8 @@ class Document(models.Model):
     record_ref = fields.Reference(selection='_selection_record_ref', string='Belongs To',
                                   compute='_compute_record_ref', inverse='_inverse_record_ref')
     type_id = fields.Many2one(
-        'document.type', required=True, tracking=True, index=True,
-        domain="[('res_model', '=', res_model), '|', ('company_id', '=', False), ('company_id', '=', company_id)]")
+        'document.type', required=True, tracking=True, index=True, check_company=True,
+        domain="[('res_model', '=', res_model)]")
     has_number = fields.Boolean(related='type_id.has_number')
     has_issue_date = fields.Boolean(related='type_id.has_issue_date')
     has_expiry_date = fields.Boolean(related='type_id.has_expiry_date')
@@ -53,7 +54,8 @@ class Document(models.Model):
     last_reminder = fields.Integer(
         copy=False, default=-1,
         help='The reminder sent last, in days before the expiry date, -1 for none: each one is sent once.')
-    previous_id = fields.Many2one('document.document', string='Renews', copy=False, readonly=True, index=True)
+    previous_id = fields.Many2one('document.document', string='Renews', copy=False, readonly=True, index=True,
+                                  check_company=True)
     renewal_ids = fields.One2many('document.document', 'previous_id', string='Renewals', context={'active_test': False})
     next_id = fields.Many2one('document.document', string='Renewed By', compute='_compute_next_id')
 
