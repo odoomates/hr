@@ -12,6 +12,7 @@
         'om_hr_base',
         'om_approval',
         'om_hr_approval',
+        'om_hr_approval_leave',
         'om_hr_payroll',
         'om_hr_loan',
         'om_hr_loan_payroll',

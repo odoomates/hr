@@ -22,6 +22,8 @@ What it installs:
   groups or the user a field names, in steps, and runs once approved.
 * ``om_hr_approval`` HR Approvals: the manager, the department manager, the
   coach or the HR responsible approve, and the employees send HR requests.
+* ``om_hr_approval_leave`` HR Approvals: Time Off: an approver on validated
+  time off is replaced by their substitute, else their manager.
 * ``om_hr_payroll`` Payroll: salary structures, rules, components, parameters
   and brackets, payslips and payslip batches, paid on the working schedule or
   on the attendances.
