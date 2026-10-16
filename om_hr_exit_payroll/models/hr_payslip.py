@@ -8,7 +8,7 @@ class HrPayslip(models.Model):
     _inherit = 'hr.payslip'
 
     exit_id = fields.Many2one('hr.exit', string='Final Settlement Of', index=True, copy=False, readonly=True,
-                              help='The exit the payslip settles.')
+                              help='The exit the payslip settles.', check_company=True)
 
     def compute_sheet(self):
         for payslip in self.filtered(lambda p: p.exit_id and p.state not in ('done', 'cancel')):

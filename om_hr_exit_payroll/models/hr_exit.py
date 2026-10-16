@@ -6,7 +6,7 @@ class HrExit(models.Model):
     _inherit = 'hr.exit'
 
     settlement_payslip_id = fields.Many2one('hr.payslip', string='Final Settlement', readonly=True, copy=False,
-                                            groups='hr.group_hr_user')
+                                            groups='hr.group_hr_user', check_company=True)
     encashment_days = fields.Float(string='Unused Time Off (Days)', compute='_compute_encashment',
                                    groups='hr.group_hr_user', digits=(16, 2))
     encashment_amount = fields.Monetary(string='Time Off Paid Out', compute='_compute_encashment',
