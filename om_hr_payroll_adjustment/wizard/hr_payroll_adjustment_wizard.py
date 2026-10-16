@@ -2,9 +2,9 @@ from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 
-class OmHrPayrollAdjustmentWizard(models.TransientModel):
+class HrPayrollAdjustmentWizard(models.TransientModel):
     """ The same adjustment for many employees at once, e.g. a bonus for a department. """
-    _name = 'om.hr.payroll.adjustment.wizard'
+    _name = 'hr.payroll.adjustment.wizard'
     _description = 'Add Payroll Adjustments'
 
     department_id = fields.Many2one('hr.department', string='Department',
@@ -12,7 +12,7 @@ class OmHrPayrollAdjustmentWizard(models.TransientModel):
     employee_ids = fields.Many2many('hr.employee', string='Employees', required=True)
     company_id = fields.Many2one('res.company', default=lambda self: self.env.company)
     currency_id = fields.Many2one(related='company_id.currency_id')
-    type_id = fields.Many2one('om.hr.payroll.adjustment.type', string='Type', required=True)
+    type_id = fields.Many2one('hr.payroll.adjustment.type', string='Type', required=True)
     kind = fields.Selection(related='type_id.kind')
     description = fields.Char()
     recurrence = fields.Selection([
@@ -42,7 +42,7 @@ class OmHrPayrollAdjustmentWizard(models.TransientModel):
         self.ensure_one()
         if not self.employee_ids:
             raise UserError(_('Choose the employees.'))
-        adjustments = self.env['om.hr.payroll.adjustment'].create([{
+        adjustments = self.env['hr.payroll.adjustment'].create([{
             'employee_id': employee.id,
             'type_id': self.type_id.id,
             'description': self.description,
@@ -60,7 +60,7 @@ class OmHrPayrollAdjustmentWizard(models.TransientModel):
         return {
             'type': 'ir.actions.act_window',
             'name': _('Payroll Adjustments'),
-            'res_model': 'om.hr.payroll.adjustment',
+            'res_model': 'hr.payroll.adjustment',
             'view_mode': 'list,form',
             'domain': [('id', 'in', adjustments.ids)],
         }

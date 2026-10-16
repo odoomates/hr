@@ -25,7 +25,7 @@ class TestAdjustment(TransactionCase):
         net = cls.env.ref('om_hr_payroll.hr_rule_net')
         cls.structure = cls.env['hr.payroll.structure'].create({
             'name': 'Adjustment Structure', 'code': 'ADJS', 'rule_ids': [Command.set((basic | gross | net).ids)]})
-        Type = cls.env['om.hr.payroll.adjustment.type']
+        Type = cls.env['hr.payroll.adjustment.type']
         cls.bonus = Type.create({'name': 'Test Bonus', 'code': 'T_BONUS', 'kind': 'addition',
                                  'category_id': cls.env.ref('om_hr_payroll.ALW').id, 'require_approval': False,
                                  'structure_ids': [Command.set(cls.structure.ids)]})
@@ -53,7 +53,7 @@ class TestAdjustment(TransactionCase):
             'contract_date_start': date(2026, 1, 1), 'wage': 3000.0, 'struct_id': cls.structure.id})
 
     def adjustment(self, adjustment_type, confirm=True, **values):
-        adjustment = self.env['om.hr.payroll.adjustment'].with_user(self.officer).create({
+        adjustment = self.env['hr.payroll.adjustment'].with_user(self.officer).create({
             'employee_id': self.employee.id, 'type_id': adjustment_type.id, 'date_start': date(2026, 8, 1),
             **values})
         if confirm:
@@ -91,7 +91,7 @@ class TestAdjustment(TransactionCase):
         self.assertEqual(self.total(august, 'T_BONUS'), 500)
         self.assertEqual(self.total(august, 'GROSS'), 3500)
         self.assertEqual(self.total(august, 'NET'), 3500)
-        self.assertEqual(august.om_adjustment_line_ids, adjustment.line_ids)
+        self.assertEqual(august.adjustment_line_ids, adjustment.line_ids)
         august.action_payslip_done()
         self.assertEqual(adjustment.state, 'done')
         self.assertEqual(adjustment.amount_done, 500)
@@ -163,7 +163,7 @@ class TestAdjustment(TransactionCase):
     def test_exit_settles(self):
         fine = self.adjustment(self.fine, recurrence='months', month_count=3, amount=100.0)
         bonus = self.adjustment(self.bonus, recurrence='months', month_count=3, amount=50.0)
-        with patch.object(HrPayslip, '_om_adjustment_settles_all', lambda payslip: True):
+        with patch.object(HrPayslip, '_adjustment_settles_all', lambda payslip: True):
             august = self.payslip(8)
         self.assertEqual(self.total(august, 'T_FINE'), -300, 'everything due at exit')
         self.assertEqual(self.total(august, 'T_BONUS'), 50, 'a type not settled at exit keeps its months')
@@ -186,12 +186,12 @@ class TestAdjustment(TransactionCase):
 
     def test_wizard_for_a_department(self):
         other = self.env['hr.employee'].create({'name': 'Adjusted Too', 'department_id': self.department.id})
-        wizard = self.env['om.hr.payroll.adjustment.wizard'].with_user(self.officer).create({
+        wizard = self.env['hr.payroll.adjustment.wizard'].with_user(self.officer).create({
             'type_id': self.bonus.id, 'amount': 250.0, 'date_start': date(2026, 8, 1)})
         with Form(wizard) as form:
             form.department_id = self.department
         action = wizard.action_create()
-        adjustments = self.env['om.hr.payroll.adjustment'].search(action['domain'])
+        adjustments = self.env['hr.payroll.adjustment'].search(action['domain'])
         self.assertEqual(adjustments.employee_id, self.employee | other)
         self.assertEqual(set(adjustments.mapped('state')), {'running'})
         self.assertEqual(self.total(self.payslip(8), 'T_BONUS'), 250)
@@ -200,10 +200,10 @@ class TestAdjustment(TransactionCase):
         draft = self.adjustment(self.bonus, confirm=False, amount=100.0)
         running = self.adjustment(self.fine, amount=50.0)
         other = self.env['hr.employee'].create({'name': 'Somebody Else'})
-        theirs = self.env['om.hr.payroll.adjustment'].create({
+        theirs = self.env['hr.payroll.adjustment'].create({
             'employee_id': other.id, 'type_id': self.fine.id, 'amount': 20.0, 'date_start': date(2026, 8, 1)})
         theirs.with_user(self.officer).action_confirm()
-        seen = self.env['om.hr.payroll.adjustment'].with_user(self.employee_user).search([])
+        seen = self.env['hr.payroll.adjustment'].with_user(self.employee_user).search([])
         self.assertEqual(seen, running, 'the running ones, not the drafts, nor those of others')
         self.assertTrue(running.with_user(self.employee_user).line_ids)
         with self.assertRaises(AccessError):

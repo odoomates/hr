@@ -4,23 +4,23 @@ from odoo import _, fields, models
 class HrPayslip(models.Model):
     _inherit = 'hr.payslip'
 
-    om_adjustment_line_ids = fields.One2many('om.hr.payroll.adjustment.line', 'payslip_id',
+    adjustment_line_ids = fields.One2many('hr.payroll.adjustment.line', 'payslip_id',
                                              string='Payroll Adjustments', readonly=True)
 
-    def _om_adjustment_lines(self):
-        return self.env['om.hr.payroll.adjustment.line'].sudo().search([('payslip_id', 'in', self.ids)])
+    def _adjustment_lines(self):
+        return self.env['hr.payroll.adjustment.line'].sudo().search([('payslip_id', 'in', self.ids)])
 
-    def _om_adjustment_settles_all(self):
+    def _adjustment_settles_all(self):
         """ The final settlement of an exit takes everything due on the types settled at exit. """
         self.ensure_one()
         return bool('exit_id' in self._fields and self.exit_id)
 
-    def _om_adjustment_version(self):
+    def _adjustment_version(self):
         self.ensure_one()
         return self.version_id or self.env['hr.version'].browse(
             self.get_versions(self.employee_id, self.date_from, self.date_to)[:1])
 
-    def _om_adjustment_gross(self):
+    def _adjustment_gross(self):
         """ :return: the gross of the payslip as last computed """
         self.ensure_one()
         lines = self.line_ids.filtered(lambda line: line.category_id.code == 'GROSS')
@@ -28,16 +28,16 @@ class HrPayslip(models.Model):
             lines = self.line_ids.filtered(lambda line: line.category_id.code in ('BASIC', 'ALW'))
         return sum(lines.mapped('total'))
 
-    def _om_adjustment_sync(self):
+    def _adjustment_sync(self):
         """ Give each payslip the adjustment lines due by the end of its period and not taken yet, those of earlier
             months included, as one input per adjustment type, read by the rule of the type. """
-        Line = self.env['om.hr.payroll.adjustment.line'].sudo()
-        Adjustment = self.env['om.hr.payroll.adjustment'].sudo()
-        codes = set(self.env['om.hr.payroll.adjustment.type'].sudo().with_context(active_test=False)
+        Line = self.env['hr.payroll.adjustment.line'].sudo()
+        Adjustment = self.env['hr.payroll.adjustment'].sudo()
+        codes = set(self.env['hr.payroll.adjustment.type'].sudo().with_context(active_test=False)
                     .search([]).mapped('code'))
         for payslip in self.filtered(lambda p: not p.credit_note and p.state not in ('done', 'cancel')):
             Line.search([('payslip_id', '=', payslip.id), ('state', '=', 'to_pay')]).payslip_id = False
-            settles = payslip._om_adjustment_settles_all()
+            settles = payslip._adjustment_settles_all()
             adjustments = Adjustment.search([('employee_id', '=', payslip.employee_id.id), ('state', '=', 'running'),
                                              ('date_start', '<=', payslip.date_to)])
             # a percentage until a total gets the line of the month of the payslip when it needs one
@@ -57,15 +57,15 @@ class HrPayslip(models.Model):
                 domain.append(('date', '<=', payslip.date_to))
             due = Line.search(domain)
             due.payslip_id = payslip
-            payslip._om_adjustment_set_amounts(due, settles)
-            payslip._om_adjustment_set_inputs(due, codes)
+            payslip._adjustment_set_amounts(due, settles)
+            payslip._adjustment_set_inputs(due, codes)
 
-    def _om_adjustment_set_amounts(self, lines, settles):
+    def _adjustment_set_amounts(self, lines, settles):
         """ The amounts of the percentages, of the wage or of the gross; a total is never exceeded, and the final
             settlement takes all that is left of a total settled at exit. """
         self.ensure_one()
-        wage = self._om_adjustment_version().wage
-        gross = self._om_adjustment_gross()
+        wage = self._adjustment_version().wage
+        gross = self._adjustment_gross()
         for adjustment in lines.adjustment_id:
             currency = adjustment.currency_id
             left = None
@@ -85,14 +85,14 @@ class HrPayslip(models.Model):
                 if currency.compare_amounts(amount, line.amount):
                     line.amount = amount
 
-    def _om_adjustment_set_inputs(self, lines, codes):
+    def _adjustment_set_inputs(self, lines, codes):
         self.ensure_one()
         by_type = {}
         for line in lines:
             by_type.setdefault(line.type_id, 0.0)
             by_type[line.type_id] += line.amount
         amounts = {adjustment_type.code: (adjustment_type, amount) for adjustment_type, amount in by_type.items()}
-        version = self._om_adjustment_version()
+        version = self._adjustment_version()
         for code in codes:
             inputs = self.input_line_ids.filtered(lambda line: line.code == code)
             adjustment_type, amount = amounts.get(code, (False, 0.0))
@@ -108,40 +108,40 @@ class HrPayslip(models.Model):
                 })]
 
     def compute_sheet(self):
-        self._om_adjustment_sync()
+        self._adjustment_sync()
         result = super().compute_sheet()
         # a percentage of the gross needs the gross: the payslip computes again, with it
-        again = self.filtered(lambda payslip: payslip._om_adjustment_lines().filtered(
+        again = self.filtered(lambda payslip: payslip._adjustment_lines().filtered(
             lambda line: line.state == 'to_pay' and line.adjustment_id.amount_type == 'percent'
             and line.adjustment_id.percent_base == 'gross'))
         if again:
-            again._om_adjustment_sync()
+            again._adjustment_sync()
             super(HrPayslip, again).compute_sheet()
         return result
 
     def action_payslip_done(self):
         result = super().action_payslip_done()
         for payslip in self.filtered(lambda p: p.state == 'done' and not p.credit_note):
-            payslip._om_adjustment_lines().filtered(lambda line: line.state == 'to_pay')._mark_paid(
+            payslip._adjustment_lines().filtered(lambda line: line.state == 'to_pay')._mark_paid(
                 _('Taken by %s', payslip.number or payslip.name), date=payslip.date_to)
         return result
 
     def action_payslip_draft(self):
-        self._om_adjustment_release(keep=True)
+        self._adjustment_release(keep=True)
         return super().action_payslip_draft()
 
     def action_payslip_cancel(self):
-        self._om_adjustment_release()
+        self._adjustment_release()
         return super().action_payslip_cancel()
 
     def refund_sheet(self):
-        self._om_adjustment_release()
+        self._adjustment_release()
         return super().refund_sheet()
 
-    def _om_adjustment_release(self, keep=False):
+    def _adjustment_release(self, keep=False):
         """ The lines of the payslips are due again: the payslip is cancelled, refunded, or set back to draft, in
             which case it keeps them, to take them when confirmed again. """
-        lines = self.filtered(lambda p: not p.credit_note)._om_adjustment_lines()
+        lines = self.filtered(lambda p: not p.credit_note)._adjustment_lines()
         values = {'state': 'to_pay', 'date_paid': False, 'note': False}
         if not keep:
             values['payslip_id'] = False

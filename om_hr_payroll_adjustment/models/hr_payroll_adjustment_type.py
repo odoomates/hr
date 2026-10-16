@@ -2,10 +2,10 @@ from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
 
 
-class OmHrPayrollAdjustmentType(models.Model):
+class HrPayrollAdjustmentType(models.Model):
     """ A kind of addition to or deduction from the pay, e.g. a bonus or a fine: it has its own salary rule, kept in
     sync by the type, so that the payslips show each kind on its own line. """
-    _name = 'om.hr.payroll.adjustment.type'
+    _name = 'hr.payroll.adjustment.type'
     _description = 'Payroll Adjustment Type'
     _order = 'sequence, name'
 
@@ -108,7 +108,7 @@ class OmHrPayrollAdjustmentType(models.Model):
             else:
                 rule = Rule.create(dict(values, input_ids=[(0, 0, {
                     'name': adjustment_type.name, 'code': adjustment_type.code})]))
-                super(OmHrPayrollAdjustmentType, adjustment_type).write({'rule_id': rule.id})
+                super(HrPayrollAdjustmentType, adjustment_type).write({'rule_id': rule.id})
             previous = (old_structures or {}).get(adjustment_type, self.env['hr.payroll.structure'])
             for structure in (previous - adjustment_type.structure_ids).sudo():
                 structure.rule_ids = [(3, rule.id)]

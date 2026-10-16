@@ -2,8 +2,8 @@
 <odoo>
 
     <record id="om_hr_payroll_adjustment_wizard_view_form" model="ir.ui.view">
-        <field name="name">om.hr.payroll.adjustment.wizard.view.form</field>
-        <field name="model">om.hr.payroll.adjustment.wizard</field>
+        <field name="name">hr.payroll.adjustment.wizard.view.form</field>
+        <field name="model">hr.payroll.adjustment.wizard</field>
         <field name="arch" type="xml">
             <form string="Add Payroll Adjustments">
                 <group>
@@ -42,7 +42,7 @@
 
     <record id="om_hr_payroll_adjustment_wizard_action" model="ir.actions.act_window">
         <field name="name">Add Adjustments</field>
-        <field name="res_model">om.hr.payroll.adjustment.wizard</field>
+        <field name="res_model">hr.payroll.adjustment.wizard</field>
         <field name="view_mode">form</field>
         <field name="target">new</field>
     </record>

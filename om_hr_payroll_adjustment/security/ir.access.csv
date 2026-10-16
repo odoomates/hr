@@ -1,11 +1,11 @@
 id,name,model_id,group_id/id,operation,domain
-access_type_employee,om.hr.payroll.adjustment.type.employee,om.hr.payroll.adjustment.type,base.group_user,r,
-access_type_payroll_manager,om.hr.payroll.adjustment.type.payroll.manager,om.hr.payroll.adjustment.type,om_hr_payroll.group_hr_payroll_manager,crud,
-type_company_rule,Adjustment types: multi-company,om.hr.payroll.adjustment.type,,crud,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"
-access_adjustment_employee_read,om.hr.payroll.adjustment.employee.read,om.hr.payroll.adjustment,base.group_user,r,"['|', '&', ('employee_id.user_id', '=', user.id), ('state', 'in', ('running', 'done')), ('approval_request_ids.line_ids.approver_user_ids', 'in', user.id)]"
-access_adjustment_payroll,om.hr.payroll.adjustment.payroll,om.hr.payroll.adjustment,om_hr_payroll.group_hr_payroll_user,crud,
-adjustment_company_rule,Payroll adjustments: multi-company,om.hr.payroll.adjustment,,crud,"[('company_id', 'in', company_ids)]"
-access_adjustment_line_employee_read,om.hr.payroll.adjustment.line.employee.read,om.hr.payroll.adjustment.line,base.group_user,r,"['|', '&', ('adjustment_id.employee_id.user_id', '=', user.id), ('adjustment_id.state', 'in', ('running', 'done')), ('adjustment_id.approval_request_ids.line_ids.approver_user_ids', 'in', user.id)]"
-access_adjustment_line_payroll,om.hr.payroll.adjustment.line.payroll,om.hr.payroll.adjustment.line,om_hr_payroll.group_hr_payroll_user,crud,
-adjustment_line_company_rule,Payroll adjustment lines: multi-company,om.hr.payroll.adjustment.line,,crud,"[('company_id', 'in', company_ids)]"
-access_adjustment_wizard,om.hr.payroll.adjustment.wizard,om.hr.payroll.adjustment.wizard,om_hr_payroll.group_hr_payroll_user,crud,
+access_type_employee,hr.payroll.adjustment.type.employee,hr.payroll.adjustment.type,base.group_user,r,
+access_type_payroll_manager,hr.payroll.adjustment.type.payroll.manager,hr.payroll.adjustment.type,om_hr_payroll.group_hr_payroll_manager,crud,
+type_company_rule,Adjustment types: multi-company,hr.payroll.adjustment.type,,crud,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"
+access_adjustment_employee_read,hr.payroll.adjustment.employee.read,hr.payroll.adjustment,base.group_user,r,"['|', '&', ('employee_id.user_id', '=', user.id), ('state', 'in', ('running', 'done')), ('approval_request_ids.line_ids.approver_user_ids', 'in', user.id)]"
+access_adjustment_payroll,hr.payroll.adjustment.payroll,hr.payroll.adjustment,om_hr_payroll.group_hr_payroll_user,crud,
+adjustment_company_rule,Payroll adjustments: multi-company,hr.payroll.adjustment,,crud,"[('company_id', 'in', company_ids)]"
+access_adjustment_line_employee_read,hr.payroll.adjustment.line.employee.read,hr.payroll.adjustment.line,base.group_user,r,"['|', '&', ('adjustment_id.employee_id.user_id', '=', user.id), ('adjustment_id.state', 'in', ('running', 'done')), ('adjustment_id.approval_request_ids.line_ids.approver_user_ids', 'in', user.id)]"
+access_adjustment_line_payroll,hr.payroll.adjustment.line.payroll,hr.payroll.adjustment.line,om_hr_payroll.group_hr_payroll_user,crud,
+adjustment_line_company_rule,Payroll adjustment lines: multi-company,hr.payroll.adjustment.line,,crud,"[('company_id', 'in', company_ids)]"
+access_adjustment_wizard,hr.payroll.adjustment.wizard,hr.payroll.adjustment.wizard,om_hr_payroll.group_hr_payroll_user,crud,

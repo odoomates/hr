@@ -4,12 +4,12 @@ from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
 
-class OmHrPayrollAdjustment(models.Model):
+class HrPayrollAdjustment(models.Model):
     """ An addition to or a deduction from the pay of an employee, e.g. a bonus or a fine: once, for a number of
     months, or every month until a total, of a fixed amount or of a percentage of the wage or of the gross. The
     payslips take its monthly lines as they fall due. """
-    _name = 'om.hr.payroll.adjustment'
-    _inherit = ['om.approval.mixin']
+    _name = 'hr.payroll.adjustment'
+    _inherit = ['approval.mixin']
     _description = 'Payroll Adjustment'
     _order = 'date_start desc, id desc'
     _mail_post_access = 'read'
@@ -22,7 +22,7 @@ class OmHrPayrollAdjustment(models.Model):
     currency_id = fields.Many2one(related='company_id.currency_id')
     department_id = fields.Many2one(related='employee_id.department_id', store=True)
     type_id = fields.Many2one(
-        'om.hr.payroll.adjustment.type', string='Type', required=True, tracking=True,
+        'hr.payroll.adjustment.type', string='Type', required=True, tracking=True,
         domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
     kind = fields.Selection(related='type_id.kind', store=True)
     description = fields.Char(help='Shown to the employee, e.g. "Q3 sales commission".')
@@ -55,7 +55,7 @@ class OmHrPayrollAdjustment(models.Model):
         ('refused', 'Refused'),
         ('cancel', 'Cancelled'),
     ], required=True, default='draft', copy=False, index=True, tracking=True)
-    line_ids = fields.One2many('om.hr.payroll.adjustment.line', 'adjustment_id', string='Monthly Lines', copy=False)
+    line_ids = fields.One2many('hr.payroll.adjustment.line', 'adjustment_id', string='Monthly Lines', copy=False)
     amount_done = fields.Monetary(compute='_compute_amounts', string='Paid', store=True,
                                   help='Paid or deducted so far, by the confirmed payslips or by hand.')
     amount_residual = fields.Monetary(compute='_compute_amounts', string='Still Due', store=True)
@@ -116,7 +116,7 @@ class OmHrPayrollAdjustment(models.Model):
     def create(self, vals_list):
         for vals in vals_list:
             if vals.get('name', _('New')) == _('New'):
-                vals['name'] = self.env['ir.sequence'].next_by_code('om.hr.payroll.adjustment') or _('New')
+                vals['name'] = self.env['ir.sequence'].next_by_code('hr.payroll.adjustment') or _('New')
         return super().create(vals_list)
 
     def write(self, vals):
@@ -245,13 +245,13 @@ class OmHrPayrollAdjustment(models.Model):
                 adjustment.state = 'done'
 
 
-class OmHrPayrollAdjustmentLine(models.Model):
+class HrPayrollAdjustmentLine(models.Model):
     """ What one month of an adjustment pays or deducts. """
-    _name = 'om.hr.payroll.adjustment.line'
+    _name = 'hr.payroll.adjustment.line'
     _description = 'Payroll Adjustment Line'
     _order = 'adjustment_id, date, id'
 
-    adjustment_id = fields.Many2one('om.hr.payroll.adjustment', required=True, ondelete='cascade', index=True)
+    adjustment_id = fields.Many2one('hr.payroll.adjustment', required=True, ondelete='cascade', index=True)
     employee_id = fields.Many2one(related='adjustment_id.employee_id', store=True)
     company_id = fields.Many2one(related='adjustment_id.company_id', store=True)
     currency_id = fields.Many2one(related='adjustment_id.currency_id')
