@@ -20,11 +20,11 @@ class TestAssetPayroll(TransactionCase):
         cls.laptop = cls.env['maintenance.equipment'].create({'name': 'Payroll Laptop'})
 
     def lose(self, day, charge):
-        self.laptop.write({'employee_id': self.employee.id, 'om_lost': False})
-        self.env['om.hr.asset.wizard'].with_context(
+        self.laptop.write({'employee_id': self.employee.id, 'lost': False})
+        self.env['hr.asset.wizard'].with_context(
             default_equipment_id=self.laptop.id, default_mode='lost').create(
             {'date': day, 'charge_amount': charge}).action_confirm()
-        return self.laptop.om_assignment_ids.filtered(lambda a: a.state == 'lost' and a.date_to == day)
+        return self.laptop.assignment_ids.filtered(lambda a: a.state == 'lost' and a.date_to == day)
 
     def payslip(self, month):
         with Form(self.env['hr.payslip']) as form:

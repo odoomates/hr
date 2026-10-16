@@ -3,8 +3,8 @@ from odoo import _, fields, models
 ASSET_CODE = 'ASSET'
 
 
-class OmHrAssetAssignment(models.Model):
-    _inherit = 'om.hr.asset.assignment'
+class HrAssetAssignment(models.Model):
+    _inherit = 'hr.asset.assignment'
 
     payslip_id = fields.Many2one('hr.payslip', string='Deducted On', readonly=True, copy=False,
                                  index='btree_not_null', ondelete='set null',
@@ -15,13 +15,13 @@ class HrPayslip(models.Model):
     _inherit = 'hr.payslip'
 
     def compute_sheet(self):
-        self._om_hr_asset_sync()
+        self._hr_asset_sync()
         return super().compute_sheet()
 
-    def _om_hr_asset_sync(self):
+    def _hr_asset_sync(self):
         """ Give each payslip the asset charges of its employee up to the end of its period not deducted yet, as
             the input ASSET read by the asset rule. The final settlement of an exit takes them all. """
-        Assignment = self.env['om.hr.asset.assignment'].sudo()
+        Assignment = self.env['hr.asset.assignment'].sudo()
         for payslip in self.filtered(lambda p: not p.credit_note and p.state not in ('done', 'cancel')):
             Assignment.search([('payslip_id', '=', payslip.id)]).payslip_id = False
             domain = [
@@ -48,15 +48,15 @@ class HrPayslip(models.Model):
                         'version_id': version.id, 'sequence': 91,
                     })]
 
-    def _om_hr_asset_release(self):
+    def _hr_asset_release(self):
         """ The charges of the payslips are to deduct again: the payslip is cancelled or refunded. """
-        self.env['om.hr.asset.assignment'].sudo().search(
+        self.env['hr.asset.assignment'].sudo().search(
             [('payslip_id', 'in', self.filtered(lambda p: not p.credit_note).ids)]).payslip_id = False
 
     def action_payslip_cancel(self):
-        self._om_hr_asset_release()
+        self._hr_asset_release()
         return super().action_payslip_cancel()
 
     def refund_sheet(self):
-        self._om_hr_asset_release()
+        self._hr_asset_release()
         return super().refund_sheet()
