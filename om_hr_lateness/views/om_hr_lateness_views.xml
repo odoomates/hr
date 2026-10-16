@@ -2,8 +2,8 @@
 <odoo>
 
     <record id="om_hr_lateness_view_list" model="ir.ui.view">
-        <field name="name">om.hr.lateness.view.list</field>
-        <field name="model">om.hr.lateness</field>
+        <field name="name">hr.lateness.view.list</field>
+        <field name="model">hr.lateness</field>
         <field name="arch" type="xml">
             <list string="Lateness" create="0" edit="0" decoration-muted="state == 'excused'">
                 <field name="date"/>
@@ -27,8 +27,8 @@
     </record>
 
     <record id="om_hr_lateness_view_form" model="ir.ui.view">
-        <field name="name">om.hr.lateness.view.form</field>
-        <field name="model">om.hr.lateness</field>
+        <field name="name">hr.lateness.view.form</field>
+        <field name="model">hr.lateness</field>
         <field name="arch" type="xml">
             <form string="Lateness" create="0" edit="0">
                 <header>
@@ -62,8 +62,8 @@
     </record>
 
     <record id="om_hr_lateness_view_pivot" model="ir.ui.view">
-        <field name="name">om.hr.lateness.view.pivot</field>
-        <field name="model">om.hr.lateness</field>
+        <field name="name">hr.lateness.view.pivot</field>
+        <field name="model">hr.lateness</field>
         <field name="arch" type="xml">
             <pivot string="Lateness">
                 <field name="employee_id" type="row"/>
@@ -74,8 +74,8 @@
     </record>
 
     <record id="om_hr_lateness_view_search" model="ir.ui.view">
-        <field name="name">om.hr.lateness.view.search</field>
-        <field name="model">om.hr.lateness</field>
+        <field name="name">hr.lateness.view.search</field>
+        <field name="model">hr.lateness</field>
         <field name="arch" type="xml">
             <search string="Lateness">
                 <field name="employee_id"/>
@@ -98,7 +98,7 @@
 
     <record id="om_hr_lateness_action" model="ir.actions.act_window">
         <field name="name">Lateness</field>
-        <field name="res_model">om.hr.lateness</field>
+        <field name="res_model">hr.lateness</field>
         <field name="view_mode">list,pivot,form</field>
         <field name="context">{'search_default_counted': 1, 'search_default_date': 1}</field>
         <field name="help" type="html">
@@ -110,7 +110,7 @@
 
     <record id="om_hr_lateness_action_my" model="ir.actions.act_window">
         <field name="name">My Lateness</field>
-        <field name="res_model">om.hr.lateness</field>
+        <field name="res_model">hr.lateness</field>
         <field name="view_mode">list,form</field>
         <field name="domain">[('employee_id.user_id', '=', uid)]</field>
         <field name="help" type="html">
@@ -120,8 +120,8 @@
     </record>
 
     <record id="om_hr_lateness_excuse_view_form" model="ir.ui.view">
-        <field name="name">om.hr.lateness.excuse.view.form</field>
-        <field name="model">om.hr.lateness.excuse</field>
+        <field name="name">hr.lateness.excuse.view.form</field>
+        <field name="model">hr.lateness.excuse</field>
         <field name="arch" type="xml">
             <form string="Excuse">
                 <field name="lateness_ids" invisible="1"/>
@@ -138,17 +138,17 @@
 
     <record id="om_hr_lateness_action_excuse" model="ir.actions.act_window">
         <field name="name">Excuse</field>
-        <field name="res_model">om.hr.lateness.excuse</field>
+        <field name="res_model">hr.lateness.excuse</field>
         <field name="view_mode">form</field>
         <field name="target">new</field>
-        <field name="binding_model_id" ref="model_om_hr_lateness"/>
+        <field name="binding_model_id" ref="model_hr_lateness"/>
         <field name="context">{'default_lateness_ids': active_ids}</field>
         <field name="group_ids" eval="[(4, ref('hr_attendance.group_hr_attendance_officer'))]"/>
     </record>
 
     <record id="om_hr_lateness_policy_view_list" model="ir.ui.view">
-        <field name="name">om.hr.lateness.policy.view.list</field>
-        <field name="model">om.hr.lateness.policy</field>
+        <field name="name">hr.lateness.policy.view.list</field>
+        <field name="model">hr.lateness.policy</field>
         <field name="arch" type="xml">
             <list string="Lateness Policies">
                 <field name="name"/>
@@ -162,8 +162,8 @@
     </record>
 
     <record id="om_hr_lateness_policy_view_form" model="ir.ui.view">
-        <field name="name">om.hr.lateness.policy.view.form</field>
-        <field name="model">om.hr.lateness.policy</field>
+        <field name="name">hr.lateness.policy.view.form</field>
+        <field name="model">hr.lateness.policy</field>
         <field name="arch" type="xml">
             <form string="Lateness Policy">
                 <sheet>
@@ -209,7 +209,7 @@
 
     <record id="om_hr_lateness_policy_action" model="ir.actions.act_window">
         <field name="name">Lateness Policies</field>
-        <field name="res_model">om.hr.lateness.policy</field>
+        <field name="res_model">hr.lateness.policy</field>
         <field name="view_mode">list,form</field>
     </record>
 
@@ -219,7 +219,7 @@
         <field name="inherit_id" ref="hr.view_employee_form"/>
         <field name="arch" type="xml">
             <field name="resource_calendar_id" position="after">
-                <field name="om_lateness_policy_id" groups="hr.group_hr_user"/>
+                <field name="lateness_policy_id" groups="hr.group_hr_user"/>
             </field>
         </field>
     </record>
@@ -232,7 +232,7 @@
             <block name="attendance_settings" position="inside">
                 <setting id="om_lateness_policy_setting" string="Lateness Policy" company_dependent="1"
                          help="Grace minutes and penalties of the late arrivals and early departures, for the employees with no policy of their own.">
-                    <field name="om_lateness_policy_id" placeholder="The first policy"/>
+                    <field name="lateness_policy_id" placeholder="The first policy"/>
                     <div class="mt8">
                         <button name="%(om_hr_lateness_policy_action)d" type="action" string="Lateness Policies"
                                 class="btn-link" icon="arrow_forward"/>

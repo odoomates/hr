@@ -2,10 +2,10 @@ from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 
-class OmHrLateness(models.Model):
+class HrLateness(models.Model):
     """ A late arrival or an early departure of an employee on a working day, against the working schedule minus the
     time off and the public holidays. """
-    _name = 'om.hr.lateness'
+    _name = 'hr.lateness'
     _description = 'Lateness'
     _order = 'date desc, employee_id, kind'
 
@@ -18,13 +18,13 @@ class OmHrLateness(models.Model):
     actual_at = fields.Datetime(string='Actual', required=True)
     minutes = fields.Integer(required=True, aggregator='sum')
     attendance_id = fields.Many2one('hr.attendance', string='Attendance', ondelete='set null')
-    policy_id = fields.Many2one('om.hr.lateness.policy', string='Policy', ondelete='set null')
+    policy_id = fields.Many2one('hr.lateness.policy', string='Policy', ondelete='set null')
     state = fields.Selection([('counted', 'Counted'), ('excused', 'Excused')], required=True, default='counted',
                              index=True)
     excuse_reason = fields.Char(string='Excuse')
     occurrence = fields.Integer(help='The time in the month the employee is late in this way, the excused ones not '
                                      'counted.')
-    policy_line_id = fields.Many2one('om.hr.lateness.policy.line', string='Penalty Rule', ondelete='set null')
+    policy_line_id = fields.Many2one('hr.lateness.policy.line', string='Penalty Rule', ondelete='set null')
     penalty = fields.Selection(related='policy_line_id.penalty', store=True)
     warned = fields.Boolean(copy=False)
 
@@ -53,19 +53,19 @@ class OmHrLateness(models.Model):
         raise UserError(_('Only the attendance manager of the employee, or the attendance officers, excuse a '
                           'lateness.'))
 
-    def _om_excuse(self, reason):
+    def _excuse(self, reason):
         self._check_can_review()
         if not reason:
             raise UserError(_('Give the reason of the excuse.'))
         self.sudo().write({'state': 'excused', 'excuse_reason': reason})
-        self.sudo()._om_evaluate_months()
+        self.sudo()._evaluate_months()
         return True
 
     def action_open_excuse(self):
         return {
             'type': 'ir.actions.act_window',
             'name': _('Excuse'),
-            'res_model': 'om.hr.lateness.excuse',
+            'res_model': 'hr.lateness.excuse',
             'view_mode': 'form',
             'target': 'new',
             'context': {'default_lateness_ids': self.ids},
@@ -74,21 +74,21 @@ class OmHrLateness(models.Model):
     def action_count_again(self):
         self._check_can_review()
         self.sudo().write({'state': 'counted', 'excuse_reason': False})
-        self.sudo()._om_evaluate_months()
+        self.sudo()._evaluate_months()
         return True
 
     # ------------------------------------------------------------------
     # Occurrences and penalties
     # ------------------------------------------------------------------
 
-    def _om_evaluate_months(self):
+    def _evaluate_months(self):
         """ Number the latenesses of the months of these, kind by kind, and give each its penalty. """
         months = {(lateness.employee_id, lateness.date.replace(day=1)) for lateness in self}
         for employee, month in months:
-            self.env['om.hr.lateness']._om_evaluate(employee, month)
+            self.env['hr.lateness']._evaluate(employee, month)
 
     @api.model
-    def _om_evaluate(self, employee, month):
+    def _evaluate(self, employee, month):
         next_month = fields.Date.add(month, months=1)
         latenesses = self.sudo().search([('employee_id', '=', employee.id), ('date', '>=', month),
                                          ('date', '<', next_month)], order='date, id')
@@ -103,9 +103,9 @@ class OmHrLateness(models.Model):
             if any(lateness[name] != (value if name != 'policy_line_id' else lateness.policy_line_id.browse(value))
                    for name, value in values.items()):
                 lateness.write(values)
-        latenesses.filtered(lambda l: l.penalty == 'warning' and not l.warned)._om_warn()
+        latenesses.filtered(lambda l: l.penalty == 'warning' and not l.warned)._warn()
 
-    def _om_warn(self):
+    def _warn(self):
         """ A message to the employee, on their own chatter of the lateness. """
         for lateness in self:
             partner = lateness.employee_id.user_id.partner_id

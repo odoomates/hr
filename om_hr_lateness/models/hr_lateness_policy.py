@@ -9,10 +9,10 @@ PENALTIES = [
 ]
 
 
-class OmHrLatenessPolicy(models.Model):
+class HrLatenessPolicy(models.Model):
     """ How late arrivals and early departures are counted and penalised: grace minutes, then a matrix of bands of
     minutes and of occurrences in the month. """
-    _name = 'om.hr.lateness.policy'
+    _name = 'hr.lateness.policy'
     _description = 'Lateness Policy'
     _order = 'name'
 
@@ -28,7 +28,7 @@ class OmHrLatenessPolicy(models.Model):
     monthly_cap_days = fields.Float(
         string='Monthly Cap (Days of Wage)', default=0.0,
         help='The lateness penalties of a month never go beyond this many days of wage; 0 for no cap.')
-    line_ids = fields.One2many('om.hr.lateness.policy.line', 'policy_id', string='Penalties', copy=True)
+    line_ids = fields.One2many('hr.lateness.policy.line', 'policy_id', string='Penalties', copy=True)
     description = fields.Text(translate=True)
 
     @api.constrains('grace_in', 'grace_out', 'monthly_cap_days')
@@ -47,13 +47,13 @@ class OmHrLatenessPolicy(models.Model):
         return lines.sorted(lambda line: (line.occurrence, line.minutes_from))[-1:]
 
 
-class OmHrLatenessPolicyLine(models.Model):
+class HrLatenessPolicyLine(models.Model):
     """ One cell of the matrix: from that many minutes, from that occurrence in the month on. """
-    _name = 'om.hr.lateness.policy.line'
+    _name = 'hr.lateness.policy.line'
     _description = 'Lateness Penalty'
     _order = 'policy_id, applies_to, minutes_from, occurrence'
 
-    policy_id = fields.Many2one('om.hr.lateness.policy', required=True, ondelete='cascade', index=True)
+    policy_id = fields.Many2one('hr.lateness.policy', required=True, ondelete='cascade', index=True)
     applies_to = fields.Selection([('both', 'Both'), ('late_in', 'Late Arrival'), ('early_out', 'Early Departure')],
                                   required=True, default='both')
     minutes_from = fields.Integer(string='From (Minutes)', required=True, default=1)

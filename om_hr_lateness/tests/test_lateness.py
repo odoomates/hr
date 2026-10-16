@@ -24,7 +24,7 @@ class TestLateness(TransactionCase):
                                 'day_period': 'morning'}) for day in range(5)] + [
                 Command.create({'dayofweek': str(day), 'hour_from': 13, 'hour_to': 17,
                                 'day_period': 'afternoon'}) for day in range(5)]})
-        cls.policy = cls.env['om.hr.lateness.policy'].create({
+        cls.policy = cls.env['hr.lateness.policy'].create({
             'name': 'Test Policy', 'grace_in': 10, 'grace_out': 10, 'line_ids': [
                 Command.create({'minutes_from': 0, 'minutes_to': 30, 'occurrence': 1, 'penalty': 'warning'}),
                 Command.create({'minutes_from': 0, 'minutes_to': 30, 'occurrence': 2, 'penalty': 'fixed',
@@ -35,7 +35,7 @@ class TestLateness(TransactionCase):
             ]})
         cls.employee = cls.env['hr.employee'].create({
             'name': 'Late Employee', 'tz': 'UTC', 'user_id': cls.employee_user.id,
-            'resource_calendar_id': cls.calendar.id, 'om_lateness_policy_id': cls.policy.id,
+            'resource_calendar_id': cls.calendar.id, 'lateness_policy_id': cls.policy.id,
             'attendance_manager_id': cls.officer.id,
             'date_version': date(2026, 1, 1), 'contract_date_start': date(2026, 1, 1)})
         cls.employee.version_id.resource_calendar_id = cls.calendar
@@ -50,7 +50,7 @@ class TestLateness(TransactionCase):
         })
 
     def lateness(self, employee=None):
-        return self.env['om.hr.lateness'].search([('employee_id', '=', (employee or self.employee).id)],
+        return self.env['hr.lateness'].search([('employee_id', '=', (employee or self.employee).id)],
                                                  order='date, kind')
 
     def test_within_grace(self):
@@ -106,7 +106,7 @@ class TestLateness(TransactionCase):
         self.assertEqual(late.mapped('penalty'), ['warning', 'fixed', 'daily_percent', 'minutes'])
         self.assertTrue(late[0].warned)
         self.assertIn(self.employee_user.partner_id, self.employee.message_ids[0].partner_ids)
-        late[1].with_user(self.officer)._om_excuse('Errand for the company')
+        late[1].with_user(self.officer)._excuse('Errand for the company')
         self.assertEqual(late.mapped('occurrence'), [1, 0, 2, 3])
         self.assertEqual(late[2].penalty, 'fixed', 'the third is now the second')
         late[1].with_user(self.officer).action_count_again()
@@ -118,7 +118,7 @@ class TestLateness(TransactionCase):
         line = self.policy._line_for
         self.assertEqual(line('late_in', 20, 5).penalty, 'daily_percent', 'the 3rd and after')
         self.assertEqual(line('late_in', 45, 2).penalty, 'minutes')
-        self.assertFalse(self.env['om.hr.lateness.policy'].create({'name': 'Empty'})._line_for('late_in', 20, 1))
+        self.assertFalse(self.env['hr.lateness.policy'].create({'name': 'Empty'})._line_for('late_in', 20, 1))
 
     def test_flexible_skipped(self):
         flexible = self.env['resource.calendar'].create({'name': 'Flexible', 'calendar_type': 'undefined'})
@@ -132,7 +132,7 @@ class TestLateness(TransactionCase):
             'name': 'Company Policy', 'tz': 'UTC', 'resource_calendar_id': self.calendar.id,
             'date_version': date(2026, 1, 1), 'contract_date_start': date(2026, 1, 1)})
         other.version_id.resource_calendar_id = self.calendar
-        other.company_id.om_lateness_policy_id = self.env.ref('om_hr_lateness.policy_standard')
+        other.company_id.lateness_policy_id = self.env.ref('om_hr_lateness.policy_standard')
         self.attend(MONDAY, 8.5, 17, employee=other)
         late = self.lateness(other)
         self.assertEqual((late.policy_id, late.penalty), (self.env.ref('om_hr_lateness.policy_standard'), 'minutes'))
@@ -140,17 +140,17 @@ class TestLateness(TransactionCase):
     def test_access(self):
         self.attend(MONDAY, 8.5, 17)
         other = self.env['hr.employee'].create({'name': 'Someone', 'tz': 'UTC', 'resource_calendar_id': self.calendar.id,
-                                                'om_lateness_policy_id': self.policy.id})
+                                                'lateness_policy_id': self.policy.id})
         self.attend(MONDAY, 8.5, 17, employee=other)
-        self.assertEqual(self.env['om.hr.lateness'].with_user(self.employee_user).search([]).employee_id,
+        self.assertEqual(self.env['hr.lateness'].with_user(self.employee_user).search([]).employee_id,
                          self.employee, 'an employee sees their own')
         late = self.lateness()
         with self.assertRaises((UserError, AccessError)):
-            late.with_user(self.other_officer)._om_excuse('Not my employee')
+            late.with_user(self.other_officer)._excuse('Not my employee')
         with self.assertRaises((UserError, AccessError)):
-            late.with_user(self.employee_user)._om_excuse('Myself')
+            late.with_user(self.employee_user)._excuse('Myself')
         with self.assertRaises(UserError):
-            late.with_user(self.officer)._om_excuse('')
+            late.with_user(self.officer)._excuse('')
 
     def test_team_officer_reaches_the_menu(self):
         """ An officer managing only their team, not all the attendances, finds the lateness of their team. """

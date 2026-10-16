@@ -7,31 +7,31 @@ from odoo import api, fields, models
 class ResCompany(models.Model):
     _inherit = 'res.company'
 
-    om_lateness_policy_id = fields.Many2one('om.hr.lateness.policy', string='Lateness Policy',
+    lateness_policy_id = fields.Many2one('hr.lateness.policy', string='Lateness Policy',
                                             help='The policy of the employees with none of their own.')
 
 
 class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
-    om_lateness_policy_id = fields.Many2one(related='company_id.om_lateness_policy_id', readonly=False)
+    lateness_policy_id = fields.Many2one(related='company_id.lateness_policy_id', readonly=False)
 
 
 class HrEmployee(models.Model):
     _inherit = 'hr.employee'
 
-    om_lateness_policy_id = fields.Many2one(
-        'om.hr.lateness.policy', string='Lateness Policy', groups='hr.group_hr_user',
+    lateness_policy_id = fields.Many2one(
+        'hr.lateness.policy', string='Lateness Policy', groups='hr.group_hr_user',
         help='Leave empty for the policy of the company.')
 
-    def _om_lateness_policy(self):
+    def _lateness_policy(self):
         self.ensure_one()
         employee = self.sudo()
-        return employee.om_lateness_policy_id or employee.company_id.om_lateness_policy_id or \
-            self.env['om.hr.lateness.policy'].sudo().search(
+        return employee.lateness_policy_id or employee.company_id.lateness_policy_id or \
+            self.env['hr.lateness.policy'].sudo().search(
                 [('company_id', 'in', [employee.company_id.id, False])], order='company_id, id', limit=1)
 
-    def _om_schedule_of_day(self, day, intervals, tz):
+    def _schedule_of_day(self, day, intervals, tz):
         """ :return: the start and the end of the work of `day`, the end running past midnight for a night shift;
             None on a day off, on time off or on a public holiday """
         day_start = datetime.combine(day, time.min, tz)
@@ -47,18 +47,18 @@ class HrEmployee(models.Model):
             stop = later_stop
         return start, stop
 
-    def _om_compute_lateness(self, date_from, date_to):
+    def _compute_lateness(self, date_from, date_to):
         """ Record the late arrivals and the early departures of the employees between the two days. """
-        Lateness = self.env['om.hr.lateness'].sudo()
+        Lateness = self.env['hr.lateness'].sudo()
         to_evaluate = Lateness
         for employee in self.sudo():
             existing = Lateness.search([('employee_id', '=', employee.id), ('date', '>=', date_from),
                                         ('date', '<=', date_to)])
-            policy = employee._om_lateness_policy()
+            policy = employee._lateness_policy()
             calendar = employee.resource_calendar_id
             found = {}
             if policy and calendar and not calendar._is_flexible():
-                found = employee._om_find_lateness(policy, date_from, date_to)
+                found = employee._find_lateness(policy, date_from, date_to)
             done = Lateness
             for (day, kind), values in found.items():
                 lateness = existing.filtered(lambda l: l.date == day and l.kind == kind)
@@ -73,10 +73,10 @@ class HrEmployee(models.Model):
             months = {(employee, lateness.date.replace(day=1)) for lateness in to_evaluate if lateness.exists()}
             gone.unlink()
             for month_employee, month in months | {(employee, day.replace(day=1)) for day, _kind in found}:
-                Lateness._om_evaluate(month_employee, month)
+                Lateness._evaluate(month_employee, month)
         return True
 
-    def _om_expected_intervals(self, start, end):
+    def _expected_intervals(self, start, end):
         """ :return: the work intervals of the employee, time off and public holidays left out """
         self.ensure_one()
         if self._get_versions_with_contract_overlap_with_period(start.date(), end.date()):
@@ -87,18 +87,18 @@ class HrEmployee(models.Model):
             domain=[('company_id', 'in', [False, self.company_id.id]), ('count_as', '=', 'absence')],
         )[self.resource_id.id]
 
-    def _om_find_lateness(self, policy, date_from, date_to):
+    def _find_lateness(self, policy, date_from, date_to):
         """ :return: {(day, kind): values} of the latenesses beyond the grace minutes of the policy """
         self.ensure_one()
         tz = ZoneInfo(self._get_tz(date=date_from))
-        intervals = self._om_expected_intervals(
+        intervals = self._expected_intervals(
             datetime.combine(date_from, time.min, tz), datetime.combine(date_to + timedelta(days=2), time.min, tz))
         attendances = self.env['hr.attendance'].sudo().search([
             ('employee_id', '=', self.id), ('date', '>=', date_from), ('date', '<=', date_to),
             ('source_attendance_id', '=', False)])
         found = {}
         for day in sorted(set(attendances.mapped('date'))):
-            schedule = self._om_schedule_of_day(day, intervals, tz)
+            schedule = self._schedule_of_day(day, intervals, tz)
             if not schedule:
                 continue
             scheduled_in, scheduled_out = schedule
@@ -121,10 +121,10 @@ class HrEmployee(models.Model):
         return found
 
     @api.model
-    def _cron_om_compute_lateness(self, days=7):
+    def _cron_compute_lateness(self, days=7):
         """ The last days again, for the schedules, the time off and the attendances changed since. """
         today = fields.Date.context_today(self)
         date_from = today - timedelta(days=days)
         employees = self.env['hr.attendance'].sudo().search(
             [('date', '>=', date_from), ('date', '<', today)]).employee_id
-        employees._om_compute_lateness(date_from, today - timedelta(days=1))
+        employees._compute_lateness(date_from, today - timedelta(days=1))
