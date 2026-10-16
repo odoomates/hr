@@ -12,14 +12,15 @@ class HrAssetAssignment(models.Model):
     _name = 'hr.asset.assignment'
     _inherit = ['mail.thread']
     _description = 'Asset Assignment'
+    _check_company_auto = True
     _order = 'date_from desc, id desc'
     _rec_name = 'equipment_id'
 
     equipment_id = fields.Many2one('maintenance.equipment', string='Asset', required=True, index=True,
-                                   ondelete='cascade', tracking=True)
+                                   ondelete='cascade', tracking=True, check_company=True)
     category_id = fields.Many2one(related='equipment_id.category_id', store=True, string='Category')
     serial_no = fields.Char(related='equipment_id.serial_no', string='Serial Number')
-    employee_id = fields.Many2one('hr.employee', required=True, index=True, tracking=True)
+    employee_id = fields.Many2one('hr.employee', required=True, index=True, tracking=True, check_company=True)
     department_id = fields.Many2one(related='employee_id.department_id', store=True)
     company_id = fields.Many2one('res.company', required=True, index=True,
                                  default=lambda self: self.env.company)
@@ -55,9 +56,14 @@ class HrAssetAssignment(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
+            if 'company_id' in vals:
+                continue
+            # the company of the asset, else the one of the employee holding a shared asset
             equipment = self.env['maintenance.equipment'].browse(vals.get('equipment_id'))
-            if equipment.company_id and 'company_id' not in vals:
-                vals['company_id'] = equipment.company_id.id
+            employee = self.env['hr.employee'].browse(vals.get('employee_id'))
+            company = equipment.company_id or employee.sudo().company_id
+            if company:
+                vals['company_id'] = company.id
         return super().create(vals_list)
 
     def _close(self, state='returned', date=None, condition=False, note=False, charge=0.0):
