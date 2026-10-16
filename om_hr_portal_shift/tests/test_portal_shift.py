@@ -2,11 +2,11 @@ from datetime import date, timedelta
 
 from odoo.tests import tagged
 
-from odoo.addons.om_hr_portal.tests.common import OmHrPortalCase
+from odoo.addons.om_hr_portal.tests.common import HrPortalCase
 
 
 @tagged('post_install', '-at_install')
-class TestPortalShift(OmHrPortalCase):
+class TestPortalShift(HrPortalCase):
 
     @classmethod
     def setUpClass(cls):
@@ -16,7 +16,7 @@ class TestPortalShift(OmHrPortalCase):
         (cls.employee | cls.colleague).write({'department_id': department.id, 'tz': 'UTC'})
         morning = cls.env.ref('om_hr_shift.template_morning')
         evening = cls.env.ref('om_hr_shift.template_evening')
-        Shift = cls.env['om.hr.shift'].with_context(om_shift_override=True)
+        Shift = cls.env['hr.shift'].with_context(om_shift_override=True)
         cls.mine = Shift.create(dict(morning._shift_values(), employee_id=cls.employee.id, date=cls.day))
         cls.theirs = Shift.create(dict(evening._shift_values(), employee_id=cls.colleague.id,
                                        date=cls.day + timedelta(days=1)))
@@ -36,11 +36,11 @@ class TestPortalShift(OmHrPortalCase):
     def test_claim_and_swap(self):
         self.login_employee()
         self.url_open('/my/hr/shifts/claim', data={'csrf_token': self.csrf_token(), 'shift_id': self.open_shift.id})
-        claim = self.env['om.hr.shift.request'].search([('kind', '=', 'claim'), ('employee_id', '=', self.employee.id)])
+        claim = self.env['hr.shift.request'].search([('kind', '=', 'claim'), ('employee_id', '=', self.employee.id)])
         self.assertEqual((claim.shift_id, claim.state), (self.open_shift, 'to_approve'))
         self.url_open('/my/hr/shifts/swap', data={'csrf_token': self.csrf_token(), 'shift_id': self.mine.id,
                                                   'target_shift_id': self.theirs.id})
-        swap = self.env['om.hr.shift.request'].search([('kind', '=', 'swap'), ('employee_id', '=', self.employee.id)])
+        swap = self.env['hr.shift.request'].search([('kind', '=', 'swap'), ('employee_id', '=', self.employee.id)])
         self.assertEqual((swap.target_shift_id, swap.state), (self.theirs, 'to_accept'))
         # the employee cannot answer for the colleague
         self.assertEqual(self.url_open('/my/hr/shifts/requests/%s/accept' % swap.id,
@@ -60,10 +60,10 @@ class TestPortalShift(OmHrPortalCase):
         self.login_employee()
         self.url_open('/my/hr/shifts/unavailable', data={
             'csrf_token': self.csrf_token(), 'date_from': str(self.day), 'reason': 'Wedding'})
-        unavailable = self.env['om.hr.shift.unavailability'].search([('employee_id', '=', self.employee.id)])
+        unavailable = self.env['hr.shift.unavailability'].search([('employee_id', '=', self.employee.id)])
         self.assertEqual((unavailable.date_to, unavailable.reason), (self.day, 'Wedding'))
         self.assertIn('Wedding', self.mine.warning)
-        other = self.env['om.hr.shift.unavailability'].create({'employee_id': self.colleague.id,
+        other = self.env['hr.shift.unavailability'].create({'employee_id': self.colleague.id,
                                                                'date_from': self.day, 'date_to': self.day})
         response = self.url_open('/my/hr/shifts/unavailable/%s/delete' % other.id,
                                  data={'csrf_token': self.csrf_token()})
