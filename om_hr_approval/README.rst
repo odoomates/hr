@@ -28,6 +28,10 @@ Features
   Change of My Details and Other to start with.
 * Employees > Requests > To Approve and All Requests; My HR > To Approve lists
   everything waiting for your approval, from every app.
+* A step waiting too long is escalated to the managers of its approvers, by
+  default.
+* With Time Off, validated time off names the substitute of the approver for
+  its dates (HR Approvals: Time Off).
 
 Configuration
 =============

@@ -35,6 +35,19 @@ class ApprovalStep(models.Model):
     def _approvers_hr_responsible(self, request, record):
         return self._employee_of(request, record).sudo().version_id.hr_responsible_id
 
+    escalate_type = fields.Selection(selection_add=[('manager', 'Manager of the Approvers')],
+                                     ondelete={'manager': 'set default'})
+
+    @api.model
+    def _default_escalate_type(self):
+        return 'manager'
+
+    def _escalate_manager(self, line):
+        """ The managers of the approvers of the step, as Employees knows them. """
+        approvers = line.approver_user_ids.sudo()
+        managers = approvers.employee_ids.parent_id.user_id
+        return managers - approvers
+
     @api.model
     def _users_models(self):
         return super()._users_models() + ('hr.employee',)

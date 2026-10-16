@@ -1,4 +1,8 @@
-from odoo import Command
+from datetime import timedelta
+
+from freezegun import freeze_time
+
+from odoo import Command, fields
 from odoo.exceptions import AccessError, UserError
 from odoo.tests import TransactionCase, new_test_user, tagged
 
@@ -102,3 +106,17 @@ class TestHrRequest(TransactionCase):
         request = self.env['approval.request'].search([('res_model', '=', 'res.partner'),
                                                          ('res_id', '=', partner.id)])
         self.assertEqual(request.approver_user_ids, self.manager_user)
+
+    def test_escalate_to_the_manager_of_the_approver(self):
+        boss_user = new_test_user(self.env, 'om_hr_boss', groups='base.group_user')
+        self.manager.parent_id = self.env['hr.employee'].create({'name': 'Boss', 'user_id': boss_user.id})
+        step = self.env.ref('om_hr_approval.flow_om_hr_request_manager')
+        self.assertEqual(self.env['approval.step'].new({}).escalate_type, 'manager', 'the default with HR')
+        step.write({'escalate_days': 2, 'escalate_type': 'manager'})
+        request = self.new_request()
+        request.action_approval_submit()
+        line = request.approval_line_ids.filtered(lambda line: line.state == 'pending')
+        self.assertEqual(line.approver_user_ids, self.manager_user)
+        with freeze_time(fields.Datetime.now() + timedelta(days=2, hours=1)):
+            self.env['approval.line']._cron_follow_up()
+        self.assertEqual(line.approver_user_ids, self.manager_user | boss_user)
