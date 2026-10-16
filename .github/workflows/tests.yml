@@ -70,3 +70,49 @@ jobs:
         with:
           name: log-${{ strategy.job-index }}
           path: logs/
+
+  upgrade:
+    # the users of the version before this change upgrade without an error or a warning
+    name: upgrade
+    needs: lint
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: odoo
+          POSTGRES_PASSWORD: odoo
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      PGHOST: localhost
+      PGUSER: odoo
+      PGPASSWORD: odoo
+      ODOO_PATH: ${{ github.workspace }}/odoo
+      LOG_DIR: ${{ github.workspace }}/logs
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          path: hr
+          fetch-depth: 0
+      - name: Version before the change
+        id: base
+        run: |
+          base=${{ github.event.pull_request.base.sha || github.event.before }}
+          if [ -z "$base" ] || ! git -C hr cat-file -e "$base^{commit}" 2>/dev/null; then
+            base=$(git -C hr rev-parse HEAD~1)
+          fi
+          echo "sha=$base" >> "$GITHUB_OUTPUT"
+          git -C hr worktree add --detach ../before "$base"
+      - uses: ./hr/.github/actions/setup-odoo
+      - name: Install the version before, upgrade to this one
+        run: hr/.github/scripts/run_odoo_upgrade.sh test_upgrade before om_hrms,om_hr_payroll_account
+      - name: Log
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: log-upgrade
+          path: logs/

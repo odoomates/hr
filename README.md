@@ -77,8 +77,9 @@ from the payslips, install by themselves once both sides are there.
 
 Every push and pull request runs the checks of `.github/workflows/tests.yml`: ruff and pylint-odoo, then the
 tests of every module with demo data, with and without Accounting, against the latest Odoo 20.0. A test failing,
-or a warning or an error in the log, fails the check. Every week, each module is also installed alone with its
-tests (`.github/workflows/isolation.yml`).
+or a warning or an error in the log, fails the check. The upgrade check installs the version before the change
+and upgrades it to the new one, as the existing users do. Every week, each module is also installed alone with
+its tests, and the last release tagged upgrades to the current code (`.github/workflows/isolation.yml`).
 
 Run the same locally, on a PostgreSQL server you can create databases on:
 

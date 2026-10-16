@@ -1,6 +1,7 @@
-name: Modules alone
+name: Weekly
 
-# every module installs alone, with its demo data, and its tests pass: nobody needs the whole suite
+# every module installs alone, with its demo data, and its tests pass: nobody needs the whole suite;
+# and the last release upgrades to the current code
 on:
   schedule:
     - cron: '0 3 * * 1'
@@ -56,4 +57,47 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: log-${{ matrix.module }}
+          path: logs/
+
+  upgrade-from-release:
+    # the users of the last release tagged (e.g. 20.0.2026.10) upgrade to the current code
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: odoo
+          POSTGRES_PASSWORD: odoo
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      PGHOST: localhost
+      PGUSER: odoo
+      PGPASSWORD: odoo
+      ODOO_PATH: ${{ github.workspace }}/odoo
+      LOG_DIR: ${{ github.workspace }}/logs
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          path: hr
+          fetch-depth: 0
+      - name: Last release
+        id: release
+        run: |
+          tag=$(git -C hr describe --tags --abbrev=0 2>/dev/null || true)
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          if [ -n "$tag" ]; then git -C hr worktree add --detach ../release "$tag"; else echo "No release tagged yet"; fi
+      - uses: ./hr/.github/actions/setup-odoo
+        if: steps.release.outputs.tag != ''
+      - name: Install the last release, upgrade to the current code
+        if: steps.release.outputs.tag != ''
+        run: hr/.github/scripts/run_odoo_upgrade.sh test_release_upgrade release om_hrms,om_hr_payroll_account
+      - name: Log
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: log-release-upgrade
           path: logs/
