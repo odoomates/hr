@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Ronnie Hart, last week, on the 08:00-16:00 schedule of the core demo (Brussels time): late on Monday,
+         Wednesday and Friday, gone early on Thursday; the lateness is recorded as the attendances are created -->
+    <record id="demo_attendance_al_mon" model="hr.attendance">
+        <field name="employee_id" ref="hr.employee_al"/>
+        <field name="check_in" eval="(DateTime.today() + relativedelta(days=-13, weekday=0, hour=8, minute=25, second=0, microsecond=0) + relativedelta(days=0)).replace(tzinfo=pytz.timezone('Europe/Brussels')).astimezone(pytz.utc).strftime('%Y-%m-%d %H:%M:%S')"/>
+        <field name="check_out" eval="(DateTime.today() + relativedelta(days=-13, weekday=0, hour=16, minute=0, second=0, microsecond=0) + relativedelta(days=0)).replace(tzinfo=pytz.timezone('Europe/Brussels')).astimezone(pytz.utc).strftime('%Y-%m-%d %H:%M:%S')"/>
+    </record>
+    <record id="demo_attendance_al_tue" model="hr.attendance">
+        <field name="employee_id" ref="hr.employee_al"/>
+        <field name="check_in" eval="(DateTime.today() + relativedelta(days=-13, weekday=0, hour=8, minute=5, second=0, microsecond=0) + relativedelta(days=1)).replace(tzinfo=pytz.timezone('Europe/Brussels')).astimezone(pytz.utc).strftime('%Y-%m-%d %H:%M:%S')"/>
+        <field name="check_out" eval="(DateTime.today() + relativedelta(days=-13, weekday=0, hour=16, minute=5, second=0, microsecond=0) + relativedelta(days=1)).replace(tzinfo=pytz.timezone('Europe/Brussels')).astimezone(pytz.utc).strftime('%Y-%m-%d %H:%M:%S')"/>
+    </record>
+    <record id="demo_attendance_al_wed" model="hr.attendance">
+        <field name="employee_id" ref="hr.employee_al"/>
+        <field name="check_in" eval="(DateTime.today() + relativedelta(days=-13, weekday=0, hour=8, minute=40, second=0, microsecond=0) + relativedelta(days=2)).replace(tzinfo=pytz.timezone('Europe/Brussels')).astimezone(pytz.utc).strftime('%Y-%m-%d %H:%M:%S')"/>
+        <field name="check_out" eval="(DateTime.today() + relativedelta(days=-13, weekday=0, hour=16, minute=0, second=0, microsecond=0) + relativedelta(days=2)).replace(tzinfo=pytz.timezone('Europe/Brussels')).astimezone(pytz.utc).strftime('%Y-%m-%d %H:%M:%S')"/>
+    </record>
+    <record id="demo_attendance_al_thu" model="hr.attendance">
+        <field name="employee_id" ref="hr.employee_al"/>
+        <field name="check_in" eval="(DateTime.today() + relativedelta(days=-13, weekday=0, hour=8, minute=0, second=0, microsecond=0) + relativedelta(days=3)).replace(tzinfo=pytz.timezone('Europe/Brussels')).astimezone(pytz.utc).strftime('%Y-%m-%d %H:%M:%S')"/>
+        <field name="check_out" eval="(DateTime.today() + relativedelta(days=-13, weekday=0, hour=15, minute=20, second=0, microsecond=0) + relativedelta(days=3)).replace(tzinfo=pytz.timezone('Europe/Brussels')).astimezone(pytz.utc).strftime('%Y-%m-%d %H:%M:%S')"/>
+    </record>
+    <record id="demo_attendance_al_fri" model="hr.attendance">
+        <field name="employee_id" ref="hr.employee_al"/>
+        <field name="check_in" eval="(DateTime.today() + relativedelta(days=-13, weekday=0, hour=8, minute=15, second=0, microsecond=0) + relativedelta(days=4)).replace(tzinfo=pytz.timezone('Europe/Brussels')).astimezone(pytz.utc).strftime('%Y-%m-%d %H:%M:%S')"/>
+        <field name="check_out" eval="(DateTime.today() + relativedelta(days=-13, weekday=0, hour=16, minute=0, second=0, microsecond=0) + relativedelta(days=4)).replace(tzinfo=pytz.timezone('Europe/Brussels')).astimezone(pytz.utc).strftime('%Y-%m-%d %H:%M:%S')"/>
+    </record>
+
+    <!-- Wednesday's delay is excused: a train strike -->
+    <function model="hr.lateness" name="_excuse"
+              eval="[obj().search([('employee_id', '=', ref('hr.employee_al')), ('kind', '=', 'late_in'),
+                                   ('minutes', '=', 40)]).ids, 'Train strike']"/>
+
+</odoo>

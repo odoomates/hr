@@ -14,5 +14,6 @@
         'data/om_hr_lateness_data.xml',
         'views/om_hr_lateness_views.xml',
     ],
+    'demo': ['demo/om_hr_lateness_demo.xml'],
     'images': ['static/description/banner.gif'],
 }
