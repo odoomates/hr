@@ -13,5 +13,6 @@
         'views/om_hr_gratuity_scheme_views.xml',
         'views/om_hr_exit_views.xml',
     ],
+    'demo': ['demo/om_hr_gratuity_demo.xml'],
     'images': ['static/description/banner.gif'],
 }

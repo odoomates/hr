@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- an example scheme: half a month of pay a year for the first five years, a month beyond -->
+    <record id="demo_gratuity_scheme" model="hr.gratuity.scheme">
+        <field name="name">End of Service (Example)</field>
+        <field name="sequence">50</field>
+        <field name="days_per_month">30</field>
+        <field name="min_years">1</field>
+        <field name="max_months">24</field>
+        <field name="note">An example to adapt: the days of pay per year of service, and the part kept when the employee resigns early.</field>
+        <field name="band_ids" eval="[
+            Command.create({'from_years': 0, 'to_years': 5, 'days_per_year': 15}),
+            Command.create({'from_years': 5, 'to_years': 0, 'days_per_year': 30}),
+        ]"/>
+        <field name="factor_ids" eval="[
+            Command.create({'departure_reason_ids': [Command.set([ref('hr.departure_resigned')])],
+                            'from_years': 0, 'to_years': 5, 'factor': 50}),
+        ]"/>
+    </record>
+
+    <!-- the resignation of the demo computes its gratuity with it -->
+    <function model="hr.exit" name="write"
+              eval="[[ref('om_hr_exit.demo_exit_resignation')], {'gratuity_scheme_id': ref('demo_gratuity_scheme')}]"/>
+    <function model="hr.exit" name="action_compute_gratuity" eval="[[ref('om_hr_exit.demo_exit_resignation')]]"/>
+
+</odoo>
