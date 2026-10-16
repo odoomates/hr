@@ -5,7 +5,7 @@ from odoo.exceptions import UserError
 class HrEmployee(models.Model):
     _inherit = 'hr.employee'
 
-    def action_om_grant_portal(self):
+    def action_grant_portal(self):
         """ A portal user for the employee, invited by email: they reach their HR pages on the website without
             being a user of the backend. """
         self.ensure_one()

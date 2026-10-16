@@ -7,7 +7,7 @@
         <field name="inherit_id" ref="hr.view_employee_form"/>
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
-                <button name="action_om_grant_portal" string="Grant Portal Access" type="object"
+                <button name="action_grant_portal" string="Grant Portal Access" type="object"
                         invisible="user_id" groups="hr.group_hr_user"
                         confirm="An invitation to the HR pages of the website will be sent to the email of the employee. Continue?"/>
             </xpath>

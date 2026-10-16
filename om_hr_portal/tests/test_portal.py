@@ -1,20 +1,20 @@
 from odoo.exceptions import UserError
 from odoo.tests import new_test_user, tagged
 
-from .common import OmHrPortalCase
+from .common import HrPortalCase
 
 
 @tagged('post_install', '-at_install')
-class TestHrPortal(OmHrPortalCase):
+class TestHrPortal(HrPortalCase):
 
     def test_grant_portal_access(self):
         self.assertTrue(self.portal_user.share, 'a portal user, not a user of the backend')
         self.assertTrue(self.portal_user.has_group('base.group_portal'))
         self.assertEqual(self.portal_user.login, 'portal.employee@example.com')
         with self.assertRaises(UserError):
-            self.employee.with_user(self.hr_user).action_om_grant_portal()
+            self.employee.with_user(self.hr_user).action_grant_portal()
         with self.assertRaises(UserError):
-            self.colleague.with_user(self.manager_user).action_om_grant_portal()
+            self.colleague.with_user(self.manager_user).action_grant_portal()
 
     def test_home_and_profile(self):
         self.login_employee()

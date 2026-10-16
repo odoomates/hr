@@ -3,7 +3,7 @@ from datetime import date
 from odoo.tests import HttpCase, new_test_user
 
 
-class OmHrPortalCase(HttpCase):
+class HrPortalCase(HttpCase):
     """ An employee with a portal user, and a colleague with one too, for the HR pages of the website. """
 
     @classmethod
@@ -19,8 +19,8 @@ class OmHrPortalCase(HttpCase):
                                         'job_title': 'Storekeeper', **values})
         cls.colleague = Employee.create({'name': 'Portal Colleague', 'work_email': 'portal.colleague@example.com',
                                          **values})
-        cls.employee.with_user(cls.hr_user).action_om_grant_portal()
-        cls.colleague.with_user(cls.hr_user).action_om_grant_portal()
+        cls.employee.with_user(cls.hr_user).action_grant_portal()
+        cls.colleague.with_user(cls.hr_user).action_grant_portal()
         cls.portal_user = cls.employee.user_id
         cls.colleague_user = cls.colleague.user_id
         for user in (cls.portal_user, cls.colleague_user):
