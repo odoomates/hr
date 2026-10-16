@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="portal_my_hr" inherit_id="om_hr_portal.portal_my_hr" name="My HR: Policies">
+        <xpath expr="//div[@id='om_hr_cards']" position="inside">
+            <div class="col" style="order: 0;">
+                <t t-call="om_hr_portal.portal_my_hr_card" url="'/my/hr/policies'" icon="'task'"
+                   title.translate="Policies" text.translate="The company policies to read and agree to, or sign"/>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="portal_my_policies" name="My Policies">
+        <t t-call="portal.portal_layout">
+            <div t-if="not assignments" class="alert alert-info">No policy asked to you.</div>
+            <div class="list-group mb-4">
+                <a t-foreach="assignments" t-as="assignment" t-attf-href="/my/hr/policies/#{assignment.id}"
+                   class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    <span>
+                        <span t-attf-class="#{'fw-bold' if assignment.state == 'pending' else ''}"
+                              t-out="assignment.policy_id.name"/>
+                        <div class="small text-muted">
+                            Version <t t-out="assignment.version_id.number"/>
+                            <t t-if="assignment.date_due and assignment.state == 'pending'">
+                                · Due <t t-out="assignment.date_due"/></t>
+                        </div>
+                    </span>
+                    <span>
+                        <span t-if="assignment.state == 'pending' and assignment.is_overdue" class="badge text-bg-danger">Overdue</span>
+                        <span t-elif="assignment.state == 'pending'" class="badge text-bg-warning">
+                            <t t-if="assignment.answer_type == 'sign'">To Sign</t><t t-else="">To Read and Agree</t>
+                        </span>
+                        <span t-elif="assignment.state == 'done'" class="badge text-bg-success">Answered</span>
+                        <span t-else="" class="badge text-bg-secondary">Declined</span>
+                    </span>
+                </a>
+            </div>
+        </t>
+    </template>
+
+    <template id="portal_my_policy" name="My Policy">
+        <t t-call="portal.portal_layout">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0" t-out="assignment.policy_id.name"/>
+                    <div class="small text-muted">
+                        Version <t t-out="assignment.version_id.number"/>
+                        <t t-if="assignment.date_due and assignment.state == 'pending'"> · Due <t t-out="assignment.date_due"/></t>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div t-if="error" class="alert alert-danger" t-out="error"/>
+                    <div t-if="assignment.version_id.change_note" class="alert alert-light border" style="white-space: pre-line;"
+                         t-out="assignment.version_id.change_note"/>
+                    <div t-if="assignment.content_type == 'text'" t-field="assignment.body"/>
+                    <iframe t-else="" t-attf-src="/my/hr/policies/#{assignment.id}/document"
+                            class="w-100 border rounded" style="height: 70vh;" title="Policy"/>
+                </div>
+                <div class="card-footer">
+                    <t t-if="assignment.state == 'pending'">
+                        <form t-if="assignment.answer_type == 'acknowledge'"
+                              t-attf-action="/my/hr/policies/#{assignment.id}/agree" method="post">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <button type="submit" class="btn btn-primary">I Have Read and Agree</button>
+                        </form>
+                        <a t-elif="sign_url" t-att-href="sign_url" class="btn btn-primary">Sign</a>
+                        <span t-else="" class="text-muted">HR prepares the document for your signature.</span>
+                    </t>
+                    <span t-elif="assignment.state == 'done'" class="text-success">
+                        Answered on <t t-out="assignment.date_done"/> UTC
+                    </span>
+                    <span t-else="" class="text-muted">You declined to sign it.</span>
+                </div>
+            </div>
+        </t>
+    </template>
+
+</odoo>
