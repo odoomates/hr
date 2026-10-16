@@ -58,9 +58,9 @@ class TestOvertimePayroll(TransactionCase):
         june = self.payslip(6)
         self.assertEqual(self.total(june, 'OVERTIME'), 75.0, '4 h x 12.50 x 150%')
         self.assertEqual(self.total(june, 'NET'), 3075.0)
-        self.assertEqual(june.om_overtime_ids, paid)
-        self.assertFalse((draft | refused).om_payslip_id)
-        self.assertEqual(june.om_overtime_hours, 4.0)
+        self.assertEqual(june.overtime_ids, paid)
+        self.assertFalse((draft | refused).payslip_id)
+        self.assertEqual(june.overtime_hours, 4.0)
 
     def test_overtime_entered_by_hand_uses_the_type_rate(self):
         self.overtime(date(2026, 6, 10), rule=False)
@@ -73,16 +73,16 @@ class TestOvertimePayroll(TransactionCase):
         late = self.overtime(date(2026, 6, 20), hours=2, state='draft')
         late.with_context(skip_time_rules=True).write({'state': 'validated'})
         july = self.payslip(7)
-        self.assertEqual(july.om_overtime_ids, late, 'June overtime validated after the June payslip')
+        self.assertEqual(july.overtime_ids, late, 'June overtime validated after the June payslip')
         self.assertEqual(self.total(july, 'OVERTIME'), 37.5)
-        self.assertEqual(june_overtime.om_payslip_id, june)
+        self.assertEqual(june_overtime.payslip_id, june)
 
     def test_cancelled_payslip_releases_the_overtime(self):
         overtime = self.overtime(date(2026, 6, 10))
         june = self.payslip(6)
         june.action_payslip_cancel()
-        self.assertFalse(overtime.om_payslip_id)
-        self.assertEqual(self.payslip(6).om_overtime_ids, overtime)
+        self.assertFalse(overtime.payslip_id)
+        self.assertEqual(self.payslip(6).overtime_ids, overtime)
 
     def test_recompute_does_not_double(self):
         self.overtime(date(2026, 6, 10))
@@ -114,5 +114,5 @@ class TestOvertimePayroll(TransactionCase):
                                                     ('time_rule_id', '=', rule.id)])
         self.assertAlmostEqual(sum(outputs.mapped('worked_hours')), 4.0)
         june = self.payslip(6)
-        self.assertEqual(june.om_overtime_ids, outputs)
+        self.assertEqual(june.overtime_ids, outputs)
         self.assertEqual(self.total(june, 'OVERTIME'), 75.0)

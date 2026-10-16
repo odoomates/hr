@@ -18,7 +18,7 @@ wage x the salary rate of the time rule. Add the rule to the salary structures p
             <field name="company_id" eval="False"/>
         </record>
 
-        <function model="hr.salary.rule" name="_om_hr_overtime_add_to_base_structure"/>
+        <function model="hr.salary.rule" name="_hr_overtime_add_to_base_structure"/>
 
     </data>
 </odoo>

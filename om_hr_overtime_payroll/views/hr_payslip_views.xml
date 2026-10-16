@@ -7,8 +7,8 @@
         <field name="inherit_id" ref="om_hr_payroll.view_hr_payslip_form"/>
         <field name="arch" type="xml">
             <page name="worked_days" position="after">
-                <page string="Overtime" name="om_overtime" invisible="not om_overtime_ids">
-                    <field name="om_overtime_ids" readonly="1">
+                <page string="Overtime" name="om_overtime" invisible="not overtime_ids">
+                    <field name="overtime_ids" readonly="1">
                         <list>
                             <field name="date"/>
                             <field name="check_in"/>
