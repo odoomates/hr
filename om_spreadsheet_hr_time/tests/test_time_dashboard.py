@@ -17,6 +17,6 @@ class TestTimeDashboard(HttpCase):
             'check_out': datetime(today.year, today.month, 1, 12, 0),
         })
         attendance.state = 'validated'
-        self.assertEqual(attendance.om_department_id, department)
+        self.assertEqual(attendance.employee_department_id, department)
         self.start_tour('/odoo/action-spreadsheet_dashboard.ir_actions_dashboard_action', 'om_spreadsheet_hr_time',
                         login='admin')

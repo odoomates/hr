@@ -41,7 +41,7 @@ def build_time():
     period = workbook.date_filter('period', 'Period', 'this_year')
     department = workbook.relation_filter('department', 'Department', 'hr.department')
     leave_matching = {period: ('request_date_from', 'date'), department: ('department_id', 'many2one')}
-    attendance_matching = {period: ('check_in', 'datetime'), department: ('om_department_id', 'many2one')}
+    attendance_matching = {period: ('check_in', 'datetime'), department: ('employee_department_id', 'many2one')}
 
     leaves = workbook.pivot('Time Off', 'hr.leave', VALIDATED_LEAVES, ['number_of_days'],
                             rows=[('request_date_from', 'month')], field_matching=leave_matching)
@@ -99,8 +99,8 @@ def build_time():
         ('leave_department', 'bar', 'Time Off by Department (Days)', 'hr.leave', 'number_of_days', 'department_id',
          VALIDATED_LEAVES, leave_matching, 'hr_holidays.hr_leave_action_action_approve_department'),
         ('overtime_department', 'bar', 'Overtime by Department (Hours)', 'hr.attendance', 'worked_hours',
-         'om_department_id', OVERTIME, attendance_matching, 'hr_attendance.hr_attendance_action'),
-        ('worked_department', 'bar', 'Hours Worked by Department', 'hr.attendance', 'worked_hours', 'om_department_id',
+         'employee_department_id', OVERTIME, attendance_matching, 'hr_attendance.hr_attendance_action'),
+        ('worked_department', 'bar', 'Hours Worked by Department', 'hr.attendance', 'worked_hours', 'employee_department_id',
          WORKED, attendance_matching, 'hr_attendance.hr_attendance_action'),
     ]
     for index, (key, chart_type, title, model, measure, group_by, domain, matching, action) in enumerate(charts):

@@ -5,5 +5,5 @@ class HrAttendance(models.Model):
     _inherit = 'hr.attendance'
 
     # the department of core is not stored: the dashboard groups and filters the attendances by this one
-    om_department_id = fields.Many2one('hr.department', string='Department (Dashboard)',
+    employee_department_id = fields.Many2one('hr.department', string='Department (Dashboard)',
                                        related='employee_id.department_id', store=True, index='btree_not_null')

@@ -393,7 +393,7 @@
                                     "type": "odoo",
                                     "metaData": {
                                         "groupBy": [
-                                            "om_department_id"
+                                            "employee_department_id"
                                         ],
                                         "measure": "worked_hours",
                                         "order": null,
@@ -417,7 +417,7 @@
                                             ]
                                         ],
                                         "groupBy": [
-                                            "om_department_id"
+                                            "employee_department_id"
                                         ],
                                         "orderBy": []
                                     },
@@ -446,7 +446,7 @@
                                     "type": "datetime"
                                 },
                                 "3899a263-21d3-5d33-aedb-bab26d44b658": {
-                                    "chain": "om_department_id",
+                                    "chain": "employee_department_id",
                                     "type": "many2one"
                                 }
                             }
@@ -475,7 +475,7 @@
                                     "type": "odoo",
                                     "metaData": {
                                         "groupBy": [
-                                            "om_department_id"
+                                            "employee_department_id"
                                         ],
                                         "measure": "worked_hours",
                                         "order": null,
@@ -499,7 +499,7 @@
                                             ]
                                         ],
                                         "groupBy": [
-                                            "om_department_id"
+                                            "employee_department_id"
                                         ],
                                         "orderBy": []
                                     },
@@ -528,7 +528,7 @@
                                     "type": "datetime"
                                 },
                                 "3899a263-21d3-5d33-aedb-bab26d44b658": {
-                                    "chain": "om_department_id",
+                                    "chain": "employee_department_id",
                                     "type": "many2one"
                                 }
                             }
@@ -863,7 +863,7 @@
                     "type": "datetime"
                 },
                 "3899a263-21d3-5d33-aedb-bab26d44b658": {
-                    "chain": "om_department_id",
+                    "chain": "employee_department_id",
                     "type": "many2one"
                 }
             }
@@ -906,7 +906,7 @@
                     "type": "datetime"
                 },
                 "3899a263-21d3-5d33-aedb-bab26d44b658": {
-                    "chain": "om_department_id",
+                    "chain": "employee_department_id",
                     "type": "many2one"
                 }
             }
