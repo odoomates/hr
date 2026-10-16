@@ -19,6 +19,7 @@ class HrRequest(models.Model):
     _name = 'hr.request'
     _inherit = ['approval.mixin']
     _description = 'HR Request'
+    _check_company_auto = True
     _order = 'date desc, id desc'
     _mail_post_access = 'read'
 
@@ -26,14 +27,13 @@ class HrRequest(models.Model):
                        default=lambda self: self.env._('New'))
     employee_id = fields.Many2one(
         'hr.employee', required=True, index=True, tracking=True,
-        default=lambda self: self.env.user.employee_id)
+        default=lambda self: self.env.user.employee_id, check_company=True)
     company_id = fields.Many2one(
         'res.company', required=True, index=True,
         compute='_compute_company_id', store=True, readonly=False, precompute=True)
     department_id = fields.Many2one(related='employee_id.department_id', store=True)
     category_id = fields.Many2one(
-        'hr.request.category', required=True, tracking=True,
-        domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
+        'hr.request.category', required=True, tracking=True, check_company=True)
     category_description = fields.Text(related='category_id.description')
     date = fields.Date(required=True, default=fields.Date.context_today)
     description = fields.Text(string='Details')
