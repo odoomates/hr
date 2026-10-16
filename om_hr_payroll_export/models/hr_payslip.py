@@ -92,7 +92,12 @@ class HrPayslip(models.Model):
         payslips = self.filtered(lambda slip: slip.state == 'done' and not slip.credit_note)
         if not payslips:
             raise UserError(self.env._('Only the confirmed payslips are paid by bank: confirm them first.'))
-        layout = self.env['file.layout'].search([('model', '=', 'hr.payslip')], limit=1)
+        # a layout of the company of the payslips, or shared: never the one of another company allowed
+        companies = payslips.company_id
+        layout = self.env['file.layout'].search(
+            [('model', '=', 'hr.payslip'), ('company_id', 'in', [False, *companies.ids])],
+            order='company_id, sequence, id', limit=1) if len(companies) == 1 else \
+            self.env['file.layout'].search([('model', '=', 'hr.payslip'), ('company_id', '=', False)], limit=1)
         return {
             'type': 'ir.actions.act_window',
             'name': self.env._('Export Bank File'),
