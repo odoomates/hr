@@ -11,20 +11,20 @@ class HrPayrollAdjustment(models.Model):
     _name = 'hr.payroll.adjustment'
     _inherit = ['approval.mixin']
     _description = 'Payroll Adjustment'
+    _check_company_auto = True
     _order = 'date_start desc, id desc'
     _mail_post_access = 'read'
 
     name = fields.Char(string='Reference', required=True, readonly=True, copy=False,
                        default=lambda self: self.env._('New'))
-    employee_id = fields.Many2one('hr.employee', required=True, index=True, tracking=True)
+    employee_id = fields.Many2one('hr.employee', required=True, index=True, tracking=True, check_company=True)
     company_id = fields.Many2one(
         'res.company', required=True, index=True,
         compute='_compute_company_id', store=True, readonly=False, precompute=True)
     currency_id = fields.Many2one(related='company_id.currency_id')
     department_id = fields.Many2one(related='employee_id.department_id', store=True)
     type_id = fields.Many2one(
-        'hr.payroll.adjustment.type', required=True, tracking=True,
-        domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
+        'hr.payroll.adjustment.type', required=True, tracking=True, check_company=True)
     kind = fields.Selection(related='type_id.kind', store=True)
     description = fields.Char(help='Shown to the employee, e.g. "Q3 sales commission".')
     note = fields.Text(string='Internal Note')
@@ -254,9 +254,11 @@ class HrPayrollAdjustmentLine(models.Model):
     """ What one month of an adjustment pays or deducts. """
     _name = 'hr.payroll.adjustment.line'
     _description = 'Payroll Adjustment Line'
+    _check_company_auto = True
     _order = 'adjustment_id, date, id'
 
-    adjustment_id = fields.Many2one('hr.payroll.adjustment', required=True, ondelete='cascade', index=True)
+    adjustment_id = fields.Many2one('hr.payroll.adjustment', required=True, ondelete='cascade', index=True,
+                                    check_company=True)
     employee_id = fields.Many2one(related='adjustment_id.employee_id', store=True)
     company_id = fields.Many2one(related='adjustment_id.company_id', store=True)
     currency_id = fields.Many2one(related='adjustment_id.currency_id')
@@ -266,7 +268,7 @@ class HrPayrollAdjustmentLine(models.Model):
     amount = fields.Monetary(help='Positive: the type of the adjustment says whether it is paid or deducted. A '
                                   'percentage is set by the payslip taking the line.')
     state = fields.Selection([('to_pay', 'Due'), ('paid', 'Done')], required=True, default='to_pay', index=True)
-    payslip_id = fields.Many2one('hr.payslip', ondelete='set null', index=True, copy=False)
+    payslip_id = fields.Many2one('hr.payslip', ondelete='set null', index=True, copy=False, check_company=True)
     date_paid = fields.Date(string='Done On')
     note = fields.Char()
 

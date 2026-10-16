@@ -7,6 +7,7 @@ class HrPayrollAdjustmentType(models.Model):
     sync by the type, so that the payslips show each kind on its own line. """
     _name = 'hr.payroll.adjustment.type'
     _description = 'Payroll Adjustment Type'
+    _check_company_auto = True
     _order = 'sequence, name'
 
     name = fields.Char(required=True, translate=True)
@@ -17,7 +18,7 @@ class HrPayrollAdjustmentType(models.Model):
                             default='addition')
     category_id = fields.Many2one(
         'hr.salary.rule.category', required=True,
-        default=lambda self: self.env.ref('om_hr_payroll.ALW', raise_if_not_found=False),
+        default=lambda self: self.env.ref('om_hr_payroll.ALW', raise_if_not_found=False), check_company=True,
         help='Where the payslip counts it: an allowance is part of the gross, a deduction comes off it.')
     structure_ids = fields.Many2many(
         'hr.payroll.structure', string='Salary Structures',
@@ -27,7 +28,7 @@ class HrPayrollAdjustmentType(models.Model):
                                       help='An adjustment of this type runs once approved along the approval flow.')
     settle_at_exit = fields.Boolean(
         string='Settle at Exit', help='The final settlement of an employee leaving takes everything still due.')
-    rule_id = fields.Many2one('hr.salary.rule', string='Salary Rule', readonly=True, copy=False)
+    rule_id = fields.Many2one('hr.salary.rule', string='Salary Rule', readonly=True, copy=False, check_company=True)
     company_id = fields.Many2one('res.company', help='Leave empty to share the type with all the companies.')
     description = fields.Text(translate=True)
 
