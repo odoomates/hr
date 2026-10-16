@@ -2,16 +2,16 @@ from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
 
 
-class OmHrShiftRotation(models.Model):
+class HrShiftRotation(models.Model):
     """ A cycle of shifts and days off, e.g. 2 mornings, 2 nights, 2 days off, repeated over the roster. """
-    _name = 'om.hr.shift.rotation'
+    _name = 'hr.shift.rotation'
     _description = 'Shift Rotation'
     _order = 'name'
 
     name = fields.Char(required=True, translate=True)
     active = fields.Boolean(default=True)
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company)
-    line_ids = fields.One2many('om.hr.shift.rotation.line', 'rotation_id', string='Days', copy=True)
+    line_ids = fields.One2many('hr.shift.rotation.line', 'rotation_id', string='Days', copy=True)
     cycle_days = fields.Integer(compute='_compute_cycle_days', string='Days in the Cycle')
     pattern = fields.Char(compute='_compute_cycle_days')
 
@@ -28,11 +28,11 @@ class OmHrShiftRotation(models.Model):
                 raise ValidationError(_('The rotation %s works one shift at least.', rotation.name))
 
 
-class OmHrShiftRotationLine(models.Model):
-    _name = 'om.hr.shift.rotation.line'
+class HrShiftRotationLine(models.Model):
+    _name = 'hr.shift.rotation.line'
     _description = 'Shift Rotation Day'
     _order = 'rotation_id, sequence, id'
 
-    rotation_id = fields.Many2one('om.hr.shift.rotation', required=True, ondelete='cascade', index=True)
+    rotation_id = fields.Many2one('hr.shift.rotation', required=True, ondelete='cascade', index=True)
     sequence = fields.Integer(default=10)
-    template_id = fields.Many2one('om.hr.shift.template', string='Shift', help='Empty for a day off.')
+    template_id = fields.Many2one('hr.shift.template', string='Shift', help='Empty for a day off.')

@@ -25,9 +25,9 @@ def shift_segments(hour_from, hour_to, break_from=0.0, break_to=0.0):
     return [segment for segment in segments if segment[2] > segment[1]]
 
 
-class OmHrShiftTemplate(models.Model):
+class HrShiftTemplate(models.Model):
     """ A kind of shift, e.g. Morning 06:00-14:00, assigned on the roster in a click. """
-    _name = 'om.hr.shift.template'
+    _name = 'hr.shift.template'
     _description = 'Shift Template'
     _order = 'sequence, hour_from'
 

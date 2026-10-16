@@ -2,11 +2,11 @@ from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 
-class OmHrShiftRequest(models.Model):
+class HrShiftRequest(models.Model):
     """ An employee claims an open shift, or swaps a shift with a colleague: the colleague accepts, the manager
     approves, along the approval flow of the shift requests. """
-    _name = 'om.hr.shift.request'
-    _inherit = ['om.approval.mixin']
+    _name = 'hr.shift.request'
+    _inherit = ['approval.mixin']
     _description = 'Shift Request'
     _order = 'id desc'
     _mail_post_access = 'read'
@@ -16,9 +16,9 @@ class OmHrShiftRequest(models.Model):
     employee_id = fields.Many2one('hr.employee', string='Employee', required=True, index=True,
                                   default=lambda self: self.env.user.employee_id)
     company_id = fields.Many2one(related='employee_id.company_id', store=True)
-    shift_id = fields.Many2one('om.hr.shift', string='Shift', required=True, ondelete='cascade',
+    shift_id = fields.Many2one('hr.shift', string='Shift', required=True, ondelete='cascade',
                                help='The open shift claimed, or the shift of the employee given in a swap.')
-    target_shift_id = fields.Many2one('om.hr.shift', string='Shift Taken', ondelete='cascade',
+    target_shift_id = fields.Many2one('hr.shift', string='Shift Taken', ondelete='cascade',
                                       help='The shift of the colleague taken in a swap.')
     target_employee_id = fields.Many2one(related='target_shift_id.employee_id', string='Colleague', store=True)
     note = fields.Char()
@@ -45,7 +45,7 @@ class OmHrShiftRequest(models.Model):
             else:
                 request.display_name = _('Claim %s', request.shift_id.display_name)
 
-    def _om_validate(self):
+    def _validate(self):
         for request in self:
             shift = request.shift_id.sudo()
             if shift.state != 'published':
@@ -53,7 +53,7 @@ class OmHrShiftRequest(models.Model):
             if request.kind == 'claim':
                 if shift.employee_id:
                     raise UserError(_('The shift %s is no longer open.', shift.display_name))
-                if not request._om_can_claim(shift):
+                if not request._can_claim(shift):
                     raise UserError(_('The shift %s is for another department or position.', shift.display_name))
             else:
                 target = request.target_shift_id.sudo()
@@ -63,7 +63,7 @@ class OmHrShiftRequest(models.Model):
                         target.employee_id == request.employee_id:
                     raise UserError(_('Swap with a published shift of a colleague.'))
 
-    def _om_can_claim(self, shift):
+    def _can_claim(self, shift):
         self.ensure_one()
         employee = self.employee_id.sudo()
         template = shift.template_id
@@ -75,7 +75,7 @@ class OmHrShiftRequest(models.Model):
 
     def action_submit(self):
         """ A claim goes to the approval; a swap to the colleague first. """
-        self._om_validate()
+        self._validate()
         swaps = self.filtered(lambda request: request.kind == 'swap')
         for request in swaps:
             request._approval_check_requester()
@@ -90,7 +90,7 @@ class OmHrShiftRequest(models.Model):
             (self - swaps).action_approval_submit()
         return True
 
-    def _om_check_colleague(self):
+    def _check_colleague(self):
         for request in self:
             if request.state != 'to_accept':
                 raise UserError(_('%s does not wait for the colleague.', request.display_name))
@@ -100,16 +100,16 @@ class OmHrShiftRequest(models.Model):
 
     def action_accept(self):
         """ The colleague accepts the swap: it goes to the approval, asked by the employee. """
-        self._om_check_colleague()
+        self._check_colleague()
         for request in self:
-            request._om_validate()
+            request._validate()
             requester = request.sudo().employee_id.user_id or self.env.user
             request.with_user(requester).sudo().action_approval_submit()
             request.message_post(body=_('Accepted by %s.', self.env.user.name), subtype_xmlid='mail.mt_note')
         return True
 
     def action_decline(self):
-        self._om_check_colleague()
+        self._check_colleague()
         for request in self:
             request.sudo().write({'state': 'refused', 'approval_state': 'refused'})
             request.message_post(body=_('Declined by %s.', self.env.user.name), subtype_xmlid='mail.mt_note')
@@ -130,7 +130,7 @@ class OmHrShiftRequest(models.Model):
 
     def _on_approval_approved(self, request):
         super()._on_approval_approved(request)
-        self.sudo()._om_apply()
+        self.sudo()._apply()
         self.sudo().state = 'approved'
 
     def _on_approval_refused(self, request):
@@ -150,13 +150,13 @@ class OmHrShiftRequest(models.Model):
         waiting.sudo().write({'state': 'cancel', 'approval_state': 'cancel'})
         others = self - waiting
         if others:
-            super(OmHrShiftRequest, others).action_approval_cancel()
+            super(HrShiftRequest, others).action_approval_cancel()
             others.sudo().state = 'cancel'
         return True
 
-    def _om_apply(self):
+    def _apply(self):
         """ The shifts change hands; their schedules follow. """
-        self._om_validate()
+        self._validate()
         for request in self:
             if request.kind == 'claim':
                 request.shift_id.employee_id = request.employee_id

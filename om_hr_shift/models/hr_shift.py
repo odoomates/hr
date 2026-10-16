@@ -6,13 +6,13 @@ from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import format_duration
 
-from .om_hr_shift_template import shift_segments
+from .hr_shift_template import shift_segments
 
 
-class OmHrShift(models.Model):
+class HrShift(models.Model):
     """ A shift of an employee on a day, or an open shift no one works yet. Published, it is written on the roster
     schedule of the employee, which the time off, the work entries, the overtime and the payroll all read. """
-    _name = 'om.hr.shift'
+    _name = 'hr.shift'
     _inherit = ['mail.thread']
     _description = 'Shift'
     _order = 'date, hour_from, id'
@@ -23,7 +23,7 @@ class OmHrShift(models.Model):
                                  compute='_compute_company_id', store=True, readonly=False, precompute=True)
     department_id = fields.Many2one('hr.department', string='Department', compute='_compute_department_id',
                                     store=True, readonly=False, index=True)
-    template_id = fields.Many2one('om.hr.shift.template', string='Shift Template', tracking=True)
+    template_id = fields.Many2one('hr.shift.template', string='Shift Template', tracking=True)
     date = fields.Date(required=True, index=True, tracking=True)
     hour_from = fields.Float(string='From', required=True, tracking=True)
     hour_to = fields.Float(string='To', required=True, tracking=True, help='At or before the start: the next day.')
@@ -109,18 +109,18 @@ class OmHrShift(models.Model):
 
     @api.depends('employee_id', 'start', 'stop')
     def _compute_warning(self):
-        warnings = self._om_check()
+        warnings = self._check()
         for shift in self:
             shift.warning = '\n'.join(warnings.get(shift.id, [])) or False
 
-    def _om_check(self):
+    def _check(self):
         """ :return: {shift id: [warnings]}: time off or public holiday, unavailability, rest, hours of the week,
             overlap, before the roster of the employee started """
         result = defaultdict(list)
         shifts = self.filtered(lambda s: s.employee_id and s.start and s.stop and s.id)
         if not shifts:
             return result
-        Shift = self.env['om.hr.shift'].sudo()
+        Shift = self.env['hr.shift'].sudo()
         employees = shifts.employee_id.sudo()
         first = min(shifts.mapped('start')) - timedelta(days=7)
         last = max(shifts.mapped('stop')) + timedelta(days=7)
@@ -129,7 +129,7 @@ class OmHrShift(models.Model):
             ('date_from', '<', last), ('date_to', '>', first),
             '|', ('resource_id', 'in', employees.resource_id.ids),
             '&', ('resource_id', '=', False), ('company_id', 'in', employees.company_id.ids + [False])])
-        unavailable = self.env['om.hr.shift.unavailability'].sudo().search([
+        unavailable = self.env['hr.shift.unavailability'].sudo().search([
             ('employee_id', 'in', employees.ids), ('date_from', '<=', max(shifts.mapped('date'))),
             ('date_to', '>=', min(shifts.mapped('date')))])
         for shift in shifts:
@@ -139,7 +139,7 @@ class OmHrShift(models.Model):
                     l.resource_id == employee.resource_id
                     or (not l.resource_id and l.company_id in (company, self.env['res.company'])
                         and (not l.calendar_id or l.calendar_id in (employee.resource_calendar_id,
-                                                                    employee.om_roster_calendar_id))))):
+                                                                    employee.roster_calendar_id))))):
                 result[shift.id].append(_('Time off: %s', leave.name or _('Public Holiday')))
             for unavailability in unavailable.filtered(
                     lambda u: u.employee_id == employee and u.date_from <= shift.date <= u.date_to):
@@ -147,7 +147,7 @@ class OmHrShift(models.Model):
             mine = others.filtered(lambda s: s.employee_id == employee and s != shift)
             for other in mine.filtered(lambda s: s.start < shift.stop and s.stop > shift.start):
                 result[shift.id].append(_('Overlaps %s', other.display_name))
-            rest = company.om_shift_min_rest
+            rest = company.shift_min_rest
             if rest:
                 for other in mine.filtered(lambda s: not (s.start < shift.stop and s.stop > shift.start)):
                     gap = (shift.start - other.stop) if other.stop <= shift.start else (other.start - shift.stop)
@@ -155,17 +155,17 @@ class OmHrShift(models.Model):
                         result[shift.id].append(_('Only %(hours)s of rest with %(shift)s',
                                                   hours=format_duration(gap.total_seconds() / 3600),
                                                   shift=other.display_name))
-            if company.om_shift_max_week_hours:
+            if company.shift_max_week_hours:
                 monday = shift.date - timedelta(days=shift.date.weekday())
                 week = (mine | shift).filtered(lambda s: monday <= s.date < monday + timedelta(days=7))
                 total = sum(week.mapped('hours'))
-                if total > company.om_shift_max_week_hours:
+                if total > company.shift_max_week_hours:
                     result[shift.id].append(_('%(hours)s hours in the week, %(max)s at most',
                                               hours=format_duration(total),
-                                              max=format_duration(company.om_shift_max_week_hours)))
-            if employee.om_roster_date_start and shift.date < employee.om_roster_date_start:
+                                              max=format_duration(company.shift_max_week_hours)))
+            if employee.roster_date_start and shift.date < employee.roster_date_start:
                 result[shift.id].append(_('Before the roster of %(employee)s starts, on %(date)s',
-                                          employee=employee.name, date=employee.om_roster_date_start))
+                                          employee=employee.name, date=employee.roster_date_start))
         return result
 
     # ------------------------------------------------------------------
@@ -182,40 +182,40 @@ class OmHrShift(models.Model):
         shifts = self.filtered(lambda s: s.state == 'draft')
         if not shifts:
             raise UserError(_('Nothing to publish: the shifts are published already.'))
-        warnings = shifts._om_check()
+        warnings = shifts._check()
         if warnings and not self.env.context.get('om_shift_override'):
             return {
                 'type': 'ir.actions.act_window',
                 'name': _('Publish Shifts'),
-                'res_model': 'om.hr.shift.publish.wizard',
+                'res_model': 'hr.shift.publish.wizard',
                 'view_mode': 'form',
                 'target': 'new',
                 'context': {'default_shift_ids': shifts.ids},
             }
-        shifts._om_publish(warnings, self.env.context.get('om_shift_override_reason'))
+        shifts._publish(warnings, self.env.context.get('om_shift_override_reason'))
         return True
 
-    def _om_publish(self, warnings=None, reason=None):
+    def _publish(self, warnings=None, reason=None):
         warnings = warnings or {}
         for shift in self:
             if shift.employee_id:
-                shift._om_write_schedule()
+                shift._write_schedule()
             if warnings.get(shift.id):
                 shift.message_post(body=_('Published despite: %(warnings)s. %(reason)s',
                                           warnings='; '.join(warnings[shift.id]), reason=reason or ''),
                                    subtype_xmlid='mail.mt_note')
         self.write({'state': 'published'})
-        self._om_notify(_('Your shifts are published'))
+        self._notify(_('Your shifts are published'))
 
-    def _om_write_schedule(self):
+    def _write_schedule(self):
         """ The shift as dated lines of the roster schedule of the employee. """
         self.ensure_one()
-        self._om_clear_schedule()
+        self._clear_schedule()
         employee = self.employee_id.sudo()
-        if not employee.om_roster_calendar_id:
-            employee._om_start_rostering(self.date)
+        if not employee.roster_calendar_id:
+            employee._start_rostering(self.date)
         lines = self.env['resource.calendar.attendance'].sudo().create([{
-            'calendar_id': employee.om_roster_calendar_id.id,
+            'calendar_id': employee.roster_calendar_id.id,
             'date': self.date + timedelta(days=day),
             'hour_from': hour_from,
             'hour_to': hour_to,
@@ -224,10 +224,10 @@ class OmHrShift(models.Model):
         } for day, hour_from, hour_to in self._segments()])
         self.sudo().attendance_ids = lines
 
-    def _om_clear_schedule(self):
+    def _clear_schedule(self):
         self.sudo().attendance_ids.unlink()
 
-    def _om_notify(self, subject):
+    def _notify(self, subject):
         """ One message per employee, listing their shifts. """
         for employee, shifts in self.grouped('employee_id').items():
             partner = employee.sudo().user_id.partner_id
@@ -243,7 +243,7 @@ class OmHrShift(models.Model):
     def action_unpublish(self):
         self._check_planner()
         published = self.filtered(lambda s: s.state == 'published')
-        published._om_clear_schedule()
+        published._clear_schedule()
         published.write({'state': 'draft'})
         return True
 
@@ -254,18 +254,18 @@ class OmHrShift(models.Model):
         result = super().write(vals)
         for shift in published:
             if shift.employee_id:
-                shift._om_write_schedule()
+                shift._write_schedule()
             else:
-                shift._om_clear_schedule()
+                shift._clear_schedule()
         changed = published.filtered(lambda s: s.employee_id)
         if changed:
-            changed._om_notify(_('Your shifts changed'))
+            changed._notify(_('Your shifts changed'))
         for shift, employee in old_employees.items():
             if employee and employee != shift.employee_id:
-                shift._om_notify_removed(employee)
+                shift._notify_removed(employee)
         return result
 
-    def _om_notify_removed(self, employee):
+    def _notify_removed(self, employee):
         partner = employee.sudo().user_id.partner_id
         if partner:
             employee.sudo().message_notify(partner_ids=partner.ids, subject=_('A shift of yours is cancelled'),
@@ -277,8 +277,8 @@ class OmHrShift(models.Model):
     def unlink(self):
         published = self.filtered(lambda s: s.state == 'published' and s.employee_id)
         for shift in published:
-            shift._om_notify_removed(shift.employee_id)
-        self._om_clear_schedule()
+            shift._notify_removed(shift.employee_id)
+        self._clear_schedule()
         return super().unlink()
 
     # ------------------------------------------------------------------
@@ -286,28 +286,28 @@ class OmHrShift(models.Model):
     # ------------------------------------------------------------------
 
     @api.model
-    def _om_roster_employees(self, date_from, date_to, department_id=False):
+    def _roster_employees(self, date_from, date_to, department_id=False):
         # the planners may not be HR officers: the roster reads the employees of the companies of the user
         domain = [('company_id', 'in', self.env.companies.ids)]
         if department_id:
             domain.append(('department_id', 'child_of', department_id))
-        rostered = self.env['hr.employee'].sudo().search(domain + [('om_roster_calendar_id', '!=', False)])
+        rostered = self.env['hr.employee'].sudo().search(domain + [('roster_calendar_id', '!=', False)])
         planned = self.search([('date', '>=', date_from), ('date', '<=', date_to), ('employee_id', '!=', False)]
                               + ([('department_id', 'child_of', department_id)] if department_id else [])).employee_id.sudo()
         return (rostered | planned).sorted(lambda e: (e.department_id.name or '', e.name))
 
     @api.model
-    def om_roster_data(self, date_from, days=7, department_id=False):
+    def roster_data(self, date_from, days=7, department_id=False):
         """ The roster board: the employees, the days, the shifts, the time off and the unavailability. """
         date_from = fields.Date.to_date(date_from)
         date_to = date_from + timedelta(days=days - 1)
-        employees = self._om_roster_employees(date_from, date_to, department_id)
+        employees = self._roster_employees(date_from, date_to, department_id)
         domain = [('date', '>=', date_from), ('date', '<=', date_to),
                   '|', ('employee_id', 'in', employees.ids), ('employee_id', '=', False)]
         if department_id:
             domain += ['|', ('employee_id', '!=', False), ('department_id', 'child_of', department_id)]
         shifts = self.search(domain)
-        warnings = shifts._om_check()
+        warnings = shifts._check()
         dates = [date_from + timedelta(days=index) for index in range(days)]
         off = defaultdict(dict)
         start = datetime.combine(date_from, time.min)
@@ -323,14 +323,14 @@ class OmHrShift(models.Model):
                     if leave.date_from < datetime.combine(day + timedelta(days=1), time.min) and \
                             leave.date_to > datetime.combine(day, time.min):
                         off[employee.id][str(day)] = leave.name or _('Time Off')
-        unavailable = self.env['om.hr.shift.unavailability'].sudo().search([
+        unavailable = self.env['hr.shift.unavailability'].sudo().search([
             ('employee_id', 'in', employees.ids), ('date_from', '<=', date_to), ('date_to', '>=', date_from)])
         busy = defaultdict(dict)
         for unavailability in unavailable:
             for day in dates:
                 if unavailability.date_from <= day <= unavailability.date_to:
                     busy[unavailability.employee_id.id][str(day)] = unavailability.reason or _('Unavailable')
-        templates = self.env['om.hr.shift.template'].search([('company_id', 'in', self.env.companies.ids + [False])])
+        templates = self.env['hr.shift.template'].search([('company_id', 'in', self.env.companies.ids + [False])])
         return {
             'dates': [str(day) for day in dates],
             'employees': [{
@@ -351,22 +351,22 @@ class OmHrShift(models.Model):
         }
 
     @api.model
-    def om_roster_assign(self, employee_id, date, template_id, department_id=False):
+    def roster_assign(self, employee_id, date, template_id, department_id=False):
         self._check_planner()
-        template = self.env['om.hr.shift.template'].browse(template_id)
+        template = self.env['hr.shift.template'].browse(template_id)
         shift = self.create(dict(template._shift_values(), employee_id=employee_id or False,
                                  date=fields.Date.to_date(date),
                                  **({'department_id': department_id} if not employee_id and department_id else {})))
         return shift.id
 
     @api.model
-    def om_roster_move(self, shift_id, employee_id, date):
+    def roster_move(self, shift_id, employee_id, date):
         self._check_planner()
         self.browse(shift_id).write({'employee_id': employee_id or False, 'date': fields.Date.to_date(date)})
         return True
 
     @api.model
-    def om_roster_copy_previous(self, date_from, days=7, department_id=False):
+    def roster_copy_previous(self, date_from, days=7, department_id=False):
         """ The draft shifts of the period before, on the same days of this one, for the employees with no shift on
             the day yet. """
         self._check_planner()
@@ -390,7 +390,7 @@ class OmHrShift(models.Model):
         return len(self.create(values))
 
     @api.model
-    def om_roster_publish(self, date_from, days=7, department_id=False):
+    def roster_publish(self, date_from, days=7, department_id=False):
         date_from = fields.Date.to_date(date_from)
         domain = [('date', '>=', date_from), ('date', '<', date_from + timedelta(days=days)), ('state', '=', 'draft')]
         if department_id:

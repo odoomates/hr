@@ -2,9 +2,9 @@ from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
 
 
-class OmHrShiftUnavailability(models.Model):
+class HrShiftUnavailability(models.Model):
     """ Days an employee cannot work, for the planners to see on the roster. """
-    _name = 'om.hr.shift.unavailability'
+    _name = 'hr.shift.unavailability'
     _description = 'Unavailability'
     _order = 'date_from desc'
 

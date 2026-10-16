@@ -6,7 +6,7 @@ import { serializeDate } from "@web/core/l10n/dates";
 import { FormViewDialog } from "@web/views/view_dialogs/form_view_dialog";
 import { standardActionServiceProps } from "@web/webclient/actions/action_plugin";
 
-const MODEL = "om.hr.shift";
+const MODEL = "hr.shift";
 const { DateTime } = luxon;
 
 /**
@@ -47,7 +47,7 @@ export class RosterBoard extends Component {
     }
 
     async load() {
-        this.state.data = await this.orm.call(MODEL, "om_roster_data", [
+        this.state.data = await this.orm.call(MODEL, "roster_data", [
             serializeDate(this.state.dateFrom),
             this.state.days,
             this.state.departmentId,
@@ -94,7 +94,7 @@ export class RosterBoard extends Component {
 
     copyPrevious() {
         return this.run(async () => {
-            const count = await this.orm.call(MODEL, "om_roster_copy_previous", [
+            const count = await this.orm.call(MODEL, "roster_copy_previous", [
                 serializeDate(this.state.dateFrom),
                 this.state.days,
                 this.state.departmentId,
@@ -104,7 +104,7 @@ export class RosterBoard extends Component {
     }
 
     async publish() {
-        const result = await this.orm.call(MODEL, "om_roster_publish", [
+        const result = await this.orm.call(MODEL, "roster_publish", [
             serializeDate(this.state.dateFrom),
             this.state.days,
             this.state.departmentId,
@@ -162,7 +162,7 @@ export class RosterBoard extends Component {
             return;
         }
         return this.run(() =>
-            this.orm.call(MODEL, "om_roster_assign", [row.id, date, this.state.templateId, this.state.departmentId])
+            this.orm.call(MODEL, "roster_assign", [row.id, date, this.state.templateId, this.state.departmentId])
         );
     }
 
@@ -212,7 +212,7 @@ export class RosterBoard extends Component {
         if (!shift || (shift.employee_id === row.id && shift.date === date)) {
             return;
         }
-        return this.run(() => this.orm.call(MODEL, "om_roster_move", [shift.id, row.id, date]));
+        return this.run(() => this.orm.call(MODEL, "roster_move", [shift.id, row.id, date]));
     }
 }
 

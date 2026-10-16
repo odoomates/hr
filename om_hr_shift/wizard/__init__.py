@@ -1,1 +1,1 @@
-from . import om_hr_shift_wizards
+from . import hr_shift_wizards

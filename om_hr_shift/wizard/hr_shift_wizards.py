@@ -4,8 +4,8 @@ from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 
-class OmHrShiftRosteringWizard(models.TransientModel):
-    _name = 'om.hr.shift.rostering.wizard'
+class HrShiftRosteringWizard(models.TransientModel):
+    _name = 'hr.shift.rostering.wizard'
     _description = 'Start or Stop Rostering'
 
     mode = fields.Selection([('start', 'Start Rostering'), ('stop', 'Stop Rostering')], required=True,
@@ -20,23 +20,23 @@ class OmHrShiftRosteringWizard(models.TransientModel):
 
     def action_confirm(self):
         self.ensure_one()
-        self.env['om.hr.shift']._check_planner()
+        self.env['hr.shift']._check_planner()
         employees = self.env['hr.employee'].sudo().browse(self.employee_ids.ids)
         if self.mode == 'start':
-            employees._om_start_rostering(self.date)
+            employees._start_rostering(self.date)
         else:
             if not self.calendar_id:
                 raise UserError(_('Choose the working schedule of the employees from then on.'))
-            employees._om_stop_rostering(self.date, self.calendar_id)
+            employees._stop_rostering(self.date, self.calendar_id)
         return {'type': 'ir.actions.act_window_close'}
 
 
-class OmHrShiftRotationWizard(models.TransientModel):
+class HrShiftRotationWizard(models.TransientModel):
     """ A rotation laid over some days for some employees, each starting further in the cycle when staggered. """
-    _name = 'om.hr.shift.rotation.wizard'
+    _name = 'hr.shift.rotation.wizard'
     _description = 'Apply a Shift Rotation'
 
-    rotation_id = fields.Many2one('om.hr.shift.rotation', string='Rotation', required=True)
+    rotation_id = fields.Many2one('hr.shift.rotation', string='Rotation', required=True)
     employee_ids = fields.Many2many('hr.employee.public', string='Employees', required=True)
     date_from = fields.Date(string='From', required=True, default=fields.Date.context_today)
     date_to = fields.Date(string='To', required=True,
@@ -49,11 +49,11 @@ class OmHrShiftRotationWizard(models.TransientModel):
 
     def action_apply(self):
         self.ensure_one()
-        self.env['om.hr.shift']._check_planner()
+        self.env['hr.shift']._check_planner()
         if self.date_to < self.date_from:
             raise UserError(_('The rotation ends after it starts.'))
         lines = self.rotation_id.line_ids
-        Shift = self.env['om.hr.shift']
+        Shift = self.env['hr.shift']
         existing = {(shift.employee_id.id, shift.date) for shift in Shift.search([
             ('employee_id', 'in', self.employee_ids.ids), ('date', '>=', self.date_from),
             ('date', '<=', self.date_to)])}
@@ -70,24 +70,24 @@ class OmHrShiftRotationWizard(models.TransientModel):
         return {
             'type': 'ir.actions.act_window',
             'name': _('Shifts'),
-            'res_model': 'om.hr.shift',
+            'res_model': 'hr.shift',
             'view_mode': 'list,form',
             'domain': [('id', 'in', shifts.ids)],
         }
 
 
-class OmHrShiftPublishWizard(models.TransientModel):
-    _name = 'om.hr.shift.publish.wizard'
+class HrShiftPublishWizard(models.TransientModel):
+    _name = 'hr.shift.publish.wizard'
     _description = 'Publish Shifts Despite Warnings'
 
-    shift_ids = fields.Many2many('om.hr.shift', string='Shifts', required=True)
+    shift_ids = fields.Many2many('hr.shift', string='Shifts', required=True)
     warnings = fields.Text(compute='_compute_warnings')
     reason = fields.Char(help='Kept on each shift published despite a warning.')
 
     @api.depends('shift_ids')
     def _compute_warnings(self):
         for wizard in self:
-            warnings = wizard.shift_ids._om_check()
+            warnings = wizard.shift_ids._check()
             wizard.warnings = '\n'.join('%s: %s' % (shift.display_name, '; '.join(warnings[shift.id]))
                                         for shift in wizard.shift_ids if warnings.get(shift.id))
 
