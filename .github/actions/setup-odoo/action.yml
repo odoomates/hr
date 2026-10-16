@@ -27,4 +27,4 @@ runs:
         cache-dependency-path: odoo/requirements.txt
     - name: Python requirements
       shell: bash
-      run: pip install -r odoo/requirements.txt pdfminer.six markdown2 rlPyCairo
+      run: pip install -r odoo/requirements.txt pdfminer.six markdown2 rlPyCairo websocket-client
