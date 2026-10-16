@@ -1,8 +1,8 @@
 from odoo import api, fields, models
 
 
-class OmPrintIssue(models.Model):
-    _inherit = 'om.print.issue'
+class PrintIssue(models.Model):
+    _inherit = 'print.issue'
 
     employee_id = fields.Many2one(
         'hr.employee', string='Employee', compute='_compute_employee_id', store=True, index='btree_not_null')

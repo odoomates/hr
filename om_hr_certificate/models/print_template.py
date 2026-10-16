@@ -1,8 +1,8 @@
 from odoo import fields, models
 
 
-class OmPrintTemplate(models.Model):
-    _inherit = 'om.print.template'
+class PrintTemplate(models.Model):
+    _inherit = 'print.template'
 
     employee_request = fields.Boolean(
         string='Employees Can Request',

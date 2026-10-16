@@ -27,7 +27,7 @@ class TestCertificate(TransactionCase):
         cls.salary = cls.env.ref('om_hr_certificate.template_salary_certificate')
 
     def request(self, template=None, **values):
-        return self.env['om.hr.certificate'].with_user(self.employee_user).create({
+        return self.env['hr.certificate'].with_user(self.employee_user).create({
             'employee_id': self.employee.id, 'template_id': (template or self.salary).id,
             'addressee': 'Emirates NBD', 'purpose': 'Bank account', **values})
 
@@ -88,4 +88,4 @@ class TestCertificate(TransactionCase):
         certificate = self.request()
         self.approve(certificate)
         self.employee.invalidate_recordset()
-        self.assertEqual(self.employee.om_print_issue_count, 1)
+        self.assertEqual(self.employee.print_issue_count, 1)

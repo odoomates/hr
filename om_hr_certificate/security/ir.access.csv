@@ -1,8 +1,8 @@
 id,name,model_id,group_id/id,operation,domain
-access_om_hr_certificate_employee_read,om.hr.certificate.employee.read,om.hr.certificate,base.group_user,r,"['|', ('employee_id.user_id', '=', user.id), ('approval_request_ids.line_ids.approver_user_ids', 'in', user.id)]"
-access_om_hr_certificate_employee_draft,om.hr.certificate.employee.draft,om.hr.certificate,base.group_user,cud,"[('employee_id.user_id', '=', user.id), ('state', '=', 'draft')]"
-access_om_hr_certificate_hr,om.hr.certificate.hr,om.hr.certificate,hr.group_hr_user,crud,
-om_hr_certificate_company_rule,Certificate requests: multi-company,om.hr.certificate,,crud,"[('company_id', 'in', company_ids)]"
-access_om_print_issue_employee_own,om.print.issue.employee.own,om.print.issue,base.group_user,r,"[('employee_id.user_id', '=', user.id), ('state', '!=', 'draft')]"
-access_om_print_issue_hr,om.print.issue.hr,om.print.issue,hr.group_hr_user,cru,"[('res_model', '=', 'hr.employee')]"
-access_om_print_template_hr_manager,om.print.template.hr.manager,om.print.template,hr.group_hr_manager,crud,"[('model', '=', 'hr.employee')]"
+access_om_hr_certificate_employee_read,hr.certificate.employee.read,hr.certificate,base.group_user,r,"['|', ('employee_id.user_id', '=', user.id), ('approval_request_ids.line_ids.approver_user_ids', 'in', user.id)]"
+access_om_hr_certificate_employee_draft,hr.certificate.employee.draft,hr.certificate,base.group_user,cud,"[('employee_id.user_id', '=', user.id), ('state', '=', 'draft')]"
+access_om_hr_certificate_hr,hr.certificate.hr,hr.certificate,hr.group_hr_user,crud,
+om_hr_certificate_company_rule,Certificate requests: multi-company,hr.certificate,,crud,"[('company_id', 'in', company_ids)]"
+access_om_print_issue_employee_own,print.issue.employee.own,print.issue,base.group_user,r,"[('employee_id.user_id', '=', user.id), ('state', '!=', 'draft')]"
+access_om_print_issue_hr,print.issue.hr,print.issue,hr.group_hr_user,cru,"[('res_model', '=', 'hr.employee')]"
+access_om_print_template_hr_manager,print.template.hr.manager,print.template,hr.group_hr_manager,crud,"[('model', '=', 'hr.employee')]"

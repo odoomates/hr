@@ -2,8 +2,8 @@
 <odoo>
 
     <record id="om_hr_certificate_view_form" model="ir.ui.view">
-        <field name="name">om.hr.certificate.view.form</field>
-        <field name="model">om.hr.certificate</field>
+        <field name="name">hr.certificate.view.form</field>
+        <field name="model">hr.certificate</field>
         <field name="arch" type="xml">
             <form string="Certificate Request">
                 <header>
@@ -71,8 +71,8 @@
     </record>
 
     <record id="om_hr_certificate_view_list" model="ir.ui.view">
-        <field name="name">om.hr.certificate.view.list</field>
-        <field name="model">om.hr.certificate</field>
+        <field name="name">hr.certificate.view.list</field>
+        <field name="model">hr.certificate</field>
         <field name="arch" type="xml">
             <list string="Certificate Requests">
                 <field name="name"/>
@@ -93,8 +93,8 @@
     </record>
 
     <record id="om_hr_certificate_view_search" model="ir.ui.view">
-        <field name="name">om.hr.certificate.view.search</field>
-        <field name="model">om.hr.certificate</field>
+        <field name="name">hr.certificate.view.search</field>
+        <field name="model">hr.certificate</field>
         <field name="arch" type="xml">
             <search>
                 <field name="name"/>
@@ -116,7 +116,7 @@
 
     <record id="om_hr_certificate_action_my" model="ir.actions.act_window">
         <field name="name">My Certificates</field>
-        <field name="res_model">om.hr.certificate</field>
+        <field name="res_model">hr.certificate</field>
         <field name="view_mode">list,form</field>
         <field name="domain">[('employee_id.user_id', '=', uid)]</field>
         <field name="help" type="html">
@@ -127,7 +127,7 @@
 
     <record id="om_hr_certificate_action_to_approve" model="ir.actions.act_window">
         <field name="name">To Approve</field>
-        <field name="res_model">om.hr.certificate</field>
+        <field name="res_model">hr.certificate</field>
         <field name="view_mode">list,form</field>
         <field name="context">{'search_default_to_approve_by_me': 1}</field>
         <field name="help" type="html">
@@ -137,13 +137,13 @@
 
     <record id="om_hr_certificate_action" model="ir.actions.act_window">
         <field name="name">All Requests</field>
-        <field name="res_model">om.hr.certificate</field>
+        <field name="res_model">hr.certificate</field>
         <field name="view_mode">list,form</field>
     </record>
 
     <record id="om_print_issue_action_hr" model="ir.actions.act_window">
         <field name="name">Issued Certificates</field>
-        <field name="res_model">om.print.issue</field>
+        <field name="res_model">print.issue</field>
         <field name="view_mode">list,form</field>
         <field name="domain">[('res_model', '=', 'hr.employee')]</field>
         <field name="help" type="html">
@@ -154,15 +154,15 @@
 
     <record id="om_print_template_action_hr" model="ir.actions.act_window">
         <field name="name">Certificate Templates</field>
-        <field name="res_model">om.print.template</field>
+        <field name="res_model">print.template</field>
         <field name="view_mode">list,form</field>
         <field name="domain">[('model', '=', 'hr.employee')]</field>
         <field name="context" eval="{'default_model_id': ref('hr.model_hr_employee')}"/>
     </record>
 
     <record id="om_print_template_view_form_hr" model="ir.ui.view">
-        <field name="name">om.print.template.view.form.hr</field>
-        <field name="model">om.print.template</field>
+        <field name="name">print.template.view.form.hr</field>
+        <field name="model">print.template</field>
         <field name="inherit_id" ref="om_print_template.om_print_template_view_form"/>
         <field name="arch" type="xml">
             <field name="print_menu" position="after">
@@ -177,9 +177,9 @@
         <field name="inherit_id" ref="hr.view_employee_form"/>
         <field name="arch" type="xml">
             <xpath expr="//div[@name='button_box']" position="inside">
-                <button name="action_open_om_print_issues" type="object" class="oe_stat_button" icon="badge"
-                        groups="hr.group_hr_user" invisible="not om_print_issue_count">
-                    <field name="om_print_issue_count" widget="statinfo" string="Certificates"/>
+                <button name="action_open_print_issues" type="object" class="oe_stat_button" icon="badge"
+                        groups="hr.group_hr_user" invisible="not print_issue_count">
+                    <field name="print_issue_count" widget="statinfo" string="Certificates"/>
                 </button>
             </xpath>
         </field>

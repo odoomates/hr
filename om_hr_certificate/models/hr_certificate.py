@@ -2,11 +2,11 @@ from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 
-class OmHrCertificate(models.Model):
+class HrCertificate(models.Model):
     """ An employee asks for a certificate, e.g. a salary certificate for a bank: approved along its flow, then
     printed from its template and kept as an issued print the employee downloads. """
-    _name = 'om.hr.certificate'
-    _inherit = ['om.approval.mixin']
+    _name = 'hr.certificate'
+    _inherit = ['approval.mixin']
     _description = 'Certificate Request'
     _order = 'date desc, id desc'
     _mail_post_access = 'read'
@@ -20,7 +20,7 @@ class OmHrCertificate(models.Model):
         compute='_compute_company_id', store=True, readonly=False, precompute=True)
     department_id = fields.Many2one(related='employee_id.department_id', store=True)
     template_id = fields.Many2one(
-        'om.print.template', string='Certificate', required=True, tracking=True,
+        'print.template', string='Certificate', required=True, tracking=True,
         domain="[('model', '=', 'hr.employee'), ('employee_request', '=', True), "
                "'|', ('company_id', '=', False), ('company_id', '=', company_id)]")
     addressee = fields.Char(help='Who the certificate is for, e.g. the name of a bank or an embassy. '
@@ -34,7 +34,7 @@ class OmHrCertificate(models.Model):
         ('refused', 'Refused'),
         ('cancel', 'Cancelled'),
     ], required=True, default='draft', copy=False, index=True, tracking=True)
-    issue_id = fields.Many2one('om.print.issue', string='Print', readonly=True, copy=False)
+    issue_id = fields.Many2one('print.issue', string='Print', readonly=True, copy=False)
     issue_name = fields.Char(related='issue_id.name', string='Certificate Reference')
 
     @api.depends('employee_id')
@@ -47,7 +47,7 @@ class OmHrCertificate(models.Model):
     def create(self, vals_list):
         for vals in vals_list:
             if vals.get('name', _('New')) == _('New'):
-                vals['name'] = self.env['ir.sequence'].next_by_code('om.hr.certificate') or _('New')
+                vals['name'] = self.env['ir.sequence'].next_by_code('hr.certificate') or _('New')
         return super().create(vals_list)
 
     def unlink(self):
@@ -98,7 +98,7 @@ class OmHrCertificate(models.Model):
             values = {'date': fields.Date.context_today(certificate)}
             if certificate.addressee:
                 values['addressee'] = certificate.addressee
-            issue = self.env['om.print.issue'].sudo()._create_from_template(
+            issue = self.env['print.issue'].sudo()._create_from_template(
                 certificate.template_id, certificate.employee_id.ids, values)
             issue.action_issue()
             certificate.write({'issue_id': issue.id, 'state': 'issued'})

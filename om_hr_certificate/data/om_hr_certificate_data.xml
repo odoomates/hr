@@ -4,27 +4,27 @@
 
         <record id="seq_om_hr_certificate" model="ir.sequence">
             <field name="name">Certificate Request</field>
-            <field name="code">om.hr.certificate</field>
+            <field name="code">hr.certificate</field>
             <field name="prefix">CREQ/%(year)s/</field>
             <field name="padding">4</field>
             <field name="company_id" eval="False"/>
         </record>
 
-        <record id="flow_om_hr_certificate" model="om.approval.flow">
+        <record id="flow_om_hr_certificate" model="approval.rule">
             <field name="name">Certificates</field>
-            <field name="model_id" ref="om_hr_certificate.model_om_hr_certificate"/>
+            <field name="model_id" ref="om_hr_certificate.model_hr_certificate"/>
             <field name="fallback_group_id" ref="hr.group_hr_manager"/>
             <field name="self_approve" eval="False"/>
         </record>
 
-        <record id="flow_om_hr_certificate_manager" model="om.approval.step">
+        <record id="flow_om_hr_certificate_manager" model="approval.step">
             <field name="flow_id" ref="flow_om_hr_certificate"/>
             <field name="sequence">10</field>
             <field name="name">Manager</field>
             <field name="approver_type">manager</field>
         </record>
 
-        <record id="flow_om_hr_certificate_hr" model="om.approval.step">
+        <record id="flow_om_hr_certificate_hr" model="approval.step">
             <field name="flow_id" ref="flow_om_hr_certificate"/>
             <field name="sequence">20</field>
             <field name="name">HR</field>
@@ -32,7 +32,7 @@
             <field name="group_id" ref="hr.group_hr_manager"/>
         </record>
 
-        <record id="template_salary_certificate" model="om.print.template">
+        <record id="template_salary_certificate" model="print.template">
             <field name="name">Salary Certificate</field>
             <field name="sequence">10</field>
             <field name="model_id" ref="hr.model_hr_employee"/>
@@ -54,7 +54,7 @@
             </field>
         </record>
 
-        <record id="template_employment_certificate" model="om.print.template">
+        <record id="template_employment_certificate" model="print.template">
             <field name="name">Employment Certificate</field>
             <field name="sequence">20</field>
             <field name="model_id" ref="hr.model_hr_employee"/>
@@ -75,7 +75,7 @@
             </field>
         </record>
 
-        <record id="template_experience_certificate" model="om.print.template">
+        <record id="template_experience_certificate" model="print.template">
             <field name="name">Experience Certificate</field>
             <field name="sequence">30</field>
             <field name="model_id" ref="hr.model_hr_employee"/>
@@ -97,7 +97,7 @@
             </field>
         </record>
 
-        <record id="template_noc" model="om.print.template">
+        <record id="template_noc" model="print.template">
             <field name="name">No Objection Certificate</field>
             <field name="sequence">40</field>
             <field name="model_id" ref="hr.model_hr_employee"/>
