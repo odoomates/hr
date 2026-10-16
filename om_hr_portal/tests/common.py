@@ -1,5 +1,6 @@
 from datetime import date
 
+from odoo import Command
 from odoo.tests import HttpCase, new_test_user
 
 
@@ -31,3 +32,24 @@ class HrPortalCase(HttpCase):
 
     def get(self, url):
         return self.url_open(url, allow_redirects=False)
+
+
+class HrPortalMultiCompanyCase(HrPortalCase):
+    """ ... and an employee of a second company, with a portal user too. """
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.company_a = cls.env.company
+        cls.company_b = cls.env['res.company'].create({'name': 'Portal Company B'})
+        cls.hr_user.company_ids = [Command.link(cls.company_b.id)]
+        cls.employee_b = cls.env['hr.employee'].create({
+            'name': 'Portal Employee B', 'company_id': cls.company_b.id, 'work_email': 'portal.b@example.com',
+            'resource_calendar_id': cls.company_b.resource_calendar_id.id, 'date_version': date(2025, 1, 1),
+            'contract_date_start': date(2025, 1, 1), 'wage': 3000.0})
+        cls.employee_b.with_user(cls.hr_user).action_grant_portal()
+        cls.portal_user_b = cls.employee_b.user_id
+        cls.portal_user_b.password = cls.portal_user_b.login
+
+    def login_employee_b(self):
+        self.authenticate(self.portal_user_b.login, self.portal_user_b.login)
