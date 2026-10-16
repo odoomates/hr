@@ -9,6 +9,7 @@
     'license': 'LGPL-3',
     'depends': ['om_hr_preboarding', 'om_hr_portal_sign'],
     'data': ['views/preboarding_views.xml'],
+    'demo': ['demo/om_hr_preboarding_sign_demo.xml'],
     'images': ['static/description/banner.gif'],
     'auto_install': True,
 }

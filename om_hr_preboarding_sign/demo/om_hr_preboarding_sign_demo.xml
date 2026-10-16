@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- the new hires agree to the policies of the company before their first day -->
+    <record id="demo_step_policies" model="hr.preboarding.step">
+        <field name="name">Agree to the company policies</field>
+        <field name="sequence">60</field>
+        <field name="kind">policies</field>
+        <field name="company_id" ref="base.main_company"/>
+    </record>
+
+</odoo>

@@ -18,6 +18,8 @@ class TestPreboardingSign(TransactionCase):
         Step.search([]).active = False
         Step.create({'name': 'Policies', 'kind': 'policies', 'sequence': 1})
         Step.create({'name': 'Contract', 'kind': 'signatures', 'sequence': 2})
+        # only the policy of the test asks the new employee, whatever policies the database has
+        self.env['hr.policy'].search([]).assign_new = False
         policy = self.env['hr.policy'].with_user(hr_user).create({'name': 'Code of Conduct'})
         version = self.env['hr.policy.version'].create({'policy_id': policy.id, 'body': '<p>Be kind.</p>'})
         version.with_user(hr_user).action_publish()
