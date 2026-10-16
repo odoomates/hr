@@ -1,5 +1,7 @@
 # Odoo Mates HR
 
+[![Tests](https://github.com/odoomates/hr/actions/workflows/tests.yml/badge.svg?branch=20.0)](https://github.com/odoomates/hr/actions/workflows/tests.yml)
+
 The HR suite of Odoo Mates for **Odoo 20 Community**: payroll, time and attendance, shifts, employee
 self-service and the whole employee lifecycle, with or without Accounting.
 
@@ -70,6 +72,20 @@ from the payslips, install by themselves once both sides are there.
 1. Clone the branch of your Odoo version into a folder of your addons path:
    `git clone -b 20.0 https://github.com/odoomates/hr.git`
 2. Update the Apps list and install **Odoo Mates HR**, or the modules you need.
+
+## Tests
+
+Every push and pull request runs the checks of `.github/workflows/tests.yml`: ruff and pylint-odoo, then the
+tests of every module with demo data, with and without Accounting, against the latest Odoo 20.0. A test failing,
+or a warning or an error in the log, fails the check. Every week, each module is also installed alone with its
+tests (`.github/workflows/isolation.yml`).
+
+Run the same locally, on a PostgreSQL server you can create databases on:
+
+```
+ODOO_PATH=/path/to/odoo PYTHON=/path/to/odoo/venv/bin/python3 PGUSER=odoo PGPASSWORD=odoo \
+    .github/scripts/run_odoo_tests.sh test_hr om_hrms
+```
 
 ## Support
 
