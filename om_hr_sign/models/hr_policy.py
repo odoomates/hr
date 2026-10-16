@@ -31,7 +31,7 @@ class HrPolicy(models.Model):
              'version too.')
     version_ids = fields.One2many('hr.policy.version', 'policy_id', string='Versions')
     version_id = fields.Many2one('hr.policy.version', string='Current Version', compute='_compute_version_id',
-                                 store=True)
+                                 store=True, check_company=True)
     assignment_ids = fields.One2many('hr.policy.assignment', 'policy_id', string='Answers')
     assignment_count = fields.Integer(compute='_compute_answers', string='Asked')
     done_count = fields.Integer(compute='_compute_answers', string='Answered')

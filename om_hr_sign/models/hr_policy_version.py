@@ -12,9 +12,10 @@ class HrPolicyVersion(models.Model):
     employee of the policy; the next version published replaces it and asks everyone again. """
     _name = 'hr.policy.version'
     _description = 'Policy Version'
+    _check_company_auto = True
     _order = 'policy_id, number desc'
 
-    policy_id = fields.Many2one('hr.policy', required=True, ondelete='cascade', index=True)
+    policy_id = fields.Many2one('hr.policy', required=True, ondelete='cascade', index=True, check_company=True)
     number = fields.Integer(string='Version', readonly=True, copy=False)
     name = fields.Char(compute='_compute_name')
     content_type = fields.Selection([

@@ -15,12 +15,15 @@ class HrPolicyAssignment(models.Model):
     _name = 'hr.policy.assignment'
     _inherit = ['sign.mixin']
     _description = 'Policy Answer'
+    _check_company_auto = True
     _order = 'date_assigned desc, id desc'
 
-    version_id = fields.Many2one('hr.policy.version', required=True, ondelete='cascade', index=True, readonly=True)
+    version_id = fields.Many2one('hr.policy.version', required=True, ondelete='cascade', index=True, readonly=True,
+                                 check_company=True)
     policy_id = fields.Many2one(related='version_id.policy_id', store=True, index=True)
     answer_type = fields.Selection(related='policy_id.answer_type')
-    employee_id = fields.Many2one('hr.employee', required=True, ondelete='cascade', index=True, readonly=True)
+    employee_id = fields.Many2one('hr.employee', required=True, ondelete='cascade', index=True, readonly=True,
+                                  check_company=True)
     department_id = fields.Many2one(related='employee_id.department_id', store=True, string='Department')
     company_id = fields.Many2one(related='version_id.company_id', store=True, index=True)
     state = fields.Selection([
@@ -36,7 +39,7 @@ class HrPolicyAssignment(models.Model):
     done_by_id = fields.Many2one('res.users', string='Answered By', readonly=True)
     ip = fields.Char(string='IP Address', readonly=True)
     user_agent = fields.Char(string='Browser', readonly=True)
-    sign_request_id = fields.Many2one('sign.request', string='Signature Request', readonly=True)
+    sign_request_id = fields.Many2one('sign.request', string='Signature Request', readonly=True, check_company=True)
     sign_state = fields.Selection(related='sign_request_id.state', string='Signature')
     date_reminded = fields.Datetime(string='Reminded On', readonly=True)
     problem = fields.Char(readonly=True, help='Why the employee could not be asked, e.g. no email address.')
