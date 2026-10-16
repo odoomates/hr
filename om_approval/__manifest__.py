@@ -19,5 +19,6 @@
         'views/approval_delegation_views.xml',
         'views/menu.xml',
     ],
+    'demo': ['demo/om_approval_demo.xml'],
     'images': ['static/description/banner.gif'],
 }
