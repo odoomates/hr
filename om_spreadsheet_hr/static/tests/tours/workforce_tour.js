@@ -15,7 +15,11 @@ registry.category("web_tour.tours").add("om_spreadsheet_hr_workforce", {
             trigger: ".o_spreadsheet_dashboard_action",
             run: async () => {
                 const loader = odoo.__WOWL_DEBUG__.root.env.services.spreadsheet_dashboard_loader;
-                const model = loader.getActiveDashboard().model;
+                // the dashboard and its data load after its action shows: wait for them
+                let model;
+                for (let attempt = 0; attempt < 50 && !(model = loader.getActiveDashboard()?.model); attempt++) {
+                    await new Promise((resolve) => setTimeout(resolve, 200));
+                }
                 const sheetId = model.getters.getSheetIds().find(
                     (id) => model.getters.getSheetName(id) === "Data"
                 );
