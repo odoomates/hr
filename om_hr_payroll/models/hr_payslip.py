@@ -60,15 +60,16 @@ PAYSLIP_CLOSED_WRITABLE = {
 class HrPayslip(models.Model):
     _name = 'hr.payslip'
     _description = 'Pay Slip'
+    _check_company_auto = True
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'id desc'
 
     struct_id = fields.Many2one('hr.payroll.structure', string='Structure',
                                 help='Defines the rules that have to be applied to this payslip, accordingly '
-                                     'to the version/contract chosen.', tracking=True)
+                                     'to the version/contract chosen.', tracking=True, check_company=True)
     name = fields.Char(string='Payslip Name')
     number = fields.Char(string='Reference', copy=False, tracking=True)
-    employee_id = fields.Many2one('hr.employee', string='Employee', required=True, tracking=True)
+    employee_id = fields.Many2one('hr.employee', string='Employee', required=True, tracking=True, check_company=True)
     date_from = fields.Date(string='Date From', required=True,
                             default=lambda self: fields.Date.context_today(self).replace(day=1), tracking=True)
     date_to = fields.Date(string='Date To', required=True,
@@ -101,14 +102,15 @@ class HrPayslip(models.Model):
     paid = fields.Boolean(string='Made Payment Order ? ', copy=False, tracking=True)
     note = fields.Text(string='Internal Note')
 
-    version_id = fields.Many2one('hr.version', string='Employment Version/Contract', tracking=True)
+    version_id = fields.Many2one('hr.version', string='Employment Version/Contract', tracking=True, check_company=True)
 
     details_by_salary_rule_category = fields.One2many('hr.payslip.line',
                                                       compute='_compute_details_by_salary_rule_category',
                                                       string='Details by Salary Rule Category')
     credit_note = fields.Boolean(string='Credit Note',
                                  help="Indicates this payslip has a refund of another", tracking=True)
-    payslip_run_id = fields.Many2one('hr.payslip.run', string='Payslip Batches', copy=False, tracking=True)
+    payslip_run_id = fields.Many2one('hr.payslip.run', string='Payslip Batches', copy=False, tracking=True,
+                                     check_company=True)
     payslip_count = fields.Integer(compute='_compute_payslip_count', string="Payslip Computation Details")
 
     def _compute_details_by_salary_rule_category(self):
@@ -930,10 +932,12 @@ class HrPayslipLine(models.Model):
     _description = 'Payslip Line'
     _order = 'version_id, sequence'
 
-    slip_id = fields.Many2one('hr.payslip', string='Pay Slip', required=True, ondelete='cascade')
-    salary_rule_id = fields.Many2one('hr.salary.rule', string='Rule', required=True)
-    employee_id = fields.Many2one('hr.employee', string='Employee', required=True)
-    version_id = fields.Many2one('hr.version', string='Version/Contract', required=True, index=True)
+    slip_id = fields.Many2one('hr.payslip', string='Pay Slip', required=True, ondelete='cascade', check_company=True)
+    # the company of the payslip, not the one of the user computing it, nor the one of the rule
+    company_id = fields.Many2one(related='slip_id.company_id', store=True, index=True, default=None)
+    salary_rule_id = fields.Many2one('hr.salary.rule', string='Rule', required=True, check_company=True)
+    employee_id = fields.Many2one('hr.employee', string='Employee', required=True, check_company=True)
+    version_id = fields.Many2one('hr.version', string='Version/Contract', required=True, index=True, check_company=True)
     rate = fields.Float(string='Rate (%)', default=100.0)
     amount = fields.Float()
     quantity = fields.Float(default=1.0)
@@ -1017,6 +1021,7 @@ class HrPayslipRun(models.Model):
     _name = 'hr.payslip.run'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Payslip Batches'
+    _check_company_auto = True
 
     name = fields.Char(required=True, tracking=True)
     slip_ids = fields.One2many('hr.payslip', 'payslip_run_id', string='Payslips')

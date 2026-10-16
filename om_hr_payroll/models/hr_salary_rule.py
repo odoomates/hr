@@ -14,6 +14,7 @@ class HrPayrollStructure(models.Model):
     _name = 'hr.payroll.structure'
     _inherit = ['mail.thread']
     _description = 'Salary Structure'
+    _check_company_auto = True
 
     @api.model
     def _get_parent(self):
@@ -24,7 +25,8 @@ class HrPayrollStructure(models.Model):
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company,
                                  help="Leave empty to share the structure with all the companies.", tracking=True)
     note = fields.Text(string='Description')
-    parent_id = fields.Many2one('hr.payroll.structure', string='Parent', default=_get_parent, tracking=True)
+    parent_id = fields.Many2one('hr.payroll.structure', string='Parent', default=_get_parent, tracking=True,
+                                check_company=True)
     children_ids = fields.One2many('hr.payroll.structure', 'parent_id', string='Children', copy=True)
     rule_ids = fields.Many2many('hr.salary.rule', 'hr_structure_salary_rule_rel', 'struct_id', 'rule_id',
                                 string='Salary Rules', tracking=True)
@@ -73,11 +75,12 @@ class HrContributionRegister(models.Model):
 class HrSalaryRuleCategory(models.Model):
     _name = 'hr.salary.rule.category'
     _description = 'Salary Rule Category'
+    _check_company_auto = True
 
     name = fields.Char(required=True, translate=True)
     code = fields.Char(required=True)
     parent_id = fields.Many2one('hr.salary.rule.category', string='Parent',
-        help="Linking a salary category to its parent is used only for the reporting purpose.")
+        help="Linking a salary category to its parent is used only for the reporting purpose.", check_company=True)
     children_ids = fields.One2many('hr.salary.rule.category', 'parent_id', string='Children')
     note = fields.Text(string='Description')
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company)
@@ -93,6 +96,7 @@ class HrSalaryRule(models.Model):
     _inherit = ['mail.thread']
     _order = 'sequence, id'
     _description = 'Salary Rule'
+    _check_company_auto = True
 
     name = fields.Char(required=True, translate=True, tracking=True)
     code = fields.Char(required=True,
@@ -105,12 +109,14 @@ class HrSalaryRule(models.Model):
              "For e.g. A rule for Meal Voucher having fixed amount of "
              u"1€ per worked day can have its quantity defined in expression "
              "like worked_days.WORK100.number_of_days.", tracking=True)
-    category_id = fields.Many2one('hr.salary.rule.category', string='Category', required=True, tracking=True)
+    category_id = fields.Many2one('hr.salary.rule.category', string='Category', required=True, tracking=True,
+                                  check_company=True)
     active = fields.Boolean(default=True,
         help="If the active field is set to false, it will allow you to hide the salary rule without removing it.", tracking=True)
     appears_on_payslip = fields.Boolean(string='Appears on Payslip', default=True,
         help="Used to display the salary rule on payslip.", tracking=True)
-    parent_rule_id = fields.Many2one('hr.salary.rule', string='Parent Salary Rule', index=True, tracking=True)
+    parent_rule_id = fields.Many2one('hr.salary.rule', string='Parent Salary Rule', index=True, tracking=True,
+                                     check_company=True)
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, tracking=True)
     condition_select = fields.Selection([
         ('none', 'Always True'),
@@ -168,7 +174,7 @@ class HrSalaryRule(models.Model):
     amount_percentage_base = fields.Char(string='Percentage based on', help='result will be affected to a variable', tracking=True)
     child_ids = fields.One2many('hr.salary.rule', 'parent_rule_id', string='Child Salary Rule', copy=True)
     register_id = fields.Many2one('hr.contribution.register', string='Contribution Register',
-        help="Eventual third party involved in the salary payment of the employees.", tracking=True)
+        help="Eventual third party involved in the salary payment of the employees.", tracking=True, check_company=True)
     input_ids = fields.One2many('hr.rule.input', 'input_id', string='Inputs', copy=True)
     note = fields.Text(string='Description')
     rounding_method = fields.Selection([

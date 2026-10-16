@@ -84,10 +84,11 @@ class HrSalaryBracketVersion(models.Model):
     """ The bands of a bracket from a date on, for one key. """
     _name = 'hr.salary.bracket.version'
     _description = 'Salary Bracket Table'
+    _check_company_auto = True
     _order = 'date_from desc, key'
 
     bracket_id = fields.Many2one(
-        'hr.salary.bracket', string='Bracket', required=True, ondelete='cascade', index=True)
+        'hr.salary.bracket', string='Bracket', required=True, ondelete='cascade', index=True, check_company=True)
     date_from = fields.Date(string='From', required=True, default=fields.Date.context_today)
     key = fields.Char(
         string='Key',
@@ -161,10 +162,11 @@ class HrSalaryBracketLine(models.Model):
     """ One band of a bracket table. """
     _name = 'hr.salary.bracket.line'
     _description = 'Salary Bracket Band'
+    _check_company_auto = True
     _order = 'lower'
 
     version_id = fields.Many2one(
-        'hr.salary.bracket.version', string='Table', required=True, ondelete='cascade', index=True)
+        'hr.salary.bracket.version', string='Table', required=True, ondelete='cascade', index=True, check_company=True)
     lower = fields.Float(string='From', digits='Payroll')
     upper = fields.Float(string='To', digits='Payroll', help='Leave at zero for the last band, which has no limit.')
     rate = fields.Float(string='Rate (%)', digits='Payroll Rate')

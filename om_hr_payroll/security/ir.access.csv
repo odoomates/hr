@@ -55,3 +55,8 @@ access_hr_payslip_retro_officer,hr.payslip.retro.officer,hr.payslip.retro,om_hr_
 access_hr_payslip_own,hr.payslip.own,hr.payslip,base.group_user,r,"[('employee_id.user_id', '=', user.id), ('state', '=', 'done'), ('credit_note', '=', False)]"
 access_hr_payslip_line_own,hr.payslip.line.own,hr.payslip.line,base.group_user,r,"[('slip_id.employee_id.user_id', '=', user.id), ('slip_id.state', '=', 'done'), ('slip_id.credit_note', '=', False)]"
 access_hr_payslip_worked_days_own,hr.payslip.worked_days.own,hr.payslip.worked_days,base.group_user,r,"[('payslip_id.employee_id.user_id', '=', user.id), ('payslip_id.state', '=', 'done'), ('payslip_id.credit_note', '=', False)]"
+hr_salary_bracket_version_company_rule,Salary bracket tables: multi-company,hr.salary.bracket.version,,crud,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"
+hr_salary_bracket_line_company_rule,Salary bracket lines: multi-company,hr.salary.bracket.line,,crud,"['|', ('version_id.company_id', '=', False), ('version_id.company_id', 'in', company_ids)]"
+hr_rule_parameter_value_company_rule,Rule parameter values: multi-company,hr.rule.parameter.value,,crud,"['|', ('parameter_id.company_id', '=', False), ('parameter_id.company_id', 'in', company_ids)]"
+hr_rule_input_company_rule,Rule inputs: multi-company,hr.rule.input,,crud,"['|', ('input_id.company_id', '=', False), ('input_id.company_id', 'in', company_ids)]"
+hr_contract_advantage_template_company_rule,Advantage templates: multi-company,hr.contract.advantage.template,,crud,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"

@@ -1,6 +1,6 @@
 {
     'name': 'Odoo 20 HR Payroll',
-    'version': '2.2.0',
+    'version': '2.3.0',
     'category': 'Generic Modules/Human Resources',
     'summary': 'Payroll for Odoo 20 Community: salary structures and rules, payslips, payslip batches and reports',
     'description': 'Payroll for Odoo 20 Community. Salary structures built from salary rules (fixed, percentage or '

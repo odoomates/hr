@@ -151,6 +151,17 @@ Since 2.2.0 the module depends on HR Base (om_hr_base): add both modules to the
 addons folder. Until the module is upgraded, the server skips it and the Payroll
 menu is missing; the upgrade installs HR Base.
 
+The upgrade to 2.3.0 checks the companies of the payroll in a multi-company
+database: a contract, payslip, batch, structure or rule now only links records
+of its own company, or records shared by all the companies. Nothing is changed
+by the upgrade: the records already linking another company are listed as
+warnings in the server log, and the next change of such a record asks to fix
+its link first. The bracket tables, rule parameters, rule inputs and advantage
+templates now follow the company too.
+The payslip lines now belong to the company of their payslip: the upgrade
+corrects the lines computed from another company, which only happened in a
+multi-company database.
+
 The upgrade to 2.2.0 fixes the total of a salary rule category reaching exactly 0
 on a payslip: it was replaced by the last amount added, e.g. a whole month of
 unpaid time off paid minus the wage instead of nothing.

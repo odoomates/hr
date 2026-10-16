@@ -41,12 +41,16 @@ class TestPayroll(TransactionCase):
                 'account_debit': False, 'account_credit': False,
             })
         rules |= cls.env.ref('om_hr_payroll.hr_rule_taxable') | cls.env.ref('om_hr_payroll.hr_rule_net')
+        # shared by the companies, as the payroll data: the employees of another company use it too
+        rules.company_id = False
         cls.structure = cls.env['hr.payroll.structure'].create({
             'name': 'Test Structure', 'code': 'TEST', 'parent_id': False, 'rule_ids': [Command.set(rules.ids)],
+            'company_id': False,
         })
+        # shared by the companies, as the payroll data: the employees of another company use it too
         cls.housing = cls.env['hr.salary.component'].create({
             'name': 'Housing', 'code': 'HOUSING', 'category_id': cls.env.ref('om_hr_payroll.ALW').id,
-            'default_amount': 1000.0,
+            'default_amount': 1000.0, 'company_id': False,
         })
         cls.employee = cls._create_employee('Payroll Employee')
 
@@ -397,6 +401,9 @@ class TestPayroll(TransactionCase):
 
     def test_batch_of_another_company(self):
         company_2 = self.env['res.company'].create({'name': 'Batch Company 2'})
+        if 'journal_id' in self.env['hr.payslip.run']._fields:
+            self.env['account.journal'].create({
+                'name': 'Salaries', 'code': 'SAL2', 'type': 'general', 'company_id': company_2.id})
         run = self.env['hr.payslip.run'].create({
             'name': 'August', 'date_start': date(2026, 8, 1), 'date_end': date(2026, 8, 31), 'company_id': company_2.id,
         })

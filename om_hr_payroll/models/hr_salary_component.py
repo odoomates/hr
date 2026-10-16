@@ -11,6 +11,7 @@ class HrSalaryComponent(models.Model):
     _name = 'hr.salary.component'
     _inherit = ['mail.thread']
     _description = 'Salary Component'
+    _check_company_auto = True
     _order = 'sequence, code'
 
     name = fields.Char(required=True, translate=True, tracking=True)
@@ -22,7 +23,7 @@ class HrSalaryComponent(models.Model):
         'hr.salary.rule.category', string='Category',
         default=lambda self: self.env.ref('om_hr_payroll.ALW', raise_if_not_found=False),
         help='The category of the salary rule paying the component. It only documents the component: '
-             'the rules decide what is computed.', tracking=True)
+             'the rules decide what is computed.', tracking=True, check_company=True)
     default_amount = fields.Monetary(
         string='Default Amount',
         help='Proposed on the versions where the component is added. The amount of each version can be changed.', tracking=True)
@@ -64,12 +65,13 @@ class HrVersionSalaryComponent(models.Model):
     """ The amount of a salary component for one version/contract of an employee. """
     _name = 'hr.version.salary.component'
     _description = 'Salary Component of a Version'
+    _check_company_auto = True
     _order = 'sequence, id'
 
     version_id = fields.Many2one(
-        'hr.version', string='Version', required=True, ondelete='cascade', index=True)
+        'hr.version', string='Version', required=True, ondelete='cascade', index=True, check_company=True)
     component_id = fields.Many2one(
-        'hr.salary.component', string='Component', required=True, ondelete='restrict')
+        'hr.salary.component', string='Component', required=True, ondelete='restrict', check_company=True)
     code = fields.Char(related='component_id.code', store=True, string='Code')
     sequence = fields.Integer(related='component_id.sequence', store=True)
     amount = fields.Monetary(string='Amount')

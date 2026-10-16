@@ -13,7 +13,7 @@ class HrVersion(models.Model):
     _description = 'Employee Contract'
 
 
-    struct_id = fields.Many2one('hr.payroll.structure', string='Salary Structure')
+    struct_id = fields.Many2one('hr.payroll.structure', string='Salary Structure', check_company=True)
     schedule_pay = fields.Selection([
         ('monthly', 'Monthly'),
         ('quarterly', 'Quarterly'),
@@ -34,6 +34,10 @@ class HrVersion(models.Model):
         help='Fixed Wage: the wage of the month. Hourly Wage: the hours paid in the period times the hourly wage.')
     hourly_wage = fields.Monetary(tracking=True, groups="hr.group_hr_manager,om_hr_payroll.group_hr_payroll_user",
                                   help='Paid per hour worked, or per hour of paid time off at its rate.')
+
+    @api.model
+    def _company_checked_fields(self):
+        return super()._company_checked_fields() + ['struct_id']
 
     @api.onchange('wage_type')
     def _onchange_wage_type(self):
@@ -94,6 +98,7 @@ class HrContractAdvantageTemplate(models.Model):
 
     name = fields.Char('Name', required=True)
     code = fields.Char('Code', required=True)
+    company_id = fields.Many2one('res.company', help='Leave empty to share the advantage with all the companies.')
     lower_bound = fields.Float('Lower Bound', help="Lower bound authorized by the employer for this advantage")
     upper_bound = fields.Float('Upper Bound', help="Upper bound authorized by the employer for this advantage")
     default_value = fields.Float('Default value for this advantage')
