@@ -5,6 +5,7 @@ class HrLoanType(models.Model):
     """ A kind of loan and its limits, e.g. a salary advance repaid at once, or a personal loan over a year. """
     _name = 'hr.loan.type'
     _description = 'Loan Type'
+    _check_company_auto = True
     _order = 'sequence, name'
 
     name = fields.Char(required=True, translate=True)

@@ -12,6 +12,7 @@ class HrLoan(models.Model):
     _name = 'hr.loan'
     _inherit = ['approval.mixin']
     _description = 'Employee Loan'
+    _check_company_auto = True
     _order = 'date desc, id desc'
     _mail_post_access = 'read'
 
@@ -19,15 +20,14 @@ class HrLoan(models.Model):
                        default=lambda self: self.env._('New'))
     employee_id = fields.Many2one(
         'hr.employee', required=True, index=True, tracking=True,
-        default=lambda self: self.env.user.employee_id)
+        default=lambda self: self.env.user.employee_id, check_company=True)
     company_id = fields.Many2one(
         'res.company', required=True, index=True,
         compute='_compute_company_id', store=True, readonly=False, precompute=True)
     currency_id = fields.Many2one(related='company_id.currency_id')
     department_id = fields.Many2one(related='employee_id.department_id', store=True)
     type_id = fields.Many2one(
-        'hr.loan.type', required=True, tracking=True,
-        domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
+        'hr.loan.type', required=True, tracking=True, check_company=True)
     type_description = fields.Text(related='type_id.description')
     is_advance = fields.Boolean(related='type_id.is_advance')
     date = fields.Date(string='Asked On', required=True, default=fields.Date.context_today)
@@ -260,9 +260,10 @@ class HrLoanLine(models.Model):
     """ One monthly installment of a loan. """
     _name = 'hr.loan.line'
     _description = 'Loan Installment'
+    _check_company_auto = True
     _order = 'loan_id, date, id'
 
-    loan_id = fields.Many2one('hr.loan', required=True, ondelete='cascade', index=True)
+    loan_id = fields.Many2one('hr.loan', required=True, ondelete='cascade', index=True, check_company=True)
     employee_id = fields.Many2one(related='loan_id.employee_id', store=True)
     company_id = fields.Many2one(related='loan_id.company_id', store=True)
     currency_id = fields.Many2one(related='loan_id.currency_id')
