@@ -19,4 +19,5 @@
         'views/menu.xml',
     ],
     'images': ['static/description/banner.gif'],
+    'auto_install': True,
 }
