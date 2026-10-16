@@ -2,16 +2,16 @@ from datetime import date
 
 from odoo.tests import tagged
 
-from odoo.addons.om_hr_portal.tests.common import OmHrPortalCase
+from odoo.addons.om_hr_portal.tests.common import HrPortalCase
 
 @tagged('post_install', '-at_install')
-class TestPortalDocument(OmHrPortalCase):
+class TestPortalDocument(HrPortalCase):
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         passport = cls.env.ref('om_hr_document.document_type_passport')
-        Document = cls.env['om.document']
+        Document = cls.env['document.document']
         cls.own = Document.create({'res_model': 'hr.employee', 'res_id': cls.employee.id, 'type_id': passport.id,
                                    'number': 'P-OWN-1', 'date_expiry': date(2030, 1, 1)})
         cls.theirs = Document.create({'res_model': 'hr.employee', 'res_id': cls.colleague.id,
