@@ -108,4 +108,4 @@ class AccountPayment(models.Model):
     _inherit = 'account.payment'
 
     loan_id = fields.Many2one('hr.loan', string='Employee Loan', readonly=True, copy=False,
-                                 index='btree_not_null')
+                                 index='btree_not_null', check_company=True)
