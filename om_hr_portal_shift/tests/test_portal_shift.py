@@ -17,6 +17,8 @@ class TestPortalShift(HrPortalCase):
         morning = cls.env.ref('om_hr_shift.template_morning')
         evening = cls.env.ref('om_hr_shift.template_evening')
         Shift = cls.env['hr.shift'].with_context(om_shift_override=True)
+        # the open shifts already there, e.g. of the demo data, are not those of the test
+        Shift.search([('employee_id', '=', False)]).unlink()
         cls.mine = Shift.create(dict(morning._shift_values(), employee_id=cls.employee.id, date=cls.day))
         cls.theirs = Shift.create(dict(evening._shift_values(), employee_id=cls.colleague.id,
                                        date=cls.day + timedelta(days=1)))
