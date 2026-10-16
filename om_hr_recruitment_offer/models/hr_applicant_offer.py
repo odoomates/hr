@@ -10,23 +10,25 @@ class HrApplicantOffer(models.Model):
     _name = 'hr.applicant.offer'
     _inherit = ['approval.mixin', 'sign.mixin']
     _description = 'Job Offer'
+    _check_company_auto = True
     _order = 'id desc'
 
     name = fields.Char(string='Reference', required=True, readonly=True, copy=False,
                        default=lambda self: self.env._('New'))
     applicant_id = fields.Many2one('hr.applicant', required=True, ondelete='cascade', index=True,
-                                   tracking=True)
+                                   tracking=True, check_company=True)
     candidate_name = fields.Char(related='applicant_id.partner_name', string='Candidate')
     company_id = fields.Many2one('res.company', required=True, index=True,
                                  compute='_compute_company_id', store=True, readonly=False, precompute=True)
     currency_id = fields.Many2one(related='company_id.currency_id')
-    job_id = fields.Many2one('hr.job', string='Job Position', required=True, tracking=True)
-    department_id = fields.Many2one('hr.department', tracking=True)
+    job_id = fields.Many2one('hr.job', string='Job Position', required=True, tracking=True, check_company=True)
+    department_id = fields.Many2one('hr.department', tracking=True, check_company=True)
     wage = fields.Monetary(required=True, tracking=True, help='The monthly gross wage offered.')
     date_start = fields.Date(string='Start Date', required=True, tracking=True)
-    employee_type_id = fields.Many2one('hr.employee.type', tracking=True)
-    resource_calendar_id = fields.Many2one('resource.calendar', string='Working Schedule',
-                                           default=lambda self: self.env.company.resource_calendar_id)
+    employee_type_id = fields.Many2one('hr.employee.type', tracking=True, check_company=True)
+    resource_calendar_id = fields.Many2one(
+        'resource.calendar', string='Working Schedule', check_company=True,
+        compute='_compute_resource_calendar_id', store=True, readonly=False, precompute=True)
     trial_date_end = fields.Date(string='End of Probation')
     benefits = fields.Text(string='Other Benefits', help='Printed in the letter, e.g. housing or a phone.')
     date_valid = fields.Date(string='Valid Until', required=True, tracking=True,
@@ -35,7 +37,7 @@ class HrApplicantOffer(models.Model):
     template_id = fields.Many2one(
         'print.template', string='Letter', required=True, domain=[('model', '=', 'hr.applicant.offer')],
         default=lambda self: self.env.ref('om_hr_recruitment_offer.print_template_offer_letter',
-                                          raise_if_not_found=False))
+                                          raise_if_not_found=False), check_company=True)
     state = fields.Selection([
         ('draft', 'Draft'),
         ('to_approve', 'To Approve'),
@@ -47,8 +49,9 @@ class HrApplicantOffer(models.Model):
         ('expired', 'Expired'),
         ('cancelled', 'Cancelled'),
     ], required=True, default='draft', copy=False, index=True, tracking=True, readonly=True)
-    issue_id = fields.Many2one('print.issue', string='Offer Letter', readonly=True, copy=False)
-    sign_request_id = fields.Many2one('sign.request', string='Signature Request', readonly=True, copy=False)
+    issue_id = fields.Many2one('print.issue', string='Offer Letter', readonly=True, copy=False, check_company=True)
+    sign_request_id = fields.Many2one('sign.request', string='Signature Request', readonly=True, copy=False,
+                                      check_company=True)
     decline_reason = fields.Text(readonly=True, copy=False)
     date_accepted = fields.Datetime(string='Accepted On', readonly=True, copy=False)
 
@@ -56,6 +59,14 @@ class HrApplicantOffer(models.Model):
     def _compute_company_id(self):
         for offer in self:
             offer.company_id = offer.applicant_id.company_id or offer.company_id or self.env.company
+
+    @api.depends('company_id')
+    def _compute_resource_calendar_id(self):
+        """ The working schedule of the company of the offer, unless another one of that company is chosen. """
+        for offer in self:
+            if offer.resource_calendar_id.company_id not in (offer.company_id, self.env['res.company']):
+                offer.resource_calendar_id = False
+            offer.resource_calendar_id = offer.resource_calendar_id or offer.company_id.resource_calendar_id
 
     @api.onchange('applicant_id')
     def _onchange_applicant_id(self):
