@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="hr_appraisal_feedback_request_view_form" model="ir.ui.view">
+        <field name="name">hr.appraisal.feedback.request.view.form</field>
+        <field name="model">hr.appraisal.feedback.request</field>
+        <field name="arch" type="xml">
+            <form string="Ask for 360 Feedback">
+                <p class="text-muted">
+                    Each reviewer gets their own link to the survey by email. The employee reads the answers of
+                    everyone combined, without the names, once the appraisal is done and at least three people
+                    answered; you and HR read who answered what.
+                </p>
+                <group>
+                    <field name="appraisal_id"/>
+                    <field name="relation" widget="radio" options="{'horizontal': true}"/>
+                    <field name="reviewer_ids" widget="many2many_avatar_employee" options="{'no_create': True}"/>
+                    <field name="survey_id" options="{'no_create': True}"/>
+                    <field name="date_deadline"/>
+                </group>
+                <footer>
+                    <button name="action_send" string="Send" type="object" class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

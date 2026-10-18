@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Al was reviewed by three colleagues: the answers show on his appraisal -->
+
+    <record id="demo_answer_1" model="survey.user_input">
+        <field name="survey_id" ref="survey_360"/>
+        <field name="state">done</field>
+    </record>
+    <record id="demo_answer_1_quality" model="survey.user_input.line">
+        <field name="user_input_id" ref="demo_answer_1"/>
+        <field name="question_id" ref="survey_360_quality"/>
+        <field name="answer_type">scale</field>
+        <field name="value_scale">5</field>
+    </record>
+    <record id="demo_answer_1_keep" model="survey.user_input.line">
+        <field name="user_input_id" ref="demo_answer_1"/>
+        <field name="question_id" ref="survey_360_keep"/>
+        <field name="answer_type">text_box</field>
+        <field name="value_text_box">Shares what he learns with the whole team</field>
+    </record>
+    <record id="demo_feedback_1" model="hr.appraisal.feedback">
+        <field name="appraisal_id" ref="om_hr_appraisal.demo_appraisal_al"/>
+        <field name="reviewer_id" ref="hr.employee_mit"/>
+        <field name="relation">peer</field>
+        <field name="survey_id" ref="survey_360"/>
+        <field name="user_input_id" ref="demo_answer_1"/>
+    </record>
+
+    <record id="demo_answer_2" model="survey.user_input">
+        <field name="survey_id" ref="survey_360"/>
+        <field name="state">done</field>
+    </record>
+    <record id="demo_answer_2_quality" model="survey.user_input.line">
+        <field name="user_input_id" ref="demo_answer_2"/>
+        <field name="question_id" ref="survey_360_quality"/>
+        <field name="answer_type">scale</field>
+        <field name="value_scale">4</field>
+    </record>
+    <record id="demo_answer_2_keep" model="survey.user_input.line">
+        <field name="user_input_id" ref="demo_answer_2"/>
+        <field name="question_id" ref="survey_360_keep"/>
+        <field name="answer_type">text_box</field>
+        <field name="value_text_box">Calm and clear with the customers</field>
+    </record>
+    <record id="demo_feedback_2" model="hr.appraisal.feedback">
+        <field name="appraisal_id" ref="om_hr_appraisal.demo_appraisal_al"/>
+        <field name="reviewer_id" ref="hr.employee_niv"/>
+        <field name="relation">peer</field>
+        <field name="survey_id" ref="survey_360"/>
+        <field name="user_input_id" ref="demo_answer_2"/>
+    </record>
+
+    <record id="demo_answer_3" model="survey.user_input">
+        <field name="survey_id" ref="survey_360"/>
+        <field name="state">done</field>
+    </record>
+    <record id="demo_answer_3_quality" model="survey.user_input.line">
+        <field name="user_input_id" ref="demo_answer_3"/>
+        <field name="question_id" ref="survey_360_quality"/>
+        <field name="answer_type">scale</field>
+        <field name="value_scale">4</field>
+    </record>
+    <record id="demo_answer_3_keep" model="survey.user_input.line">
+        <field name="user_input_id" ref="demo_answer_3"/>
+        <field name="question_id" ref="survey_360_keep"/>
+        <field name="answer_type">text_box</field>
+        <field name="value_text_box">Takes ownership of the onboarding projects</field>
+    </record>
+    <record id="demo_feedback_3" model="hr.appraisal.feedback">
+        <field name="appraisal_id" ref="om_hr_appraisal.demo_appraisal_al"/>
+        <field name="reviewer_id" ref="hr.employee_qdp"/>
+        <field name="relation">manager</field>
+        <field name="survey_id" ref="survey_360"/>
+        <field name="user_input_id" ref="demo_answer_3"/>
+    </record>
+
+</odoo>

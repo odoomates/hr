@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="hr_appraisal_view_form" model="ir.ui.view">
+        <field name="name">hr.appraisal.view.form.360</field>
+        <field name="model">hr.appraisal</field>
+        <field name="inherit_id" ref="om_hr_appraisal.om_hr_appraisal_view_form"/>
+        <field name="arch" type="xml">
+            <button name="action_back_to_self" position="after">
+                <button name="action_request_feedback" string="Ask for 360 Feedback" type="object"
+                        invisible="state not in ('new', 'self', 'review') or not (is_manager or is_hr)"/>
+            </button>
+            <div name="button_box" position="inside">
+                <button name="action_open_feedback" type="object" class="oe_stat_button" icon="groups"
+                        invisible="not feedback_count">
+                    <div class="o_stat_info">
+                        <span class="o_stat_value"><field name="feedback_done_count"/> / <field name="feedback_count"/></span>
+                        <span class="o_stat_text">360 Answers</span>
+                    </div>
+                </button>
+            </div>
+            <page name="goals" position="before">
+                <page string="360 Feedback" name="feedback_360" invisible="not feedback_summary">
+                    <field name="feedback_summary" readonly="1"/>
+                    <div invisible="not feedback_detail" class="mt-4">
+                        <h4>Who Answered What</h4>
+                        <p class="text-muted">For the manager and HR only: the employee reads the summary above.</p>
+                        <field name="feedback_detail" readonly="1"/>
+                    </div>
+                </page>
+            </page>
+        </field>
+    </record>
+
+    <record id="hr_appraisal_feedback_view_list" model="ir.ui.view">
+        <field name="name">hr.appraisal.feedback.view.list</field>
+        <field name="model">hr.appraisal.feedback</field>
+        <field name="arch" type="xml">
+            <list string="360 Feedback" create="0">
+                <field name="reviewer_id" widget="many2one_avatar_employee"/>
+                <field name="relation"/>
+                <field name="survey_id" optional="hide"/>
+                <field name="date_deadline"/>
+                <field name="state" widget="badge" decoration-success="state == 'done'"
+                       decoration-info="state == 'in_progress'"/>
+            </list>
+        </field>
+    </record>
+
+</odoo>

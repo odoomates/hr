@@ -1,0 +1,5 @@
+id,name,model_id,group_id/id,operation,domain
+access_hr_appraisal_feedback_manager,hr.appraisal.feedback.manager,hr.appraisal.feedback,base.group_user,r,"[('appraisal_id.manager_id.user_id', '=', user.id)]"
+access_hr_appraisal_feedback_hr,hr.appraisal.feedback.hr,hr.appraisal.feedback,hr.group_hr_user,crud,
+hr_appraisal_feedback_company_rule,360 feedback: multi-company,hr.appraisal.feedback,,crud,"[('company_id', 'in', company_ids)]"
+access_hr_appraisal_feedback_request_user,hr.appraisal.feedback.request.user,hr.appraisal.feedback.request,base.group_user,crud,
