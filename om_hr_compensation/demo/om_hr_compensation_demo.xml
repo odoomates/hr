@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="demo_grade_g3" model="hr.salary.grade">
+        <field name="name">G3</field>
+        <field name="sequence">3</field>
+        <field name="wage_min">2500</field>
+        <field name="wage_max">4000</field>
+    </record>
+    <record id="demo_grade_g4" model="hr.salary.grade">
+        <field name="name">G4</field>
+        <field name="sequence">4</field>
+        <field name="wage_min">3500</field>
+        <field name="wage_max">5500</field>
+    </record>
+    <record id="demo_grade_g5" model="hr.salary.grade">
+        <field name="name">G5</field>
+        <field name="sequence">5</field>
+        <field name="wage_min">5000</field>
+        <field name="wage_max">8000</field>
+    </record>
+
+    <record id="hr.job_trainee" model="hr.job">
+        <field name="salary_grade_id" ref="demo_grade_g3"/>
+    </record>
+    <record id="hr.job_developer" model="hr.job">
+        <field name="salary_grade_id" ref="demo_grade_g4"/>
+    </record>
+    <record id="hr.job_consultant" model="hr.job">
+        <field name="salary_grade_id" ref="demo_grade_g4"/>
+    </record>
+    <record id="hr.job_marketing" model="hr.job">
+        <field name="salary_grade_id" ref="demo_grade_g4"/>
+    </record>
+    <record id="hr.job_hrm" model="hr.job">
+        <field name="salary_grade_id" ref="demo_grade_g5"/>
+    </record>
+    <record id="hr.job_cto" model="hr.job">
+        <field name="salary_grade_id" ref="demo_grade_g5"/>
+    </record>
+
+    <!-- the raises of next year, open for the managers -->
+    <record id="demo_merit_cycle" model="hr.merit.cycle">
+        <field name="name">Merit Review</field>
+        <field name="date_effective" eval="(DateTime.today() + relativedelta(years=1, month=1, day=1)).strftime('%Y-%m-%d')"/>
+        <field name="date_deadline" eval="(DateTime.today() + relativedelta(days=21)).strftime('%Y-%m-%d')"/>
+        <field name="budget_percent">3.5</field>
+    </record>
+
+    <function model="hr.merit.cycle" name="action_generate" eval="[[ref('demo_merit_cycle')]]"/>
+    <function model="hr.merit.cycle" name="action_open" eval="[[ref('demo_merit_cycle')]]"/>
+
+</odoo>

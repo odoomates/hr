@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_hr_compensation"
+              name="Compensation"
+              parent="hr.menu_hr_root"
+              sequence="85"/>
+
+    <menuitem id="menu_hr_merit_cycle_line_team"
+              action="hr_merit_cycle_line_action_team"
+              parent="menu_hr_compensation"
+              sequence="10"/>
+
+    <menuitem id="menu_hr_merit_cycle"
+              action="hr_merit_cycle_action"
+              parent="menu_hr_compensation"
+              sequence="20"
+              groups="hr.group_hr_manager"/>
+
+    <menuitem id="menu_hr_pay_position"
+              action="hr_version_action_server_pay_position"
+              parent="menu_hr_compensation"
+              sequence="30"
+              groups="hr.group_hr_manager"/>
+
+    <menuitem id="menu_hr_salary_grade"
+              action="hr_salary_grade_action"
+              parent="hr.menu_human_resources_configuration"
+              sequence="45"
+              groups="hr.group_hr_manager"/>
+
+</odoo>

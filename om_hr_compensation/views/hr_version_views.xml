@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="hr_employee_view_form" model="ir.ui.view">
+        <field name="name">hr.employee.view.form.compensation</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <div name="wage" position="after">
+                <field name="salary_grade_id" groups="hr.group_hr_manager" invisible="not salary_grade_id"/>
+                <field name="compa_ratio" groups="hr.group_hr_manager" invisible="not salary_grade_id"
+                       decoration-danger="band_position in ('below', 'above')"/>
+                <field name="band_position" groups="hr.group_hr_manager" invisible="not salary_grade_id"/>
+            </div>
+        </field>
+    </record>
+
+    <!-- where the wages sit in their bands: the current versions of the employees -->
+    <record id="hr_version_view_list_pay_position" model="ir.ui.view">
+        <field name="name">hr.version.view.list.pay.position</field>
+        <field name="model">hr.version</field>
+        <field name="priority">100</field>
+        <field name="group_ids" eval="[Command.link(ref('hr.group_hr_manager'))]"/>
+        <field name="arch" type="xml">
+            <list string="Pay Positioning" create="0">
+                <field name="employee_id"/>
+                <field name="department_id" optional="show"/>
+                <field name="job_id"/>
+                <field name="salary_grade_id"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="wage"/>
+                <field name="compa_ratio"/>
+                <field name="band_position" decoration-danger="band_position in ('below', 'above')"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hr_version_view_pivot_pay_position" model="ir.ui.view">
+        <field name="name">hr.version.view.pivot.pay.position</field>
+        <field name="model">hr.version</field>
+        <field name="priority">100</field>
+        <field name="group_ids" eval="[Command.link(ref('hr.group_hr_manager'))]"/>
+        <field name="arch" type="xml">
+            <pivot string="Pay Positioning">
+                <field name="salary_grade_id" type="row"/>
+                <field name="band_position" type="col"/>
+                <field name="compa_ratio" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="hr_version_view_search_pay_position" model="ir.ui.view">
+        <field name="name">hr.version.view.search.pay.position</field>
+        <field name="model">hr.version</field>
+        <field name="priority">100</field>
+        <field name="group_ids" eval="[Command.link(ref('hr.group_hr_manager'))]"/>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <field name="department_id"/>
+                <field name="salary_grade_id"/>
+                <filter name="outside" string="Outside the Band" domain="[('band_position', 'in', ('below', 'above'))]"/>
+                <group>
+                    <filter name="group_grade" string="Grade" context="{'group_by': 'salary_grade_id'}"/>
+                    <filter name="group_department" string="Department" context="{'group_by': 'department_id'}"/>
+                    <filter name="group_band" string="In Band" context="{'group_by': 'band_position'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="hr_version_action_pay_position" model="ir.actions.act_window">
+        <field name="name">Pay Positioning</field>
+        <field name="res_model">hr.version</field>
+        <field name="view_mode">list,pivot</field>
+        <field name="search_view_id" ref="hr_version_view_search_pay_position"/>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('hr_version_view_list_pay_position')}),
+            (0, 0, {'view_mode': 'pivot', 'view_id': ref('hr_version_view_pivot_pay_position')})]"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No wage on a salary grade yet</p>
+            <p>Give the job positions their salary grade: each current wage then shows its compa-ratio and where it
+                sits in the band.</p>
+        </field>
+    </record>
+
+    <record id="hr_version_action_server_pay_position" model="ir.actions.server">
+        <field name="name">Pay Positioning</field>
+        <field name="model_id" ref="hr.model_hr_version"/>
+        <field name="group_ids" eval="[Command.link(ref('hr.group_hr_manager'))]"/>
+        <field name="state">code</field>
+        <field name="code">action = model.action_open_pay_position()</field>
+    </record>
+
+</odoo>

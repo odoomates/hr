@@ -1,0 +1,13 @@
+id,name,model_id,group_id/id,operation,domain
+access_hr_salary_grade_hr,hr.salary.grade.hr,hr.salary.grade,hr.group_hr_user,r,
+access_hr_salary_grade_manager,hr.salary.grade.manager,hr.salary.grade,hr.group_hr_manager,crud,
+hr_salary_grade_company_rule,Salary grades: multi-company,hr.salary.grade,,crud,"[('company_id', 'in', company_ids)]"
+access_hr_merit_cycle_hr,hr.merit.cycle.hr,hr.merit.cycle,hr.group_hr_manager,crud,
+access_hr_merit_cycle_team,hr.merit.cycle.team,hr.merit.cycle,base.group_user,r,"[('state', 'in', ('open', 'review', 'done')), ('line_ids.manager_id.user_id', '=', user.id)]"
+hr_merit_cycle_company_rule,Merit cycles: multi-company,hr.merit.cycle,,crud,"[('company_id', 'in', company_ids)]"
+access_hr_merit_cycle_line_hr,hr.merit.cycle.line.hr,hr.merit.cycle.line,hr.group_hr_manager,crud,
+access_hr_merit_cycle_line_team,hr.merit.cycle.line.team,hr.merit.cycle.line,base.group_user,ru,"[('manager_id.user_id', '=', user.id), ('cycle_id.state', 'in', ('open', 'review', 'done'))]"
+hr_merit_cycle_line_company_rule,Merit cycle lines: multi-company,hr.merit.cycle.line,,crud,"[('company_id', 'in', company_ids)]"
+access_hr_merit_cycle_budget_hr,hr.merit.cycle.budget.hr,hr.merit.cycle.budget,hr.group_hr_manager,crud,
+access_hr_merit_cycle_budget_department,hr.merit.cycle.budget.department,hr.merit.cycle.budget,base.group_user,r,"[('department_id.manager_id.user_id', '=', user.id), ('cycle_id.state', 'in', ('open', 'review', 'done'))]"
+hr_merit_cycle_budget_company_rule,Merit cycle budgets: multi-company,hr.merit.cycle.budget,,crud,"[('company_id', 'in', company_ids)]"
