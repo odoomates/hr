@@ -1,0 +1,6 @@
+id,name,model_id,group_id/id,operation,domain
+access_hr_pulse_hr,hr.pulse.hr,hr.pulse,hr.group_hr_user,crud,
+hr_pulse_company_rule,Pulse surveys: multi-company,hr.pulse,,crud,"[('company_id', 'in', company_ids)]"
+access_hr_pulse_invitation_hr,hr.pulse.invitation.hr,hr.pulse.invitation,hr.group_hr_user,cr,
+hr_pulse_invitation_company_rule,Pulse survey invitations: multi-company,hr.pulse.invitation,,crud,"[('company_id', 'in', company_ids)]"
+access_hr_pulse_ballot_system,hr.pulse.ballot.system,hr.pulse.ballot,base.group_system,r,

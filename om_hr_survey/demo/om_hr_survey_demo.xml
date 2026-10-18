@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- a pulse of last month, closed: six answers from Research and Development -->
+    <record id="demo_pulse" model="hr.pulse">
+        <field name="name">Monthly Pulse</field>
+        <field name="department_ids" eval="[(4, ref('hr.dep_rd'))]"/>
+        <field name="date_start" eval="(DateTime.today() + relativedelta(months=-1)).strftime('%Y-%m-%d')"/>
+        <field name="date_end" eval="(DateTime.today() + relativedelta(months=-1, days=7)).strftime('%Y-%m-%d')"/>
+        <field name="state">running</field>
+    </record>
+
+    <record id="demo_answer_1" model="survey.user_input">
+        <field name="survey_id" ref="survey_pulse"/>
+        <field name="state">done</field>
+    </record>
+    <record id="demo_answer_1_enps" model="survey.user_input.line">
+        <field name="user_input_id" ref="demo_answer_1"/>
+        <field name="question_id" ref="survey_pulse_enps"/>
+        <field name="answer_type">scale</field>
+        <field name="value_scale">10</field>
+    </record>
+    <record id="demo_answer_1_workload" model="survey.user_input.line">
+        <field name="user_input_id" ref="demo_answer_1"/>
+        <field name="question_id" ref="survey_pulse_workload"/>
+        <field name="answer_type">scale</field>
+        <field name="value_scale">5</field>
+    </record>
+    <record id="demo_answer_1_comment" model="survey.user_input.line">
+        <field name="user_input_id" ref="demo_answer_1"/>
+        <field name="question_id" ref="survey_pulse_comment"/>
+        <field name="answer_type">text_box</field>
+        <field name="value_text_box">Great team, clear goals</field>
+    </record>
+    <record id="demo_ballot_1" model="hr.pulse.ballot">
+        <field name="pulse_id" ref="demo_pulse"/>
+        <field name="token_hash">924652900f09629d08aac14e683d04e94dcc53bdb5b03e6f16c376f1f0285b70</field>
+        <field name="department_id" ref="hr.dep_rd"/>
+        <field name="user_input_id" ref="demo_answer_1"/>
+    </record>
+
+    <record id="demo_answer_2" model="survey.user_input">
+        <field name="survey_id" ref="survey_pulse"/>
+        <field name="state">done</field>
+    </record>
+    <record id="demo_answer_2_enps" model="survey.user_input.line">
+        <field name="user_input_id" ref="demo_answer_2"/>
+        <field name="question_id" ref="survey_pulse_enps"/>
+        <field name="answer_type">scale</field>
+        <field name="value_scale">9</field>
+    </record>
+    <record id="demo_answer_2_workload" model="survey.user_input.line">
+        <field name="user_input_id" ref="demo_answer_2"/>
+        <field name="question_id" ref="survey_pulse_workload"/>
+        <field name="answer_type">scale</field>
+        <field name="value_scale">4</field>
+    </record>
+    <record id="demo_ballot_2" model="hr.pulse.ballot">
+        <field name="pulse_id" ref="demo_pulse"/>
+        <field name="token_hash">5d73d7248307697d2d7ff3a769090b53e8c55d62ae9cc02770d33e1bcf5c96b5</field>
+        <field name="department_id" ref="hr.dep_rd"/>
+        <field name="user_input_id" ref="demo_answer_2"/>
+    </record>
+
+    <record id="demo_answer_3" model="survey.user_input">
+        <field name="survey_id" ref="survey_pulse"/>
+        <field name="state">done</field>
+    </record>
+    <record id="demo_answer_3_enps" model="survey.user_input.line">
+        <field name="user_input_id" ref="demo_answer_3"/>
+        <field name="question_id" ref="survey_pulse_enps"/>
+        <field name="answer_type">scale</field>
+        <field name="value_scale">9</field>
+    </record>
+    <record id="demo_answer_3_workload" model="survey.user_input.line">
+        <field name="user_input_id" ref="demo_answer_3"/>
+        <field name="question_id" ref="survey_pulse_workload"/>
+        <field name="answer_type">scale</field>
+        <field name="value_scale">4</field>
+    </record>
+    <record id="demo_answer_3_comment" model="survey.user_input.line">
+        <field name="user_input_id" ref="demo_answer_3"/>
+        <field name="question_id" ref="survey_pulse_comment"/>
+        <field name="answer_type">text_box</field>
+        <field name="value_text_box">More time for training would help</field>
+    </record>
+    <record id="demo_ballot_3" model="hr.pulse.ballot">
+        <field name="pulse_id" ref="demo_pulse"/>
+        <field name="token_hash">5e5bd13c48e51360da1675a3d1e612c37fe0f5c33d1ee6369766e4d5cb23ca68</field>
+        <field name="department_id" ref="hr.dep_rd"/>
+        <field name="user_input_id" ref="demo_answer_3"/>
+    </record>
+
+    <record id="demo_answer_4" model="survey.user_input">
+        <field name="survey_id" ref="survey_pulse"/>
+        <field name="state">done</field>
+    </record>
+    <record id="demo_answer_4_enps" model="survey.user_input.line">
+        <field name="user_input_id" ref="demo_answer_4"/>
+        <field name="question_id" ref="survey_pulse_enps"/>
+        <field name="answer_type">scale</field>
+        <field name="value_scale">8</field>
+    </record>
+    <record id="demo_answer_4_workload" model="survey.user_input.line">
+        <field name="user_input_id" ref="demo_answer_4"/>
+        <field name="question_id" ref="survey_pulse_workload"/>
+        <field name="answer_type">scale</field>
+        <field name="value_scale">4</field>
+    </record>
+    <record id="demo_ballot_4" model="hr.pulse.ballot">
+        <field name="pulse_id" ref="demo_pulse"/>
+        <field name="token_hash">d24accd49438e78c9c3df4db7e3f472e09d3cb080901ed32cc1c4f9179926f16</field>
+        <field name="department_id" ref="hr.dep_rd"/>
+        <field name="user_input_id" ref="demo_answer_4"/>
+    </record>
+
+    <record id="demo_answer_5" model="survey.user_input">
+        <field name="survey_id" ref="survey_pulse"/>
+        <field name="state">done</field>
+    </record>
+    <record id="demo_answer_5_enps" model="survey.user_input.line">
+        <field name="user_input_id" ref="demo_answer_5"/>
+        <field name="question_id" ref="survey_pulse_enps"/>
+        <field name="answer_type">scale</field>
+        <field name="value_scale">7</field>
+    </record>
+    <record id="demo_answer_5_workload" model="survey.user_input.line">
+        <field name="user_input_id" ref="demo_answer_5"/>
+        <field name="question_id" ref="survey_pulse_workload"/>
+        <field name="answer_type">scale</field>
+        <field name="value_scale">3</field>
+    </record>
+    <record id="demo_ballot_5" model="hr.pulse.ballot">
+        <field name="pulse_id" ref="demo_pulse"/>
+        <field name="token_hash">fd15f6a0f48a47189526df8d395d04aa7f0de8dc01a48b835c6fd144e1bde17b</field>
+        <field name="department_id" ref="hr.dep_rd"/>
+        <field name="user_input_id" ref="demo_answer_5"/>
+    </record>
+
+    <record id="demo_answer_6" model="survey.user_input">
+        <field name="survey_id" ref="survey_pulse"/>
+        <field name="state">done</field>
+    </record>
+    <record id="demo_answer_6_enps" model="survey.user_input.line">
+        <field name="user_input_id" ref="demo_answer_6"/>
+        <field name="question_id" ref="survey_pulse_enps"/>
+        <field name="answer_type">scale</field>
+        <field name="value_scale">6</field>
+    </record>
+    <record id="demo_answer_6_workload" model="survey.user_input.line">
+        <field name="user_input_id" ref="demo_answer_6"/>
+        <field name="question_id" ref="survey_pulse_workload"/>
+        <field name="answer_type">scale</field>
+        <field name="value_scale">3</field>
+    </record>
+    <record id="demo_answer_6_comment" model="survey.user_input.line">
+        <field name="user_input_id" ref="demo_answer_6"/>
+        <field name="question_id" ref="survey_pulse_comment"/>
+        <field name="answer_type">text_box</field>
+        <field name="value_text_box">Too many meetings this month</field>
+    </record>
+    <record id="demo_ballot_6" model="hr.pulse.ballot">
+        <field name="pulse_id" ref="demo_pulse"/>
+        <field name="token_hash">49681b600e92db01907e40218ea676718927d06af434f08148258d1587ba4c3a</field>
+        <field name="department_id" ref="hr.dep_rd"/>
+        <field name="user_input_id" ref="demo_answer_6"/>
+    </record>
+
+    <function model="hr.pulse" name="action_close" eval="[[ref('demo_pulse')]]"/>
+
+</odoo>

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="hr_pulse_view_form" model="ir.ui.view">
+        <field name="name">hr.pulse.view.form</field>
+        <field name="model">hr.pulse</field>
+        <field name="arch" type="xml">
+            <form string="Pulse Survey">
+                <header>
+                    <button name="action_launch" string="Launch" type="object" class="btn-primary"
+                            invisible="state != 'draft'"
+                            confirm="Each employee gets their one-time link by email now. Launch?"/>
+                    <button name="action_close" string="Close" type="object" invisible="state != 'running'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. October Pulse" readonly="state != 'draft'"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="survey_id" readonly="state != 'draft'" options="{'no_create': True}"/>
+                            <field name="enps_question_id" readonly="state != 'draft'" options="{'no_create': True}"/>
+                            <field name="department_ids" widget="many2many_tags" readonly="state != 'draft'"/>
+                            <field name="company_id" groups="base.group_multi_company" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="date_start" readonly="state != 'draft'"/>
+                            <field name="date_end" readonly="state == 'closed'"/>
+                            <label for="repeat_weeks"/>
+                            <div class="o_row">
+                                <field name="repeat_weeks" class="oe_inline" readonly="state == 'closed'"/> weeks
+                            </div>
+                            <field name="invited_count" invisible="state == 'draft'"/>
+                            <field name="answer_count" invisible="state == 'draft'"/>
+                            <field name="participation" widget="percentage" invisible="state != 'closed'"
+                                   options="{'digits': [16, 0]}"/>
+                            <field name="enps" invisible="state != 'closed'"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-info" role="status" invisible="state != 'draft'">
+                        Odoo never stores who answered what: each employee gets a one-time link opening a ballot
+                        that knows their department only. The results show by department, from five answers.
+                    </div>
+                    <notebook invisible="state == 'draft'">
+                        <page string="Results" name="results">
+                            <field name="results" readonly="1"/>
+                        </page>
+                        <page string="Invited" name="invited">
+                            <field name="invitation_ids" readonly="1">
+                                <list>
+                                    <field name="employee_id"/>
+                                    <field name="department_id"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_pulse_view_list" model="ir.ui.view">
+        <field name="name">hr.pulse.view.list</field>
+        <field name="model">hr.pulse</field>
+        <field name="arch" type="xml">
+            <list string="Pulse Surveys">
+                <field name="name"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="participation" widget="percentage" options="{'digits': [16, 0]}"/>
+                <field name="enps"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="state" widget="badge" decoration-info="state == 'running'"
+                       decoration-success="state == 'closed'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hr_pulse_view_graph" model="ir.ui.view">
+        <field name="name">hr.pulse.view.graph</field>
+        <field name="model">hr.pulse</field>
+        <field name="arch" type="xml">
+            <graph string="eNPS" type="line">
+                <field name="date_start" interval="month"/>
+                <field name="enps" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="hr_pulse_action" model="ir.actions.act_window">
+        <field name="name">Pulse Surveys</field>
+        <field name="res_model">hr.pulse</field>
+        <field name="view_mode">list,form,graph</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Ask how things are going</p>
+            <p>A few questions, every few weeks, anonymously: each employee gets a one-time link, and the results
+                show by department, with the eNPS, from five answers.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_hr_pulse"
+              action="hr_pulse_action"
+              parent="hr.menu_hr_root"
+              sequence="88"
+              groups="hr.group_hr_user"/>
+
+    <template id="pulse_closed" name="Pulse Survey: Link Used">
+        <t t-call="web.frontend_layout">
+            <div class="container py-5 text-center">
+                <h3 t-if="answered">Thank you: your answers are in.</h3>
+                <h3 t-else="">This survey is closed, or the link is not valid.</h3>
+            </div>
+        </t>
+    </template>
+
+</odoo>
