@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="hr_merit_matrix_view_list" model="ir.ui.view">
+        <field name="name">hr.merit.matrix.view.list</field>
+        <field name="model">hr.merit.matrix</field>
+        <field name="arch" type="xml">
+            <list string="Merit Matrix" editable="bottom">
+                <field name="rating_id" options="{'no_create': True}"/>
+                <field name="band_position"/>
+                <field name="percent"/>
+                <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hr_merit_matrix_view_pivot" model="ir.ui.view">
+        <field name="name">hr.merit.matrix.view.pivot</field>
+        <field name="model">hr.merit.matrix</field>
+        <field name="arch" type="xml">
+            <pivot string="Merit Matrix">
+                <field name="rating_id" type="row"/>
+                <field name="band_position" type="col"/>
+                <field name="percent" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="hr_merit_matrix_action" model="ir.actions.act_window">
+        <field name="name">Merit Matrix</field>
+        <field name="res_model">hr.merit.matrix</field>
+        <field name="view_mode">list,pivot</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Set your merit matrix</p>
+            <p>The raise suggested for each rating, by where the wage sits in its band: the merit cycles fill the
+                proposals with it.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_hr_merit_matrix"
+              action="hr_merit_matrix_action"
+              parent="hr.menu_human_resources_configuration"
+              sequence="46"
+              groups="hr.group_hr_manager"/>
+
+    <record id="hr_merit_cycle_line_view_list" model="ir.ui.view">
+        <field name="name">hr.merit.cycle.line.view.list.appraisal</field>
+        <field name="model">hr.merit.cycle.line</field>
+        <field name="inherit_id" ref="om_hr_compensation.hr_merit_cycle_line_view_list"/>
+        <field name="arch" type="xml">
+            <field name="band_position" position="after">
+                <field name="rating_id" optional="show"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

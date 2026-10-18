@@ -1,0 +1,4 @@
+id,name,model_id,group_id/id,operation,domain
+access_hr_merit_matrix_user,hr.merit.matrix.user,hr.merit.matrix,base.group_user,r,
+access_hr_merit_matrix_manager,hr.merit.matrix.manager,hr.merit.matrix,hr.group_hr_manager,crud,
+hr_merit_matrix_company_rule,Merit matrix: multi-company,hr.merit.matrix,,crud,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"
