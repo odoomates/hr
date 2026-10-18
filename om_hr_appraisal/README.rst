@@ -102,6 +102,13 @@ Expectations and Outstanding high. Set the level of your own ratings in
 Employees > Configuration > Appraisals > Ratings. The goals keep their employee
 and company; the new features stay off until switched on in the settings.
 
+Editions
+========
+
+Works with Odoo 20 Community and Odoo 20 Enterprise. On Enterprise, it cannot
+be installed together with the Enterprise Appraisals app (``hr_appraisal``): both define
+the same records. Use one or the other.
+
 Dependencies
 ============
 

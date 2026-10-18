@@ -249,6 +249,13 @@ Usage
 * To pay a raise dated back to a past month, open a draft payslip, click Retro
   Pay and give the date from which the confirmed payslips are computed again.
 
+Editions
+========
+
+Works with Odoo 20 Community and Odoo 20 Enterprise. On Enterprise, it cannot
+be installed together with the Enterprise Payroll app (``hr_payroll``): both define
+the same records. Use one or the other.
+
 Dependencies
 ============
 

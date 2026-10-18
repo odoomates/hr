@@ -50,6 +50,13 @@ Usage
 * Sign > Requests > New uploads a PDF to send.
 * The signed PDF is attached to the request and sent to everyone.
 
+Editions
+========
+
+Works with Odoo 20 Community and Odoo 20 Enterprise. On Enterprise, it cannot
+be installed together with the Enterprise Sign app (``sign``): both define
+the same records. Use one or the other.
+
 Dependencies
 ============
 

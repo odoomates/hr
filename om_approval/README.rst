@@ -64,6 +64,13 @@ Usage
   methods called through the web client's RPC; server code calling the method
   directly is not stopped.
 
+Editions
+========
+
+Works with Odoo 20 Community and Odoo 20 Enterprise. On Enterprise, it cannot
+be installed together with the Enterprise Approvals app (``approvals``): both define
+the same records. Use one or the other.
+
 Dependencies
 ============
 

@@ -9,6 +9,8 @@
     'support': 'odoomates@gmail.com',
     'license': 'LGPL-3',
     'depends': ['base', 'mail', 'web'],
+    # the Enterprise app defining the same models
+    'excludes': ['approvals'],
     'data': [
         'security/om_approval_security.xml',
         'security/ir.access.csv',

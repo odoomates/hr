@@ -9,6 +9,8 @@
     'support': 'odoomates@gmail.com',
     'license': 'LGPL-3',
     'depends': ['om_print_template', 'portal'],
+    # the Enterprise app defining the same models
+    'excludes': ['sign'],
     'data': [
         'security/sign_security.xml',
         'security/ir.access.csv',
