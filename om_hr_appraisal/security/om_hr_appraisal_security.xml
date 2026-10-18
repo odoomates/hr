@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- the features switched on in the settings: the group is given to every employee -->
+    <record id="group_goal_alignment" model="res.groups">
+        <field name="name">Appraisals: Goal Alignment</field>
+    </record>
+
+    <record id="group_one_on_one" model="res.groups">
+        <field name="name">Appraisals: One-on-Ones</field>
+    </record>
+
+    <record id="group_calibration" model="res.groups">
+        <field name="name">Appraisals: 9-Box and Calibration</field>
+    </record>
+
+</odoo>

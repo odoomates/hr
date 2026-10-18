@@ -79,3 +79,10 @@ class HrAppraisalCycle(models.Model):
             'domain': [('cycle_id', '=', self.id)],
             'context': {'default_cycle_id': self.id, 'default_date_deadline': self.date_deadline},
         }
+
+    def action_open_nine_box(self):
+        self.ensure_one()
+        action = self.env['ir.actions.act_window']._for_xml_id('om_hr_appraisal.om_hr_appraisal_action_nine_box')
+        action['domain'] = [('cycle_id', '=', self.id), ('box', '!=', False)]
+        action['display_name'] = self.env._('9-Box: %s', self.name)
+        return action

@@ -1,15 +1,16 @@
 {
     'name': 'HR Appraisals',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.1.0',
     'category': 'Human Resources',
-    'summary': 'Employee appraisals: self assessment, manager review, rating, goals, probation reviews and '
-               'review cycles',
+    'summary': 'Employee appraisals: self assessment, manager review, rating, goals, probation reviews, '
+               'review cycles, goal alignment, one-on-ones, 9-box and calibration',
     'author': 'Odoo Mates',
     'maintainer': 'Odoo Mates',
     'support': 'odoomates@gmail.com',
     'license': 'LGPL-3',
     'depends': ['om_hr_base', 'mail'],
     'data': [
+        'security/om_hr_appraisal_security.xml',
         'security/ir.access.csv',
         'data/om_hr_appraisal_data.xml',
         'wizard/om_hr_appraisal_version_views.xml',
@@ -17,6 +18,8 @@
         'views/om_hr_appraisal_cycle_views.xml',
         'views/om_hr_appraisal_goal_views.xml',
         'views/om_hr_appraisal_config_views.xml',
+        'views/hr_one_on_one_views.xml',
+        'views/hr_appraisal_calibration_views.xml',
         'views/hr_employee_views.xml',
         'views/res_config_settings_views.xml',
         'views/menu.xml',

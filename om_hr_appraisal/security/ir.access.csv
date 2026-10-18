@@ -6,6 +6,8 @@ om_hr_appraisal_company_rule,Appraisals: multi-company,hr.appraisal,,crud,"[('co
 access_om_hr_appraisal_goal_own,hr.appraisal.goal.own,hr.appraisal.goal,base.group_user,ru,"['|', ('employee_id.user_id', '=', user.id), ('employee_id.parent_id.user_id', '=', user.id)]"
 access_om_hr_appraisal_goal_manager,hr.appraisal.goal.manager,hr.appraisal.goal,base.group_user,cd,"[('employee_id.parent_id.user_id', '=', user.id)]"
 access_om_hr_appraisal_goal_hr,hr.appraisal.goal.hr,hr.appraisal.goal,hr.group_hr_user,crud,
+access_om_hr_appraisal_goal_shared,hr.appraisal.goal.shared,hr.appraisal.goal,base.group_user,r,"[('level', 'in', ('company', 'department'))]"
+access_om_hr_appraisal_goal_department,hr.appraisal.goal.department,hr.appraisal.goal,base.group_user,crud,"[('level', '=', 'department'), ('department_id.manager_id.user_id', '=', user.id)]"
 om_hr_appraisal_goal_company_rule,Goals: multi-company,hr.appraisal.goal,,crud,"[('company_id', 'in', company_ids)]"
 access_om_hr_appraisal_cycle_hr,hr.appraisal.cycle.hr,hr.appraisal.cycle,hr.group_hr_user,crud,
 om_hr_appraisal_cycle_company_rule,Appraisal cycles: multi-company,hr.appraisal.cycle,,crud,"[('company_id', 'in', company_ids)]"
@@ -15,3 +17,17 @@ access_om_hr_appraisal_rating_user,hr.appraisal.rating.user,hr.appraisal.rating,
 access_om_hr_appraisal_rating_manager,hr.appraisal.rating.manager,hr.appraisal.rating,hr.group_hr_manager,crud,
 access_om_hr_appraisal_version_hr,hr.appraisal.version.hr,hr.appraisal.version,hr.group_hr_user,crud,
 hr_appraisal_template_company_rule,Appraisal feedback templates: multi-company,hr.appraisal.template,,crud,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"
+access_hr_one_on_one_own,hr.one.on.one.own,hr.one.on.one,base.group_user,ru,"['|', ('employee_id.user_id', '=', user.id), ('manager_id.user_id', '=', user.id)]"
+access_hr_one_on_one_manager,hr.one.on.one.manager,hr.one.on.one,base.group_user,cd,"[('manager_id.user_id', '=', user.id)]"
+access_hr_one_on_one_hr,hr.one.on.one.hr,hr.one.on.one,hr.group_hr_user,crud,
+hr_one_on_one_company_rule,One-on-ones: multi-company,hr.one.on.one,,crud,"[('company_id', 'in', company_ids)]"
+access_hr_one_on_one_action_own,hr.one.on.one.action.own,hr.one.on.one.action,base.group_user,r,"['|', ('one_on_one_id.employee_id.user_id', '=', user.id), ('one_on_one_id.manager_id.user_id', '=', user.id)]"
+access_hr_one_on_one_action_done,hr.one.on.one.action.done,hr.one.on.one.action,base.group_user,u,"[('user_id', '=', user.id)]"
+access_hr_one_on_one_action_manager,hr.one.on.one.action.manager,hr.one.on.one.action,base.group_user,cud,"[('one_on_one_id.manager_id.user_id', '=', user.id)]"
+access_hr_one_on_one_action_hr,hr.one.on.one.action.hr,hr.one.on.one.action,hr.group_hr_user,crud,
+hr_one_on_one_action_company_rule,One-on-one actions: multi-company,hr.one.on.one.action,,crud,"[('company_id', 'in', company_ids)]"
+access_hr_appraisal_calibration_hr,hr.appraisal.calibration.hr,hr.appraisal.calibration,hr.group_hr_user,crud,
+hr_appraisal_calibration_company_rule,Calibration sessions: multi-company,hr.appraisal.calibration,,crud,"[('company_id', 'in', company_ids)]"
+access_hr_appraisal_calibration_log_hr,hr.appraisal.calibration.log.hr,hr.appraisal.calibration.log,hr.group_hr_user,cr,
+hr_appraisal_calibration_log_company_rule,Calibration changes: multi-company,hr.appraisal.calibration.log,,crud,"[('company_id', 'in', company_ids)]"
+access_hr_appraisal_calibration_adjust_hr,hr.appraisal.calibration.adjust.hr,hr.appraisal.calibration.adjust,hr.group_hr_user,crud,

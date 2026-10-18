@@ -27,3 +27,13 @@ class ResConfigSettings(models.TransientModel):
     appraisal_first_months = fields.Integer(related='company_id.appraisal_first_months', readonly=False)
     appraisal_interval_months = fields.Integer(related='company_id.appraisal_interval_months', readonly=False)
     appraisal_lead_days = fields.Integer(related='company_id.appraisal_lead_days', readonly=False)
+    group_goal_alignment = fields.Boolean(
+        string='Goal Alignment', implied_group='om_hr_appraisal.group_goal_alignment',
+        help='Goals of the company and of the departments, served by the goals of the employees.')
+    group_one_on_one = fields.Boolean(
+        string='One-on-Ones', implied_group='om_hr_appraisal.group_one_on_one',
+        help='Regular meetings of the managers with each employee, with their notes and actions.')
+    group_calibration = fields.Boolean(
+        string='9-Box and Calibration', implied_group='om_hr_appraisal.group_calibration',
+        help='The potential of the employees next to their rating, the 9-box grid and the calibration sessions.')
+    module_om_hr_appraisal_survey = fields.Boolean(string='360 Feedback')

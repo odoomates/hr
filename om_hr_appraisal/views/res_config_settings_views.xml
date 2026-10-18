@@ -24,6 +24,22 @@
                             <div>Created <field name="appraisal_lead_days" class="o_light_label oe_inline"/> days ahead</div>
                         </div>
                     </setting>
+                    <setting id="om_appraisal_goal_alignment_setting"
+                             help="Goals of the company and of the departments, which the goals of the employees serve: their progress is the average of the goals serving them">
+                        <field name="group_goal_alignment"/>
+                    </setting>
+                    <setting id="om_appraisal_one_on_one_setting"
+                             help="Regular meetings of the managers with each employee: shared notes, private notes of the manager and actions as to-dos">
+                        <field name="group_one_on_one"/>
+                    </setting>
+                    <setting id="om_appraisal_calibration_setting"
+                             help="The potential of the employees next to their rating, the 9-box grid of a review cycle and the calibration sessions adjusting the ratings">
+                        <field name="group_calibration"/>
+                    </setting>
+                    <setting id="om_appraisal_survey_setting"
+                             help="Peers, direct reports and others answer a survey about the employee; the employee reads the combined answers without the names">
+                        <field name="module_om_hr_appraisal_survey"/>
+                    </setting>
                 </block>
             </block>
         </field>

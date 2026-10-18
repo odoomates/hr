@@ -35,3 +35,6 @@ class HrAppraisalRating(models.Model):
     sequence = fields.Integer(default=10)
     active = fields.Boolean(default=True)
     description = fields.Char(translate=True)
+    performance_level = fields.Selection(
+        [('low', 'Low'), ('medium', 'Medium'), ('high', 'High')], string='Performance',
+        required=True, default='medium', help='Where the rating places the employee across the 9-box grid.')

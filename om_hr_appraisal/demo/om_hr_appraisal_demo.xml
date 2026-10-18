@@ -64,4 +64,57 @@
         <field name="progress">30</field>
     </record>
 
+    <!-- goal alignment: a company goal, the goal of R&D serving it, and the goals of the employees serving that -->
+    <record id="demo_goal_company" model="hr.appraisal.goal">
+        <field name="name">Make every customer successful in their first quarter</field>
+        <field name="level">company</field>
+        <field name="target">Nine customers in ten live within three months</field>
+        <field name="date_deadline" eval="(DateTime.today() + relativedelta(months=6)).strftime('%Y-%m-%d')"/>
+    </record>
+
+    <record id="demo_goal_department" model="hr.appraisal.goal">
+        <field name="name">Onboarding of the new customers in half the time</field>
+        <field name="level">department</field>
+        <field name="department_id" ref="hr.dep_rd"/>
+        <field name="parent_id" ref="demo_goal_company"/>
+        <field name="date_deadline" eval="(DateTime.today() + relativedelta(months=4)).strftime('%Y-%m-%d')"/>
+    </record>
+
+    <function model="hr.appraisal.goal" name="write"
+              eval="[[ref('demo_goal_deals'), ref('demo_goal_mentor')], {'parent_id': ref('demo_goal_department')}]"/>
+
+    <!-- the 9-box: Al rated Exceeds Expectations with a high potential -->
+    <function model="hr.appraisal" name="write" eval="[[ref('demo_appraisal_al')], {'potential_level': 'high'}]"/>
+
+    <!-- one-on-ones of Marc Demo with Al, every two weeks -->
+    <record id="demo_one_on_one_done" model="hr.one.on.one">
+        <field name="employee_id" ref="hr.employee_al"/>
+        <field name="manager_id" ref="hr.employee_qdp"/>
+        <field name="date" eval="(DateTime.today() + relativedelta(days=-3, hour=9, minute=0)).strftime('%Y-%m-%d %H:%M:%S')"/>
+        <field name="repeat_weeks">2</field>
+        <field name="notes" type="html"><p>The trainee works on their own now. Al would like to lead the next
+            customer onboarding.</p></field>
+        <field name="manager_note_html" type="html"><p>Ready for more: talk about the team lead role at the next
+            appraisal.</p></field>
+    </record>
+
+    <record id="demo_one_on_one_action" model="hr.one.on.one.action">
+        <field name="one_on_one_id" ref="demo_one_on_one_done"/>
+        <field name="name">Share the onboarding checklist with the trainee</field>
+        <field name="user_id" ref="base.user_demo"/>
+        <field name="date_deadline" eval="(DateTime.today() + relativedelta(days=4)).strftime('%Y-%m-%d')"/>
+    </record>
+
+    <function model="hr.one.on.one" name="action_done" eval="[[ref('demo_one_on_one_done')]]"/>
+
+    <!-- a calibration session of the yearly review -->
+    <record id="demo_calibration" model="hr.appraisal.calibration">
+        <field name="name">Yearly Review Calibration</field>
+        <field name="cycle_id" ref="demo_cycle"/>
+        <field name="date" eval="(DateTime.today() + relativedelta(days=14)).strftime('%Y-%m-%d')"/>
+        <field name="user_ids" eval="[(4, ref('base.user_admin')), (4, ref('base.user_demo'))]"/>
+    </record>
+
+    <function model="hr.appraisal.calibration" name="action_load_appraisals" eval="[[ref('demo_calibration')]]"/>
+
 </odoo>

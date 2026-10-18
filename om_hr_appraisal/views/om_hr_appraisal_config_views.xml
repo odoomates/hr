@@ -57,6 +57,7 @@
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
                 <field name="description"/>
+                <field name="performance_level" groups="om_hr_appraisal.group_calibration"/>
             </list>
         </field>
     </record>

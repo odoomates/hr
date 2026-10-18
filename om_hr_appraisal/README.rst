@@ -38,11 +38,36 @@ Features
 * The employee form shows the number of appraisals and the date of the next
   one (Appraisals smart button, for HR officers).
 
+Switched on in the settings, each on its own:
+
+* **Goal Alignment**: goals of the company and of the departments besides the
+  goals of the employees. A goal serves a goal above it, and a goal served by
+  others takes the average of their progress: an employee updating their goal
+  moves the goal of their department and of the company. The department
+  manager sets the goals of the department; everyone reads the goals of the
+  company and of the departments, shown as a tree in Goal Alignment.
+* **One-on-Ones**: the regular meetings of a manager with each employee. Both
+  write the shared notes; the private notes of the manager are read by the
+  manager and HR only, never by the employee, through the API too. The actions
+  agreed on become to-dos of the person doing them. A one-on-one repeating every
+  N weeks plans the next one when it is done, and it prepares the open
+  appraisal of the employee, which shows them in its One-on-Ones button.
+* **9-Box and Calibration**: the manager sets the potential of the employee
+  (low, medium or high) next to the rating; the employee never reads it. Each
+  rating has a performance level, and the two place the employee on the 9-box
+  grid, from Underperformer to Star, shown by box and as a grid of counts for a
+  cycle. In a calibration session HR reviews the ratings and the potentials of a
+  cycle with the managers and adjusts them: each change is logged with who made
+  it, the old and new value and why.
+* **360 Feedback**: installs HR Appraisals: 360 Feedback (``om_hr_appraisal_survey``).
+
 Menus:
 
 * My HR > My Appraisals and My HR > Goals, for every employee.
 * Employees > Appraisals > My Team, for the managers.
 * Employees > Appraisals > Appraisals and Cycles, for the HR officers.
+* Employees > Appraisals > One-on-Ones, Goal Alignment and Talent Review (9-Box,
+  Calibration), and My HR > My One-on-Ones, once switched on.
 
 Configuration
 =============
@@ -51,8 +76,11 @@ Configuration
   Reviews (how many days before the trial period ends, 14 by default) and Plan
   the Appraisals (first after 6 months, then every 12 months, created 30 days
   ahead by default).
+* The same settings switch on Goal Alignment, One-on-Ones, 9-Box and
+  Calibration, and 360 Feedback, for all the companies.
 * Employees > Configuration > Appraisals (HR managers): Feedback Templates,
-  for the departments chosen or for everyone else, and Ratings.
+  for the departments chosen or for everyone else, and Ratings with their
+  performance level on the 9-box grid.
 
 Usage
 =====
@@ -64,6 +92,15 @@ Usage
 #. The manager writes the review, sets the rating and the goals, and clicks
    Mark as Done. The employee then reads the review.
 #. If a raise or a promotion is decided, HR clicks New Contract Version.
+
+Upgrade
+=======
+
+The upgrade to 20.0.1.1.0 places the ratings installed with the module on the
+9-box grid: Needs Improvement low, Meets Expectations medium, Exceeds
+Expectations and Outstanding high. Set the level of your own ratings in
+Employees > Configuration > Appraisals > Ratings. The goals keep their employee
+and company; the new features stay off until switched on in the settings.
 
 Dependencies
 ============

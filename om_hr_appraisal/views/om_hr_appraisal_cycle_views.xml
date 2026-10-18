@@ -16,6 +16,8 @@
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
+                        <button name="action_open_nine_box" type="object" class="oe_stat_button" icon="grid_view"
+                                string="9-Box" invisible="state == 'draft'" groups="om_hr_appraisal.group_calibration"/>
                         <button name="action_open_appraisals" type="object" class="oe_stat_button" icon="groups">
                             <div class="o_stat_info">
                                 <span class="o_stat_value"><field name="done_count"/> / <field name="appraisal_count"/></span>

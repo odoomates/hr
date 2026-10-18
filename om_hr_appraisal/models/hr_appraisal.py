@@ -9,7 +9,20 @@ from odoo.exceptions import AccessError, UserError
 OPEN_STATES = ('new', 'self', 'review')
 # what the employee, and the manager, change on an appraisal besides their own feedback
 EMPLOYEE_WRITABLE = {'employee_feedback'}
-MANAGER_WRITABLE = {'manager_feedback', 'rating_id', 'meeting_date', 'date_deadline', 'goal_ids'}
+MANAGER_WRITABLE = {'manager_feedback', 'rating_id', 'meeting_date', 'date_deadline', 'goal_ids', 'potential'}
+LEVELS = [('low', 'Low'), ('medium', 'Medium'), ('high', 'High')]
+# the 9-box grid: performance (rating) across, potential up
+NINE_BOX = {
+    ('low', 'high'): ('7', 'Rough Diamond'),
+    ('medium', 'high'): ('8', 'Future Star'),
+    ('high', 'high'): ('9', 'Star'),
+    ('low', 'medium'): ('4', 'Inconsistent Player'),
+    ('medium', 'medium'): ('5', 'Core Player'),
+    ('high', 'medium'): ('6', 'High Performer'),
+    ('low', 'low'): ('1', 'Underperformer'),
+    ('medium', 'low'): ('2', 'Effective Employee'),
+    ('high', 'low'): ('3', 'Trusted Professional'),
+}
 
 
 class HrAppraisal(models.Model):
@@ -50,6 +63,17 @@ class HrAppraisal(models.Model):
     ], required=True, default='new', copy=False, index=True, tracking=True)
     rating_id = fields.Many2one('hr.appraisal.rating', tracking=True)
     goal_ids = fields.One2many('hr.appraisal.goal', 'appraisal_id', string='Goals')
+    performance_level = fields.Selection(related='rating_id.performance_level', store=True)
+    # the potential is the view of the manager and of HR on the employee, never shown to the employee
+    potential_level = fields.Selection(LEVELS, groups='hr.group_hr_user', copy=False)
+    potential = fields.Selection(LEVELS, compute='_compute_potential', inverse='_inverse_potential',
+                                 help='How far the employee can grow, as the manager and HR see it. The employee '
+                                      'never reads it.')
+    box = fields.Selection(
+        sorted(NINE_BOX.values()), string='9-Box', compute='_compute_box', store=True, groups='hr.group_hr_user',
+        help='Where the rating and the potential place the employee on the 9-box grid.')
+    one_on_one_ids = fields.One2many('hr.one.on.one', 'appraisal_id', string='One-on-Ones')
+    one_on_one_count = fields.Integer(compute='_compute_one_on_one_count')
 
     employee_feedback_html = fields.Html(groups='base.group_system', copy=False, prefetch=False)
     manager_feedback_html = fields.Html(groups='base.group_system', copy=False, prefetch=False)
@@ -119,6 +143,37 @@ class HrAppraisal(models.Model):
             appraisal.can_edit_manager_feedback = appraisal._can_write_feedback('manager')
             appraisal.employee_feedback_hidden = not appraisal._can_read_feedback('employee')
             appraisal.manager_feedback_hidden = not appraisal._can_read_feedback('manager')
+
+    @api.depends('potential_level', 'employee_id', 'manager_id')
+    @api.depends_context('uid')
+    def _compute_potential(self):
+        for appraisal in self:
+            appraisal.potential = appraisal.sudo().potential_level \
+                if appraisal._roles() & {'hr', 'manager'} else False
+
+    def _inverse_potential(self):
+        for appraisal in self:
+            if not appraisal._roles() & {'hr', 'manager'}:
+                raise AccessError(self.env._('The manager and HR set the potential of %s.', appraisal.name))
+            appraisal.sudo().potential_level = appraisal.potential
+
+    @api.depends('performance_level', 'potential_level')
+    def _compute_box(self):
+        for appraisal in self:
+            box = NINE_BOX.get((appraisal.performance_level, appraisal.potential_level))
+            appraisal.box = box and box[0]
+
+    @api.depends('one_on_one_ids')
+    def _compute_one_on_one_count(self):
+        for appraisal in self:
+            appraisal.one_on_one_count = len(appraisal.one_on_one_ids)
+
+    def action_open_one_on_ones(self):
+        self.ensure_one()
+        action = self.env['ir.actions.act_window']._for_xml_id('om_hr_appraisal.hr_one_on_one_action')
+        action['domain'] = [('appraisal_id', '=', self.id)]
+        action['context'] = {'default_employee_id': self.employee_id.id, 'default_appraisal_id': self.id}
+        return action
 
     @api.depends('employee_feedback_html', 'manager_feedback_html', 'state', 'employee_id', 'manager_id')
     @api.depends_context('uid')

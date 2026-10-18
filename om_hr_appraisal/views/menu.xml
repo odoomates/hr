@@ -33,6 +33,43 @@
               parent="om_hr_base.menu_my_hr"
               sequence="75"/>
 
+    <menuitem id="menu_om_hr_appraisal_goal_alignment"
+              action="om_hr_appraisal_goal_action_alignment"
+              parent="menu_om_hr_appraisals"
+              sequence="50"
+              groups="om_hr_appraisal.group_goal_alignment"/>
+
+    <menuitem id="menu_hr_one_on_one"
+              action="hr_one_on_one_action"
+              parent="menu_om_hr_appraisals"
+              sequence="25"
+              groups="om_hr_appraisal.group_one_on_one"/>
+
+    <menuitem id="menu_hr_one_on_one_my"
+              action="hr_one_on_one_action_my"
+              parent="om_hr_base.menu_my_hr"
+              sequence="72"
+              groups="om_hr_appraisal.group_one_on_one"/>
+
+    <!-- shown with the feature switched on, to HR only -->
+    <menuitem id="menu_om_hr_appraisal_talent_review"
+              name="Talent Review"
+              parent="menu_om_hr_appraisals"
+              sequence="60"
+              groups="om_hr_appraisal.group_calibration"/>
+
+    <menuitem id="menu_om_hr_appraisal_nine_box"
+              action="om_hr_appraisal_action_nine_box"
+              parent="menu_om_hr_appraisal_talent_review"
+              sequence="10"
+              groups="hr.group_hr_user"/>
+
+    <menuitem id="menu_hr_appraisal_calibration"
+              action="hr_appraisal_calibration_action"
+              parent="menu_om_hr_appraisal_talent_review"
+              sequence="20"
+              groups="hr.group_hr_user"/>
+
     <menuitem id="menu_om_hr_appraisal_configuration"
               name="Appraisals"
               parent="hr.menu_human_resources_configuration"

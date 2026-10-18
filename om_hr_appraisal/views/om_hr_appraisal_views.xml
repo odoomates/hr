@@ -33,6 +33,15 @@
                     <field name="can_edit_manager_feedback" invisible="1"/>
                     <field name="employee_feedback_hidden" invisible="1"/>
                     <field name="manager_feedback_hidden" invisible="1"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_one_on_ones" type="object" class="oe_stat_button" icon="forum"
+                                invisible="not (is_hr or is_manager)" groups="om_hr_appraisal.group_one_on_one">
+                            <div class="o_stat_info">
+                                <span class="o_stat_value"><field name="one_on_one_count"/></span>
+                                <span class="o_stat_text">One-on-Ones</span>
+                            </div>
+                        </button>
+                    </div>
                     <widget name="web_ribbon" title="Done" bg_color="text-bg-success" invisible="state != 'done'"/>
                     <widget name="web_ribbon" title="Cancelled" bg_color="text-bg-danger" invisible="state != 'cancel'"/>
                     <div class="oe_title">
@@ -51,6 +60,10 @@
                             <field name="meeting_date" readonly="state == 'done' or not (is_hr or is_manager)"/>
                             <field name="rating_id" invisible="state not in ('review', 'done') or (state == 'review' and not (is_manager or is_hr))"
                                    readonly="state != 'review'" options="{'no_create': True, 'no_open': True}"/>
+                            <field name="potential" groups="om_hr_appraisal.group_calibration"
+                                   invisible="not (is_manager or is_hr)" readonly="state in ('done', 'cancel')"/>
+                            <field name="box" groups="om_hr_appraisal.group_calibration"
+                                   invisible="not box"/>
                             <field name="date_done" invisible="not date_done"/>
                             <field name="template_id" readonly="state != 'new'" groups="hr.group_hr_user"
                                    options="{'no_create': True}"/>

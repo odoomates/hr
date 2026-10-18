@@ -5,18 +5,22 @@
         <record id="rating_needs_improvement" model="hr.appraisal.rating">
             <field name="name">Needs Improvement</field>
             <field name="sequence">10</field>
+            <field name="performance_level">low</field>
         </record>
         <record id="rating_meets" model="hr.appraisal.rating">
             <field name="name">Meets Expectations</field>
             <field name="sequence">20</field>
+            <field name="performance_level">medium</field>
         </record>
         <record id="rating_exceeds" model="hr.appraisal.rating">
             <field name="name">Exceeds Expectations</field>
             <field name="sequence">30</field>
+            <field name="performance_level">high</field>
         </record>
         <record id="rating_outstanding" model="hr.appraisal.rating">
             <field name="name">Outstanding</field>
             <field name="sequence">40</field>
+            <field name="performance_level">high</field>
         </record>
 
         <record id="template_default" model="hr.appraisal.template">

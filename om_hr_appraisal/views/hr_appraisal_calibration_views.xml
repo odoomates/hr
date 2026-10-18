@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- the 9-box grid: the count of each box, potential up and performance across, and the cards of each box -->
+    <record id="om_hr_appraisal_view_pivot_nine_box" model="ir.ui.view">
+        <field name="name">hr.appraisal.view.pivot.nine.box</field>
+        <field name="model">hr.appraisal</field>
+        <field name="arch" type="xml">
+            <pivot string="9-Box" disable_linking="0">
+                <field name="potential_level" type="row"/>
+                <field name="performance_level" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="om_hr_appraisal_view_kanban_nine_box" model="ir.ui.view">
+        <field name="name">hr.appraisal.view.kanban.nine.box</field>
+        <field name="model">hr.appraisal</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="box" quick_create="false" group_create="false" group_delete="false"
+                    group_edit="false" records_draggable="false">
+                <templates>
+                    <t t-name="card">
+                        <field name="employee_id" widget="many2one_avatar_employee" class="fw-bold"/>
+                        <field name="department_id" class="text-muted small"/>
+                        <div class="d-flex gap-2 mt-2">
+                            <field name="rating_id" widget="badge"/>
+                            <field name="potential_level" widget="badge" decoration-info="1"/>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="om_hr_appraisal_action_nine_box" model="ir.actions.act_window">
+        <field name="name">9-Box</field>
+        <field name="res_model">hr.appraisal</field>
+        <field name="view_mode">kanban,pivot,list,form</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'kanban', 'view_id': ref('om_hr_appraisal_view_kanban_nine_box')}),
+            (0, 0, {'view_mode': 'pivot', 'view_id': ref('om_hr_appraisal_view_pivot_nine_box')})]"/>
+        <field name="domain">[('box', '!=', False)]</field>
+        <field name="context">{'create': False}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No appraisal on the grid yet</p>
+            <p>An appraisal shows here once it has a rating and a potential.</p>
+        </field>
+    </record>
+
+    <record id="hr_appraisal_calibration_adjust_view_form" model="ir.ui.view">
+        <field name="name">hr.appraisal.calibration.adjust.view.form</field>
+        <field name="model">hr.appraisal.calibration.adjust</field>
+        <field name="arch" type="xml">
+            <form string="Adjust">
+                <group>
+                    <field name="calibration_id" invisible="1"/>
+                    <field name="appraisal_id"/>
+                    <field name="rating_id" options="{'no_create': True, 'no_open': True}"/>
+                    <field name="potential"/>
+                    <field name="reason" placeholder="Why the session changes it"/>
+                </group>
+                <footer>
+                    <button name="action_apply" string="Apply" type="object" class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_appraisal_calibration_adjust_action" model="ir.actions.act_window">
+        <field name="name">Adjust</field>
+        <field name="res_model">hr.appraisal.calibration.adjust</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="hr_appraisal_calibration_view_form" model="ir.ui.view">
+        <field name="name">hr.appraisal.calibration.view.form</field>
+        <field name="model">hr.appraisal.calibration</field>
+        <field name="arch" type="xml">
+            <form string="Calibration Session">
+                <header>
+                    <button name="action_load_appraisals" string="Load the Cycle" type="object"
+                            invisible="state == 'done' or not cycle_id"/>
+                    <button name="action_start" string="Start" type="object" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_close" string="Close" type="object" class="btn-primary"
+                            invisible="state != 'running'"/>
+                    <button name="action_reset" string="Reopen" type="object" invisible="state != 'done'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_grid" type="object" class="oe_stat_button" icon="grid_view"
+                                string="9-Box"/>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Sales Calibration 2026"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="cycle_id" readonly="state == 'done'" options="{'no_create': True}"/>
+                            <field name="date" readonly="state == 'done'"/>
+                        </group>
+                        <group>
+                            <field name="user_ids" widget="many2many_avatar_user" readonly="state == 'done'"/>
+                            <field name="company_id" groups="base.group_multi_company" readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Appraisals" name="appraisals">
+                            <field name="appraisal_ids" readonly="state == 'done'">
+                                <list>
+                                    <field name="employee_id" widget="many2one_avatar_employee"/>
+                                    <field name="department_id" optional="show"/>
+                                    <field name="manager_id" widget="many2one_avatar_employee" optional="show"/>
+                                    <field name="rating_id"/>
+                                    <field name="potential_level"/>
+                                    <field name="box"/>
+                                    <button name="%(hr_appraisal_calibration_adjust_action)d" type="action"
+                                            string="Adjust" icon="tune"
+                                            context="{'appraisal_id': id, 'default_calibration_id': parent.id}"
+                                            column_invisible="parent.state != 'running'"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Changes" name="changes">
+                            <field name="log_ids">
+                                <list>
+                                    <field name="create_date" string="When"/>
+                                    <field name="employee_id" widget="many2one_avatar_employee"/>
+                                    <field name="what"/>
+                                    <field name="old_value"/>
+                                    <field name="new_value"/>
+                                    <field name="user_id" widget="many2one_avatar_user"/>
+                                    <field name="reason"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="note" placeholder="What the session agreed on"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_appraisal_calibration_view_list" model="ir.ui.view">
+        <field name="name">hr.appraisal.calibration.view.list</field>
+        <field name="model">hr.appraisal.calibration</field>
+        <field name="arch" type="xml">
+            <list string="Calibration Sessions">
+                <field name="date"/>
+                <field name="name"/>
+                <field name="cycle_id"/>
+                <field name="log_count" string="Changes"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="state" widget="badge" decoration-info="state == 'running'"
+                       decoration-success="state == 'done'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hr_appraisal_calibration_action" model="ir.actions.act_window">
+        <field name="name">Calibration</field>
+        <field name="res_model">hr.appraisal.calibration</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Plan a calibration session</p>
+            <p>Review the ratings and the potentials of a cycle together on the 9-box grid, and adjust them:
+                each change is logged with who made it and why.</p>
+        </field>
+    </record>
+
+</odoo>
