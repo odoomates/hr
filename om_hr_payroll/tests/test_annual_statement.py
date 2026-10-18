@@ -69,8 +69,8 @@ class TestAnnualStatement(TransactionCase):
         self.assertEqual([self._total(slip, 'SS') for slip in self.payslips], [-100.0, -100.0, -50.0, 0.0])
 
     def test_statement_by_month(self):
-        # the April payslip refunded: the refund is computed again, and nothing is left to contribute in April
-        self.payslips[3].refund_sheet()
+        # the February payslip refunded: the refund takes back its contribution of 100, not what is left today
+        self.payslips[1].refund_sheet()
         statement = self.env['report.om_hr_payroll.report_annual_statement']._get_statement(self.employee, 2026)
         self.assertEqual((statement['date_from'], statement['date_to']), (date(2026, 1, 1), date(2026, 12, 31)))
         self.assertEqual([month for month, _label in statement['months']],
@@ -78,10 +78,11 @@ class TestAnnualStatement(TransactionCase):
         rows = {row['code']: row for row in statement['rows']}
         self.assertNotIn('SSBASE', rows, 'A rule not shown on the payslips is not shown on the statement')
         self.assertEqual(list(rows), ['BASIC', 'SS', 'NET'], 'In the order of the rules')
-        self.assertEqual(rows['BASIC']['amounts'][date(2026, 4, 1)], 0.0, 'The refund is taken back')
+        self.assertEqual(rows['BASIC']['amounts'][date(2026, 2, 1)], 0.0, 'The refund is taken back')
+        self.assertEqual(rows['SS']['amounts'][date(2026, 2, 1)], 0.0)
         self.assertEqual(rows['BASIC']['total'], 3000.0)
         self.assertEqual(rows['SS']['amounts'][date(2026, 3, 1)], -50.0)
-        self.assertEqual(rows['NET']['total'], 3000.0 - 250.0)
+        self.assertEqual(rows['NET']['total'], 3000.0 - 150.0)
         self.assertTrue(rows['NET']['net'])
 
         empty = self.env['report.om_hr_payroll.report_annual_statement']._get_statement(self.employee, 2025)

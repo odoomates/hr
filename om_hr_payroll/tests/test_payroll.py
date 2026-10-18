@@ -207,6 +207,18 @@ class TestPayroll(TransactionCase):
         self.assertEqual(refund.state, 'done')
         self.assertEqual(self._totals(refund)['NET'], self._totals(payslip)['NET'])
 
+    def test_refund_takes_back_what_was_paid(self):
+        # a raise after the payslip: the refund takes back the old wage, line for line, not the new one
+        payslip = self._new_payslip(self.employee)
+        payslip.action_payslip_done()
+        self.employee.version_id.wage = 9000.0
+        refund = self.env['hr.payslip'].search(payslip.refund_sheet()['domain'])
+        self.assertEqual(self._totals(refund), self._totals(payslip))
+        self.assertEqual(refund.line_ids.mapped('salary_rule_id'), payslip.line_ids.mapped('salary_rule_id'))
+        self.assertTrue(refund.number)
+        self.assertNotEqual(refund.number, payslip.number)
+        self.assertEqual(refund.state, 'done')
+
     def test_changes_are_tracked(self):
         rule = self.structure.rule_ids.filtered(lambda rule: rule.code == 'TAX')
         rule.amount_percentage = -12

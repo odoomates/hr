@@ -123,7 +123,8 @@ Features
   of an employee opens the same analysis for that employee, month by month.
 * Record the third parties who collect or inject money on payslips as
   contribution registers, and read back the payslip lines that belong to them.
-* Refund a payslip: a credit note copy is created, computed and confirmed.
+* Refund a payslip: a credit note taking back its lines as they were paid is
+  created and confirmed.
 * Number confirmed payslips from the Salary Slip sequence, and take the worked
   days and the leaves from the working schedule of the employee.
 * Employees see their own confirmed payslips in My HR > My Payslips and
@@ -167,8 +168,12 @@ menu is missing; the upgrade installs HR Base.
 
 The upgrade to 2.4.0 adds the variance check of the payslip batches, at 10%
 for every company: set another threshold, or 0 to turn it off, in Payroll >
-Configuration > Settings. It also adds the annual statement and ``ytd.capped``;
-nothing changes on the payslips.
+Configuration > Settings. It also adds the annual statement and ``ytd.capped``.
+From 2.4.0 a refund takes back the lines of the payslip it refunds as they
+were paid, where it used to compute the payslip again: after a raise, a new
+rate or a time off validated since, it took back what the payslip would pay
+today. The refunds made before stay as they are. To pay what a payslip should
+have paid, use Retro Pay.
 
 The upgrade to 2.3.0 checks the companies of the payroll in a multi-company
 database: a contract, payslip, batch, structure or rule now only links records

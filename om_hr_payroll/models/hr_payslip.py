@@ -56,6 +56,14 @@ class YearToDate:
             ``result = ytd.capped('SS_BASE', categories.GROSS, parameters.SS_CEILING)`` and is a rate of it. """
         return max(0.0, min(base, ceiling - self.total(code)))
 
+# what a refund takes from each line of the payslip it refunds: what computing the payslip writes
+REFUND_LINE_FIELDS = (
+    'salary_rule_id', 'version_id', 'name', 'code', 'category_id', 'sequence', 'appears_on_payslip',
+    'condition_select', 'condition_python', 'condition_range', 'condition_range_min', 'condition_range_max',
+    'amount_select', 'amount_fix', 'amount_python_compute', 'amount_percentage', 'amount_percentage_base',
+    'register_id', 'amount', 'employee_id', 'quantity', 'rate',
+)
+
 # what may still be written on a confirmed payslip: the trail of what happened to it
 PAYSLIP_CLOSED_WRITABLE = {
     'state', 'paid', 'note', 'move_id', 'date', 'number', 'message_ids', 'message_follower_ids',
@@ -193,7 +201,9 @@ class HrPayslip(models.Model):
 
     def action_payslip_done(self):
         self._check_own_payslip()
-        self.compute_sheet()
+        # a refund confirms the lines it took from the payslip it refunds, as they are
+        if not self.env.context.get('hr_payslip_keep_lines'):
+            self.compute_sheet()
         return self.write({'state': 'done'})
 
     def action_payslip_cancel(self):
@@ -203,12 +213,19 @@ class HrPayslip(models.Model):
     def refund_sheet(self):
         refunds = self.env['hr.payslip']
         for payslip in self:
+            # the lines the payslip paid, as they are: computed again, the refund would take back what the payslip
+            # would pay today, after a raise, a new rate or a time off validated since
+            lines = [{
+                name: line[name].id if line._fields[name].type == 'many2one' else line[name]
+                for name in REFUND_LINE_FIELDS
+            } for line in payslip.line_ids]
             copied_payslip = payslip.copy({
                 'credit_note': True,
                 'name': _('Refund: %s', payslip.name or ''),
+                'number': self.env['ir.sequence'].next_by_code('salary.slip'),
+                'line_ids': [(0, 0, values) for values in lines],
             })
-            copied_payslip.compute_sheet()
-            copied_payslip.action_payslip_done()
+            copied_payslip.with_context(hr_payslip_keep_lines=True).action_payslip_done()
             refunds |= copied_payslip
         form_view_ref = self.env.ref('om_hr_payroll.view_hr_payslip_form', False)
         list_view_ref = self.env.ref('om_hr_payroll.view_hr_payslip_tree', False)
