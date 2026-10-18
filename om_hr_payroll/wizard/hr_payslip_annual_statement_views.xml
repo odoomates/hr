@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_hr_payslip_annual_statement" model="ir.ui.view">
+        <field name="name">hr.payslip.annual.statement.form</field>
+        <field name="model">hr.payslip.annual.statement</field>
+        <field name="arch" type="xml">
+            <form string="Annual Statement">
+                <p class="text-muted">
+                    What each employee was paid over the payroll year, month by month, from the confirmed
+                    payslips. The payroll year follows the fiscal year of the company.
+                </p>
+                <group>
+                    <group>
+                        <field name="year" options="{'format': false}"/>
+                        <label for="date_from" string="Period"/>
+                        <div class="o_row">
+                            <field name="date_from"/> - <field name="date_to"/>
+                        </div>
+                    </group>
+                </group>
+                <field name="employee_ids" widget="many2many_tags" options="{'no_create': True}"
+                       placeholder="Employees"/>
+                <footer>
+                    <button string="Print" name="action_print" type="object" class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_hr_payslip_annual_statement" model="ir.actions.act_window">
+        <field name="name">Annual Statement</field>
+        <field name="res_model">hr.payslip.annual.statement</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_hr_payslip_annual_statement"/>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="hr.model_hr_employee"/>
+        <field name="binding_view_types">list,form</field>
+        <field name="group_ids" eval="[Command.link(ref('om_hr_payroll.group_hr_payroll_user'))]"/>
+    </record>
+
+    <menuitem id="menu_hr_payslip_annual_statement"
+              name="Annual Statements"
+              action="action_hr_payslip_annual_statement"
+              parent="menu_hr_payroll_reporting"
+              sequence="20"/>
+
+</odoo>

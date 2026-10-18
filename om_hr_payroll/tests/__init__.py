@@ -7,3 +7,4 @@ from . import test_payroll_engine
 from . import test_payslip_self
 from . import test_work_entries
 from . import test_payroll_variance
+from . import test_annual_statement

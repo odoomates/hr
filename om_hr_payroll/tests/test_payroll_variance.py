@@ -104,7 +104,8 @@ class TestPayrollVariance(TransactionCase):
         # the refund of the last payslip pays minus its amounts: the payslip itself is compared with
         july = self.env['hr.payslip'].search([('employee_id', '=', self.steady.id), ('state', '=', 'done')])
         july.refund_sheet()
-        self.assertTrue(self.env['hr.payslip'].search([('employee_id', '=', self.steady.id), ('credit_note', '=', True)]))
+        self.assertTrue(self.env['hr.payslip'].search([
+            ('employee_id', '=', self.steady.id), ('credit_note', '=', True)]))
         run = self._create_run('August', date(2026, 8, 1), date(2026, 8, 31), self.steady)
         run.action_done_payslip_run()
         self.assertEqual(run.state, 'done', 'The July payslip is compared with, not its refund')

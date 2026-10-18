@@ -50,6 +50,12 @@ class YearToDate:
             self.totals[code] = self.env.cr.fetchone()[0] or 0.0
         return self.totals[code]
 
+    def capped(self, code, base, ceiling):
+        """ :return: the part of `base` still under the yearly `ceiling`, the rule `code` holding the part of the
+            year already counted. A contribution stopping at a yearly ceiling has a rule SS_BASE computing
+            ``result = ytd.capped('SS_BASE', categories.GROSS, parameters.SS_CEILING)`` and is a rate of it. """
+        return max(0.0, min(base, ceiling - self.total(code)))
+
 # what may still be written on a confirmed payslip: the trail of what happened to it
 PAYSLIP_CLOSED_WRITABLE = {
     'state', 'paid', 'note', 'move_id', 'date', 'number', 'message_ids', 'message_follower_ids',
@@ -155,6 +161,23 @@ class HrPayslip(models.Model):
             'om_hr_payroll.action_report_payslip', res_ids=self.ids)
         name = '%s.pdf' % (self.number or self.name or 'payslip').replace('/', '_')
         return pdf, name
+
+    @api.model
+    def _om_render_own_statement(self, year):
+        """ :return: the PDF of the annual statement of the current user for the payroll year starting in `year`,
+            and its file name, rendered as the super user like the payslip """
+        employees = self.env['hr.employee'].sudo().search([('user_id', '=', self.env.uid)])
+        if not employees:
+            raise AccessError(_('Only an employee has an annual statement.'))
+        pdf, _type = self.env['ir.actions.report'].sudo()._render_qweb_pdf(
+            'om_hr_payroll.action_report_annual_statement', res_ids=employees.ids, data={'year': year})
+        return pdf, 'Annual Statement %s.pdf' % year
+
+    def action_om_download_own_statement(self):
+        """ The annual statement of the payroll year before, the one the employee declares """
+        today = fields.Date.context_today(self)
+        year = self._get_year_start(today, self.env.company).year - 1
+        return {'type': 'ir.actions.act_url', 'url': '/my/payslip/statement/%s' % year, 'target': 'download'}
 
     def action_om_download_own(self):
         self.ensure_one()
@@ -308,6 +331,13 @@ class HrPayslip(models.Model):
             lines = [(0, 0, line) for line in self._get_payslip_lines(version_ids, payslip.id)]
             payslip.write({'line_ids': lines, 'number': number})
         return True
+
+    @api.model
+    def _get_tax_year(self, year, company):
+        """ :return: the first and last day of the payroll year of the company starting in the calendar `year`,
+            e.g. April 2026 to March 2027 for 2026 when the fiscal year starts in April """
+        start = self._get_year_start(date(year, 12, 31), company)
+        return start, start + relativedelta(years=1, days=-1)
 
     @api.model
     def _get_year_start(self, date, company):

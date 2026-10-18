@@ -95,6 +95,15 @@ Features
 * Use it for what has to be counted over the year: a contribution stopping at a
   yearly ceiling, a tax computed on the year and spread over the periods, or a
   payslip showing its year to date.
+* Stop a contribution at a yearly ceiling in one line: a rule SS_BASE computing
+  ``result = ytd.capped('SS_BASE', categories.GROSS, parameters.SS_CEILING)``
+  gives the part of this month's base still under the ceiling, and the
+  contribution is a rate of it, ``result = -SS_BASE * parameters.SS_RATE``.
+* Print the annual statement of the employees: what each one was paid over the
+  payroll year, salary rule by salary rule and month by month, from the
+  confirmed payslips, refunds taken back. The payroll year is the fiscal year of
+  the company. Employees download their own statement of last year from My HR >
+  My Payslips, and of every year from the portal with HR Portal: Payslips.
 * Generate the payslips of a batch for the employees you select, then confirm
   the whole batch in one step; employees belonging to another company than the
   batch are refused.
@@ -158,7 +167,8 @@ menu is missing; the upgrade installs HR Base.
 
 The upgrade to 2.4.0 adds the variance check of the payslip batches, at 10%
 for every company: set another threshold, or 0 to turn it off, in Payroll >
-Configuration > Settings.
+Configuration > Settings. It also adds the annual statement and ``ytd.capped``;
+nothing changes on the payslips.
 
 The upgrade to 2.3.0 checks the companies of the payroll in a multi-company
 database: a contract, payslip, batch, structure or rule now only links records
@@ -228,6 +238,9 @@ Usage
   Done once the payslips are right.
 * Print the payslip from the Print menu of the payslip, or send it to the
   employee with Send by Email on a payslip, or Send Payslips by Email on a batch.
+* For the annual statements, go to Payroll > Reporting > Annual Statements, or
+  select employees and use Annual Statement in their Action menu, choose the
+  year and print.
 * To pay a raise dated back to a past month, open a draft payslip, click Retro
   Pay and give the date from which the confirmed payslips are computed again.
 

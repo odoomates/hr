@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="paperformat_annual_statement" model="report.paperformat">
+        <field name="name">A4 Landscape (Annual Statement)</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">40</field>
+        <field name="margin_bottom">25</field>
+        <field name="margin_left">7</field>
+        <field name="margin_right">7</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">35</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="action_report_annual_statement" model="ir.actions.report">
+        <field name="name">Annual Statement</field>
+        <field name="model">hr.employee</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">om_hr_payroll.report_annual_statement</field>
+        <field name="print_report_name">'Annual Statement - %s' % object.name</field>
+        <field name="paperformat_id" ref="paperformat_annual_statement"/>
+    </record>
+
+    <template id="report_annual_statement">
+        <t t-call="web.html_container">
+            <t t-foreach="statements" t-as="statement">
+                <t t-set="o" t-value="statement['employee']"/>
+                <t t-set="currency" t-value="statement['currency']"/>
+                <t t-set="layout_document_title">Annual Statement</t>
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div id="informations" class="row mb-4">
+                            <div class="col">
+                                <strong>Employee</strong>
+                                <div t-field="o.name"/>
+                                <div t-if="o.job_id" class="text-muted" t-field="o.job_id"/>
+                            </div>
+                            <div class="col">
+                                <strong>Payroll Year</strong>
+                                <div>
+                                    <span t-out="statement['date_from']" t-options="{'widget': 'date'}"/> -
+                                    <span t-out="statement['date_to']" t-options="{'widget': 'date'}"/>
+                                </div>
+                            </div>
+                            <div class="col" t-if="o.identification_id">
+                                <strong>Identification No</strong>
+                                <div t-field="o.identification_id"/>
+                            </div>
+                        </div>
+
+                        <p t-if="not statement['rows']" class="text-muted">
+                            No confirmed payslip in this payroll year.
+                        </p>
+                        <table t-else="" class="table table-sm o_main_table small">
+                            <thead>
+                                <tr>
+                                    <th class="text-start">Salary Rule</th>
+                                    <th t-foreach="statement['months']" t-as="month" class="text-end"
+                                        t-out="month[1]"/>
+                                    <th class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="statement['rows']" t-as="row"
+                                    t-att-class="'fw-bold' if row['net'] else None">
+                                    <td t-out="row['name']"/>
+                                    <td t-foreach="statement['months']" t-as="month" class="text-end text-nowrap">
+                                        <span t-if="month[0] in row['amounts']" t-out="row['amounts'][month[0]]"
+                                              t-options="{'widget': 'float', 'precision': currency.decimal_places}"/>
+                                    </td>
+                                    <td class="text-end text-nowrap">
+                                        <span t-out="row['total']"
+                                              t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>
