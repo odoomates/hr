@@ -1,13 +1,13 @@
 {
     'name': 'Odoo 20 HR Payroll',
-    'version': '2.3.0',
+    'version': '2.4.0',
     'category': 'Generic Modules/Human Resources',
     'summary': 'Payroll for Odoo 20 Community: salary structures and rules, payslips, payslip batches and reports',
     'description': 'Payroll for Odoo 20 Community. Salary structures built from salary rules (fixed, percentage or '
                    'Python), salary components, rule parameters and salary brackets; payslips computed from the '
                    'worked days and the time off, alone or in batches; retro pay, year to date totals, refunds, '
-                   'payslips sent by email, payslip reports and a payroll analysis. Employees read their own '
-                   'confirmed payslips in My HR. Part of Odoo Mates HR.',
+                   'payslips sent by email, a variance check before a batch is confirmed, payslip reports and a '
+                   'payroll analysis. Employees read their own confirmed payslips in My HR. Part of Odoo Mates HR.',
     'author': 'Odoo Mates, Odoo SA',
     'maintainer': 'Odoo Mates',
     'support': 'odoomates@gmail.com',
@@ -25,6 +25,7 @@
         'data/hr_payroll_data.xml',
         'wizard/hr_payroll_payslips_by_employees_views.xml',
         'wizard/hr_payslip_retro_views.xml',
+        'wizard/hr_payslip_run_variance_views.xml',
         'views/hr_contract_views.xml',
         'views/hr_salary_component_views.xml',
         'views/hr_rule_parameter_views.xml',

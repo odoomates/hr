@@ -439,7 +439,7 @@
                     <header>
                         <button name="%(action_hr_payslip_by_employees)d" type="action" invisible="state != 'draft'"
                                 string="Generate Payslips" class="btn-primary"/>
-                        <button string="Mark as Done" name="done_payslip_run" type="object"
+                        <button string="Mark as Done" name="action_done_payslip_run" type="object"
                                 invisible="state != 'draft'"/>
                         <button name="close_payslip_run" type="object" string="Close" invisible="state != 'draft'"/>
                         <button name="action_send_payslips" type="object" string="Send Payslips by Email"

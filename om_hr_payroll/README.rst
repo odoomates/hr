@@ -98,6 +98,11 @@ Features
 * Generate the payslips of a batch for the employees you select, then confirm
   the whole batch in one step; employees belonging to another company than the
   batch are refused.
+* Check a batch before it is confirmed: Mark as Done first lists the payslips
+  whose gross or net pay changes by more than 10% from the last confirmed
+  payslip of the employee, with the salary rule that moved most, and the
+  employees paid for the first time. Open a payslip to check it, or confirm
+  anyway: the list stays in the chatter of the batch.
 * Send a confirmed payslip to the employee by email, from the payslip or for a
   whole batch at once, with the payslip attached; the employees who have no
   work email are named back to you instead of being skipped silently.
@@ -150,6 +155,10 @@ clicking on the upgrade button.
 Since 2.2.0 the module depends on HR Base (om_hr_base): add both modules to the
 addons folder. Until the module is upgraded, the server skips it and the Payroll
 menu is missing; the upgrade installs HR Base.
+
+The upgrade to 2.4.0 adds the variance check of the payslip batches, at 10%
+for every company: set another threshold, or 0 to turn it off, in Payroll >
+Configuration > Settings.
 
 The upgrade to 2.3.0 checks the companies of the payroll in a multi-company
 database: a contract, payslip, batch, structure or rule now only links records
@@ -204,6 +213,8 @@ Configuration
   subtracted.
 * Fill the wage and the salary components of each employee, and pick the salary
   structure, in Payroll > Employees > Contracts.
+* Set the variance threshold of the payslip batches in Payroll > Configuration
+  > Settings, 10% by default, or 0 to confirm the batches without the check.
 * To also post the payslips in accounting, tick Payroll Entries in Payroll >
   Configuration > Settings, which installs the payroll accounting module.
 

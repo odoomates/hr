@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_hr_payslip_run_variance" model="ir.ui.view">
+        <field name="name">hr.payslip.run.variance.form</field>
+        <field name="model">hr.payslip.run.variance</field>
+        <field name="arch" type="xml">
+            <form string="Check the Payslips">
+                <p class="text-muted">
+                    The gross or net pay of these payslips changes by more than
+                    <field name="threshold" class="oe_inline" nolabel="1"/>% from the last confirmed payslip of
+                    the employee, or the employee has no confirmed payslip yet. Check them, or confirm the batch
+                    anyway: the list is kept in the chatter of the batch.
+                </p>
+                <field name="payslip_run_id" invisible="1"/>
+                <field name="line_ids">
+                    <list decoration-info="reason == 'first'" create="0" delete="0">
+                        <field name="currency_id" column_invisible="1"/>
+                        <field name="employee_id"/>
+                        <field name="reason"/>
+                        <field name="previous_gross" optional="hide"/>
+                        <field name="gross" optional="hide"/>
+                        <field name="gross_change" widget="percentage" optional="hide"
+                               invisible="reason == 'first'"/>
+                        <field name="previous_net" invisible="reason == 'first'"/>
+                        <field name="net"/>
+                        <field name="net_change" widget="percentage" invisible="reason == 'first'"
+                               decoration-danger="net_change &lt; 0" decoration-success="net_change &gt; 0"/>
+                        <field name="top_rule"/>
+                        <field name="top_difference" invisible="reason == 'first'"/>
+                        <button name="action_open_payslip" type="object" string="Open" icon="open_in_new"/>
+                    </list>
+                </field>
+                <footer>
+                    <button string="Confirm Anyway" name="action_confirm" type="object" class="btn-primary"
+                            data-hotkey="q"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

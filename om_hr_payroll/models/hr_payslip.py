@@ -1070,6 +1070,15 @@ class HrPayslipRun(models.Model):
         }
         return action
 
+    def action_done_payslip_run(self):
+        """ Mark as Done: the payslips changing much from the last confirmed payslip of their employee are
+        listed first, to confirm anyway or to check them. The code confirming a batch calls done_payslip_run. """
+        self.ensure_one()
+        check = self.env['hr.payslip.run.variance']._create_for(self)
+        if check:
+            return check._get_action()
+        return self.done_payslip_run()
+
     def done_payslip_run(self):
         # the payslips already confirmed or rejected keep their status and their amounts
         self.slip_ids.filtered(lambda payslip: payslip.state in ('draft', 'verify')).action_payslip_done()
