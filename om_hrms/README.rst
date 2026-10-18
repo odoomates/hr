@@ -5,10 +5,30 @@ Odoo Mates HR
 Part of `Odoo Mates HR <https://github.com/odoomates/hr>`_, the HR suite of Odoo Mates for Odoo 20
 Community.
 
-All the Odoo Mates HR modules in one download, for Odoo 20 Community, with or
-without Accounting. The module adds nothing itself: it depends on each of them,
+All the Odoo Mates HR modules in one download, for Odoo 20 Community and
+Enterprise, with or without Accounting. The module adds nothing itself: it depends on each of them,
 so that the App Store download holds them all and installing it installs them
 all.
+
+How to use it
+=============
+
+Download the bundle once, and install only what you need:
+
+#. Download this bundle: it brings every Odoo Mates HR module, in versions made
+   and tested together.
+#. Unzip it into the addons folder of your Odoo 20 and restart Odoo; in Apps,
+   click Update Apps List (developer mode).
+#. Search for Odoo Mates and install the apps you need today, one by one. The
+   bridges between two apps (e.g. Loans in Payroll) install themselves once
+   both apps are there.
+#. Come back for the next app when a new need shows up: nothing to migrate,
+   nothing to reinstall.
+
+Do not install Odoo Mates HR itself unless you want every app: it installs
+them all at once, with the Odoo apps they need (Time Off, Attendances,
+Recruitment, Maintenance, Surveys, Dashboards). Odoo Mates HR is modular, the
+Odoo way: start small, and grow step by step.
 
 Features
 ========
@@ -61,7 +81,15 @@ What it installs:
 * ``om_hr_certificate`` HR Certificates: salary, employment and experience
   certificates and NOC, requested by the employees and approved.
 * ``om_hr_appraisal`` HR Appraisals: self assessment, manager review and
-  rating, goals, probation reviews, planned appraisals and review cycles.
+  rating, goals, probation reviews, planned appraisals and review cycles; goal
+  alignment, one-on-ones, 9-box and calibration, switched on in the settings.
+* ``om_hr_appraisal_survey`` HR Appraisals: 360 Feedback, a survey about the
+  employee answered by peers, reports and others, read combined without names.
+* ``om_hr_compensation`` HR Compensation: salary grades and bands, compa-ratio,
+  merit cycles with department budgets turning raises into contract versions;
+  with ``om_hr_compensation_appraisal``, the last rating and a merit matrix.
+* ``om_hr_survey`` HR Pulse Surveys: anonymous pulse surveys and eNPS through
+  one-time links, results by department from five answers.
 * ``om_hr_overtime_payroll`` Overtime in Payroll: the validated overtime of
   the Attendances app paid on the payslips, at the rate of each time rule. It
   installs Attendances.

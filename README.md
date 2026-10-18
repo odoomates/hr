@@ -43,7 +43,10 @@ from the payslips, install by themselves once both sides are there.
 |---|---|
 | `om_hr_loan` | Loans and salary advances, approved and repaid in installments (with `om_hr_loan_payroll`, `om_hr_loan_account`) |
 | `om_hr_exit`, `om_hr_gratuity`, `om_hr_exit_payroll` | Resignations and terminations, clearance checklist, end of service gratuity, final settlement with leave encashment |
-| `om_hr_appraisal` | Self assessment, manager review, goals, probation reviews and review cycles |
+| `om_hr_appraisal` | Self assessment, manager review, goals, probation reviews, review cycles, goal alignment, one-on-ones, 9-box and calibration |
+| `om_hr_appraisal_survey` | 360 feedback on a survey: peers, reports and others answer, the employee reads the combined answers |
+| `om_hr_compensation`, `om_hr_compensation_appraisal` | Salary grades and bands, compa-ratio, merit cycles with department budgets and a merit matrix from the ratings |
+| `om_hr_survey` | Anonymous pulse surveys and eNPS: one-time links, results by department from five answers (installs Surveys) |
 | `om_hr_asset` | Assets in the hands of the employees, handover forms, charges for lost assets (installs Maintenance) |
 | `om_hr_reminder` | Birthdays, work anniversaries and probation ends through the Automation Rules |
 

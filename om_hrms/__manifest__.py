@@ -1,6 +1,6 @@
 {
     'name': 'Odoo Mates HR',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.1.0',
     'category': 'Human Resources',
     'summary': 'HRMS for Odoo 20 Community: Payroll, Loans, Exit, Gratuity, Documents, Appraisals, Shifts, '
                'Approvals, Employee Portal',
@@ -26,6 +26,10 @@
         'om_sign',
         'om_hr_certificate',
         'om_hr_appraisal',
+        'om_hr_appraisal_survey',
+        'om_hr_compensation',
+        'om_hr_compensation_appraisal',
+        'om_hr_survey',
         'om_hr_overtime_payroll',
         'om_hr_asset',
         'om_hr_asset_exit',
