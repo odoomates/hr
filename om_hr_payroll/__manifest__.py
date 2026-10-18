@@ -17,7 +17,6 @@
         'hr_holidays',
         'om_hr_base',
     ],
-    # the Enterprise app defining the same models
     'excludes': ['hr_payroll'],
     'data': [
         'security/hr_payroll_security.xml',

@@ -9,7 +9,6 @@
     'support': 'odoomates@gmail.com',
     'license': 'LGPL-3',
     'depends': ['om_hr_base', 'mail'],
-    # the Enterprise app defining the same models
     'excludes': ['hr_appraisal'],
     'data': [
         'security/om_hr_appraisal_security.xml',
