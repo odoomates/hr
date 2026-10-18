@@ -15,13 +15,16 @@ Features
 * ``/my/hr/payslips/<id>``: the lines that appear on the payslip, the net in bold.
 * **Download PDF** gives the payslip report through ``/my/payslip/<id>/pdf`` of the payroll, for the
   employee it belongs to only.
+* **Annual Statements**: one download per payroll year the employee was paid in, what they were paid
+  month by month, through ``/my/payslip/statement/<year>`` of the payroll.
 * Each employee sees only their own records: changing an id in the address gives a page not found,
   not someone else's record.
 
 Usage
 =====
 
-The employee opens **My HR > Payslips**, clicks a payslip to read it, and downloads the PDF.
+The employee opens **My HR > Payslips**, clicks a payslip to read it, and downloads the PDF, or the
+annual statement of a year below the list.
 
 Dependencies
 ============

@@ -50,3 +50,11 @@ class TestPortalPayslip(HrPortalCase):
         self.assertEqual(self.get('/my/hr/payslips/%s' % self.others.id).status_code, 404)
         self.assertEqual(self.get('/my/hr/payslips/%s' % self.draft.id).status_code, 404)
         self.assertEqual(self.get('/my/payslip/%s/pdf' % self.others.id).status_code, 404)
+
+    def test_annual_statement(self):
+        self.login_employee()
+        page = self.get('/my/hr/payslips')
+        self.assertIn('/my/payslip/statement/2026', page.text)
+        pdf = self.get('/my/payslip/statement/2026')
+        self.assertEqual((pdf.status_code, pdf.headers['Content-Type']), (200, 'application/pdf'))
+        self.assertEqual(self.get('/my/payslip/statement/99999').status_code, 404)

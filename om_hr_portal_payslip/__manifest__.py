@@ -1,6 +1,6 @@
 {
     'name': 'HR Portal: Payslips',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.1.0',
     'category': 'Human Resources',
     'summary': 'Employees read their payslips and download them as PDF on the website portal',
     'author': 'Odoo Mates',

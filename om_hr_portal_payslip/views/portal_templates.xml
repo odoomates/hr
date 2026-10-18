@@ -40,6 +40,14 @@
                     </tr>
                 </tbody>
             </t>
+            <div t-if="statement_years" class="mt-4">
+                <h5>Annual Statements</h5>
+                <p class="text-muted small">What you were paid over each payroll year, month by month.</p>
+                <a t-foreach="statement_years" t-as="year" t-attf-href="/my/payslip/statement/#{year[0]}"
+                   class="btn btn-sm btn-secondary me-2 mb-2">
+                    <i class="oi" data-icon="download" title="Download"/> <t t-out="year[1]"/>
+                </a>
+            </div>
         </t>
     </template>
 
