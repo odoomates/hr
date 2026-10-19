@@ -5,8 +5,9 @@
 The HR suite of Odoo Mates for **Odoo 20 Community**: payroll, time and attendance, shifts, employee
 self-service and the whole employee lifecycle, with or without Accounting.
 
-Every module works on its own and installs only what it needs. Install **Odoo Mates HR** (`om_hrms`) for the
-whole suite, or only the modules you need, e.g. HR Loans alone. The links between modules, e.g. loans deducted
+Every module works on its own and installs only what it needs. Download **Odoo 20 HRMS - Odoo Mates**
+(`om_hrms`) from the [Odoo App Store](https://apps.odoo.com/apps/modules/20.0/om_hrms) to get the whole suite at
+once, then install only the modules you need, e.g. HR Loans alone. The links between modules, e.g. loans deducted
 from the payslips, install by themselves once both sides are there.
 
 ## Requirements
@@ -74,7 +75,8 @@ from the payslips, install by themselves once both sides are there.
 
 1. Clone the branch of your Odoo version into a folder of your addons path:
    `git clone -b 20.0 https://github.com/odoomates/hr.git`
-2. Update the Apps list and install **Odoo Mates HR**, or the modules you need.
+2. Update the Apps list and install the modules you need. Installing **Odoo 20 HRMS - Odoo Mates** itself
+   installs every module at once.
 
 ## Tests
 
@@ -91,6 +93,18 @@ ODOO_PATH=/path/to/odoo PYTHON=/path/to/odoo/venv/bin/python3 PGUSER=odoo PGPASS
     .github/scripts/run_odoo_tests.sh test_hr om_hrms
 ```
 
+## Contributing
+
+You are welcome to help: try the apps and report what you find, review the pull requests, fix a bug, translate
+the apps into your language, improve the documentation. New to it? Ask, and we guide you. Read
+[CONTRIBUTING.md](CONTRIBUTING.md) to start, and follow the [Code of Conduct](CODE_OF_CONDUCT.md).
+
+- Bugs and ideas: [issues](https://github.com/odoomates/hr/issues/new/choose) or odoomates@gmail.com
+- Security problems: privately, as in [SECURITY.md](SECURITY.md)
+- Help with a module: [SUPPORT.md](SUPPORT.md)
+
+If you love it, let us know: star the repository and rate the apps on the Odoo App Store.
+
 ## Support
 
-Odoo Mates — odoomates@gmail.com. License: LGPL-3.
+Always your Odoo Mates — odoomates@gmail.com. License: LGPL-3.
