@@ -1,6 +1,6 @@
-=============
-Odoo Mates HR
-=============
+=========================
+Odoo 20 HRMS - Odoo Mates
+=========================
 
 Part of `Odoo Mates HR <https://github.com/odoomates/hr>`_, the HR suite of Odoo Mates for Odoo 20
 Community.
