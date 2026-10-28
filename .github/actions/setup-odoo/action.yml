@@ -1,5 +1,5 @@
 name: Set up Odoo 20.0
-description: The latest Odoo 20.0 source, its Python requirements, and the libraries keeping the test logs quiet
+description: The latest Odoo 20.0 source, its Python requirements, wkhtmltopdf for the reports, and the libraries keeping the test logs quiet
 runs:
   using: composite
   steps:
@@ -20,6 +20,12 @@ runs:
     - name: System libraries
       shell: bash
       run: sudo apt-get update -q && sudo apt-get install -yq libldap2-dev libsasl2-dev libpq-dev libcairo2-dev pkg-config postgresql-client
+    - name: wkhtmltopdf
+      shell: bash
+      run: |
+        curl -sSLo /tmp/wkhtmltox.deb https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-3/wkhtmltox_0.12.6.1-3.jammy_amd64.deb
+        sudo apt-get install -yq /tmp/wkhtmltox.deb
+        wkhtmltopdf --version
     - uses: actions/setup-python@v7
       with:
         python-version: '3.13'
