@@ -440,7 +440,7 @@
                                     "type": "odoo",
                                     "metaData": {
                                         "groupBy": [
-                                            "employee_type"
+                                            "employee_type_id"
                                         ],
                                         "measure": "__count",
                                         "order": null,
@@ -453,7 +453,7 @@
                                         "context": {},
                                         "domain": [],
                                         "groupBy": [
-                                            "employee_type"
+                                            "employee_type_id"
                                         ],
                                         "orderBy": []
                                     },

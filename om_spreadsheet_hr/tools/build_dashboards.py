@@ -88,7 +88,7 @@ def build_workforce():
         ('department', 'bar', 'Employees by Department', 'department_id'),
         ('job', 'bar', 'Employees by Job Position', 'job_id'),
         ('nationality', 'pie', 'Employees by Nationality', 'country_id'),
-        ('type', 'pie', 'Employees by Type', 'employee_type'),
+        ('type', 'pie', 'Employees by Type', 'employee_type_id'),
     ]
     for index, (key, chart_type, title, group_by) in enumerate(charts):
         x = (index % 2) * (HALF_WIDTH + GAP)

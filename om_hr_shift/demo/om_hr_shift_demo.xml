@@ -30,8 +30,8 @@
         <field name="break_from">10</field>
         <field name="break_to">10.5</field>
     </record>
-    <record id="demo_shift_mit_mon" model="hr.shift">
-        <field name="employee_id" ref="hr.employee_mit"/>
+    <record id="demo_shift_jog_mon" model="hr.shift">
+        <field name="employee_id" ref="hr.employee_jog"/>
         <field name="template_id" ref="template_evening"/>
         <field name="date" eval="(DateTime.today() + relativedelta(days=-6, weekday=0)).strftime('%Y-%m-%d')"/>
         <field name="hour_from">14</field>
@@ -39,8 +39,8 @@
         <field name="break_from">18</field>
         <field name="break_to">18.5</field>
     </record>
-    <record id="demo_shift_mit_wed" model="hr.shift">
-        <field name="employee_id" ref="hr.employee_mit"/>
+    <record id="demo_shift_jog_wed" model="hr.shift">
+        <field name="employee_id" ref="hr.employee_jog"/>
         <field name="template_id" ref="template_evening"/>
         <field name="date" eval="(DateTime.today() + relativedelta(days=-6, weekday=0) + relativedelta(days=2)).strftime('%Y-%m-%d')"/>
         <field name="hour_from">14</field>
@@ -48,8 +48,8 @@
         <field name="break_from">18</field>
         <field name="break_to">18.5</field>
     </record>
-    <record id="demo_shift_mit_thu" model="hr.shift">
-        <field name="employee_id" ref="hr.employee_mit"/>
+    <record id="demo_shift_jog_thu" model="hr.shift">
+        <field name="employee_id" ref="hr.employee_jog"/>
         <field name="template_id" ref="template_evening"/>
         <field name="date" eval="(DateTime.today() + relativedelta(days=-6, weekday=0) + relativedelta(days=3)).strftime('%Y-%m-%d')"/>
         <field name="hour_from">14</field>
@@ -68,8 +68,8 @@
         <field name="break_from">10</field>
         <field name="break_to">10.5</field>
     </record>
-    <record id="demo_shift_mit_next_mon" model="hr.shift">
-        <field name="employee_id" ref="hr.employee_mit"/>
+    <record id="demo_shift_jog_next_mon" model="hr.shift">
+        <field name="employee_id" ref="hr.employee_jog"/>
         <field name="template_id" ref="template_evening"/>
         <field name="date" eval="(DateTime.today() + relativedelta(days=1, weekday=0)).strftime('%Y-%m-%d')"/>
         <field name="hour_from">14</field>
@@ -91,7 +91,7 @@
 
     <function model="hr.shift" name="action_publish" context="{'om_shift_override': True}"
               eval="[[ref('demo_shift_stw_mon'), ref('demo_shift_stw_tue'), ref('demo_shift_stw_wed'),
-                      ref('demo_shift_mit_mon'), ref('demo_shift_mit_wed'), ref('demo_shift_mit_thu'),
+                      ref('demo_shift_jog_mon'), ref('demo_shift_jog_wed'), ref('demo_shift_jog_thu'),
                       ref('demo_shift_open')]]"/>
 
     <record id="demo_unavailability_stw" model="hr.shift.unavailability">
@@ -110,11 +110,11 @@
     </record>
     <function model="hr.shift.request" name="action_submit" eval="[[ref('demo_request_claim')]]"/>
 
-    <!-- Anita asks Randall to swap their Wednesday shifts: it waits for Randall -->
+    <!-- Beth asks Randall to swap their Wednesday shifts: it waits for Randall -->
     <record id="demo_request_swap" model="hr.shift.request">
         <field name="kind">swap</field>
-        <field name="employee_id" ref="hr.employee_mit"/>
-        <field name="shift_id" ref="demo_shift_mit_wed"/>
+        <field name="employee_id" ref="hr.employee_jog"/>
+        <field name="shift_id" ref="demo_shift_jog_wed"/>
         <field name="target_shift_id" ref="demo_shift_stw_wed"/>
         <field name="note">A family dinner on Wednesday evening.</field>
     </record>
