@@ -88,6 +88,28 @@ Works with Odoo 17 Community and Odoo 17 Enterprise. On Enterprise, it cannot
 be installed together with the Enterprise Payroll app (``hr_payroll``): both
 define the same records. Use one or the other.
 
+Upgrade
+=======
+
+After pulling or downloading a new version of the module, upgrade it in Apps >
+Odoo 17 HR Payroll > Upgrade, or restart the server with
+``-u om_hr_payroll,om_hr_payroll_account``: the new code works once the
+database is upgraded, until then payslips may fail to open or compute.
+
+Version 17.0.1.2.1:
+
+* ``payslip.sum()`` works in the salary rules: the total of the payslip lines
+  is now stored, filled in for the lines of the existing payslips by the
+  upgrade.
+* A payslip stored without the Credit Note flag, e.g. by an import, is no
+  longer taken off by ``payslip.sum()`` as a refund: the upgrade sets the flag.
+* A salary rule in Python returning ``result_qty = 0`` or ``result_rate = 0``
+  pays nothing, where it paid the full amount: check the payslips of such
+  rules.
+* A child salary rule applies only where its parent rule applies, whatever
+  their sequences.
+* The payslips already confirmed keep their amounts.
+
 Dependencies
 ============
 

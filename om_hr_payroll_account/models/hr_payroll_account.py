@@ -14,16 +14,13 @@ class HrPayslipLine(models.Model):
         """
         # use partner of salary rule or fallback on employee's address
         register_partner_id = self.salary_rule_id.register_id.partner_id
-        partner_id = register_partner_id.id
-        if credit_account:
-            if not register_partner_id and self.category_id.code == 'NET':
-                # the net salary is owed to the employee: the payment of the salary is matched with it
-                return self.slip_id.employee_id.work_contact_id.id
-            if register_partner_id or self.salary_rule_id.account_credit.account_type in ('asset_receivable', 'liability_payable'):
-                return partner_id
-        else:
-            if register_partner_id or self.salary_rule_id.account_debit.account_type in ('asset_receivable', 'liability_payable'):
-                return partner_id
+        if register_partner_id:
+            return register_partner_id.id
+        account = self.salary_rule_id.account_credit if credit_account else self.salary_rule_id.account_debit
+        # the employee for what they are owed or owe: the net salary, the items on a receivable or a payable account
+        if (credit_account and self.category_id.code == 'NET') or \
+                account.account_type in ('asset_receivable', 'liability_payable'):
+            return self.slip_id.employee_id.work_contact_id.id
         return False
 
 
@@ -51,11 +48,19 @@ class HrPayslip(models.Model):
         super(HrPayslip, self).onchange_contract()
         self.journal_id = self.contract_id.journal_id.id or (not self.contract_id and self.default_get(['journal_id'])['journal_id'])
 
-    def action_payslip_cancel(self):
+    def _remove_accounting_entry(self):
         moves = self.mapped('move_id')
         moves.filtered(lambda x: x.state == 'posted').button_cancel()
         moves.unlink()
+
+    def action_payslip_cancel(self):
+        self._remove_accounting_entry()
         return super(HrPayslip, self).action_payslip_cancel()
+
+    def action_payslip_draft(self):
+        # confirmed again, the payslip posts a new entry
+        self._remove_accounting_entry()
+        return super(HrPayslip, self).action_payslip_draft()
 
     def action_payslip_done(self):
         res = super(HrPayslip, self).action_payslip_done()
@@ -83,6 +88,9 @@ class HrPayslip(models.Model):
 
                 debit_account_id = line.salary_rule_id.account_debit.id
                 credit_account_id = line.salary_rule_id.account_credit.id
+                # the analytic account of the rule, else the one of the contract
+                analytic_account = line.salary_rule_id.analytic_account_id or line.contract_id.analytic_account_id
+                analytic_distribution = {analytic_account.id: 100} if analytic_account else {}
                 # if not debit_account_id or not credit_account_id:
                 #     raise UserError(_('Missing Debit Or Credit Account in salary rule: "%s" !') % (
                 #         line.salary_rule_id))
@@ -95,7 +103,7 @@ class HrPayslip(models.Model):
                         'date': date,
                         'debit': amount > 0.0 and amount or 0.0,
                         'credit': amount < 0.0 and -amount or 0.0,
-                        'analytic_distribution': {line.salary_rule_id.analytic_account_id.id: 100} if line.salary_rule_id.analytic_account_id else {},
+                        'analytic_distribution': analytic_distribution,
                         'tax_line_id': line.salary_rule_id.account_tax_id.id,
                     })
                     line_ids.append(debit_line)
@@ -110,11 +118,15 @@ class HrPayslip(models.Model):
                         'date': date,
                         'debit': amount < 0.0 and -amount or 0.0,
                         'credit': amount > 0.0 and amount or 0.0,
-                        'analytic_distribution': {line.salary_rule_id.analytic_account_id.id: 100} if line.salary_rule_id.analytic_account_id else {},
+                        'analytic_distribution': analytic_distribution,
                         'tax_line_id': line.salary_rule_id.account_tax_id.id,
                     })
                     line_ids.append(credit_line)
                     credit_sum += credit_line[2]['credit'] - credit_line[2]['debit']
+
+            if not line_ids:
+                # nothing to post: an entry without lines cannot be posted
+                continue
 
             if currency.compare_amounts(credit_sum, debit_sum) == -1:
                 acc_id = slip.journal_id.default_account_id.id
