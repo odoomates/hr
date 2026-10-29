@@ -42,13 +42,14 @@ class TestLeaveDeduction(TransactionCase):
             **values,
         })
 
-    def _take_leave(self, time_type, date_from, date_to):
+    def _take_leave(self, time_type, date_from, date_to, **values):
         leave = self.env['hr.leave'].create({
             'name': time_type.name,
             'employee_id': self.employee.id,
             'work_entry_type_id': time_type.id,
             'request_date_from': date_from,
             'request_date_to': date_to,
+            **values,
         })
         if leave.state != 'validate':
             leave.sudo().action_approve()
@@ -126,6 +127,23 @@ class TestLeaveDeduction(TransactionCase):
         self.assertTrue(closure)
         self.assertEqual(set(closure.mapped('paid_rate')), {1.0}, 'a closure is paid')
         self.assertEqual(self._totals(payslip)['UNPAID'], 0.0)
+
+    def test_two_time_offs_back_to_back_on_one_day(self):
+        """ Two time off of two types following each other on one day come merged from the working schedule:
+            each keeps its own hours, at its own rate. """
+        paid = self._time_type('Paid Hours', amount_rate=1.0, request_unit='hour')
+        unpaid = self._time_type('Unpaid Hours', amount_rate=0.0, request_unit='hour')
+        self._take_leave(paid, date(2026, 6, 8), date(2026, 6, 8), request_hour_from=8.0, request_hour_to=10.0)
+        self._take_leave(unpaid, date(2026, 6, 8), date(2026, 6, 8), request_hour_from=10.0, request_hour_to=12.0)
+        for source in ('schedule', 'work_entries'):
+            with self.subTest(source=source):
+                self.env.company.om_payroll_worked_days_source = source
+                payslip = self._payslip()
+                worked = {line.code: line for line in payslip.worked_days_line_ids}
+                self.assertEqual(worked['PAID_HOURS'].number_of_hours, -2.0)
+                self.assertEqual(worked['UNPAID_HOURS'].number_of_hours, -2.0)
+                self.assertEqual(worked['UNPAID_HOURS'].paid_rate, 0.0)
+                self.assertLess(self._totals(payslip)['UNPAID'], 0.0, 'the unpaid hours are taken off')
 
     def test_whole_month_unpaid_nets_to_zero(self):
         """ A category totalling exactly 0 stays 0: the whole month on unpaid leave pays nothing, not minus the

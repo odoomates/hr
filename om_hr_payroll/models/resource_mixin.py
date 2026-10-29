@@ -84,6 +84,16 @@ class ResourceMixin(models.AbstractModel):
         leaves = calendar._leave_intervals_batch(from_datetime, to_datetime, resources_per_tz, domain)[resource.id]
         result = []
         for start, stop, leave in (leaves & attendances):
-            hours = (stop - start).total_seconds() / 3600
-            result.append((start.date(), hours, leave))
+            if len(leave) == 1:
+                result.append((start.date(), (stop - start).total_seconds() / 3600, leave))
+                continue
+            # time off following each other or overlapping come merged in one interval: give each its own part
+            # of it, an hour that two of them cover going to the first one
+            cursor = start
+            for record in leave.sorted('date_from'):
+                record_start = max(cursor, record.date_from.replace(tzinfo=utc))
+                record_stop = min(stop, record.date_to.replace(tzinfo=utc))
+                if record_stop > record_start:
+                    result.append((start.date(), (record_stop - record_start).total_seconds() / 3600, record))
+                    cursor = record_stop
         return result
