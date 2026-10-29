@@ -4,9 +4,9 @@
     'version': '19.0.1.2',
     'sequence': 1,
     'author': 'Odoo Mates, Odoo SA',
-    'summary': 'Payroll For Odoo 18 Community Edition',
+    'summary': 'Payroll For Odoo 19 Community Edition',
     'live_test_url': 'https://www.youtube.com/watch?v=0kaHMTtn7oY',
-    'description': "Odoo 18 Payroll, Payroll Odoo 18, Odoo Community Payroll",
+    'description': "Odoo 19 Payroll, Payroll Odoo 19, Odoo Community Payroll",
     'website': 'https://www.odoomates.tech',
     'license': 'LGPL-3',
     'depends': [
