@@ -1,9 +1,13 @@
 from odoo import api, fields, models, tools, _
 from odoo.exceptions import UserError, ValidationError
 import babel
+import logging
 from datetime import date, datetime, time
 from dateutil.relativedelta import relativedelta
 from pytz import timezone
+
+
+_logger = logging.getLogger(__name__)
 
 
 class HrVersion(models.Model):
@@ -706,6 +710,100 @@ class HrPayslipRun(models.Model):
     )
     credit_note = fields.Boolean(string='Credit Note',
                                  help="If its checked, indicates that all payslips generated from here are refund payslips.")
+
+    om_monthly_company_id = fields.Many2one(
+        'res.company', string='Monthly Batch of', readonly=True, copy=False,
+        help='The company whose monthly batch this is.')
+    om_monthly_note = fields.Text(string='Monthly Batch Report', readonly=True, copy=False)
+
+    def _generate_payslips(self, employees, skip_errors=False):
+        """ A payslip of the period of the batch for each of the employees, computed. With skip_errors, an
+            employee whose payslip cannot be computed is left out: returns the payslips and {employee: error}. """
+        self.ensure_one()
+        payslips = self.env['hr.payslip']
+        errors = {}
+        for employee in employees:
+            slip_data = payslips.onchange_employee_id(self.date_start, self.date_end, employee.id, contract_id=False)
+            values = {
+                'employee_id': employee.id,
+                'name': slip_data['value'].get('name'),
+                'struct_id': slip_data['value'].get('struct_id'),
+                'version_id': slip_data['value'].get('version_id'),
+                'payslip_run_id': self.id,
+                'input_line_ids': [(0, 0, x) for x in slip_data['value'].get('input_line_ids')],
+                'worked_days_line_ids': [(0, 0, x) for x in slip_data['value'].get('worked_days_line_ids')],
+                'date_from': self.date_start,
+                'date_to': self.date_end,
+                'credit_note': self.credit_note,
+                'company_id': employee.company_id.id,
+            }
+            if not skip_errors:
+                payslips += payslips.create(values)
+                continue
+            try:
+                with self.env.cr.savepoint():
+                    payslip = payslips.create(values)
+                    payslip.compute_sheet()
+                payslips += payslip
+            except (UserError, ValidationError) as error:
+                errors[employee] = error.args[0]
+        if not skip_errors:
+            payslips.compute_sheet()
+        return payslips, errors
+
+    @api.model
+    def _cron_monthly_batch(self):
+        """ The batch of the month of the companies with the monthly batch on, from their day of the month. """
+        for company in self.env['res.company'].search([('om_payroll_monthly_batch', '=', True)]):
+            try:
+                with self.env.cr.savepoint():
+                    self.with_company(company)._create_monthly_batch(company)
+            except (UserError, ValidationError):
+                # e.g. no salary journal: the other companies get their batch, this one is tried again tomorrow
+                _logger.exception('The monthly batch of %s could not be created', company.name)
+
+    @api.model
+    def _monthly_batch_values(self, company, date_start, date_end):
+        locale = self.env.context.get('lang') or 'en_US'
+        return {
+            'name': _('Payslips of %s') % babel.dates.format_date(date=date_start, format='MMMM y', locale=locale),
+            'date_start': date_start,
+            'date_end': date_end,
+            'om_monthly_company_id': company.id,
+        }
+
+    @api.model
+    def _create_monthly_batch(self, company, today=None):
+        """ The batch of the month of the company with the payslips of its employees under contract, in draft
+            to check and confirm; once a month, from the day set on the company. Returns the batch created. """
+        today = today or fields.Date.context_today(self)
+        date_start = today.replace(day=1)
+        date_end = date_start + relativedelta(day=31)
+        if today.day < min(company.om_payroll_monthly_batch_day, date_end.day):
+            return self
+        if self.search_count([('om_monthly_company_id', '=', company.id), ('date_start', '=', date_start)]):
+            return self
+        payslip = self.env['hr.payslip']
+        employees = self.env['hr.employee']
+        without_structure = self.env['hr.employee']
+        for employee in self.env['hr.employee'].search([('company_id', '=', company.id)]):
+            contract_ids = payslip.get_versions(employee, date_start, date_end)
+            if not contract_ids:
+                continue
+            if self.env['hr.version'].browse(contract_ids[0]).struct_id:
+                employees |= employee
+            else:
+                without_structure |= employee
+        run = self.create(self._monthly_batch_values(company, date_start, date_end))
+        payslips, errors = run._generate_payslips(employees, skip_errors=True)
+        report = [_('Created by the monthly batch: %s payslips in draft, to check and confirm.') % len(payslips)]
+        if without_structure:
+            report.append(_('Left out, their contract has no salary structure: %s')
+                          % ', '.join(without_structure.mapped('name')))
+        for employee, error in errors.items():
+            report.append(_('Left out, the payslip of %s could not be computed: %s') % (employee.name, error))
+        run.om_monthly_note = '\n'.join(report)
+        return run
 
     def draft_payslip_run(self):
         return self.write({'state': 'draft'})

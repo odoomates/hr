@@ -27,6 +27,10 @@ Features
   the employment version; the base structure installs a rule for each of them.
 * Generate the payslips of a batch for the employees you select, then confirm
   the whole batch.
+* Let the batch of the month be created for you: with Monthly Batch on, each
+  month from the day you set, a batch of the month is created with the
+  payslips of the employees under contract, computed and left in draft to
+  check and confirm. The employees left out are named on the batch.
 * Print the PaySlip and the PaySlip Details PDF reports from a payslip, and the
   PaySlip Lines By Contribution Register report for a register over a period.
 * Send a payslip to the employee by email, with the payslip attached.
@@ -57,6 +61,9 @@ Configuration
   point the relevant salary rules at them.
 * Fill the wage of each employee and pick the salary structure on the
   employment version.
+* To have the batch of each month created for you, turn on Monthly Batch in
+  Payroll > Configuration > Settings and choose the day of the month, the 25th
+  by default.
 * To also post the payslips in accounting, tick Payroll Entries in Payroll >
   Configuration > Settings, which installs the payroll accounting module.
 
