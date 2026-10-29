@@ -10,17 +10,15 @@ class HrPayslipLine(models.Model):
         Get partner_id of slip line to use in account_move_line
         """
         # use partner of salary rule or fallback on employee's address
-        register_partner_id = self.salary_rule_id.register_id.partner_id
-        partner_id = register_partner_id.id
-        if credit_account:
-            if not register_partner_id and self.category_id.code == 'NET':
-                # the net salary is owed to the employee: the payment of the salary is matched with it
-                return self.slip_id.employee_id.work_contact_id.id
-            if register_partner_id or self.salary_rule_id.account_credit.account_type in ('asset_receivable', 'liability_payable'):
-                return partner_id
-        else:
-            if register_partner_id or self.salary_rule_id.account_debit.account_type in ('asset_receivable', 'liability_payable'):
-                return partner_id
+        register_partner = self.salary_rule_id.register_id.partner_id
+        if register_partner:
+            return register_partner.id
+        account = self.salary_rule_id.account_credit if credit_account else self.salary_rule_id.account_debit
+        # the net salary is owed to the employee: the payment of the salary is matched with it,
+        # and the receivable or payable items, e.g. a salary advance recovered, are the employee's
+        if (credit_account and self.category_id.code == 'NET') \
+                or account.account_type in ('asset_receivable', 'liability_payable'):
+            return self.slip_id.employee_id.work_contact_id.id
         return False
 
 
@@ -48,11 +46,19 @@ class HrPayslip(models.Model):
         super(HrPayslip, self).onchange_version()
         self.journal_id = self.version_id.journal_id.id or (not self.version_id and self.default_get(['journal_id'])['journal_id'])
 
-    def action_payslip_cancel(self):
+    def _unlink_moves(self):
         moves = self.mapped('move_id')
         moves.filtered(lambda x: x.state == 'posted').button_cancel()
         moves.unlink()
+
+    def action_payslip_cancel(self):
+        self._unlink_moves()
         return super(HrPayslip, self).action_payslip_cancel()
+
+    def action_payslip_draft(self):
+        # confirmed again, the payslip posts a new entry
+        self._unlink_moves()
+        return super(HrPayslip, self).action_payslip_draft()
 
     def action_payslip_done(self):
         res = super(HrPayslip, self).action_payslip_done()
@@ -81,6 +87,8 @@ class HrPayslip(models.Model):
                 amount = currency.round(slip.credit_note and -line.total or line.total)
                 if currency.is_zero(amount):
                     continue
+                # the analytic account of the rule, else the one of the contract
+                analytic_account = line.salary_rule_id.analytic_account_id or line.version_id.analytic_account_id
 
                 debit_account_id = line.salary_rule_id.account_debit.id
                 credit_account_id = line.salary_rule_id.account_credit.id
@@ -96,7 +104,7 @@ class HrPayslip(models.Model):
                         'date': date,
                         'debit': amount > 0.0 and amount or 0.0,
                         'credit': amount < 0.0 and -amount or 0.0,
-                        'analytic_distribution': {line.salary_rule_id.analytic_account_id.id: 100} if line.salary_rule_id.analytic_account_id else {},
+                        'analytic_distribution': {analytic_account.id: 100} if analytic_account else {},
                         'tax_line_id': line.salary_rule_id.account_tax_id.id,
                     })
                     line_ids.append(debit_line)
@@ -111,7 +119,7 @@ class HrPayslip(models.Model):
                         'date': date,
                         'debit': amount < 0.0 and -amount or 0.0,
                         'credit': amount > 0.0 and amount or 0.0,
-                        'analytic_distribution': {line.salary_rule_id.analytic_account_id.id: 100} if line.salary_rule_id.analytic_account_id else {},
+                        'analytic_distribution': {analytic_account.id: 100} if analytic_account else {},
                         'tax_line_id': line.salary_rule_id.account_tax_id.id,
                     })
                     line_ids.append(credit_line)
@@ -146,6 +154,9 @@ class HrPayslip(models.Model):
                     'credit': 0.0,
                 })
                 line_ids.append(adjust_debit)
+            if not line_ids:
+                # nothing to post: an empty entry cannot be posted
+                continue
             move_dict['line_ids'] = line_ids
             move = self.env['account.move'].create(move_dict)
             slip.write({'move_id': move.id, 'date': date})

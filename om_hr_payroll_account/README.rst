@@ -20,13 +20,15 @@ Features
   one credit line per salary rule, dated on the accounting date of the payslip,
   or the end of its period.
 * The partner of a journal item is taken from the contribution register of the
-  salary rule.
+  salary rule, else it is the employee for the net salary and for the items on
+  a receivable or a payable account, e.g. a salary advance recovered.
 * When the debits and the credits do not match, an adjustment line is added on
   the default account of the salary journal.
 * Confirming a payslip whose salary rules have no debit and credit account is
   refused with a message.
-* A refund payslip posts the opposite entry, and cancelling a payslip deletes
-  its journal entry.
+* A refund payslip posts the opposite entry, and cancelling a payslip or
+  setting it back to draft deletes its journal entry.
+* A payslip with nothing to post is confirmed without a journal entry.
 
 Installation
 ============
@@ -58,6 +60,26 @@ Create a payslip in Payroll > Employee Payslips, or a batch in Payroll >
 Payslips Batches. Check the salary journal and the accounting date, compute the
 payslip and confirm it: the journal entry is created and posted, and is
 available from the payslip.
+
+Upgrade
+=======
+
+Upgrade this module together with the payroll after pulling or downloading a
+new version: ``-u om_hr_payroll,om_hr_payroll_account``.
+
+Version 19.0.1.4.1 of the payroll, for the new journal entries:
+
+* A journal item takes the analytic account of the contract when its salary
+  rule has none.
+* Setting a payslip back to draft deletes its journal entry, as cancelling it
+  does: confirmed again, it posted a second entry.
+* A payslip with nothing to post is confirmed without an entry, where the
+  empty entry could not be posted.
+* A journal item on a receivable or a payable account without a contribution
+  register carries the employee, to reconcile it per employee.
+* A payslip created and confirmed in one call, e.g. by a script, is no longer
+  refused for missing debit or credit accounts.
+* The journal entries already posted are not changed.
 
 Dependencies
 ============
