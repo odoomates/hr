@@ -10,7 +10,6 @@
     'summary': 'Payroll For Odoo 14 Community Edition',
     'live_test_url': 'https://www.youtube.com/watch?v=0kaHMTtn7oY',
     'description': "",
-    'website': 'https://www.odoomates.tech',
     'depends': [
         'hr_contract',
         'hr_holidays',
