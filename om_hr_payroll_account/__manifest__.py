@@ -7,7 +7,6 @@
     'version': '13.0.3.0.0',
     'sequence': 1,
     'license': 'LGPL-3',
-    'website': 'https://odoomates.tech',
     'summary': 'Generic Payroll system Integrated with Accounting',
     'description': """Generic Payroll system Integrated with Accounting""",
     'depends': [
