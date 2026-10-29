@@ -1,7 +1,7 @@
 {
     'name': 'Odoo 19 HR Payroll',
     'category': 'Generic Modules/Human Resources',
-    'version': '19.0.1.3',
+    'version': '19.0.1.4',
     'sequence': 1,
     'author': 'Odoo Mates, Odoo SA',
     'summary': 'Payroll For Odoo 19 Community Edition',
@@ -25,6 +25,7 @@
         'views/hr_contract_views.xml',
         'views/hr_salary_rule_views.xml',
         'views/hr_payslip_views.xml',
+        'views/hr_payslip_analysis_views.xml',
         'views/hr_employee_views.xml',
         'views/hr_payroll_report.xml',
         'wizard/hr_payroll_contribution_register_report_views.xml',
