@@ -603,8 +603,8 @@ class HrPayslipRun(models.Model):
         return self.write({'state': 'close'})
 
     def done_payslip_run(self):
-        for line in self.slip_ids:
-            line.action_payslip_done()
+        # the payslips already confirmed or rejected keep their status, and their journal entry
+        self.slip_ids.filtered(lambda payslip: payslip.state in ('draft', 'verify')).action_payslip_done()
         return self.write({'state': 'done'})
 
     def unlink(self):
