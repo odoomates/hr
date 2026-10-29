@@ -3,7 +3,7 @@
 {
     'name': 'Odoo 14 HR Payroll',
     'category': 'Generic Modules/Human Resources',
-    'version': '14.0.8.1.0',
+    'version': '14.0.8.2.0',
     'sequence': 1,
     'license': 'LGPL-3',
     'author': 'Odoo Mates, Odoo SA',
@@ -26,6 +26,7 @@
         'views/hr_contract_views.xml',
         'views/hr_salary_rule_views.xml',
         'views/hr_payslip_views.xml',
+        'views/hr_payslip_analysis_views.xml',
         'views/hr_employee_views.xml',
         'views/hr_payroll_report.xml',
         'wizard/hr_payroll_contribution_register_report_views.xml',
