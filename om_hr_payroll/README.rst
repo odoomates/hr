@@ -107,6 +107,11 @@ Features
 * Generate the payslips of a batch for the employees you select, then confirm
   the whole batch in one step; employees belonging to another company than the
   batch are refused.
+* Let the batch of the month be created for you: with Monthly Batch on, each
+  month from the day you set, a batch of the month is created with the
+  payslips of the employees under contract, computed and left in draft to
+  check and confirm. The employees whose contract has no salary structure, or
+  whose payslip cannot be computed, are left out and named on the batch.
 * Check a batch before it is confirmed: Mark as Done first lists the payslips
   whose gross or net pay changes by more than 10% from the last confirmed
   payslip of the employee, with the salary rule that moved most, and the
@@ -165,6 +170,9 @@ clicking on the upgrade button.
 Since 2.2.0 the module depends on HR Base (om_hr_base): add both modules to the
 addons folder. Until the module is upgraded, the server skips it and the Payroll
 menu is missing; the upgrade installs HR Base.
+
+The upgrade to 2.5.0 adds the monthly batch, off for every company: turn it on
+in Payroll > Configuration > Settings.
 
 The upgrade to 2.4.0 adds the variance check of the payslip batches, at 10%
 for every company: set another threshold, or 0 to turn it off, in Payroll >
@@ -230,6 +238,9 @@ Configuration
   structure, in Payroll > Employees > Contracts.
 * Set the variance threshold of the payslip batches in Payroll > Configuration
   > Settings, 10% by default, or 0 to confirm the batches without the check.
+* To have the batch of each month created for you, turn on Monthly Batch in
+  Payroll > Configuration > Settings and choose the day of the month, the 25th
+  by default.
 * To also post the payslips in accounting, tick Payroll Entries in Payroll >
   Configuration > Settings, which installs the payroll accounting module.
 
@@ -240,7 +251,8 @@ Usage
   the employee and the period, click Compute Sheet, then confirm it.
 * For a group of employees, go to Payroll > Payslips Batches, create a batch
   for the period, use Generate Payslips to pick the employees, then Mark as
-  Done once the payslips are right.
+  Done once the payslips are right. With Monthly Batch on, the batch of the
+  month is already there, its payslips in draft.
 * Print the payslip from the Print menu of the payslip, or send it to the
   employee with Send by Email on a payslip, or Send Payslips by Email on a batch.
 * For the annual statements, go to Payroll > Reporting > Annual Statements, or

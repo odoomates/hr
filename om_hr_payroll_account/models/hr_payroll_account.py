@@ -484,6 +484,11 @@ class HrPayslipRun(models.Model):
             run.payment_count = len(run.sudo().slip_ids.payment_ids) if run.env.user.has_groups(
                 'account.group_account_invoice,account.group_account_readonly') else 0
 
+    def _generate_payslips(self, employees, skip_errors=False):
+        # the payslips generated, from the wizard or the monthly batch, take the salary journal of the batch
+        return super(HrPayslipRun, self.with_context(journal_id=self.journal_id.id))._generate_payslips(
+            employees, skip_errors=skip_errors)
+
     def done_payslip_run(self):
         for run in self:
             slips = run.slip_ids.filtered(lambda slip: slip.state in ('draft', 'verify'))

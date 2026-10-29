@@ -26,6 +26,15 @@
                                  help="Mark as Done of a batch first lists the payslips whose gross or net pay changes by more than this from the last confirmed payslip of the employee, and the employees paid for the first time. 0 turns the check off.">
                             <field name="om_payroll_variance_threshold" class="o_light_label oe_inline"/> %
                         </setting>
+                        <setting id="om_payroll_monthly_batch" string="Monthly Batch" company_dependent="1"
+                                 help="Each month, from the day set, a batch of the month is created with the payslips of the employees under contract, in draft, to check and confirm">
+                            <field name="om_payroll_monthly_batch"/>
+                            <div class="content-group" invisible="not om_payroll_monthly_batch">
+                                <div class="mt8">
+                                    From day <field name="om_payroll_monthly_batch_day" class="o_light_label oe_inline"/> of the month
+                                </div>
+                            </div>
+                        </setting>
                     </block>
                     <block title="Accounting">
                         <setting id="payroll_entries"

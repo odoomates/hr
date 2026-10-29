@@ -166,3 +166,13 @@ class TestPayrollAccount(AccountTestInvoicingCommon):
                          company_2_data['default_account_expense'] | payable_2)
         self.assertEqual(sum(move_2.line_ids.filtered(lambda line: line.account_id == payable_2).mapped('balance')),
                          -3000.0)
+
+    def test_monthly_batch_takes_the_salary_journal(self):
+        """ The payslips of the monthly batch take the salary journal of the batch, as from the wizard. """
+        self.employee.version_id.journal_id = self.env['account.journal'].create({
+            'name': 'Contract Salaries', 'code': 'CSAL', 'type': 'general', 'company_id': self.env.company.id})
+        self.env.company.write({'om_payroll_monthly_batch': True, 'om_payroll_monthly_batch_day': 25})
+        run = self.env['hr.payslip.run']._create_monthly_batch(self.env.company, today=date(2026, 8, 25))
+        payslip = run.slip_ids.filtered(lambda slip: slip.employee_id == self.employee)
+        self.assertTrue(payslip)
+        self.assertEqual(payslip.journal_id, run.journal_id)
