@@ -18,6 +18,6 @@
     ],
     'demo': ['data/hr_payroll_account_demo.xml'],
     'test': ['../account/test/account_minimal_test.xml'],
-    'images': ['static/description/banner.png'],
+    'images': ['static/description/banner.gif'],
     'application': True,
 }
