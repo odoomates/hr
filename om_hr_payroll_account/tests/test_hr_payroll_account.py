@@ -1,118 +1,42 @@
 # -*- coding: utf-8 -*-
 
-import time
-
-from datetime import datetime, timedelta
-from dateutil import relativedelta
-
-from odoo import fields, tools
-from odoo.modules.module import get_module_resource
-from odoo.tests import common
+from odoo.addons.om_hr_payroll.tests.common import TestPayslipBase
 
 
-class TestHrPayrollAccount(common.TransactionCase):
-
-    def _load(self, module, *args):
-        tools.convert_file(
-            self.cr, 'om_hr_payroll_account',
-            get_module_resource(module, *args), {}, 'init', False, 'test', self.registry._assertion_report)
+class TestHrPayrollAccount(TestPayslipBase):
 
     def setUp(self):
         super(TestHrPayrollAccount, self).setUp()
-
-        self._load('account', 'test', 'account_minimal_test.xml')
-
-        self.payslip_action_id = self.ref('om_hr_payroll.menu_department_tree')
-
-        self.res_partner_bank = self.env['res.partner.bank'].create({
-            'acc_number': '001-9876543-21',
-            'partner_id': self.ref('base.res_partner_12'),
-            'acc_type': 'bank',
-            'bank_id': self.ref('base.res_bank_1'),
+        expense_account = self.env['account.account'].create({
+            'name': 'Salary Expenses', 'code': 'OMSALEXP',
+            'user_type_id': self.env.ref('account.data_account_type_expenses').id,
         })
-
-        self.hr_employee_john = self.env['hr.employee'].create({
-            'address_home_id': self.ref('base.res_partner_address_2'),
-            'address_id': self.ref('base.res_partner_address_27'),
-            'birthday': '1984-05-01',
-            'children': 0.0,
-            'country_id': self.ref('base.in'),
-            'department_id': self.ref('hr.dep_rd'),
-            'gender': 'male',
-            'marital': 'single',
-            'name': 'John',
-            'bank_account_id': self.res_partner_bank.bank_id.id,
+        payable_account = self.env['account.account'].create({
+            'name': 'Salaries Payable', 'code': 'OMSALPAY', 'reconcile': True,
+            'user_type_id': self.env.ref('account.data_account_type_payable').id,
         })
-
-        self.hr_structure_softwaredeveloper = self.env['hr.payroll.structure'].create({
-            'name': 'Salary Structure for Software Developer',
-            'code': 'SD',
-            'company_id': self.ref('base.main_company'),
-            'parent_id': self.ref('om_hr_payroll.structure_base'),
-            'rule_ids': [(6, 0, [
-                    self.ref('om_hr_payroll.hr_salary_rule_houserentallowance1'),
-                    self.ref('om_hr_payroll.hr_salary_rule_convanceallowance1'),
-                    self.ref('om_hr_payroll.hr_salary_rule_professionaltax1'),
-                    self.ref('om_hr_payroll.hr_salary_rule_providentfund1'),
-                    self.ref('om_hr_payroll.hr_salary_rule_meal_voucher'),
-                    self.ref('om_hr_payroll.hr_salary_rule_sales_commission')
-            ])],
+        self.journal = self.env['account.journal'].create({
+            'name': 'Salaries', 'code': 'OMSAL', 'type': 'general',
+            'default_debit_account_id': expense_account.id, 'default_credit_account_id': expense_account.id,
         })
-
-        # Create account journal.
-        self.hr_contract_john = self.env['hr.contract'].create({
-            'date_end': fields.Date.to_string(datetime.now() + timedelta(days=365)),
-            'date_start': fields.Date.today(),
-            'name': 'Contract for John',
-            'wage': 5000.0,
-            'type_id': self.ref('hr_contract.hr_contract_type_emp'),
-            'employee_id': self.hr_employee_john.id,
-            'struct_id': self.hr_structure_softwaredeveloper.id,
-            'journal_id': self.ref('om_hr_payroll_account.expenses_journal'),
-        })
-
-        self.hr_payslip = self.env['hr.payslip'].create({
-            'employee_id': self.hr_employee_john.id,
-            'journal_id': self.ref('om_hr_payroll_account.expenses_journal'),
-        })
+        self.env.ref('om_hr_payroll.hr_rule_basic').account_debit = expense_account
+        self.env.ref('om_hr_payroll.hr_rule_net').account_credit = payable_account
+        self.richard_emp.address_home_id = self.env['res.partner'].create({'name': 'Richard'})
+        self.richard_contract.journal_id = self.journal
 
     def test_00_hr_payslip(self):
-        """ checking the process of payslip. """
+        """ The process of a payslip: computed, cancelled, set back to draft and confirmed, with its entry. """
+        payslip = self._new_payslip(journal_id=self.journal.id)
+        payslip.input_line_ids.write({'amount': 5.0})
+        self.assertEqual(payslip.state, 'draft')
 
-        date_from = time.strftime('%Y-%m-01')
-        date_to = str(datetime.now() + relativedelta.relativedelta(months=+1, day=1, days=-1))[:10]
-        res = self.hr_payslip.onchange_employee_id(date_from, date_to, self.hr_employee_john.id)
-        vals = {
-            'struct_id': res['value']['struct_id'],
-            'contract_id': res['value']['contract_id'],
-            'name': res['value']['name'],
-        }
-        vals['worked_days_line_ids'] = [(0, 0, i) for i in res['value']['worked_days_line_ids']]
-        vals['input_line_ids'] = [(0, 0, i) for i in res['value']['input_line_ids']]
-        vals.update({'contract_id': self.hr_contract_john.id})
-        self.hr_payslip.write(vals)
+        payslip.compute_sheet()
+        payslip.action_payslip_cancel()
+        self.assertEqual(payslip.state, 'cancel')
+        payslip.action_payslip_draft()
 
-        # I assign the amount to Input data.
-        payslip_input = self.env['hr.payslip.input'].search([('payslip_id', '=', self.hr_payslip.id)])
-        payslip_input.write({'amount': 5.0})
-
-        # I verify the payslip is in draft state.
-        self.assertEqual(self.hr_payslip.state, 'draft', 'State not changed!')
-
-        # I click on "Compute Sheet" button.
-        context = {"lang": "en_US", "tz": False, "active_model": 'hr.payslip', "department_id": False, "active_ids": [self.payslip_action_id], "section_id": False, "active_id": self.payslip_action_id}
-        self.hr_payslip.with_context(context).compute_sheet()
-
-        # I want to check cancel button. So I first cancel the sheet then make it set to draft.
-        self.hr_payslip.action_payslip_cancel()
-        self.assertEqual(self.hr_payslip.state, 'cancel', "Payslip is rejected.")
-        self.hr_payslip.action_payslip_draft()
-
-        # Confirm Payslip
-        self.hr_payslip.action_payslip_done()
-
-        # I verify that the Accounting Entries are created.
-        self.assertTrue(self.hr_payslip.move_id, 'Accounting Entries has not been created')
-
-        # I verify that the payslip is in done state.
-        self.assertEqual(self.hr_payslip.state, 'done', 'State not changed!')
+        payslip.action_payslip_done()
+        self.assertEqual(payslip.state, 'done')
+        self.assertTrue(payslip.move_id, 'Accounting Entries has not been created')
+        self.assertEqual(payslip.move_id.state, 'posted')
+        self.assertEqual(payslip.move_id.journal_id, self.journal)

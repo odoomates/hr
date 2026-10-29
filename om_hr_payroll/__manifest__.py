@@ -3,7 +3,7 @@
 {
     'name': 'Odoo 13 Payroll',
     'category': 'Generic Modules/Human Resources',
-    'version': '13.0.5.2.0',
+    'version': '13.0.5.2.1',
     'sequence': 1,
     'license': 'LGPL-3',
     'author': 'Odoo Mates, Odoo SA',

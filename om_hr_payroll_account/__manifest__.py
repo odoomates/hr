@@ -16,7 +16,7 @@
     'data': [
         'views/hr_payroll_account_views.xml'
     ],
-    'demo': ['data/hr_payroll_account_demo.xml'],
+    'demo': [],
     'test': ['../account/test/account_minimal_test.xml'],
     'images': ['static/description/banner.gif'],
     'application': True,

@@ -17,7 +17,7 @@ class HrPayrollStructure(models.Model):
 
     @api.model
     def _get_parent(self):
-        return self.env.ref('om_om_hr_payroll.structure_base', False)
+        return self.env.ref('om_hr_payroll.structure_base', False)
 
     name = fields.Char(required=True)
     code = fields.Char(string='Reference', required=True)
@@ -201,7 +201,9 @@ class HrSalaryRule(models.Model):
         else:
             try:
                 safe_eval(self.amount_python_compute, localdict, mode='exec', nocopy=True)
-                return float(localdict['result']), 'result_qty' in localdict and localdict['result_qty'] or 1.0, 'result_rate' in localdict and localdict['result_rate'] or 100.0
+                return (float(localdict['result']),
+                        float(localdict.get('result_qty', 1.0)),
+                        float(localdict.get('result_rate', 100.0)))
             except:
                 raise UserError(_('Wrong python code defined for salary rule %s (%s).') % (self.name, self.code))
 
@@ -211,6 +213,12 @@ class HrSalaryRule(models.Model):
         @return: returns True if the given rule match the condition for the given contract. Return False otherwise.
         """
         self.ensure_one()
+
+        if self.parent_rule_id:
+            # a child rule applies where its parent does, whatever their sequences
+            if not self.parent_rule_id._satisfy_condition(localdict):
+                return False
+            localdict['result'] = None
 
         if self.condition_select == 'none':
             return True
