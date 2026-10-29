@@ -41,6 +41,6 @@
     ],
     'demo': ['data/hr_payroll_demo.xml'],
     'pre_init_hook': 'pre_init_hook',
-    'images': ['static/description/banner.png'],
+    'images': ['static/description/banner.gif'],
     'application': True,
 }
