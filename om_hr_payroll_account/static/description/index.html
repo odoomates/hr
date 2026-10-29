@@ -1,37 +1,71 @@
-<section class="oe_container oe_dark">
-    <div class="col-md-12">
-        <h2 class="oe_slogan" style="font-size: 35px;color:#2C0091"><b>Odoo 17 Payroll Accounting</b></h2>
-    </div>
-</section>
+<div class="om-wrap" style="font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#2b2b3a;">
 
-<hr style="width: 100%;height: 4px;background: #2C0091;margin: 0px 0px;">
-<hr style="width: 100%;height: 4px;background: #148963;margin: 0px 0px;">
-<section class="oe_container oe_dark">
-    <div class="oe_row ">
-        <div class="oe_slogan text-center">
-            <img src="odoo_mates.png"/>
-            <div style="color:#269900;">
-                <h3 style="color:#2C0091;font-size: 25px;">If you need any help or support, just contact us:</h3><br>
-                <h3 style="color:#2C0091;font-size: 20px;">Email: <a href="odoomates@gmail.com">odoomates@gmail.com</a> <br></h3>
-            </div>
-            <div class="oe_slogan">
-               <h2>
-                    <a target="_blank" href="https://www.facebook.com/odoomate/" target="new">
-                        <i class="fa fa-facebook-square" style="font-size:38px;"></i>
-                    </a>
-                    <a target="_blank" href="https://twitter.com/odoomates/" target="new">
-                        <i class="fa fa-twitter" style="font-size:38px;"></i>
-                    </a>
-                    <a href="#" target="_blank">
-                        <i class="fa fa-linkedin" style="font-size:38px;"></i>
-                    </a>
-                    <a target="_blank" href="https://www.youtube.com/channel/UCVKlUZP7HAhdQgs-9iTJklQ">
-                        <i class="fa fa-youtube-play" style="font-size:38px;"></i>
-                    </a>
-                </h2>
-            </div>
-        </div>
+<style>
+@media (max-width: 760px) {
+    .om-card {width: 100% !important; margin: 0 0 14px 0 !important;}
+    .om-hero h1 {font-size: 26px !important;}
+    .om-band {padding: 28px 16px !important;}
+}
+</style>
+
+<div class="om-hero" style="background-color:#2C0091;color:#ffffff;padding:48px 32px;text-align:center;">
+    <h1 style="color:#ffffff;font-size:34px;font-weight:700;margin:0 0 14px 0;line-height:1.25;">Payroll Accounting for Odoo 17 Community</h1>
+    <p style="color:#e7dffa;font-size:18px;line-height:1.55;margin:0 auto;max-width:900px;">Connect the payroll of Odoo 17 Community to the accounting: each confirmed payslip posts a journal entry built from the debit and credit accounts of the salary rules.</p>
+    <div style="margin-top:24px;">
+        <span style="display:inline-block;background-color:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.38);color:#ffffff;border-radius:40px;padding:7px 18px;margin:5px;font-size:14px;font-weight:600;">Journal entries</span>
+        <span style="display:inline-block;background-color:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.38);color:#ffffff;border-radius:40px;padding:7px 18px;margin:5px;font-size:14px;font-weight:600;">Accounts per rule</span>
+        <span style="display:inline-block;background-color:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.38);color:#ffffff;border-radius:40px;padding:7px 18px;margin:5px;font-size:14px;font-weight:600;">Analytic accounts</span>
+        <span style="display:inline-block;background-color:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.38);color:#ffffff;border-radius:40px;padding:7px 18px;margin:5px;font-size:14px;font-weight:600;">Community Edition</span>
     </div>
-</section>
-<hr style="width: 100%;height: 4px;background: #148963;margin: 0px 0px;">
-<hr style="width: 100%;height: 4px;background: #2C0091;margin: 0px 0px;">
+</div>
+
+<div class="om-band" style="padding:44px 32px;background-color:#ffffff;">
+    <span style="display:inline-block;font-size:12px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#148963;background-color:#e6f4ee;border-radius:4px;padding:5px 10px;margin-bottom:12px;">Journal entries</span>
+    <h2 style="font-size:28px;font-weight:700;color:#2C0091;margin:0 0 10px 0;">Each confirmed payslip posts its entry</h2>
+    <p style="font-size:17px;color:#4a4a5a;line-height:1.6;margin:0 0 20px 0;max-width:1000px;">Confirming a payslip creates its journal entry in the salary journal and posts it: one debit and one credit line per salary rule, from the accounts set on the rule.</p>
+    <div style="margin:0 0 0 0;padding:0 0 0 4px;">
+        <div style="font-size:15px;color:#45455a;line-height:1.55;margin:0 0 8px 0;"><span style="color:#148963;font-weight:700;">&#10003;</span> &nbsp;The accounting date of the payslip, or the end of its period when it is left empty.</div>
+        <div style="font-size:15px;color:#45455a;line-height:1.55;margin:0 0 8px 0;"><span style="color:#148963;font-weight:700;">&#10003;</span> &nbsp;The partner of a line comes from the contribution register of the rule.</div>
+        <div style="font-size:15px;color:#45455a;line-height:1.55;margin:0 0 8px 0;"><span style="color:#148963;font-weight:700;">&#10003;</span> &nbsp;An adjustment line on the default account of the journal when the debits and the credits differ.</div>
+        <div style="font-size:15px;color:#45455a;line-height:1.55;margin:0 0 8px 0;"><span style="color:#148963;font-weight:700;">&#10003;</span> &nbsp;A refunded payslip posts the opposite entry; a cancelled payslip deletes its entry.</div>
+    </div>
+</div>
+
+<div class="om-band" style="padding:44px 32px;background-color:#f6f5f9;">
+    <span style="display:inline-block;font-size:12px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#148963;background-color:#e6f4ee;border-radius:4px;padding:5px 10px;margin-bottom:12px;">Salary rules</span>
+    <h2 style="font-size:28px;font-weight:700;color:#2C0091;margin:0 0 10px 0;">The accounts on the rule</h2>
+    <p style="font-size:17px;color:#4a4a5a;line-height:1.6;margin:0 0 0 0;max-width:1000px;">Each salary rule gets a Debit Account, a Credit Account, an Analytic Account and a Tax on an Accounting tab, used by every payslip the rule appears on.</p>
+</div>
+
+<div class="om-band" style="padding:44px 32px;background-color:#ffffff;">
+    <span style="display:inline-block;font-size:12px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#148963;background-color:#e6f4ee;border-radius:4px;padding:5px 10px;margin-bottom:12px;">Journals</span>
+    <h2 style="font-size:28px;font-weight:700;color:#2C0091;margin:0 0 10px 0;">A salary journal where you need it</h2>
+    <p style="font-size:17px;color:#4a4a5a;line-height:1.6;margin:0 0 0 0;max-width:1000px;">The salary journal is set on the contract, on the payslip or on the payslip batch, and the payslips generated from a batch take the journal of the batch. The contract also takes an analytic account.</p>
+</div>
+
+<div class="om-band" style="padding:44px 32px;background-color:#f6f5f9;">
+    <span style="display:inline-block;font-size:12px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#148963;background-color:#e6f4ee;border-radius:4px;padding:5px 10px;margin-bottom:12px;">Editions</span>
+    <h2 style="font-size:28px;font-weight:700;color:#2C0091;margin:0 0 10px 0;">Community and Enterprise</h2>
+    <p style="font-size:17px;color:#4a4a5a;line-height:1.6;margin:0 0 0 0;max-width:1000px;">Works with <strong>Odoo 17 Community</strong> and <strong>Odoo 17 Enterprise</strong>, with Odoo 17 HR Payroll. On Enterprise, it cannot be installed together with the Enterprise Payroll app.</p>
+</div>
+
+<div style="padding:40px 28px;background-color:#e3f2f0;text-align:center;"><span style="display:inline-block;font-size:12px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#ffffff;background-color:#0b5e5a;border-radius:4px;padding:5px 10px;margin-bottom:12px;">Join us</span><h2 style="font-size:26px;font-weight:700;color:#073f3d;margin:0 0 12px 0;">Help us make it better</h2><p style="font-size:16px;color:#2b2b3a;line-height:1.6;margin:0 auto 18px auto;max-width:820px;">Odoo Mates HR is open source and grows with the people who use it. Every report, review, fix and translation is welcome. New to it? Ask, and we guide you.</p><div style="margin:0 auto 18px auto;max-width:1000px;"><div style="display:inline-block;vertical-align:top;width:20%;min-width:180px;margin:6px;padding:16px;background-color:#ffffff;border:1px solid #e3e8e8;border-top:4px solid #f39c12;border-radius:10px;text-align:left;"><div style="font-size:16px;font-weight:700;color:#073f3d;margin:0 0 6px 0;">Report</div><div style="font-size:14px;color:#5a5a6a;line-height:1.5;">Found a bug or a gap? <a href="https://github.com/odoomates/hr/issues/new/choose" style="color:#0b5e5a;">Open an issue</a>, or write to us.</div></div><div style="display:inline-block;vertical-align:top;width:20%;min-width:180px;margin:6px;padding:16px;background-color:#ffffff;border:1px solid #e3e8e8;border-top:4px solid #f39c12;border-radius:10px;text-align:left;"><div style="font-size:16px;font-weight:700;color:#073f3d;margin:0 0 6px 0;">Review</div><div style="font-size:14px;color:#5a5a6a;line-height:1.5;">Test the <a href="https://github.com/odoomates/hr/pulls" style="color:#0b5e5a;">pull requests</a> on your database and comment.</div></div><div style="display:inline-block;vertical-align:top;width:20%;min-width:180px;margin:6px;padding:16px;background-color:#ffffff;border:1px solid #e3e8e8;border-top:4px solid #f39c12;border-radius:10px;text-align:left;"><div style="font-size:16px;font-weight:700;color:#073f3d;margin:0 0 6px 0;">Improve</div><div style="font-size:14px;color:#5a5a6a;line-height:1.5;">Fix a bug or add what your HR team needs: send a pull request.</div></div><div style="display:inline-block;vertical-align:top;width:20%;min-width:180px;margin:6px;padding:16px;background-color:#ffffff;border:1px solid #e3e8e8;border-top:4px solid #f39c12;border-radius:10px;text-align:left;"><div style="font-size:16px;font-weight:700;color:#073f3d;margin:0 0 6px 0;">Translate</div><div style="font-size:14px;color:#5a5a6a;line-height:1.5;">Bring the apps to your language: the <code>i18n</code> files of each module.</div></div></div><p style="font-size:16px;color:#2b2b3a;line-height:1.6;margin:0;"><a href="https://github.com/odoomates/hr" style="color:#0b5e5a;font-weight:700;">github.com/odoomates/hr</a> &middot; <a href="mailto:odoomates@gmail.com" style="color:#0b5e5a;font-weight:700;">odoomates@gmail.com</a></p><p style="font-size:17px;font-weight:700;color:#073f3d;margin:14px 0 0 0;">If you love it, let us know. Always your Odoo Mates.</p></div>
+
+<hr style="width:100%;height:4px;background-color:#2C0091;margin:0px;border:none;"/>
+<hr style="width:100%;height:4px;background-color:#148963;margin:0px;border:none;"/>
+
+<div style="padding:36px 32px;background-color:#ffffff;text-align:center;">
+    <img src="odoo_mates.png" alt="Odoo Mates" style="height:140px;max-width:100%;"/>
+    <h3 style="color:#2C0091;font-size:24px;margin:14px 0 6px 0;">Keeping it simple</h3>
+    <h3 style="color:#2C0091;font-size:19px;margin:0 0 14px 0;">Email: <a href="mailto:odoomates@gmail.com" style="color:#714B67;">odoomates@gmail.com</a></h3>
+    <div>
+        <a target="_blank" href="https://www.facebook.com/odoomatesofficial" style="margin:0 8px;"><i class="fa fa-facebook-square" style="font-size:34px;color:#2C0091;"></i></a>
+        <a target="_blank" href="https://twitter.com/odoomates/" style="margin:0 8px;"><i class="fa fa-twitter" style="font-size:34px;color:#2C0091;"></i></a>
+        <a target="_blank" href="https://www.youtube.com/channel/UCVKlUZP7HAhdQgs-9iTJklQ" style="margin:0 8px;"><i class="fa fa-youtube-play" style="font-size:34px;color:#2C0091;"></i></a>
+    </div>
+</div>
+
+<hr style="width:100%;height:4px;background-color:#148963;margin:0px;border:none;"/>
+<hr style="width:100%;height:4px;background-color:#2C0091;margin:0px;border:none;"/>
+
+</div>
