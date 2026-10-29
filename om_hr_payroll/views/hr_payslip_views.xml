@@ -425,6 +425,8 @@
                                 <field name="date_end" class="oe_inline"/>
                             </div>
                             <field name="credit_note"/>
+                            <field name="om_monthly_company_id" attrs="{'invisible': [('om_monthly_company_id', '=', False)]}"/>
+                            <field name="om_monthly_note" colspan="4" attrs="{'invisible': [('om_monthly_note', '=', False)]}"/>
                         </group>
                         <separator string="Payslips"/>
                         <field name="slip_ids"/>
