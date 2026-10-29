@@ -62,13 +62,15 @@ class HrPayslip(models.Model):
         states={'draft': [('readonly', False)]})
     details_by_salary_rule_category = fields.One2many('hr.payslip.line',
         compute='_compute_details_by_salary_rule_category', string='Details by Salary Rule Category')
-    credit_note = fields.Boolean(string='Credit Note', readonly=True,
+    credit_note = fields.Boolean(string='Credit Note', readonly=True, default=False,
         states={'draft': [('readonly', False)]},
         help="Indicates this payslip has a refund of another")
     payslip_run_id = fields.Many2one('hr.payslip.run', string='Payslip Batches', readonly=True,
         copy=False, states={'draft': [('readonly', False)]})
     payslip_count = fields.Integer(compute='_compute_payslip_count', string="Payslip Computation Details")
 
+    # the lines of a payslip change when it is computed: the details follow them
+    @api.depends('line_ids.category_id')
     def _compute_details_by_salary_rule_category(self):
         for payslip in self:
             payslip.details_by_salary_rule_category = payslip.mapped('line_ids').filtered(lambda line: line.category_id)
@@ -99,8 +101,8 @@ class HrPayslip(models.Model):
             copied_payslip = payslip.copy({'credit_note': True, 'name': _('Refund: ') + payslip.name})
             copied_payslip.compute_sheet()
             copied_payslip.action_payslip_done()
-        form_view_ref = self.env.ref('om_om_hr_payroll.view_hr_payslip_form', False)
-        tree_view_ref = self.env.ref('om_om_hr_payroll.view_hr_payslip_tree', False)
+        form_view_ref = self.env.ref('om_hr_payroll.view_hr_payslip_form', False)
+        tree_view_ref = self.env.ref('om_hr_payroll.view_hr_payslip_tree', False)
         return {
             'name': (_("Refund Payslip")),
             'view_mode': 'tree, form',
@@ -309,7 +311,9 @@ class HrPayslip(models.Model):
             def sum(self, code, from_date, to_date=None):
                 if to_date is None:
                     to_date = fields.Date.today()
-                self.env.cr.execute("""SELECT sum(case when hp.credit_note = False then (pl.total) else (-pl.total) end)
+                # the totals of the lines are read in SQL
+                self.env['hr.payslip.line'].flush()
+                self.env.cr.execute("""SELECT sum(case when hp.credit_note then (-pl.total) else (pl.total) end)
                             FROM hr_payslip as hp, hr_payslip_line as pl
                             WHERE hp.employee_id = %s AND hp.state = 'done'
                             AND hp.date_from >= %s AND hp.date_to <= %s AND hp.id = pl.slip_id AND pl.code = %s""",
@@ -529,7 +533,7 @@ class HrPayslipLine(models.Model):
     rate = fields.Float(string='Rate (%)', default=100.0)
     amount = fields.Float()
     quantity = fields.Float(default=1.0)
-    total = fields.Float(compute='_compute_total', string='Total')
+    total = fields.Float(compute='_compute_total', string='Total', store=True)
 
     @api.depends('quantity', 'amount', 'rate')
     def _compute_total(self):
@@ -596,7 +600,7 @@ class HrPayslipRun(models.Model):
     date_end = fields.Date(string='Date To', required=True, readonly=True,
                            states={'draft': [('readonly', False)]},
                            default=lambda self: fields.Date.to_string((datetime.now() + relativedelta(months=+1, day=1, days=-1)).date()))
-    credit_note = fields.Boolean(string='Credit Note', readonly=True,
+    credit_note = fields.Boolean(string='Credit Note', readonly=True, default=False,
                                  states={'draft': [('readonly', False)]},
                                  help="If its checked, indicates that all payslips generated from here are refund payslips.")
 
