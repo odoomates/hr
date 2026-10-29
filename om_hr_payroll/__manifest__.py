@@ -1,7 +1,7 @@
 {
     'name': 'Odoo 18 HR Payroll',
     'category': 'Generic Modules/Human Resources',
-    'version': '1.0.2',
+    'version': '1.1.0',
     'sequence': 1,
     'author': 'Odoo Mates, Odoo SA',
     'summary': 'Payroll For Odoo 18 Community Edition',
@@ -20,6 +20,7 @@
         'data/hr_payroll_sequence.xml',
         'data/hr_payroll_category.xml',
         'data/hr_payroll_data.xml',
+        'data/hr_payroll_cron.xml',
         'wizard/hr_payroll_payslips_by_employees_views.xml',
         'views/hr_contract_type_views.xml',
         'views/hr_contract_views.xml',
