@@ -12,3 +12,4 @@ access_hr_rule_input_officer,hr.rule.input.office,model_hr_rule_input,om_hr_payr
 access_hr_salary_rule_user,hr.salary.rule.user,model_hr_salary_rule,om_hr_payroll.group_hr_payroll_user,1,1,1,1
 access_hr_contract_advantage_template,hr.contract.advantage.template.user,model_hr_contract_advantage_template,om_hr_payroll.group_hr_payroll_user,1,1,1,1
 access_hr_contract_advantage_template_hr_user,hr.contract.advantage.template.hr.user,model_hr_contract_advantage_template,hr.group_hr_user,1,0,0,0
+access_hr_payslip_analysis,hr.payslip.analysis,model_hr_payslip_analysis,om_hr_payroll.group_hr_payroll_user,1,0,0,0

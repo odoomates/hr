@@ -29,6 +29,10 @@ Features
   check and confirm. The employees left out are named on the batch.
 * Print the PaySlip and the PaySlip Details PDF reports from a payslip, and the
   PaySlip Lines By Contribution Register report for a register over a period.
+* Analyse the payslip lines in Payroll > Reporting > Payroll Analysis (pivot,
+  graph and list), by employee, department, job position, salary rule category
+  or month, and export them to a spreadsheet from the pivot; the lines of the
+  refunds count negative.
 * Record the third parties who collect or inject money on payslips as
   contribution registers.
 * Number confirmed payslips from the Salary Slip sequence.
