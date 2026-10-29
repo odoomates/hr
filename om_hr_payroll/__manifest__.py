@@ -9,7 +9,6 @@
     'summary': 'Payroll For Odoo 15 Community Edition',
     'live_test_url': 'https://www.youtube.com/watch?v=0kaHMTtn7oY',
     'description': "Odoo 15 Payroll, Payroll Odoo 15, Odoo Community Payroll",
-    'website': 'https://www.odoomates.tech',
     'license': 'LGPL-3',
     'depends': [
         'mail',

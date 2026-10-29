@@ -6,7 +6,6 @@
     'author': 'Odoo Mates, Odoo SA',
     'version': '15.0.4.0.0',
     'sequence': 1,
-    'website': 'https://www.odoomates.tech',
     'license': 'LGPL-3',
     'live_test_url': 'https://www.youtube.com/watch?v=0kaHMTtn7oY',
     'summary': 'Generic Payroll system Integrated with Accounting',
