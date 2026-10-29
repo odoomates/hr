@@ -16,6 +16,9 @@ class HrPayslipLine(models.Model):
         register_partner_id = self.salary_rule_id.register_id.partner_id
         partner_id = register_partner_id.id
         if credit_account:
+            if not register_partner_id and self.category_id.code == 'NET':
+                # the net salary is owed to the employee: the payment of the salary is matched with it
+                return self.slip_id.employee_id.work_contact_id.id
             if register_partner_id or self.salary_rule_id.account_credit.account_type in ('asset_receivable', 'liability_payable'):
                 return partner_id
         else:
