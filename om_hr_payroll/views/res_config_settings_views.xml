@@ -10,6 +10,23 @@
             <xpath expr="//div[hasclass('settings')]" position="inside">
                 <div class="app_settings_block" data-string="Payroll" string="Payroll" data-key="om_hr_payroll"
                      groups="om_hr_payroll.group_hr_payroll_manager">
+                    <h2>Payslip Batches</h2>
+                    <div class="row mt16 o_settings_container" id="om_payroll_monthly_batch">
+                        <div class="col-lg-6 col-12 o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <field name="om_payroll_monthly_batch"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="om_payroll_monthly_batch"/>
+                                <div class="text-muted">
+                                    Each month, from the day set, a batch of the month is created with the payslips of the employees under contract, in draft, to check and confirm
+                                </div>
+                                <div class="content-group mt8" attrs="{'invisible': [('om_payroll_monthly_batch', '=', False)]}">
+                                    From day <field name="om_payroll_monthly_batch_day" class="oe_inline"/> of the month
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <h2>Accounting</h2>
                     <div class="row mt16 o_settings_container" id="om_hr_payroll_account">
                         <div class="col-lg-6 col-12 o_setting_box">

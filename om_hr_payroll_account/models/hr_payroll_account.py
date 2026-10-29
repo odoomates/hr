@@ -170,3 +170,18 @@ class HrPayslipRun(models.Model):
 
     journal_id = fields.Many2one('account.journal', 'Salary Journal', states={'draft': [('readonly', False)]}, readonly=True,
         required=True, default=lambda self: self.env['account.journal'].search([('type', '=', 'general')], limit=1))
+
+    def _generate_payslips(self, employees, skip_errors=False):
+        # the payslips generated, from the wizard or the monthly batch, take the salary journal of the batch
+        return super(HrPayslipRun, self.with_context(journal_id=self.journal_id.id))._generate_payslips(
+            employees, skip_errors=skip_errors)
+
+    @api.model
+    def _monthly_batch_values(self, company, date_start, date_end):
+        values = super()._monthly_batch_values(company, date_start, date_end)
+        journal = self.env['account.journal'].search([('type', '=', 'general'), ('company_id', '=', company.id)],
+                                                     limit=1)
+        if not journal:
+            raise UserError(_('%s has no miscellaneous journal for the salaries.') % company.name)
+        values['journal_id'] = journal.id
+        return values
