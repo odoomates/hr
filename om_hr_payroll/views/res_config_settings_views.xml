@@ -21,6 +21,13 @@
                             <field name="om_payroll_month_days" class="o_light_label oe_inline"/> days per month
                         </setting>
                     </block>
+                    <block title="Payslips" name="om_payroll_payslips">
+                        <setting id="om_payroll_keep_lines_on_confirm" string="Confirm the Lines as They Are"
+                                 company_dependent="1"
+                                 help="Confirming a computed payslip keeps its lines, the ones edited by hand included, instead of computing it again. The other lines are not added up again: edit the net salary too.">
+                            <field name="om_payroll_keep_lines_on_confirm"/>
+                        </setting>
+                    </block>
                     <block title="Payslip Batches" name="om_payroll_batches">
                         <setting id="om_payroll_variance_threshold" string="Variance Check" company_dependent="1"
                                  help="Mark as Done of a batch first lists the payslips whose gross or net pay changes by more than this from the last confirmed payslip of the employee, and the employees paid for the first time. 0 turns the check off.">

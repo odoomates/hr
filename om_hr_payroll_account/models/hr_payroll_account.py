@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from odoo import api, fields, models, _
+from odoo import Command, api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
 
 PAYMENT_STATES = [
@@ -33,24 +33,28 @@ class HrPayslipLine(models.Model):
     account_credit = fields.Many2one('account.account', 'Credit Account', company_dependent=False)
 
     def _get_partner_id(self, credit_account):
-        """
-        Get partner_id of slip line to use in account_move_line
-        """
-        # use partner of salary rule or fallback on employee's address
-        register_partner_id = self.salary_rule_id.register_id.partner_id
-        partner_id = register_partner_id.id
-        if credit_account:
-            if not register_partner_id and self.category_id.code == 'NET':
-                # the net salary is owed to the employee: the payment of the salary is matched with it
-                return self.slip_id.employee_id.work_contact_id.id
-            if register_partner_id or self.salary_rule_id.account_credit.account_type in (
-                    'asset_receivable', 'liability_payable'):
-                return partner_id
-        else:
-            if register_partner_id or self.salary_rule_id.account_debit.account_type in (
-                    'asset_receivable', 'liability_payable'):
-                return partner_id
+        """ :return: the partner of the journal item of the line: the partner of the contribution register of its
+        rule, else the employee for what they are owed or owe: the net salary, and the items on a receivable or a
+        payable account, e.g. a salary advance recovered, so they are reconciled per employee. """
+        register_partner = self.salary_rule_id.register_id.partner_id
+        if register_partner:
+            return register_partner.id
+        rule = self.salary_rule_id
+        account = rule.account_credit if credit_account else rule.account_debit
+        if (credit_account and self.category_id.code == 'NET') \
+                or account.account_type in ('asset_receivable', 'liability_payable'):
+            return self.slip_id.employee_id.sudo().work_contact_id.id
         return False
+
+    def _get_tax_values(self, account):
+        """ :return: the values making the journal item of the line on that account the tax line of the tax of
+        its rule: the repartition line of the tax on that account, and its tax grids, for the tax reports. """
+        tax = self.salary_rule_id.account_tax_id.sudo()
+        repartition = tax.invoice_repartition_line_ids.filtered(
+            lambda line: line.repartition_type == 'tax' and line.account_id == account)[:1]
+        if not repartition:
+            return {'tax_repartition_line_id': False, 'tax_tag_ids': []}
+        return {'tax_repartition_line_id': repartition.id, 'tax_tag_ids': [Command.set(repartition.tag_ids.ids)]}
 
 
 class HrPayslip(models.Model):
@@ -170,8 +174,7 @@ class HrPayslip(models.Model):
         # a payslip refunded before being paid owes nothing any more: its net salary is matched with the refund
         refunds = self.search(action['domain'])
         for original in self.filtered(lambda slip: slip.move_id and slip.payment_state == 'not_paid'):
-            refund = refunds.filtered(lambda slip: (slip.employee_id, slip.date_from, slip.date_to) == (
-                original.employee_id, original.date_from, original.date_to))[:1]
+            refund = refunds.filtered(lambda slip, original=original: slip.refunded_id == original)
             if not refund.move_id:
                 continue
             lines = (original._get_salary_payable_lines() | refund._get_salary_payable_lines()).sudo()
@@ -219,13 +222,30 @@ class HrPayslip(models.Model):
             self.journal_id = self._get_company_salary_journal()
         return res
 
-    def action_payslip_cancel(self):
-        self._check_own_payslip()
-        for slip in self.filtered('move_id'):
-            move = slip.move_id.sudo()
+    def _remove_accounting_entry(self):
+        """ Delete the accounting entries of the payslips, as they are cancelled or set back to draft.
+        :return: the payslips whose entry stays because it is already reversed in Accounting. """
+        reversed_slips = self.browse()
+        for move in self.move_id:
+            slips = self.filtered(lambda slip, move=move: slip.move_id == move)
+            move = move.sudo()
             if move.reversal_move_ids.filtered(lambda reversal: reversal.state == 'posted'):
                 # already cancelled in the books by a reversal: the entry stays
+                reversed_slips |= slips
                 continue
+            paid = slips.filtered(lambda slip: slip.payment_state in ('in_payment', 'paid', 'partial'))
+            if paid:
+                raise UserError(_(
+                    'The payslip %s is paid: cancel its payment in Accounting first.',
+                    paid[0].number or paid[0].name or ''))
+            # a consolidated entry posts the other payslips of the batch too
+            others = self.sudo().search([('move_id', '=', move.id), ('id', 'not in', self.ids)])
+            if others:
+                raise UserError(_(
+                    'The accounting entry %(entry)s also posts the payslips %(payslips)s: '
+                    'cancel or set back to draft all of them together.',
+                    entry=move.display_name,
+                    payslips=', '.join(others.mapped(lambda slip: slip.number or slip.name or ''))))
             try:
                 with self.env.cr.savepoint():
                     if move.state == 'posted':
@@ -235,9 +255,21 @@ class HrPayslip(models.Model):
                 raise UserError(_(
                     'The accounting entry %(entry)s of the payslip %(payslip)s cannot be deleted: %(reason)s\n'
                     'Reverse the entry in Accounting, then cancel the payslip.',
-                    entry=move.display_name, payslip=slip.number or slip.name or '', reason=error.args[0],
+                    entry=move.display_name, payslip=slips[0].number or slips[0].name or '',
+                    reason=error.args[0],
                 )) from error
+        return reversed_slips
+
+    def action_payslip_cancel(self):
+        self._check_cancel()
+        self._remove_accounting_entry()
         return super().action_payslip_cancel()
+
+    def action_payslip_draft(self):
+        self._check_set_to_draft()
+        # confirmed again, the payslip posts a new entry: the reversed one is no longer its entry
+        self._remove_accounting_entry().move_id = False
+        return super().action_payslip_draft()
 
     def _check_salary_journal(self):
         """ :return: the salary journal of the payslip, read as superuser because the
@@ -270,8 +302,9 @@ class HrPayslip(models.Model):
             amount = currency.round(slip.credit_note and -line.total or line.total)
             if currency.is_zero(amount):
                 continue
-            analytic_distribution = ({line.salary_rule_id.analytic_account_id.id: 100}
-                                     if line.salary_rule_id.analytic_account_id else {})
+            # the analytic account of the rule, else the one of the contract
+            analytic_account = line.salary_rule_id.analytic_account_id or line.version_id.analytic_account_id
+            analytic_distribution = {analytic_account.id: 100} if analytic_account else {}
             if line.salary_rule_id.account_debit:
                 values.append({
                     'name': line.name,
@@ -282,7 +315,7 @@ class HrPayslip(models.Model):
                     'debit': amount > 0.0 and amount or 0.0,
                     'credit': amount < 0.0 and -amount or 0.0,
                     'analytic_distribution': analytic_distribution,
-                    'tax_line_id': line.salary_rule_id.account_tax_id.id,
+                    **line._get_tax_values(line.salary_rule_id.account_debit),
                 })
             if line.salary_rule_id.account_credit:
                 values.append({
@@ -294,7 +327,7 @@ class HrPayslip(models.Model):
                     'debit': amount < 0.0 and -amount or 0.0,
                     'credit': amount > 0.0 and amount or 0.0,
                     'analytic_distribution': analytic_distribution,
-                    'tax_line_id': line.salary_rule_id.account_tax_id.id,
+                    **line._get_tax_values(line.salary_rule_id.account_credit),
                 })
         return values
 
@@ -332,7 +365,8 @@ class HrPayslip(models.Model):
                 vals['account_id'],
                 vals['partner_id'],
                 tuple(sorted((vals['analytic_distribution'] or {}).items())),
-                vals['tax_line_id'],
+                vals['tax_repartition_line_id'],
+                tuple(sorted(vals['tax_tag_ids'][0][2])) if vals['tax_tag_ids'] else (),
             )
             if key in merged:
                 merged[key]['debit'] += vals['debit']
@@ -399,6 +433,9 @@ class HrPayslip(models.Model):
             date = slip.date or slip.date_to
             currency = slip.company_id.currency_id
             values = slip._prepare_payslip_move_lines(date)
+            if not values:
+                # nothing to post: an entry without lines cannot be posted
+                continue
             adjustment = self._prepare_adjustment_move_line(journal, date, values, currency)
             if adjustment:
                 values.append(adjustment)
@@ -424,7 +461,10 @@ class HrSalaryRule(models.Model):
     # the default rules are shared by the companies: each company sets its own accounts on them
     analytic_account_id = fields.Many2one('account.analytic.account', 'Analytic Account', company_dependent=True,
                                           check_company=True)
-    account_tax_id = fields.Many2one('account.tax', 'Tax', company_dependent=True, check_company=True)
+    account_tax_id = fields.Many2one(
+        'account.tax', 'Tax', company_dependent=True, check_company=True,
+        help="The tax this rule computes: its journal item on the account of the tax is a tax line of the entry, "
+             "with the tax grids of the tax, as shown in the tax reports.")
     account_debit = fields.Many2one('account.account', 'Debit Account', company_dependent=True)
     account_credit = fields.Many2one('account.account', 'Credit Account', company_dependent=True)
 

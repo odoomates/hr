@@ -143,16 +143,21 @@
                                 invisible="state != 'draft' or not line_ids"/>
                         <button string="Confirm" name="action_payslip_done" type="object"
                                 invisible="state != 'draft' or line_ids"/>
+                        <button string="Refresh Worked Days" name="action_refresh_worked_days" type="object"
+                                invisible="state != 'draft'"
+                                help="Build the worked days again, e.g. for a time off validated since the payslip was made"/>
                         <button string="Retro Pay" name="%(action_hr_payslip_retro)d" type="action"
                                 context="{'default_payslip_id': id}" invisible="state != 'draft'"/>
                         <button string="Send by Email" name="action_send_email" type="object" class="btn-primary"
                                 invisible="state not in ('verify', 'done')"/>
                         <button string="Refund" name="refund_sheet"
-                                invisible="state != 'done' or credit_note" type="object"/>
+                                invisible="state != 'done' or credit_note or refunded" type="object"/>
                         <button string="Set to Draft" name="action_payslip_draft" type="object"
                                 invisible="state != 'cancel'"/>
                         <button string="Cancel" name="action_payslip_cancel" type="object"
-                                invisible="state not in ('draft', 'verify', 'done')"/>
+                                invisible="state not in ('draft', 'verify')"/>
+                        <button string="Cancel" name="action_payslip_cancel" type="object"
+                                invisible="state != 'done'" groups="om_hr_payroll.group_hr_payroll_manager"/>
                         <field name="state" widget="statusbar" statusbar_visible="draft,done"/>
                     </header>
                     <sheet>
@@ -163,6 +168,10 @@
                                     type="action">
                                 <field name="payslip_count" widget="statinfo" string="Payslip"
                                        help="Payslip Computation Details"/>
+                            </button>
+                            <button name="action_open_refunds" type="object" class="oe_stat_button" icon="undo"
+                                    invisible="not refund_count">
+                                <field name="refund_count" widget="statinfo" string="Refunds"/>
                             </button>
                         </div>
                         <widget name="web_ribbon" title="Refund" bg_color="text-bg-warning" invisible="not credit_note"/>
@@ -190,6 +199,7 @@
                                        context="{'default_employee_id': employee_id}"/>
                                 <field name="struct_id" required="version_id != False" readonly="state != 'draft'"/>
                                 <field name="credit_note" readonly="state != 'draft'"/>
+                                <field name="refunded_id" invisible="not refunded_id"/>
                             </group>
                         </group>
                         <notebook>
@@ -441,6 +451,9 @@
                                 string="Generate Payslips" class="btn-primary"/>
                         <button string="Mark as Done" name="action_done_payslip_run" type="object"
                                 invisible="state != 'draft'"/>
+                        <button string="Refresh Worked Days" name="action_refresh_worked_days" type="object"
+                                invisible="state != 'draft' or not slip_ids"
+                                help="Build the worked days of the draft payslips again, e.g. for a time off validated since"/>
                         <button name="close_payslip_run" type="object" string="Close" invisible="state != 'draft'"/>
                         <button name="action_send_payslips" type="object" string="Send Payslips by Email"
                                 class="btn-primary" invisible="state == 'draft'"

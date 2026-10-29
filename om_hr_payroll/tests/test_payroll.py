@@ -207,6 +207,52 @@ class TestPayroll(TransactionCase):
         self.assertEqual(refund.state, 'done')
         self.assertEqual(self._totals(refund)['NET'], self._totals(payslip)['NET'])
 
+    def test_refund_is_linked_and_made_once(self):
+        payslip = self._new_payslip(self.employee)
+        with self.assertRaises(UserError):
+            payslip.refund_sheet()
+        payslip.action_payslip_done()
+        refund = self.env['hr.payslip'].search(payslip.refund_sheet()['domain'])
+        self.assertEqual(refund.refunded_id, payslip)
+        self.assertEqual(payslip.refund_ids, refund)
+        self.assertTrue(payslip.refunded)
+        self.assertEqual(payslip.action_open_refunds()['domain'], [('refunded_id', '=', payslip.id)])
+        with self.assertRaises(UserError):
+            payslip.refund_sheet()
+        with self.assertRaises(UserError):
+            refund.refund_sheet()
+        # the refund takes the payslip back: it goes first
+        with self.assertRaises(UserError):
+            payslip.action_payslip_cancel()
+        with self.assertRaises(UserError):
+            payslip.action_payslip_draft()
+
+        refund.action_payslip_cancel()
+        self.assertFalse(payslip.refunded)
+        refund = self.env['hr.payslip'].search(payslip.refund_sheet()['domain'])
+        self.assertEqual(payslip.refund_ids.filtered(lambda slip: slip.state != 'cancel'), refund)
+
+    def test_confirm_keeps_lines_edited_by_hand(self):
+        """ By default confirming computes the payslip again; the company may confirm its lines as they are. """
+        payslip = self._new_payslip(self.employee)
+        payslip.compute_sheet()
+        net = payslip.line_ids.filtered(lambda line: line.code == 'NET')
+        computed = net.total
+        net.amount = computed + 10.0
+        payslip.action_payslip_done()
+        self.assertEqual(self._totals(payslip)['NET'], round(computed, 2), 'computed again')
+
+        self.env.company.om_payroll_keep_lines_on_confirm = True
+        payslip = self._new_payslip(self.employee, date(2026, 9, 1), date(2026, 9, 30))
+        payslip.compute_sheet()
+        payslip.line_ids.filtered(lambda line: line.code == 'NET').amount = computed + 10.0
+        payslip.action_payslip_done()
+        self.assertEqual(self._totals(payslip)['NET'], round(computed + 10.0, 2), 'kept as edited')
+        # a payslip never computed is computed on confirm
+        payslip = self._new_payslip(self.employee, date(2026, 10, 1), date(2026, 10, 31))
+        payslip.action_payslip_done()
+        self.assertEqual(self._totals(payslip)['NET'], round(computed, 2))
+
     def test_refund_takes_back_what_was_paid(self):
         # a raise after the payslip: the refund takes back the old wage, line for line, not the new one
         payslip = self._new_payslip(self.employee)
@@ -437,6 +483,8 @@ class TestPayroll(TransactionCase):
             as_officer.line_ids[0].with_user(officer).write({'amount': 1.0})
         with self.assertRaises(UserError):
             as_officer.action_payslip_draft()
+        with self.assertRaises(UserError):
+            as_officer.action_payslip_cancel()
         # the trail of what happens to it stays writable
         as_officer.write({'paid': True})
         self.assertTrue(payslip.paid)

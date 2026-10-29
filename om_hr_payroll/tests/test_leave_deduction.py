@@ -1,6 +1,7 @@
 from datetime import date, datetime
 
 from odoo import Command
+from odoo.exceptions import UserError
 from odoo.tests import Form, TransactionCase, tagged
 
 
@@ -152,3 +153,24 @@ class TestLeaveDeduction(TransactionCase):
         totals = self._totals(self._payslip())
         self.assertEqual(totals['UNPAID'], -4400.0)
         self.assertEqual(totals['NET'], 0.0)
+
+    def test_time_off_validated_after_the_payslip(self):
+        """ The payslip made before the time off is validated takes it when its worked days are refreshed. """
+        payslip = self._payslip()
+        self.assertEqual(self._totals(payslip)['UNPAID'], 0.0)
+        self._take_leave(self._time_type('Late Unpaid', amount_rate=0.0), date(2026, 6, 8), date(2026, 6, 9))
+        payslip.input_line_ids = [Command.create({'name': 'Bonus', 'code': 'BONUS', 'amount': 100.0,
+                                                  'version_id': payslip.version_id.id})]
+
+        payslip.payslip_run_id = self.env['hr.payslip.run'].create({
+            'name': 'June', 'date_start': date(2026, 6, 1), 'date_end': date(2026, 6, 30)})
+        payslip.payslip_run_id.action_refresh_worked_days()
+        worked = {line.code: line for line in payslip.worked_days_line_ids}
+        self.assertEqual(worked['LATE_UNPAID'].number_of_days, -2.0)
+        # computed already, the payslip follows its new worked days; the inputs stay
+        self.assertLess(self._totals(payslip)['UNPAID'], 0.0)
+        self.assertEqual(payslip.input_line_ids.mapped('code'), ['BONUS'])
+
+        payslip.action_payslip_done()
+        with self.assertRaises(UserError):
+            payslip.action_refresh_worked_days()

@@ -21,6 +21,11 @@ class ResCompany(models.Model):
         help='Mark as Done of a payslip batch first lists the payslips whose gross or net pay changes by more than '
              'this percentage from the last confirmed payslip of the employee, and the employees without one. '
              '0 turns the check off.')
+    om_payroll_keep_lines_on_confirm = fields.Boolean(
+        string='Confirm the Lines as They Are',
+        help='Confirming a computed payslip keeps its lines as they are, the ones edited by hand included, instead '
+             'of computing the payslip again. The lines are not added up again: a line edited by hand leaves the '
+             'other lines, e.g. the net salary, to edit too.')
     om_payroll_monthly_batch = fields.Boolean(
         string='Monthly Batch',
         help='Each month, from the day set, a payslip batch of the month is created with the payslips of the '
@@ -43,5 +48,7 @@ class ResConfigSettings(models.TransientModel):
                                                      readonly=False)
     om_payroll_month_days = fields.Float(related='company_id.om_payroll_month_days', readonly=False)
     om_payroll_variance_threshold = fields.Float(related='company_id.om_payroll_variance_threshold', readonly=False)
+    om_payroll_keep_lines_on_confirm = fields.Boolean(related='company_id.om_payroll_keep_lines_on_confirm',
+                                                      readonly=False)
     om_payroll_monthly_batch = fields.Boolean(related='company_id.om_payroll_monthly_batch', readonly=False)
     om_payroll_monthly_batch_day = fields.Integer(related='company_id.om_payroll_monthly_batch_day', readonly=False)

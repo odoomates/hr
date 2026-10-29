@@ -1,6 +1,7 @@
 from datetime import date
 
 from odoo import Command
+from odoo.exceptions import UserError
 from odoo.tests import tagged
 
 from odoo.addons.om_hr_payroll_account.tests.test_payroll_account import TestPayrollAccount
@@ -102,3 +103,18 @@ class TestConsolidatedMove(TestPayrollAccount):
         self.assertTrue(others.move_id)
         self.assertNotEqual(others.move_id, first.move_id)
         self.assertEqual(sum(others.move_id.line_ids.mapped('balance')), 0.0)
+
+    def test_a_consolidated_entry_is_removed_with_all_its_payslips(self):
+        """ The entry posts the whole batch: one payslip alone cannot take it away from the others. """
+        run = self._new_run(True, self.employee | self.second_employee)
+        run.done_payslip_run()
+        move = run.slip_ids.move_id
+        with self.assertRaises(UserError):
+            run.slip_ids[0].action_payslip_draft()
+        with self.assertRaises(UserError):
+            run.slip_ids[0].action_payslip_cancel()
+        self.assertEqual(move.state, 'posted')
+
+        run.slip_ids.action_payslip_draft()
+        self.assertFalse(move.exists())
+        self.assertFalse(run.slip_ids.move_id)

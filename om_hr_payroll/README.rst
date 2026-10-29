@@ -52,6 +52,9 @@ Features
   The Partial Period rule takes off the wage of the working days outside the
   contract; a monthly wage is measured against the calendar month, so a payslip
   up to the last working day pays the days worked out of the whole month.
+  An employee changing contracts during the period, e.g. a contract ending on
+  the 10th and the next one starting on the 20th, is paid the days of both, at
+  the wage of the contract in effect at the end of the period.
 * Write your own rules against the worked days with
   ``worked_days.unpaid_ratio()``, the part of the period that is not paid,
   ``worked_days.scheduled_days()``, the days the employee was due to work,
@@ -177,6 +180,14 @@ in Payroll > Configuration > Settings.
 The upgrade to 2.4.0 adds the variance check of the payslip batches, at 10%
 for every company: set another threshold, or 0 to turn it off, in Payroll >
 Configuration > Settings. It also adds the annual statement and ``ytd.capped``.
+From 2.5.1 a payslip pays the days of every contract of the employee in its
+period, where the days of a contract ended during the period were left out
+when the next one started in the same period. A payslip is refunded once, and
+the refund links the payslip it takes back; the upgrade links the refunds made
+before when one confirmed payslip of the employee matches their period. A
+payslip with a refund, or a confirmed payslip, is cancelled or set back to
+draft by a payroll manager, the refund first.
+
 From 2.4.0 a refund takes back the lines of the payslip it refunds as they
 were paid, where it used to compute the payslip again: after a raise, a new
 rate or a time off validated since, it took back what the payslip would pay

@@ -1,4 +1,4 @@
-from odoo import api, fields, models, _
+from odoo import Command, api, fields, models, _
 from odoo.exceptions import AccessError, UserError, ValidationError
 
 from .hr_rule_parameter import RuleParameters
@@ -125,11 +125,41 @@ class HrPayslip(models.Model):
     details_by_salary_rule_category = fields.One2many('hr.payslip.line',
                                                       compute='_compute_details_by_salary_rule_category',
                                                       string='Details by Salary Rule Category')
-    credit_note = fields.Boolean(string='Credit Note',
+    credit_note = fields.Boolean(string='Credit Note', default=False,
                                  help="Indicates this payslip has a refund of another", tracking=True)
+    refunded_id = fields.Many2one('hr.payslip', string='Refunded Payslip', readonly=True, copy=False,
+                                  index='btree_not_null', check_company=True,
+                                  help="The payslip this refund takes back")
+    refund_ids = fields.One2many('hr.payslip', 'refunded_id', string='Refunds', readonly=True)
+    refunded = fields.Boolean(compute='_compute_refunded', help="A refund not cancelled takes this payslip back")
+    refund_count = fields.Integer(compute='_compute_refunded', string='Refund Count')
     payslip_run_id = fields.Many2one('hr.payslip.run', string='Payslip Batches', copy=False, tracking=True,
                                      check_company=True)
     payslip_count = fields.Integer(compute='_compute_payslip_count', string="Payslip Computation Details")
+
+    @api.depends('refund_ids.state')
+    def _compute_refunded(self):
+        for payslip in self:
+            payslip.refunded = any(refund.state != 'cancel' for refund in payslip.refund_ids)
+            payslip.refund_count = len(payslip.refund_ids)
+
+    def action_open_refunds(self):
+        self.ensure_one()
+        return {
+            'name': _('Refunds'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'hr.payslip',
+            'view_mode': 'list,form',
+            'domain': [('refunded_id', '=', self.id)],
+            'context': {'create': False},
+        }
+
+    def _check_not_refunded(self):
+        """ Raise if a payslip is taken back by a refund: the refund goes first. """
+        refunded = self.filtered('refunded')
+        if refunded:
+            raise UserError(_('The payslip %s is refunded: cancel its refund first.',
+                              refunded[0].number or refunded[0].name or ''))
 
     def _compute_details_by_salary_rule_category(self):
         for payslip in self:
@@ -195,26 +225,49 @@ class HrPayslip(models.Model):
         self.ensure_one()
         return {'type': 'ir.actions.act_url', 'url': '/my/payslip/%s/pdf' % self.id, 'target': 'download'}
 
-    def action_payslip_draft(self):
-        self._check_own_payslip()
+    def _check_confirmed_by_manager(self, message):
+        """ Raise if the current user, not a payroll manager, changes the status of a confirmed payslip. """
         confirmed = self.filtered(lambda payslip: payslip.state == 'done')
         if confirmed and not self._is_payroll_manager():
-            raise UserError(_('Only a payroll manager can set a confirmed payslip back to draft: %s',
-                              ', '.join(confirmed.mapped(lambda payslip: payslip.number or payslip.name or ''))))
+            raise UserError(message % ', '.join(
+                confirmed.mapped(lambda payslip: payslip.number or payslip.name or '')))
+
+    def _check_set_to_draft(self):
+        """ Raise if the payslips cannot be set back to draft by the current user. """
+        self._check_own_payslip()
+        self._check_not_refunded()
+        self._check_confirmed_by_manager(_('Only a payroll manager can set a confirmed payslip back to draft: %s'))
+
+    def _check_cancel(self):
+        """ Raise if the payslips cannot be cancelled by the current user: a confirmed payslip was paid, a payroll
+            manager takes it back. """
+        self._check_own_payslip()
+        self._check_not_refunded()
+        self._check_confirmed_by_manager(_('Only a payroll manager can cancel a confirmed payslip: %s'))
+
+    def action_payslip_draft(self):
+        self._check_set_to_draft()
         return self.write({'state': 'draft'})
 
     def action_payslip_done(self):
         self._check_own_payslip()
-        # a refund confirms the lines it took from the payslip it refunds, as they are
+        # a refund confirms the lines it took from the payslip it refunds, as they are; and so does a computed
+        # payslip, lines edited by hand included, when the company keeps them
         if not self.env.context.get('hr_payslip_keep_lines'):
-            self.compute_sheet()
+            self.filtered(lambda payslip: not (
+                payslip.line_ids and payslip.company_id.om_payroll_keep_lines_on_confirm)).compute_sheet()
         return self.write({'state': 'done'})
 
     def action_payslip_cancel(self):
-        self._check_own_payslip()
+        self._check_cancel()
         return self.write({'state': 'cancel'})
 
     def refund_sheet(self):
+        not_refundable = self.filtered(lambda payslip: payslip.state != 'done' or payslip.credit_note)
+        if not_refundable:
+            raise UserError(_('Only a confirmed payslip can be refunded, not a refund: %s',
+                              not_refundable[0].number or not_refundable[0].name or ''))
+        self._check_not_refunded()
         refunds = self.env['hr.payslip']
         for payslip in self:
             # the lines the payslip paid, as they are: computed again, the refund would take back what the payslip
@@ -225,6 +278,7 @@ class HrPayslip(models.Model):
             } for line in payslip.line_ids]
             copied_payslip = payslip.copy({
                 'credit_note': True,
+                'refunded_id': payslip.id,
                 'name': _('Refund: %s', payslip.name or ''),
                 'number': self.env['ir.sequence'].next_by_code('salary.slip'),
                 'line_ids': [(0, 0, values) for values in lines],
@@ -331,6 +385,24 @@ class HrPayslip(models.Model):
                                   closed[0].number or closed[0].name or ''))
         return super().write(vals)
 
+    def action_refresh_worked_days(self):
+        """ Build the worked days of the draft payslips again from the calendar, the time off or the work entries,
+            e.g. for a time off validated after the payslip was made. The inputs stay as they are. """
+        not_draft = self.filtered(lambda payslip: payslip.state != 'draft')
+        if not_draft:
+            raise UserError(_('Only the worked days of a draft payslip can be refreshed: %s',
+                              not_draft[0].number or not_draft[0].name or ''))
+        for payslip in self:
+            versions = payslip.version_id or self.env['hr.version'].browse(
+                self.get_versions(payslip.employee_id, payslip.date_from, payslip.date_to)[:1])
+            if not versions:
+                continue
+            lines = self.get_worked_day_lines(versions, payslip.date_from, payslip.date_to)
+            payslip.worked_days_line_ids = [Command.clear()] + [Command.create(line) for line in lines]
+        # the lines computed already follow the new worked days
+        self.filtered('line_ids').compute_sheet()
+        return True
+
     def compute_sheet(self):
         closed = self.filtered(lambda payslip: payslip.state in ('done', 'cancel'))
         if closed:
@@ -404,13 +476,37 @@ class HrPayslip(models.Model):
         self.ensure_one()
         return version.contract_date_end
 
+    def _get_contract_periods(self, version, period_from, period_to):
+        """ :return: the periods, merged and in order, the employee of `version` is under contract within the
+            given dates: every contract of the period counts, e.g. a contract ending on the 10th and the next one
+            starting on the 20th. """
+        self.ensure_one()
+        versions = version | self.env['hr.version'].browse(
+            self.get_versions(version.employee_id, period_from, period_to))
+        periods = []
+        for contract in versions:
+            start = max(period_from, contract.contract_date_start or period_from)
+            stop = min(period_to, self._get_contract_end(contract) or period_to)
+            if start <= stop:
+                periods.append((start, stop))
+        merged = []
+        for start, stop in sorted(periods):
+            if merged and start <= merged[-1][1] + relativedelta(days=1):
+                merged[-1] = (merged[-1][0], max(merged[-1][1], stop))
+            else:
+                merged.append((start, stop))
+        return merged
+
     def _get_prorata(self, version):
-        """ :return: the share of the pay period the contract of `version` covers, in working days of its calendar
+        """ :return: the share of the pay period the contracts of the employee of `version` cover, in working days
+        of its calendar
 
         A monthly pay is measured against the calendar month of the payslip, so that a contract ending on the 20th
         pays the days worked out of the month. Other frequencies, and a monthly payslip spanning two months, are
         measured against the period of the payslip. Only the contract dates count: a payslip ending before the end
-        of the month pays the whole wage of an employee under contract for all of it.
+        of the month pays the whole wage of an employee under contract for all of it. A payslip is computed with
+        one version, the one in effect at the end of the period: when the employee changes contracts during the
+        period, the days of all their contracts are paid at the wage of that version.
         """
         self.ensure_one()
         calendar = version.resource_calendar_id or version.employee_id.resource_calendar_id
@@ -421,12 +517,10 @@ class HrPayslip(models.Model):
             period_from, period_to = self.date_from + relativedelta(day=1), self.date_from + relativedelta(day=31)
         else:
             period_from, period_to = self.date_from, self.date_to
-        contract_end = self._get_contract_end(version)
-        covered_from = max(period_from, version.contract_date_start or period_from)
-        covered_to = min(period_to, contract_end or period_to)
-        if covered_from > covered_to:
+        periods = self._get_contract_periods(version, period_from, period_to)
+        if not periods:
             return 0.0
-        if (covered_from, covered_to) == (period_from, period_to):
+        if periods == [(period_from, period_to)]:
             return 1.0
 
         def working_days(date_from, date_to):
@@ -437,7 +531,7 @@ class HrPayslip(models.Model):
         period_days = working_days(period_from, period_to)
         if not period_days:
             return 1.0
-        return min(working_days(covered_from, covered_to) / period_days, 1.0)
+        return min(sum(working_days(start, stop) for start, stop in periods) / period_days, 1.0)
 
     @api.model
     def _om_scheduled_time(self, version, calendar, date_from, date_to):
@@ -743,7 +837,7 @@ class HrPayslip(models.Model):
                 if to_date is None:
                     to_date = fields.Date.context_today(self.env['hr.payslip'])
                 self.env.flush_all()
-                self.env.cr.execute("""SELECT sum(case when hp.credit_note = False then (pl.total) else (-pl.total) end)
+                self.env.cr.execute("""SELECT sum(case when hp.credit_note then (-pl.total) else (pl.total) end)
                             FROM hr_payslip as hp, hr_payslip_line as pl
                             WHERE hp.employee_id = %s AND hp.state = 'done'
                             AND hp.date_from >= %s AND hp.date_to <= %s AND hp.id = pl.slip_id AND pl.code = %s""",
@@ -1091,7 +1185,7 @@ class HrPayslipRun(models.Model):
         default=lambda self: fields.Date.context_today(self) + relativedelta(day=31),
         tracking=True
     )
-    credit_note = fields.Boolean(string='Credit Note',
+    credit_note = fields.Boolean(string='Credit Note', default=False,
                                  help="If its checked, indicates that all payslips generated from here are refund "
                                       "payslips.", tracking=True)
     company_id = fields.Many2one('res.company', string='Company', required=True, default=lambda self: self.env.company)
@@ -1221,6 +1315,11 @@ class HrPayslipRun(models.Model):
         if check:
             return check._get_action()
         return self.done_payslip_run()
+
+    def action_refresh_worked_days(self):
+        """ Refresh the worked days of the draft payslips of the batch. """
+        self.slip_ids.filtered(lambda payslip: payslip.state == 'draft').action_refresh_worked_days()
+        return True
 
     def done_payslip_run(self):
         # the payslips already confirmed or rejected keep their status and their amounts

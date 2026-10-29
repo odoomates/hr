@@ -244,8 +244,8 @@ class HrSalaryRule(models.Model):
             try:
                 safe_eval(self.amount_python_compute, localdict, mode='exec')
                 return (float(localdict['result']),
-                        'result_qty' in localdict and localdict['result_qty'] or 1.0,
-                        'result_rate' in localdict and localdict['result_rate'] or 100.0)
+                        float(localdict.get('result_qty', 1.0)),
+                        float(localdict.get('result_rate', 100.0)))
             except Exception as ex:
                 raise UserError(_(
                     'Wrong python code defined for salary rule %s (%s). Here is the error received: %s',
@@ -257,6 +257,12 @@ class HrSalaryRule(models.Model):
         @return: returns True if the given rule match the condition for the given contract. Return False otherwise.
         """
         self.ensure_one()
+
+        if self.parent_rule_id:
+            # a child rule applies where its parent does, whatever their sequences
+            if not self.parent_rule_id._satisfy_condition(localdict):
+                return False
+            localdict['result'] = None
 
         if self.condition_select == 'none':
             return True

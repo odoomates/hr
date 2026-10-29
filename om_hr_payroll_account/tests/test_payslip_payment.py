@@ -96,6 +96,18 @@ class TestPayslipPayment(AccountTestInvoicingCommon):
         with self.assertRaises(UserError):
             payslip.action_register_payment()
 
+    def test_paid_payslip_keeps_its_entry(self):
+        """ Deleting the entry would silently unmatch the payment: the payment is cancelled first. """
+        payslip = self._confirmed_payslip()
+        self._pay(payslip, amount=1000.0)
+        move = payslip.move_id
+        with self.assertRaises(UserError):
+            payslip.action_payslip_cancel()
+        with self.assertRaises(UserError):
+            payslip.action_payslip_draft()
+        self.assertEqual(payslip.state, 'done')
+        self.assertEqual(move.state, 'posted')
+
     def test_partial_payment(self):
         payslip = self._confirmed_payslip()
         self._pay(payslip, amount=1000.0)

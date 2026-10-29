@@ -176,3 +176,124 @@ class TestPayrollAccount(AccountTestInvoicingCommon):
         payslip = run.slip_ids.filtered(lambda slip: slip.employee_id == self.employee)
         self.assertTrue(payslip)
         self.assertEqual(payslip.journal_id, run.journal_id)
+
+    def test_payslip_without_amounts_posts_no_entry(self):
+        """ Nothing to post: the payslip is confirmed without an entry, as an empty one cannot be posted. """
+        self.employee.version_id.wage = 0.0
+        payslip = self._new_payslip()
+        payslip.action_payslip_done()
+        self.assertEqual(payslip.state, 'done')
+        self.assertFalse(payslip.move_id)
+
+    def test_contract_analytic_account(self):
+        """ The journal items take the analytic account of the contract when the rule has none. """
+        plan = self.env['account.analytic.plan'].create({'name': 'Payroll Plan'})
+        contract_analytic, rule_analytic = self.env['account.analytic.account'].create([
+            {'name': 'Contract Analytic', 'plan_id': plan.id},
+            {'name': 'Rule Analytic', 'plan_id': plan.id},
+        ])
+        self.employee.version_id.analytic_account_id = contract_analytic
+        payslip = self._new_payslip()
+        payslip.action_payslip_done()
+        expense = payslip.move_id.line_ids.filtered(lambda line: line.account_id == self.expense_account)
+        self.assertEqual(expense.analytic_distribution, {str(contract_analytic.id): 100})
+
+        # the analytic account of the rule comes first
+        self.env['hr.salary.rule'].search([('code', '=', 'BASIC'), ('account_debit', '=', self.expense_account.id)]) \
+            .analytic_account_id = rule_analytic
+        payslip = self._new_payslip()
+        payslip.action_payslip_done()
+        expense = payslip.move_id.line_ids.filtered(lambda line: line.account_id == self.expense_account)
+        self.assertEqual(expense.analytic_distribution, {str(rule_analytic.id): 100})
+
+    def test_set_back_to_draft_removes_entry(self):
+        """ Set back to draft and confirmed again, the payslip posts one entry, not a second one. """
+        payslip = self._new_payslip()
+        payslip.action_payslip_done()
+        move = payslip.move_id
+        payslip.action_payslip_draft()
+        self.assertEqual(payslip.state, 'draft')
+        self.assertFalse(move.exists())
+        self.assertFalse(payslip.move_id)
+
+        payslip.action_payslip_done()
+        self.assertEqual(payslip.move_id.state, 'posted')
+        self.assertEqual(self.env['account.move'].search_count([('ref', '=', payslip.number)]), 1)
+
+    def test_set_back_to_draft_after_reversal(self):
+        """ An entry reversed in Accounting stays, with its reversal: confirmed again, the payslip posts a new one. """
+        payslip = self._new_payslip()
+        payslip.action_payslip_done()
+        move = payslip.move_id
+        move._reverse_moves(cancel=True)
+        payslip.action_payslip_draft()
+        self.assertEqual(move.state, 'posted')
+        self.assertFalse(payslip.move_id)
+        payslip.action_payslip_done()
+        self.assertNotEqual(payslip.move_id, move)
+        self.assertEqual(payslip.move_id.state, 'posted')
+
+    def test_refunded_payslip_keeps_its_entry(self):
+        payslip = self._new_payslip()
+        payslip.action_payslip_done()
+        refund = self.env['hr.payslip'].search(payslip.refund_sheet()['domain'])
+        with self.assertRaises(UserError):
+            payslip.action_payslip_cancel()
+        self.assertEqual(payslip.move_id.state, 'posted')
+        # the refund goes first, then the payslip
+        refund.action_payslip_cancel()
+        self.assertFalse(refund.move_id)
+        payslip.action_payslip_cancel()
+        self.assertEqual(payslip.state, 'cancel')
+
+    def test_rule_tax_on_the_tax_account(self):
+        """ The journal item of a tax rule on the account of the tax is a tax line, with its tax grids. """
+        tax_account = self.env['account.account'].create({
+            'name': 'Payroll Tax Payable', 'code': 'PAYTAX', 'account_type': 'liability_current',
+        })
+        tag = self.env['account.account.tag'].create({'name': 'Payroll Tax Grid', 'applicability': 'taxes'})
+        repartition = [
+            Command.create({'repartition_type': 'base'}),
+            Command.create({'repartition_type': 'tax', 'account_id': tax_account.id,
+                            'tag_ids': [Command.set(tag.ids)]}),
+        ]
+        tax = self.env['account.tax'].create({
+            'name': 'Payroll Tax 10%', 'amount': 10.0, 'type_tax_use': 'none',
+            'invoice_repartition_line_ids': repartition, 'refund_repartition_line_ids': repartition,
+        })
+        rule = self.employee.struct_id.rule_ids.filtered(lambda rule: rule.code == 'TAX')
+        # a deduction, so a negative amount: the debit account is credited with the tax withheld
+        rule.write({'account_debit': tax_account.id, 'account_credit': self.payable_account.id,
+                    'account_tax_id': tax.id})
+        payslip = self._new_payslip()
+        payslip.action_payslip_done()
+        tax_line = payslip.move_id.line_ids.filtered(lambda line: line.account_id == tax_account)
+        self.assertEqual(tax_line.tax_line_id, tax)
+        self.assertEqual(tax_line.tax_repartition_line_id.account_id, tax_account)
+        self.assertEqual(tax_line.tax_tag_ids, tag)
+        self.assertEqual(tax_line.balance, -400.0)
+        # the other side of the rule is no tax line
+        other = payslip.move_id.line_ids.filtered(
+            lambda line: line.account_id == self.payable_account and line.name == rule.name)
+        self.assertFalse(other.tax_line_id)
+
+    def test_employee_is_the_partner_of_receivable_items(self):
+        """ A salary advance recovered is reconciled per employee: its receivable item carries the employee. """
+        advances = self.env['account.account'].create({
+            'name': 'Salary Advances', 'code': 'SALADV', 'account_type': 'asset_receivable', 'reconcile': True,
+        })
+        self.employee.struct_id.rule_ids |= self.env['hr.salary.rule'].create({
+            'name': 'Advance Recovered', 'code': 'ADVREC', 'sequence': 160,
+            'category_id': self.env.ref('om_hr_payroll.DED').id, 'amount_select': 'fix', 'amount_fix': -500.0,
+            # a deduction, so a negative amount: the debit account is credited with what is recovered
+            'account_debit': advances.id, 'account_credit': self.payable_account.id,
+        })
+        payslip = self._new_payslip()
+        payslip.action_payslip_done()
+        lines = payslip.move_id.line_ids
+        advance = lines.filtered(lambda line: line.account_id == advances)
+        self.assertEqual(advance.balance, -500.0)
+        self.assertTrue(self.employee.work_contact_id)
+        self.assertEqual(advance.partner_id, self.employee.work_contact_id)
+        # an account that is neither receivable nor payable is not the employee's
+        self.assertFalse(lines.filtered(lambda line: line.account_id == self.expense_account).partner_id)
