@@ -432,6 +432,8 @@
                                 <field name="date_end" class="oe_inline" readonly="state != 'draft'"/>
                             </div>
                             <field name="credit_note" readonly="state != 'draft'"/>
+                            <field name="om_monthly_company_id" invisible="not om_monthly_company_id"/>
+                            <field name="om_monthly_note" colspan="4" invisible="not om_monthly_note"/>
                         </group>
                         <separator string="Payslips"/>
                         <field name="slip_ids" readonly="state != 'draft'"/>
