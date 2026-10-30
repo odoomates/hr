@@ -37,9 +37,10 @@ What it installs:
 
 * ``om_hr_base`` HR Base: what the HR modules share, the My HR menu and the
   employee category of the contract.
-* ``om_approval`` Approvals: approval flows for any app. A button, e.g.
-  Confirm on the sale orders above an amount, waits for the approval of users,
-  groups or the user a field names, in steps, and runs once approved.
+* ``om_approval`` Approvals, from the Odoo Mates apps: approval flows for any
+  app. A button, e.g. Confirm on the sale orders above an amount, waits for the
+  approval of users, groups or the user a field names, in steps, and runs once
+  approved.
 * ``om_hr_approval`` HR Approvals: the manager, the department manager, the
   coach or the HR responsible approve, and the employees send HR requests.
 * ``om_hr_approval_leave`` HR Approvals: Time Off: an approver on validated
@@ -183,6 +184,8 @@ Dependencies
 
 * Odoo 20.0 Community Edition.
 * No external Python library and no paid Odoo Enterprise module.
+* Approvals (``om_approval``), from the Odoo Mates apps
+  (https://github.com/odoomates/odooapps), branch 20.0, in the addons path.
 * The Odoo Mates HR modules listed above, and through them the Community apps
   Employees, Time Off, Attendances, Maintenance, Work Entries, Portal,
   Dashboards and Automation Rules.
