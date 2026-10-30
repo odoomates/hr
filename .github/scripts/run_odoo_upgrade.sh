@@ -4,7 +4,7 @@
 #
 #   run_odoo_upgrade.sh <database> <older checkout> <modules to install>
 #
-# Environment as run_odoo_tests.sh: ODOO_PATH, PYTHON, PGHOST, PGPORT, PGUSER, PGPASSWORD, LOG_DIR.
+# Environment as run_odoo_tests.sh: ODOO_PATH, PYTHON, PGHOST, PGPORT, PGUSER, PGPASSWORD, LOG_DIR, EXTRA_ADDONS.
 set -uo pipefail
 
 db=${1:?database}
@@ -14,6 +14,15 @@ repo=$(cd "$(dirname "$0")/../.." && pwd)
 odoo=${ODOO_PATH:-$repo/../odoo}
 python=${PYTHON:-python3}
 log_dir=${LOG_DIR:-$(mktemp -d)}
+if [ -z "${EXTRA_ADDONS+x}" ] && [ -d "$repo/../odooapps" ]; then
+    EXTRA_ADDONS=$(cd "$repo/../odooapps" && pwd)
+fi
+# only when it holds modules: Odoo refuses an addons directory without any
+if [ -n "${EXTRA_ADDONS:-}" ] && compgen -G "$EXTRA_ADDONS/*/__manifest__.py" >/dev/null; then
+    extra=",$EXTRA_ADDONS"
+else
+    extra=
+fi
 mkdir -p "$log_dir"
 
 conf() {
@@ -21,7 +30,7 @@ conf() {
     file=$(mktemp)
     cat > "$file" <<CONF
 [options]
-addons_path = $odoo/addons,$odoo/odoo/addons,$1
+addons_path = $odoo/addons,$odoo/odoo/addons,$1$extra
 db_host = ${PGHOST:-localhost}
 db_port = ${PGPORT:-5432}
 db_user = ${PGUSER:-odoo}

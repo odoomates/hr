@@ -9,6 +9,8 @@
 #   PYTHON     the Python of Odoo (default: python3)
 #   PGHOST, PGPORT, PGUSER, PGPASSWORD  the PostgreSQL server
 #   LOG_DIR    where the log is written (default: a temporary folder)
+#   EXTRA_ADDONS  the other addons the modules depend on, after this repository: the odooapps repository for
+#                 Approvals (om_approval) (default: ../odooapps next to the repository, when it is there)
 set -uo pipefail
 
 db=${1:?database}
@@ -18,13 +20,22 @@ tags=${3:-$(cd "$repo" && ls -d om_* | sed 's#^#/#' | paste -sd, -)}
 odoo=${ODOO_PATH:-$repo/../odoo}
 python=${PYTHON:-python3}
 log_dir=${LOG_DIR:-$(mktemp -d)}
+if [ -z "${EXTRA_ADDONS+x}" ] && [ -d "$repo/../odooapps" ]; then
+    EXTRA_ADDONS=$(cd "$repo/../odooapps" && pwd)
+fi
+# only when it holds modules: Odoo refuses an addons directory without any
+if [ -n "${EXTRA_ADDONS:-}" ] && compgen -G "$EXTRA_ADDONS/*/__manifest__.py" >/dev/null; then
+    extra=",$EXTRA_ADDONS"
+else
+    extra=
+fi
 mkdir -p "$log_dir"
 log=$log_dir/$db.log
 conf=$(mktemp)
 
 cat > "$conf" <<CONF
 [options]
-addons_path = $odoo/addons,$odoo/odoo/addons,$repo
+addons_path = $odoo/addons,$odoo/odoo/addons,$repo$extra
 db_host = ${PGHOST:-localhost}
 db_port = ${PGPORT:-5432}
 db_user = ${PGUSER:-odoo}
