@@ -7,11 +7,14 @@
         <field name="arch" type="xml">
             <form string="Approval Request" create="0" edit="0" delete="0">
                 <header>
-                    <button name="action_approve" string="Approve" type="object" class="btn-primary"
+                    <button name="action_open_approve" string="Approve" type="object" class="btn-primary"
                             invisible="not can_approve"/>
                     <button name="action_open_refuse" string="Refuse" type="object" invisible="not can_approve"/>
                     <button name="action_cancel" string="Withdraw" type="object"
                             invisible="state not in ('to_approve', 'approved')"/>
+                    <button name="action_unlock" string="Unlock" type="object" groups="om_approval.group_approval_manager"
+                            invisible="not is_locking or state != 'done'"
+                            confirm="The record becomes editable again. Unlock it?"/>
                     <field name="state" widget="statusbar" statusbar_visible="to_approve,approved,done"/>
                 </header>
                 <sheet>
@@ -23,6 +26,7 @@
                             </div>
                         </button>
                     </div>
+                    <widget name="web_ribbon" title="Locked" bg_color="text-bg-warning" invisible="not is_locking"/>
                     <div class="oe_title">
                         <h1><field name="name"/></h1>
                     </div>
@@ -39,12 +43,26 @@
                             <field name="approval_step" invisible="state != 'to_approve'"/>
                             <field name="approver_user_ids" widget="many2many_avatar_user"
                                    invisible="state != 'to_approve'"/>
+                            <field name="method" invisible="1"/>
+                            <field name="is_locking" invisible="1"/>
+                            <field name="lock_record" invisible="not method"/>
+                            <field name="keep_locked" invisible="not lock_record"/>
+                            <field name="unlocked_by_id" widget="many2one_avatar_user" invisible="not unlocked_by_id"/>
+                            <field name="date_unlocked" invisible="not date_unlocked"/>
                         </group>
+                    </group>
+                    <group invisible="not request_note and not attachment_ids">
+                        <field name="request_note"/>
+                        <field name="attachment_ids" widget="many2many_binary" readonly="1"
+                               invisible="not attachment_ids"/>
                     </group>
                     <field name="line_ids">
                         <list>
                             <field name="name"/>
                             <field name="approver_user_ids" widget="many2many_avatar_user"/>
+                            <field name="approval_mode" optional="hide"/>
+                            <field name="approved_user_ids" widget="many2many_avatar_user" optional="show"/>
+                            <field name="progress" optional="show"/>
                             <field name="state" widget="badge" decoration-info="state == 'pending'"
                                    decoration-success="state == 'approved'" decoration-danger="state == 'refused'"/>
                             <field name="date_pending" optional="hide"/>

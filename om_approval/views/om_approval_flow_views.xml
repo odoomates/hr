@@ -5,7 +5,7 @@
         <field name="name">approval.rule.view.list</field>
         <field name="model">approval.rule</field>
         <field name="arch" type="xml">
-            <list string="Approval Flows">
+            <list string="Approval Flows" js_class="approval_flow_list">
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
                 <field name="model_id"/>
@@ -36,6 +36,12 @@
         <field name="model">approval.rule</field>
         <field name="arch" type="xml">
             <form string="Approval Flow">
+                <header>
+                    <button name="action_open_designer" string="Open the Designer" type="object" class="btn-primary"
+                            invisible="not id"/>
+                    <button name="action_simulate" string="Test on a Record" type="object" class="btn-secondary"
+                            invisible="not id or not model_id"/>
+                </header>
                 <sheet>
                     <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
                     <div class="oe_title">
@@ -65,7 +71,28 @@
                     </group>
                     <group invisible="not model">
                         <field name="domain" widget="domain" options="{'model': 'model', 'in_dialog': True}"/>
+                        <label for="amount_field"/>
+                        <div class="o_row">
+                            <field name="amount_field" placeholder="e.g. amount_total"/>
+                            <span invisible="not amount_field">above</span>
+                            <field name="amount_min" invisible="not amount_field"/>
+                            <field name="amount_currency_id" invisible="not amount_field" groups="base.group_multi_currency"/>
+                        </div>
                         <field name="note" placeholder="Shown when the button is stopped" invisible="not button_id"/>
+                    </group>
+                    <group invisible="not button_id" string="While It Waits">
+                        <group>
+                            <field name="lock_record"/>
+                            <field name="lock_after" widget="radio" invisible="not lock_record"/>
+                        </group>
+                    </group>
+                    <group string="Notes">
+                        <group>
+                            <field name="request_note" widget="radio" options="{'horizontal': true}"
+                                   invisible="not button_id"/>
+                            <field name="approve_note" widget="radio" options="{'horizontal': true}"/>
+                            <field name="refuse_note" widget="radio" options="{'horizontal': true}"/>
+                        </group>
                     </group>
                     <field name="step_ids" context="{'default_flow_id': id}">
                         <list editable="bottom">
@@ -81,6 +108,9 @@
                             <field name="model" column_invisible="1"/>
                             <field name="domain" widget="domain" options="{'model': 'model', 'in_dialog': True}"
                                    optional="show"/>
+                            <field name="amount_min" optional="hide"/>
+                            <field name="approval_mode" optional="show"/>
+                            <field name="approval_count" optional="show" invisible="approval_mode != 'count'"/>
                             <field name="remind_days" optional="show"/>
                             <field name="escalate_days" optional="show"/>
                             <field name="escalate_type" optional="show" invisible="not escalate_days"/>
@@ -96,6 +126,10 @@
                         The steps are approved in turn. A step finding nobody is approved by the approvers when
                         nobody is found. Without a step, the approval administrators approve.
                     </div>
+                    <div class="alert alert-light border mt-3 mb-0" role="status" invisible="not summary">
+                        <div class="fw-bold mb-1">In short</div>
+                        <field name="summary" nolabel="1"/>
+                    </div>
                 </sheet>
             </form>
         </field>
@@ -107,7 +141,8 @@
         <field name="view_mode">list,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">Create an approval flow</p>
-            <p>Choose a button of any app, e.g. Confirm on the sale orders, and who approves it before it runs.</p>
+            <p>Choose a button of any app, e.g. Confirm on the sale orders, and who approves it before it runs.
+               Start from a template: the flow opens in the Approval Designer.</p>
         </field>
     </record>
 

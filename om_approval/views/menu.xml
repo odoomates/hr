@@ -3,6 +3,7 @@
 
     <menuitem id="menu_om_approval_root"
               name="Approvals"
+              web_icon="om_approval,static/description/icon.png"
               sequence="45"/>
 
     <menuitem id="menu_om_approval_to_approve"

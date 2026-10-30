@@ -97,6 +97,19 @@ class ApprovalMixin(models.AbstractModel):
             document._approval_pending_request().action_approve()
         return True
 
+    def action_approval_open_approve(self):
+        """ Approve, in a dialog asking the note when the flow asks for one. Several documents are approved at
+            once, without a note, unless a note is required. """
+        if len(self) == 1:
+            return self._approval_pending_request().action_open_approve()
+        for document in self:
+            request = document._approval_pending_request()
+            if request.flow_id.approve_note == 'required':
+                raise UserError(self.env._('%s needs a note to be approved: approve it on its own.',
+                                           document.display_name))
+            request.action_approve()
+        return True
+
     def action_approval_refuse(self, reason=False):
         for document in self:
             document._approval_pending_request().action_refuse(reason)

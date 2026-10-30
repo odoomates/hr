@@ -21,6 +21,7 @@ class ApprovalCase(TransactionCase):
             'name': 'Archive a partner',
             'model_id': cls.env['ir.model']._get_id('res.partner'),
             'button_id': cls.button.id,
+            'request_note': 'none',
             'step_ids': [Command.create({'name': 'Approvers', 'approver_type': 'group',
                                          'group_id': cls.approvers.id})],
         })
@@ -106,8 +107,8 @@ class TestButtonRule(ApprovalCase):
     def test_refuse(self):
         self.gate(self.requester)
         request = self.request_of()
-        self.env['approval.refuse'].with_user(self.approver).create(
-            {'request_id': request.id, 'reason': 'Still has open invoices'}).action_refuse()
+        self.env['approval.decide'].with_user(self.approver).create(
+            {'request_id': request.id, 'decision': 'refuse', 'note': 'Still has open invoices'}).action_confirm()
         self.assertEqual(request.state, 'refused')
         self.assertEqual(request.line_ids.note, 'Still has open invoices')
         self.assertTrue(self.partner.active)
@@ -169,7 +170,7 @@ class TestButtonRuleWebClient(HttpCase):
         button = self.env['approval.button'].create({
             'model_id': self.env['ir.model']._get_id('res.partner'), 'method': 'action_archive', 'name': 'Archive'})
         self.env['approval.rule'].create({
-            'name': 'Archive', 'model_id': button.model_id.id, 'button_id': button.id,
+            'name': 'Archive', 'model_id': button.model_id.id, 'button_id': button.id, 'request_note': 'none',
             'step_ids': [Command.create({'name': 'Approvers', 'approver_type': 'group', 'group_id': approvers.id})],
         })
         partner = self.env['res.partner'].create({'name': 'Web Customer'})
