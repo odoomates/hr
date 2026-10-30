@@ -1,6 +1,6 @@
 {
     'name': 'HR Exit',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources',
     'summary': 'Employee resignation and termination: approval, notice period, clearance checklist, exit interview',
     'author': 'Odoo Mates',

@@ -18,9 +18,12 @@ Features
   The employee is the one the record is about, else the employee of the
   requester, e.g. the salesperson confirming a sale order.
 * A step by field can also point to an employee, e.g. ``employee_id.parent_id``.
-* In a flow where the requester does not approve his own steps, the employee
-  the request is for does not approve it either, e.g. when HR asks on his
-  behalf, unless nobody else can.
+* In a flow where the requester does not approve their own steps, the
+  employee the request is for does not approve it either, e.g. when HR asks on
+  their behalf, unless nobody else can.
+* The Approval Designer shows the HR approvers among the choices of each step,
+  and the HR menu of the approval flows offers the HR template Manager, then
+  HR: the manager of the employee approves, then HR, for any HR document.
 * HR requests: employees ask HR for a document, a change of their details or
   anything else, in My HR > My Requests. The request goes to their manager,
   then to the HR officers.
@@ -37,7 +40,8 @@ Configuration
 =============
 
 * HR managers set who approves the HR documents in Employees > Configuration >
-  Requests > Approval Flows, and the categories in Request Categories.
+  Requests > Approval Flows, and the categories in Request Categories. A flow
+  opens in the Approval Designer; New starts one from a template.
 
 Usage
 =====

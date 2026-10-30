@@ -332,7 +332,7 @@
                     <button name="action_accept" string="Accept" type="object" class="btn-primary"
                             invisible="not can_accept"/>
                     <button name="action_decline" string="Decline" type="object" invisible="not can_accept"/>
-                    <button name="action_approval_approve" string="Approve" type="object" class="btn-primary"
+                    <button name="action_approval_open_approve" string="Approve" type="object" class="btn-primary"
                             invisible="not can_approve"/>
                     <button name="action_approval_open_refuse" string="Refuse" type="object"
                             invisible="not can_approve"/>

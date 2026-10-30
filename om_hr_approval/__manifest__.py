@@ -1,6 +1,6 @@
 {
     'name': 'HR Approvals',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.1.0',
     'category': 'Human Resources',
     'summary': 'Approvals by the manager, the department manager, the coach or HR, and HR requests of the employees',
     'author': 'Odoo Mates',

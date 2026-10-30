@@ -58,9 +58,11 @@ class TestHrRequest(TransactionCase):
         request = self.new_request()
         request.action_approval_submit()
         wizard_action = request.with_user(self.manager_user).action_approval_open_refuse()
-        self.env['approval.refuse'].with_user(self.manager_user).create({
-            'request_id': wizard_action['context']['default_request_id'], 'reason': 'Ask the bank first'},
-        ).action_refuse()
+        self.assertEqual(wizard_action['res_model'], 'approval.decide')
+        self.env['approval.decide'].with_user(self.manager_user).create({
+            'request_id': wizard_action['context']['default_request_id'], 'decision': 'refuse',
+            'note': 'Ask the bank first'},
+        ).action_confirm()
         self.assertEqual(request.approval_state, 'refused')
         request.action_approval_reset()
         self.assertEqual(request.approval_state, 'draft')
@@ -97,7 +99,7 @@ class TestHrRequest(TransactionCase):
         button = self.env['approval.button'].create({
             'model_id': self.env['ir.model']._get_id('res.partner'), 'method': 'action_archive', 'name': 'Archive'})
         self.env['approval.rule'].create({
-            'name': 'Archive', 'model_id': button.model_id.id, 'button_id': button.id,
+            'name': 'Archive', 'model_id': button.model_id.id, 'button_id': button.id, 'request_note': 'none',
             'step_ids': [Command.create({'name': 'Manager', 'approver_type': 'manager'})]})
         self.employee_user.group_ids = [Command.link(self.env.ref('base.group_partner_manager').id)]
         partner = self.env['res.partner'].create({'name': 'Customer'})

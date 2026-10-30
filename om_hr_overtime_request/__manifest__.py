@@ -1,6 +1,6 @@
 {
     'name': 'Overtime Pre-Approval',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources/Attendances',
     'summary': 'Authorise overtime in advance; overtime beyond it waits for the manager to accept or reject',
     'author': 'Odoo Mates',

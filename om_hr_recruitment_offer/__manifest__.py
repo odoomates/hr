@@ -1,6 +1,6 @@
 {
     'name': 'HR Job Offers',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources',
     'summary': 'Job offers approved, signed by the company and the candidate, and turned into the contract',
     'author': 'Odoo Mates',

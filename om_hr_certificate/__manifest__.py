@@ -1,6 +1,6 @@
 {
     'name': 'HR Certificates',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources',
     'summary': 'Salary, employment and experience certificates and NOC: requested by the employees, approved, '
                'printed on the letterhead',

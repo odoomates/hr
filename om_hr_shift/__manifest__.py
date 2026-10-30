@@ -1,6 +1,6 @@
 {
     'name': 'Shifts',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources/Shifts',
     'summary': 'Shift planning and rosters: shift templates, roster board, rotations, open shifts, shift swaps, '
                'rest checks',
