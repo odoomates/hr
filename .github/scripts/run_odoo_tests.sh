@@ -10,7 +10,8 @@
 #   PGHOST, PGPORT, PGUSER, PGPASSWORD  the PostgreSQL server
 #   LOG_DIR    where the log is written (default: a temporary folder)
 #   EXTRA_ADDONS  the other addons the modules depend on, after this repository: the odooapps repository for
-#                 Approvals (om_approval) (default: ../odooapps next to the repository, when it is there)
+#                 Approvals, Document Expiry, File Layouts, Print Templates and Sign (default: ../odooapps next
+#                 to the repository, when it is there)
 set -uo pipefail
 
 db=${1:?database}

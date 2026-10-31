@@ -42,7 +42,8 @@ Usage
 Dependencies
 ============
 
-* Recruitment (``hr_recruitment``), ``om_sign``, ``om_approval``.
+* Recruitment (``hr_recruitment``), ``om_sign``, Sign: Print Templates (``om_sign_print_template``),
+  ``om_approval``.
 
 Support
 =======

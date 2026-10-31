@@ -24,6 +24,7 @@
         'om_print_template',
         'om_print_template_document',
         'om_sign',
+        'om_sign_print_template',
         'om_hr_certificate',
         'om_hr_appraisal',
         'om_hr_appraisal_survey',

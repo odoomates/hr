@@ -13,8 +13,10 @@ from the payslips, install by themselves once both sides are there.
 ## Requirements
 
 - Odoo 20.0 Community Edition. No Enterprise module and no external Python library.
-- Approvals (`om_approval`), the approval flows for any app the HR approvals build on, from the
-  [Odoo Mates apps](https://github.com/odoomates/odooapps) (free, LGPL-3).
+- The apps for any business the HR modules build on, from the
+  [Odoo Mates apps](https://github.com/odoomates/odooapps) (free, LGPL-3): Approvals (`om_approval`), Document
+  Expiry (`om_document`), File Layouts (`om_file_layout`), Print Templates (`om_print_template`,
+  `om_print_template_document`) and Sign (`om_sign`, `om_sign_print_template`).
 - Accounting is optional: the accounting links (payroll entries, loans in accounting, salary payments) install
   when Accounting is there.
 
@@ -27,7 +29,7 @@ from the payslips, install by themselves once both sides are there.
 | `om_hr_payroll` | Salary structures, rules, components, parameters and brackets; payslips and batches; pay on the working schedule or on work entries, attendances and time off, monthly or hourly; retro pay; My Payslips for the employees |
 | `om_hr_payroll_account` | Journal entries of the payslips and the salary payments (installs Accounting) |
 | `om_hr_payroll_adjustment` | Bonuses, commissions, fines, court deductions: once, for some months or until a total, fixed or a percentage, each type on its own payslip line |
-| `om_hr_payroll_export`, `om_file_layout` | Salary transfer files in the layout of your bank (CSV, fixed width, Excel), e.g. WPS |
+| `om_hr_payroll_export` | Salary transfer files in the layout of your bank (CSV, fixed width, Excel), e.g. WPS; on File Layouts (`om_file_layout`, in [odooapps](https://github.com/odoomates/odooapps)) |
 | `om_hr_overtime_payroll` | Validated overtime paid at the rate of each time rule |
 | `om_hr_shift_payroll` | Shift allowances, e.g. a night shift allowance |
 | `om_hr_lateness_payroll` | Lateness penalties of the month taken off the payslips |
@@ -57,12 +59,11 @@ from the payslips, install by themselves once both sides are there.
 
 | Module | What it does |
 |---|---|
-| `om_document`, `om_hr_document` | Documents with expiry dates and reminders: passports, visas, permits, IDs |
-| `om_print_template`, `om_hr_certificate` | Certificates and letters from templates: salary, employment, experience, NOC, with an optional verification QR code |
-| `om_sign` | Prints and PDF files signed from an email link, in order, with a signature certificate |
+| `om_hr_document` | Documents with expiry dates and reminders: passports, visas, permits, IDs; on Document Expiry (`om_document`, in [odooapps](https://github.com/odoomates/odooapps)) |
+| `om_hr_certificate` | Certificates and letters from templates: salary, employment, experience, NOC, with an optional verification QR code; on Print Templates (`om_print_template`, in [odooapps](https://github.com/odoomates/odooapps)) |
 | `om_hr_recruitment_offer` | Job offers approved, signed by the company and the candidate, turned into the contract (installs Recruitment) |
 | `om_hr_preboarding` and `om_hr_preboarding_*` | New hires get ready before day one: details reviewed by HR, bank account, documents, policies, buddy |
-| `om_hr_sign` | Contracts signed by the employee and the manager; policies read and agreed, or signed, version after version |
+| `om_hr_sign` | Contracts signed by the employee and the manager; policies read and agreed, or signed, version after version; on Sign (`om_sign`, `om_sign_print_template`, in [odooapps](https://github.com/odoomates/odooapps)) |
 | `om_hr_approval` | HR approvers (manager, department, coach, HR) in the approval flows, and HR requests; on Approvals (`om_approval`, in [odooapps](https://github.com/odoomates/odooapps)) |
 
 ### Self-service and dashboards
@@ -75,8 +76,8 @@ from the payslips, install by themselves once both sides are there.
 
 ## Installation
 
-1. Clone the branch of your Odoo version of this repository and of the Odoo Mates apps, which hold Approvals
-   (`om_approval`), into folders of your addons path:
+1. Clone the branch of your Odoo version of this repository and of the Odoo Mates apps, which hold Approvals,
+   Document Expiry, File Layouts, Print Templates and Sign, into folders of your addons path:
    `git clone -b 20.0 https://github.com/odoomates/hr.git`
    `git clone -b 20.0 https://github.com/odoomates/odooapps.git`
 2. Update the Apps list and install the modules you need. Installing **Odoo 20 HRMS - Odoo Mates** itself

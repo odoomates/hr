@@ -7,7 +7,7 @@
     'maintainer': 'Odoo Mates',
     'support': 'odoomates@gmail.com',
     'license': 'LGPL-3',
-    'depends': ['om_sign', 'om_hr_base'],
+    'depends': ['om_sign', 'om_sign_print_template', 'om_hr_base'],
     'data': [
         'security/hr_sign_security.xml',
         'security/ir.access.csv',

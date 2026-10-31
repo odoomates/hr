@@ -45,7 +45,7 @@ Usage
 Dependencies
 ============
 
-* ``om_sign``, ``om_hr_base``.
+* Sign (``om_sign``), Sign: Print Templates (``om_sign_print_template``), ``om_hr_base``.
 
 Support
 =======

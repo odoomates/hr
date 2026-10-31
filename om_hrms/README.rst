@@ -59,17 +59,20 @@ What it installs:
   a scheme of days of pay per year of service and reasons of leaving.
 * ``om_hr_exit_payroll`` HR Exit in Payroll: the final settlement payslip,
   with the unused time off paid out, the gratuity and the loans still due.
-* ``om_document`` Document Expiry: documents with an expiry date kept on any
-  record, reminders before they expire, and their renewal.
+* ``om_document`` Document Expiry, from the Odoo Mates apps: documents with an
+  expiry date kept on any record, reminders before they expire, and their
+  renewal.
 * ``om_hr_document`` HR Documents: the passports, visas, permits and IDs of
   the employees, on a Documents tab where files are dropped on cards.
-* ``om_print_template`` Print Templates: certificates and letters written in
-  the editor and printed from the Print menu of any record, numbered, kept as
-  printed, with an optional verification QR code.
-* ``om_print_template_document`` Print Templates: Documents: files a print as
-  an expiring document of the record, e.g. an NOC valid for 30 days.
-* ``om_sign`` Sign: prints and PDF files signed from an email link, in order,
-  with a signature certificate.
+* ``om_print_template`` Print Templates, from the Odoo Mates apps: certificates
+  and letters written in the editor and printed from the Print menu of any
+  record, numbered, kept as printed, with an optional verification QR code.
+* ``om_print_template_document`` Print Templates: Documents, from the Odoo
+  Mates apps: files a print as an expiring document of the record, e.g. an NOC
+  valid for 30 days.
+* ``om_sign`` Sign, from the Odoo Mates apps: PDF files and templates signed
+  from an email link, in order, with a signature certificate; with
+  ``om_sign_print_template`` Sign: Print Templates, the prints signed too.
 * ``om_hr_sign`` HR Sign: documents signed by the employee and the manager, and
   the company policies read and agreed or signed, version after version.
 * ``om_hr_recruitment_offer`` HR Job Offers: offers made from the applicant,
@@ -103,8 +106,9 @@ What it installs:
   assets of the employee are back.
 * ``om_hr_asset_payroll`` HR Assets in Payroll: charges for assets lost or
   damaged deducted from the payslips.
-* ``om_file_layout`` File Layouts: CSV, fixed width and Excel files designed
-  column by column and exported from the Action menu of any record.
+* ``om_file_layout`` File Layouts, from the Odoo Mates apps: CSV, fixed width
+  and Excel files designed column by column and exported from the Action menu
+  of any record.
 * ``om_hr_payroll_export`` Payroll Bank Files: the salary transfers of the
   payslips, split by the salary distribution, in the layout of your bank.
 * ``om_hr_payroll_adjustment`` Payroll Adjustments: bonuses, commissions,
@@ -184,8 +188,11 @@ Dependencies
 
 * Odoo 20.0 Community Edition.
 * No external Python library and no paid Odoo Enterprise module.
-* Approvals (``om_approval``), from the Odoo Mates apps
-  (https://github.com/odoomates/odooapps), branch 20.0, in the addons path.
+* The Odoo Mates apps (https://github.com/odoomates/odooapps), branch 20.0, in
+  the addons path: Approvals (``om_approval``), Document Expiry
+  (``om_document``), File Layouts (``om_file_layout``), Print Templates
+  (``om_print_template``, ``om_print_template_document``) and Sign
+  (``om_sign``, ``om_sign_print_template``).
 * The Odoo Mates HR modules listed above, and through them the Community apps
   Employees, Time Off, Attendances, Maintenance, Work Entries, Portal,
   Dashboards and Automation Rules.
