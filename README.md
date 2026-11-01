@@ -1,6 +1,11 @@
 # Odoo Mates HR
 
 [![Tests](https://github.com/odoomates/hr/actions/workflows/tests.yml/badge.svg?branch=20.0)](https://github.com/odoomates/hr/actions/workflows/tests.yml)
+[![License: LGPL-3](https://img.shields.io/badge/license-LGPL--3-blue.svg)](LICENSE)
+[![Stars](https://img.shields.io/github/stars/odoomates/hr?style=flat)](https://github.com/odoomates/hr/stargazers)
+[![Forks](https://img.shields.io/github/forks/odoomates/hr?style=flat)](https://github.com/odoomates/hr/network/members)
+[![Contributors](https://img.shields.io/github/contributors/odoomates/hr)](https://github.com/odoomates/hr/graphs/contributors)
+[![Last commit](https://img.shields.io/github/last-commit/odoomates/hr/20.0)](https://github.com/odoomates/hr/commits/20.0)
 
 The HR suite of Odoo Mates for **Odoo 20 Community**: payroll, time and attendance, shifts, employee
 self-service and the whole employee lifecycle, with or without Accounting.
@@ -110,6 +115,19 @@ the apps into your language, improve the documentation. New to it? Ask, and we g
 
 If you love it, let us know: star the repository and rate the apps on the Odoo App Store.
 
+New here? Look for issues labelled
+[good first issue](https://github.com/odoomates/hr/labels/good%20first%20issue).
+
+## Contributors
+
+Thank you to everyone who has contributed to these apps.
+
+[![Contributors](https://contrib.rocks/image?repo=odoomates/hr)](https://github.com/odoomates/hr/graphs/contributors)
+
+## Star history
+
+[![Star history](https://api.star-history.com/svg?repos=odoomates/hr&type=Date)](https://star-history.com/#odoomates/hr&Date)
+
 ## Support
 
-Always your Odoo Mates — odoomates@gmail.com. License: LGPL-3.
+Always your Odoo Mates — odoomates@gmail.com. License: [LGPL-3](LICENSE).
