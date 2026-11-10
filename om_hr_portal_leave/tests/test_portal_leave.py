@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 
 from odoo.tests import tagged
 
@@ -25,6 +25,7 @@ class TestPortalLeave(HrPortalCase):
             'request_date_from': date(2026, 11, 2), 'request_date_to': date(2026, 11, 2)})
 
     def test_balance_request_and_withdraw(self):
+        monday = date.today() + timedelta(days=7 - date.today().weekday())
         self.login_employee()
         page = self.get('/my/hr/time-off')
         self.assertIn('Portal Annual Leave', page.text)
@@ -32,7 +33,8 @@ class TestPortalLeave(HrPortalCase):
 
         response = self.url_open('/my/hr/time-off/new', data={
             'csrf_token': self.csrf_token(), 'work_entry_type_id': self.annual.id,
-            'date_from': '2026-11-09', 'date_to': '2026-11-10', 'name': 'Family visit'}, allow_redirects=False)
+            'date_from': str(monday), 'date_to': str(monday + timedelta(days=1)),
+            'name': 'Family visit'}, allow_redirects=False)
         self.assertEqual(response.status_code, 303)
         leave = self.env['hr.leave'].search([('employee_id', '=', self.employee.id)])
         self.assertEqual((leave.state, leave.number_of_days, leave.name), ('confirm', 2, 'Family visit'))
