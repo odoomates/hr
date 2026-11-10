@@ -11,6 +11,8 @@ class TestPortalLeave(HrPortalCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        # the demo data puts a mandatory day a week ahead, where the requests of the tests fall
+        cls.env['hr.leave.mandatory.day'].search([]).unlink()
         cls.annual = cls.env['hr.work.entry.type'].create({
             'name': 'Portal Annual Leave', 'code': 'PORTALANNUAL', 'count_as': 'absence', 'requires_allocation': True,
             'time_off_selectable': True, 'request_unit': 'day', 'unit_of_measure': 'day'})
