@@ -149,17 +149,30 @@ first line is the command (with its slash):
 
 - `/mergebot r+` merges it as soon as CI is green; if your branch is behind the
   version branch, it is rebased first and CI runs again on the rebased commits
-  before the merge;
-- `/mergebot r+ minor` (or `major`, `patch`) first raises the version of the
-  modules it changes, in one `[REL]` commit on your branch, then merges it;
+  before the merge. Once merged, the mergebot raises the patch version of the
+  modules it changes, in one `[BOT] post-merge updates` commit on the version branch. A new module,
+  or one whose version your pull request changes, keeps its version;
+- `/mergebot r+ minor` (or `major`) does the same with a minor or major version;
+- `/mergebot r+ nobump` does the same without raising the version;
+- `/mergebot r+ skipci` merges it now, without waiting for CI: only for an admin of
+  the repository, when a failing check has nothing to do with the change;
 - `/mergebot rebase` rebases your branch on the version branch;
+- `/mergebot squash` makes your commits one commit, with the message of the first one;
 - `/mergebot r+ fw+` merges it, then forward-ports it: the mergebot
   cherry-picks its commits on every higher version branch (for 15.0: 16.0 to
   20.0) and opens one pull request per branch; each one is merged by a maintainer
-  with `/mergebot r+` once its CI is green;
-- `/mergebot r-` cancels a merge waiting for CI.
+  with `/mergebot r+` once its CI is green. Without conflicts, it may hold a last commit
+  `[MIG] *: mechanical rewrites` for that version: read it like the rest;
+- `/mergebot r+ fw+ 19.0` (or `fw+ upto 19.0`) forward-ports it up to that branch
+  included: for a module not on the higher branches, or a fix they do not need;
+- `/mergebot r-` cancels a merge waiting for CI, or for a linked pull request.
 
-Once merged, the mergebot thanks you on the pull request.
+A pull request that goes with one in another repository says so with a line in its
+description: `Linked: owner/repo#12`. `/mergebot r+` then waits for `/mergebot r+`
+on the other one, and the second one merges both.
+
+A wrong command is declined with a comment, and nothing is done. Once merged, the
+mergebot thanks you on the pull request.
 
 ## Translations
 
