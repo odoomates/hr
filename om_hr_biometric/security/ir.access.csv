@@ -23,5 +23,5 @@ access_template_manager,hr.biometric.template.manager,hr.biometric.template,hr_a
 template_company_rule,Biometric templates: multi-company,hr.biometric.template,,crud,"[('company_id', 'in', company_ids)]"
 access_copy_user,hr.biometric.copy,hr.biometric.copy,hr_attendance.group_hr_attendance_user,crud,
 access_enroll_user,hr.biometric.enroll,hr.biometric.enroll,hr_attendance.group_hr_attendance_user,crud,
-access_absence_wizard_user,hr.biometric.absence.wizard,hr.biometric.absence.wizard,hr_attendance.group_hr_attendance_user,crud,
-access_absence_user,hr.biometric.absence,hr.biometric.absence,hr_attendance.group_hr_attendance_user,crud,
+access_status_wizard_user,hr.biometric.status.wizard,hr.biometric.status.wizard,hr_attendance.group_hr_attendance_user,crud,
+access_day_user,hr.biometric.day,hr.biometric.day,hr_attendance.group_hr_attendance_user,crud,

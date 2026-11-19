@@ -18,6 +18,55 @@
         </field>
     </record>
 
+    <record id="hr_biometric_device_view_kanban" model="ir.ui.view">
+        <field name="name">hr.biometric.device.kanban</field>
+        <field name="model">hr.biometric.device</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="connection_state"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex align-items-baseline">
+                            <field name="name" class="fw-bold fs-5 me-auto"/>
+                            <field name="connection_state" widget="badge"
+                                   decoration-success="connection_state == 'online'"
+                                   decoration-danger="connection_state == 'offline'"/>
+                        </div>
+                        <div class="text-muted small">
+                            <field name="protocol"/> &#183; <field name="serial_number"/>
+                        </div>
+                        <div class="text-muted small" invisible="not last_contact">
+                            Last contact <field name="last_contact" widget="relative_date"/>
+                        </div>
+                        <div class="row g-0 mt-2 text-center">
+                            <div class="col-3">
+                                <div class="fw-bold fs-5"><field name="today_log_count"/></div>
+                                <div class="small text-muted">Punches 24 h</div>
+                            </div>
+                            <div class="col-3">
+                                <div class="fw-bold fs-5"><field name="user_count"/></div>
+                                <div class="small text-muted">Users</div>
+                            </div>
+                            <div class="col-3">
+                                <div class="fw-bold fs-5"><field name="linked_user_count"/></div>
+                                <div class="small text-muted">Linked</div>
+                            </div>
+                            <div class="col-3">
+                                <div class="fw-bold fs-5" t-att-class="record.unlinked_user_count.raw_value ? 'text-warning' : ''">
+                                    <field name="unlinked_user_count"/>
+                                </div>
+                                <div class="small text-muted">Unlinked</div>
+                            </div>
+                        </div>
+                        <div class="small text-danger mt-1" invisible="not error_count">
+                            <field name="error_count"/> punches in error
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
     <record id="hr_biometric_device_view_form" model="ir.ui.view">
         <field name="name">hr.biometric.device.form</field>
         <field name="model">hr.biometric.device</field>
@@ -27,6 +76,8 @@
                     <button name="action_open_download" type="object" string="Download Punches" class="btn-primary"/>
                     <button name="action_open_export" type="object" string="Send Employees"/>
                     <button name="action_query_users" type="object" string="Download Users"/>
+                    <button name="action_map_employees" type="object" string="Map Employees"
+                            invisible="not unlinked_user_count"/>
                     <button name="action_query_info" type="object" string="Device Information"/>
                     <button name="action_set_time" type="object" string="Set Time"
                             groups="hr_attendance.group_hr_attendance_manager"/>
@@ -56,6 +107,45 @@
                         </button>
                     </div>
                     <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="alert alert-info" role="status" invisible="setup_done or not id">
+                        <h5 class="mb-2">Set up this device</h5>
+                        <div>
+                            <span invisible="connection_state != 'online'">&#10003;</span>
+                            <span invisible="connection_state == 'online'">1.</span>
+                            Reach the device: <span invisible="protocol != 'adms'">set the server address of Odoo in
+                            its Cloud Server Setting (see ADMS Setup below)</span><span invisible="protocol == 'adms'">
+                            Test Connection</span>.
+                        </div>
+                        <div>
+                            <span invisible="not device_model and not firmware_version">&#10003;</span>
+                            <span invisible="device_model or firmware_version">2.</span>
+                            Read its information:
+                            <button name="action_query_info" type="object" string="Device Information"
+                                    class="btn btn-link p-0 align-baseline"/>.
+                        </div>
+                        <div>
+                            <span invisible="not user_count or unlinked_user_count">&#10003;</span>
+                            <span invisible="user_count and not unlinked_user_count">3.</span>
+                            Link the users to the employees:
+                            <button name="action_query_users" type="object" string="Download Users"
+                                    class="btn btn-link p-0 align-baseline"/>, then
+                            <button name="action_map_employees" type="object" string="Map Employees"
+                                    class="btn btn-link p-0 align-baseline"/>, or
+                            <button name="action_open_export" type="object" string="Send Employees"
+                                    class="btn btn-link p-0 align-baseline"/>.
+                        </div>
+                        <div>
+                            <span invisible="not log_count">&#10003;</span>
+                            <span invisible="log_count">4.</span>
+                            Receive the first punches: punch on the device, or
+                            <button name="action_open_download" type="object" string="Download Punches"
+                                    class="btn btn-link p-0 align-baseline"/>.
+                        </div>
+                        <div class="mt-2">
+                            <button name="action_setup_done" type="object" string="The device is ready"
+                                    class="btn btn-secondary btn-sm"/>
+                        </div>
+                    </div>
                     <div class="oe_title">
                         <label for="name"/>
                         <h1><field name="name" placeholder="e.g. Main Entrance"/></h1>
@@ -74,6 +164,8 @@
                             <field name="attendance_mode"/>
                             <field name="duplicate_window"/>
                             <field name="last_contact"/>
+                            <field name="responsible_id" widget="many2one_avatar_user"/>
+                            <field name="offline_alert"/>
                             <field name="company_id" groups="base.group_multi_company"/>
                             <field name="active" invisible="1"/>
                         </group>
@@ -168,7 +260,7 @@
     <record id="hr_biometric_device_action" model="ir.actions.act_window">
         <field name="name">Biometric Devices</field>
         <field name="res_model">hr.biometric.device</field>
-        <field name="view_mode">list,form</field>
+        <field name="view_mode">kanban,list,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">Add a biometric device</p>
             <p>Its punches become the check-ins and check-outs of the employees.</p>
