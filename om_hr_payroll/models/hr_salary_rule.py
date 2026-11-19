@@ -27,7 +27,7 @@ class HrPayrollStructure(models.Model):
 
     @api.constrains('parent_id')
     def _check_parent_id(self):
-        if not self._check_recursion():
+        if self._has_cycle():
             raise ValidationError(_('You cannot create a recursive salary structure.'))
 
     @api.returns('self', lambda value: value.id)
@@ -78,7 +78,7 @@ class HrSalaryRuleCategory(models.Model):
 
     @api.constrains('parent_id')
     def _check_parent_id(self):
-        if not self._check_recursion():
+        if self._has_cycle():
             raise ValidationError(_('Error! You cannot create recursive hierarchy of Salary Rule Category.'))
 
 
@@ -164,7 +164,7 @@ class HrSalaryRule(models.Model):
 
     @api.constrains('parent_rule_id')
     def _check_parent_rule_id(self):
-        if not self._check_recursion(parent='parent_rule_id'):
+        if self._has_cycle('parent_rule_id'):
             raise ValidationError(_('Error! You cannot create recursive hierarchy of Salary Rules.'))
 
     def _recursive_search_of_rules(self):
