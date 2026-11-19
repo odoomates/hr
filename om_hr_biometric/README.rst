@@ -1,6 +1,6 @@
-====================
-Biometric Attendance
-====================
+==============================================================
+Biometric Attendance Machine - ZKTeco, eSSL, Fingerprint, Face
+==============================================================
 
 For Odoo 15 Community, by `Odoo Mates <https://github.com/odoomates/hr>`_.
 
@@ -39,10 +39,29 @@ Features
   devices are made again, those entered by hand are kept.
 * **Daily Biometric Attendance**: first and last punch of each employee per
   day; the punches by device, day and kind of verification.
-* **Absences**: the working days without any attendance, from the working
-  schedule of each employee, less the time off and the public holidays.
-* **Biometric Device Health**: the devices offline, their unknown users,
-  punches in error and failed commands.
+* **Attendance Status**: each day of each employee against the working
+  schedule, the time off and the public holidays: on time, late, left early,
+  late and left early, missing check-out, absent, on time off, worked on a day
+  off, with a tolerance in minutes. In list, pivot and graph; *Absences* shows
+  the absent days only.
+* **Monthly Attendance Sheet** in PDF (A4 landscape): one line per employee,
+  one letter per day, with the days worked, absences, late arrivals and hours.
+* **Today**: a board of who is at work, late, not arrived yet or absent.
+* **Devices dashboard**: each device online or not, its last contact, punches
+  of the last 24 hours, users linked to an employee or not. *Biometric Device
+  Health* lists the unknown users, punches in error and failed commands.
+* **Offline alerts**: when a device stops calling (30 minutes by default), its
+  responsible gets an activity, notified by email or in Odoo as they chose; it
+  is marked done by itself when the device is back.
+* A **setup checklist** on each new device: reach it, read its information,
+  link its users, receive the first punches.
+* Device users are linked to the employees by their *Biometric ID*, else by
+  their name, the same without accents, or the start of the name (the devices
+  keep 24 characters); a name shared by several employees is left to link by
+  hand. *Map Employees* links those left.
+* Employees are sent to the devices with the fingerprints they enrolled on
+  another device, so they do not enroll again.
+* Device commands done or failed are deleted after 180 days.
 * Attendances from the devices show their check-in and check-out device;
   extra hours and the payslips read them like any attendance.
 * Multi-company: each device and its punches belong to a company.
@@ -55,7 +74,7 @@ Two ways to connect a device, chosen device by device:
 * **ADMS (push)**, in this module: the device sends its punches to Odoo over
   HTTP. No fixed IP address, no port to open. Look for *Cloud Server Setting*
   (or *ADMS*) in Menu > Communication on the device.
-* **TCP (pull)**, with *Biometric Attendance: TCP* (``om_hr_biometric_zk``):
+* **TCP (pull)**, with *Biometric Attendance Machine - TCP/UDP* (``om_hr_biometric_zk``):
   Odoo reads the device at its IP address on port 4370. For the devices
   without ADMS, or on a network they cannot leave.
 
@@ -80,7 +99,7 @@ Addresses*): ADMS has no password of its own.
 A device over TCP
 -----------------
 
-#. Install *Biometric Attendance: TCP* (``om_hr_biometric_zk``).
+#. Install *Biometric Attendance Machine - TCP/UDP* (``om_hr_biometric_zk``).
 #. On the device: a fixed IP address (Menu > Communication > Ethernet) and the
    communication key (Menu > Communication > PC Connection, 0 when none).
 #. The Odoo server must reach the device on port 4370: same network, VPN or a
@@ -96,7 +115,9 @@ Then, for all the devices
    form, HR Settings tab), or send them from Odoo with *Send Employees*: those
    without one get the next free number.
 #. Attendances > Configuration, Biometric Devices: the maximum
-   shift, and whether Odoo keeps the biometric templates (off by default).
+   shift, the tolerance of the attendance status, when a device is offline,
+   and whether Odoo keeps the biometric templates (off by default).
+#. On each device: its *Responsible* for the offline alerts.
 
 Usage
 =====
