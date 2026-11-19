@@ -46,6 +46,9 @@ from the payslips, install by themselves once both sides are there.
 | `om_hr_shift` | Shift templates, a roster board, rotations, open shifts, shift swaps and availability, with checks for time off, rest and weekly hours; published shifts become the working schedule |
 | `om_hr_lateness` | Late arrivals and early departures against the schedule, grace minutes, a penalty matrix, warnings and excuses |
 | `om_hr_overtime_request` | Overtime authorised in advance; beyond it, the manager accepts or rejects it |
+| `om_hr_biometric` | ZKTeco and eSSL biometric devices: punches pushed to Odoo (ADMS), check-in and check-out modes, device users, fingerprints, daily and absence reports |
+| `om_hr_biometric_zk` | The same devices read by Odoo over the network (TCP/UDP port 4370), for devices without ADMS |
+| `om_hr_biometric_shift` | Punches read against the published shifts, so a missed punch does not turn the day around (bridge) |
 
 ### Employee lifecycle
 
@@ -77,7 +80,7 @@ from the payslips, install by themselves once both sides are there.
 |---|---|
 | `om_hr_base` | My HR for the employees: their payslips, loans, documents, shifts, requests and the celebrations of the month |
 | `om_hr_portal` and `om_hr_portal_*` | The same on the website portal, for employees without a backend user |
-| `om_spreadsheet_hr*` | Workforce, Payroll, Time Off and Attendance, Talent and Compliance dashboards |
+| `om_spreadsheet_hr*` | Workforce, Payroll, Time Off and Attendance, Talent, Compliance and Biometric Attendance dashboards |
 
 ## Installation
 
