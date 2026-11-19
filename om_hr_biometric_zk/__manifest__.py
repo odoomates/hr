@@ -1,5 +1,5 @@
 {
-    'name': 'Biometric Attendance: TCP',
+    'name': 'Biometric Attendance Machine - TCP/UDP',
     'version': '15.0.1.0.0',
     'category': 'Human Resources/Attendances',
     'summary': 'ZKTeco and eSSL devices read by Odoo over the network (TCP/UDP port 4370): punches, users, clock',

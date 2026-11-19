@@ -32,6 +32,10 @@ class HrBiometricDevice(models.Model):
     zk_auto_download = fields.Boolean(string='Download Every 10 Minutes', default=True)
     zk_last_log_time = fields.Datetime(string='Last Punch Downloaded', readonly=True, copy=False)
     zk_error = fields.Char(string='Last Error', readonly=True, copy=False)
+    zk_clear_above = fields.Integer(
+        string='Clear Punches Above', default=0,
+        help='When the device holds more punches than this, the scheduled download stores them all, then clears '
+             'the device, which stays fast. 0: never.')
 
     def _zk_uninstalled(self):
         """ The TCP devices left when this module is uninstalled: archived. In SQL, the columns of this module being
@@ -85,6 +89,11 @@ class HrBiometricDevice(models.Model):
             raise UserError(_('%(device)s: %(error)s', device=self.name, error=error)) from error
         if self.zk_error:
             self.zk_error = False
+
+    def _is_offline(self):
+        if self.protocol == 'zk':
+            return bool(self.zk_error)
+        return super()._is_offline()
 
     # Commands: run at once on a TCP device
 
@@ -188,13 +197,31 @@ class HrBiometricDevice(models.Model):
 
     def _zk_download(self, start=None, end=None):
         """ Read the punches of the device and process the new ones: from `start` to `end` (UTC), or those from
-            the last one received on. :return: the new punches """
+            the last one received on. A device holding more punches than its limit is then cleared: every punch it
+            held is stored first, and the device is locked from the reading to the clearing so that none is lost.
+            :return: the new punches """
         self.ensure_one()
+        clear = bool(self.zk_clear_above) and not start and not end
         with self._zk_session() as client:
-            punches = client.get_attendance()
+            if clear:
+                with client.disabled():
+                    punches = client.get_attendance()
+                    logs = self._zk_store(punches)
+                    if len(punches) > self.zk_clear_above:
+                        client.clear_attendance()
+                        self.message_post(body=_(
+                            '%s punches deleted from the device, after they were stored.', len(punches)))
+            else:
+                since = start or (self.zk_last_log_time and self.zk_last_log_time - OVERLAP)
+                logs = self._zk_store(client.get_attendance(), since, end)
             info = client.get_info()
         self._touch(info)
-        since = start or (self.zk_last_log_time and self.zk_last_log_time - OVERLAP)
+        logs._process()
+        return logs
+
+    def _zk_store(self, punches, since=None, end=None):
+        """ Store the punches read from the device not received yet, from `since` to `end` (UTC) if given.
+            :return: the new punches """
         rows = []
         for punch in punches:
             timestamp = self._to_utc(punch.timestamp)
@@ -205,7 +232,6 @@ class HrBiometricDevice(models.Model):
         logs = self.env['hr.biometric.log']._create_punches(self, rows, 'zk')
         if logs and (not self.zk_last_log_time or max(logs.mapped('timestamp')) > self.zk_last_log_time):
             self.zk_last_log_time = max(logs.mapped('timestamp'))
-        logs._process()
         return logs
 
     def _zk_lock(self):
