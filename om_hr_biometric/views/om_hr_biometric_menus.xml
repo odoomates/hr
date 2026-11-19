@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- the menus of Attendances are all actions in 18.0: the biometric menus get one of their own -->
+    <menuitem id="menu_biometric_root" name="Biometric" parent="hr_attendance.menu_hr_attendance_root" sequence="50"
+              groups="hr_attendance.group_hr_attendance_manager"/>
+    <menuitem id="menu_biometric_log" name="Punches" parent="menu_biometric_root"
+              action="hr_biometric_log_action" sequence="1"/>
+    <menuitem id="menu_biometric_device_user" name="Device Users" parent="menu_biometric_root"
+              action="hr_biometric_device_user_action" sequence="2"/>
+    <menuitem id="menu_biometric_reprocess" name="Process Again" parent="menu_biometric_root"
+              action="hr_biometric_reprocess_action" sequence="3"/>
+    <menuitem id="menu_biometric_reporting" name="Reporting" parent="menu_biometric_root" sequence="10"/>
+    <menuitem id="menu_biometric_daily" name="Daily Biometric Attendance" parent="menu_biometric_reporting"
+              action="hr_biometric_daily_action" sequence="1"/>
+    <menuitem id="menu_biometric_absence" name="Absences" parent="menu_biometric_reporting"
+              action="hr_biometric_absence_wizard_action" sequence="2"/>
+    <menuitem id="menu_biometric_device_health" name="Device Health" parent="menu_biometric_reporting"
+              action="hr_biometric_device_action_health" sequence="3"/>
+    <menuitem id="menu_biometric_configuration" name="Configuration" parent="menu_biometric_root" sequence="20"/>
+    <menuitem id="menu_biometric_device" name="Devices" parent="menu_biometric_configuration"
+              action="hr_biometric_device_action" sequence="1"/>
+    <menuitem id="menu_biometric_template" name="Biometric Templates" parent="menu_biometric_configuration"
+              action="hr_biometric_template_action" sequence="2"/>
+</odoo>
