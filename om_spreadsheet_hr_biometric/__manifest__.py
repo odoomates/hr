@@ -1,6 +1,6 @@
 {
     'name': 'Biometric Attendance Machine - Dashboard',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources',
     'summary': 'Biometric attendance dashboard for Odoo 20 Community: punches by day and device, unknown users, '
                'errors, attendances to review, devices',

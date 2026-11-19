@@ -1,6 +1,6 @@
 {
     'name': 'Odoo 20 HRMS - Odoo Mates',
-    'version': '20.0.1.1.1',
+    'version': '20.0.1.1.2',
     'category': 'Human Resources',
     'summary': 'HRMS for Odoo 20 Community: Payroll, Loans, Exit, Gratuity, Documents, Appraisals, Shifts, '
                'Approvals, Employee Portal',
