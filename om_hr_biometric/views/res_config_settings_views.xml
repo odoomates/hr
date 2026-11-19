@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.form.biometric</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="hr_attendance.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//app[@name='hr_attendance']" position="inside">
+                <block title="Biometric Devices" name="biometric_settings">
+                    <setting string="Maximum Shift" company_dependent="1"
+                             help="A check-in still open for longer than this is a forgotten check-out: the next punch starts a new attendance.">
+                        <field name="biometric_max_shift" class="text-center w-25"/>
+                        <span class="ms-2">Hours</span>
+                        <div class="mt-2">
+                            <button name="%(hr_biometric_device_action)d" type="action" string="Biometric Devices"
+                                    icon="arrow_forward" class="btn-link"/>
+                        </div>
+                    </setting>
+                    <setting string="Keep Biometric Templates" company_dependent="1"
+                             help="Keep the fingerprint and face templates the devices send, to copy the employees to other devices over ADMS. They are biometric data: only the attendance managers see them.">
+                        <field name="biometric_store_templates"/>
+                        <div class="mt-2" invisible="not biometric_template_count">
+                            <field name="biometric_template_count" class="oe_inline"/> templates kept.
+                            <button name="action_biometric_purge_templates" type="object" string="Delete Them"
+                                    class="btn-link" confirm="Delete the biometric templates kept in Odoo? Those on the devices stay."/>
+                        </div>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

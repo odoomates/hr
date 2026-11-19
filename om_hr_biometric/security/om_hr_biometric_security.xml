@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="device_company_rule" model="ir.rule">
+        <field name="name">Biometric devices: multi-company</field>
+        <field name="model_id" ref="model_hr_biometric_device"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="status_code_company_rule" model="ir.rule">
+        <field name="name">Biometric status codes: multi-company</field>
+        <field name="model_id" ref="model_hr_biometric_status_code"/>
+        <field name="domain_force">[('device_id.company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="device_user_company_rule" model="ir.rule">
+        <field name="name">Biometric device users: multi-company</field>
+        <field name="model_id" ref="model_hr_biometric_device_user"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="log_company_rule" model="ir.rule">
+        <field name="name">Biometric punches: multi-company</field>
+        <field name="model_id" ref="model_hr_biometric_log"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="command_company_rule" model="ir.rule">
+        <field name="name">Biometric commands: multi-company</field>
+        <field name="model_id" ref="model_hr_biometric_command"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="daily_company_rule" model="ir.rule">
+        <field name="name">Daily biometric attendance: multi-company</field>
+        <field name="model_id" ref="model_hr_biometric_daily"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="template_company_rule" model="ir.rule">
+        <field name="name">Biometric templates: multi-company</field>
+        <field name="model_id" ref="model_hr_biometric_template"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>
