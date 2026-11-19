@@ -1,12 +1,12 @@
-================================
-Biometric Attendance with Shifts
-================================
+=====================================
+Biometric Attendance Machine - Shifts
+=====================================
 
 Part of `Odoo Mates HR <https://github.com/odoomates/hr>`_, the HR suite of Odoo Mates for Odoo 20
 Community.
 
 The punches of the biometric devices read against the published shifts. It
-installs by itself with *Biometric Attendance* and *Shifts*.
+installs by itself with *Biometric Attendance Machine - ZKTeco, eSSL, Fingerprint, Face* and *Shifts*.
 
 Features
 ========
@@ -23,7 +23,7 @@ Features
 Dependencies
 ============
 
-* ``om_hr_biometric`` (Biometric Attendance)
+* ``om_hr_biometric`` (Biometric Attendance Machine)
 * ``om_hr_shift`` (Shifts)
 
 Support
