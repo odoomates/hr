@@ -18,6 +18,60 @@
         </field>
     </record>
 
+    <record id="hr_biometric_device_view_kanban" model="ir.ui.view">
+        <field name="name">hr.biometric.device.kanban</field>
+        <field name="model">hr.biometric.device</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="connection_state"/>
+                <field name="last_contact"/>
+                <field name="unlinked_user_count"/>
+                <field name="error_count"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="d-flex align-items-baseline">
+                                <strong class="mr-auto" style="font-size: 1.15rem;"><field name="name"/></strong>
+                                <span t-attf-class="badge badge-pill #{record.connection_state.raw_value == 'online' ? 'badge-success' : record.connection_state.raw_value == 'offline' ? 'badge-danger' : 'badge-secondary'}">
+                                    <t t-esc="record.connection_state.value"/>
+                                </span>
+                            </div>
+                            <div class="text-muted small">
+                                <field name="protocol"/> &#183; <field name="serial_number"/>
+                            </div>
+                            <div class="text-muted small" t-if="record.last_contact.raw_value">
+                                Last contact <field name="last_contact"/>
+                            </div>
+                            <div class="row no-gutters mt-2 text-center">
+                                <div class="col-3">
+                                    <div class="font-weight-bold" style="font-size: 1.15rem;"><field name="today_log_count"/></div>
+                                    <div class="small text-muted">Punches 24 h</div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="font-weight-bold" style="font-size: 1.15rem;"><field name="user_count"/></div>
+                                    <div class="small text-muted">Users</div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="font-weight-bold" style="font-size: 1.15rem;"><field name="linked_user_count"/></div>
+                                    <div class="small text-muted">Linked</div>
+                                </div>
+                                <div class="col-3">
+                                    <div t-attf-class="font-weight-bold #{record.unlinked_user_count.raw_value ? 'text-warning' : ''}" style="font-size: 1.15rem;">
+                                        <field name="unlinked_user_count"/>
+                                    </div>
+                                    <div class="small text-muted">Unlinked</div>
+                                </div>
+                            </div>
+                            <div class="small text-danger mt-1" t-if="record.error_count.raw_value">
+                                <field name="error_count"/> punches in error
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
     <record id="hr_biometric_device_view_form" model="ir.ui.view">
         <field name="name">hr.biometric.device.form</field>
         <field name="model">hr.biometric.device</field>
@@ -27,6 +81,8 @@
                     <button name="action_open_download" type="object" string="Download Punches" class="btn-primary"/>
                     <button name="action_open_export" type="object" string="Send Employees"/>
                     <button name="action_query_users" type="object" string="Download Users"/>
+                    <button name="action_map_employees" type="object" string="Map Employees"
+                            attrs="{'invisible': [('unlinked_user_count', '=', 0)]}"/>
                     <button name="action_query_info" type="object" string="Device Information"/>
                     <button name="action_set_time" type="object" string="Set Time"
                             groups="hr_attendance.group_hr_attendance_manager"/>
@@ -56,6 +112,47 @@
                         </button>
                     </div>
                     <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '!=', False)]}"/>
+                    <div class="alert alert-info" role="status" attrs="{'invisible': ['|', ('setup_done', '=', True), ('id', '=', False)]}">
+                        <h5 class="mb-2">Set up this device</h5>
+                        <div>
+                            <span attrs="{'invisible': [('connection_state', '!=', 'online')]}">&#10003;</span>
+                            <span attrs="{'invisible': [('connection_state', '=', 'online')]}">1.</span>
+                            Reach the device: <span attrs="{'invisible': [('protocol', '!=', 'adms')]}">set the server address of Odoo in
+                            its Cloud Server Setting (see ADMS Setup below)</span><span attrs="{'invisible': [('protocol', '=', 'adms')]}">
+                            Test Connection</span>.
+                        </div>
+                        <div>
+                            <span attrs="{'invisible': [('device_model', '=', False), ('firmware_version', '=', False)]}">&#10003;</span>
+                            <span attrs="{'invisible': ['|', ('device_model', '!=', False), ('firmware_version', '!=', False)]}">2.</span>
+                            Read its information:
+                            <button name="action_query_info" type="object" string="Device Information"
+                                    class="btn btn-link p-0 align-baseline"/>.
+                        </div>
+                        <div>
+                            <span attrs="{'invisible': ['|', ('user_count', '=', 0), ('unlinked_user_count', '>', 0)]}">&#10003;</span>
+                            <span attrs="{'invisible': [('user_count', '>', 0), ('unlinked_user_count', '=', 0)]}">3.</span>
+                            Link the users to the employees:
+                            <button name="action_query_users" type="object" string="Download Users"
+                                    class="btn btn-link p-0 align-baseline"/>, then
+                            <button name="action_map_employees" type="object" string="Map Employees"
+                                    class="btn btn-link p-0 align-baseline"/>, or
+                            <button name="action_open_export" type="object" string="Send Employees"
+                                    class="btn btn-link p-0 align-baseline"/>.
+                        </div>
+                        <div>
+                            <span attrs="{'invisible': [('log_count', '=', 0)]}">&#10003;</span>
+                            <span attrs="{'invisible': [('log_count', '>', 0)]}">4.</span>
+                            Receive the first punches: punch on the device, or
+                            <button name="action_open_download" type="object" string="Download Punches"
+                                    class="btn btn-link p-0 align-baseline"/>.
+                        </div>
+                        <field name="setup_done" invisible="1"/>
+                        <field name="unlinked_user_count" invisible="1"/>
+                        <div class="mt-2">
+                            <button name="action_setup_done" type="object" string="The device is ready"
+                                    class="btn btn-secondary btn-sm"/>
+                        </div>
+                    </div>
                     <div class="oe_title">
                         <label for="name"/>
                         <h1><field name="name" placeholder="e.g. Main Entrance"/></h1>
@@ -74,6 +171,8 @@
                             <field name="attendance_mode"/>
                             <field name="duplicate_window"/>
                             <field name="last_contact"/>
+                            <field name="responsible_id" widget="many2one_avatar_user"/>
+                            <field name="offline_alert"/>
                             <field name="company_id" groups="base.group_multi_company"/>
                             <field name="active" invisible="1"/>
                         </group>
@@ -171,7 +270,7 @@
     <record id="hr_biometric_device_action" model="ir.actions.act_window">
         <field name="name">Biometric Devices</field>
         <field name="res_model">hr.biometric.device</field>
-        <field name="view_mode">list,form</field>
+        <field name="view_mode">kanban,tree,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">Add a biometric device</p>
             <p>Its punches become the check-ins and check-outs of the employees.</p>

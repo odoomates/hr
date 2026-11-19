@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_biometric_status_wizard_view_form" model="ir.ui.view">
+        <field name="name">hr.biometric.status.wizard.form</field>
+        <field name="model">hr.biometric.status.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <p>The day of each employee against the working schedule, the time off and the public holidays: on
+                    time, late, left early, missing check-out, absent, on time off, or working on a day off.</p>
+                <group>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                        <field name="tolerance"/>
+                        <field name="status_filter"/>
+                    </group>
+                    <group>
+                        <field name="department_ids" widget="many2many_tags"/>
+                        <field name="employee_ids" widget="many2many_tags"/>
+                        <field name="biometric_only" attrs="{'invisible': [('employee_ids', '!=', [])]}"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_analyze" type="object" string="Analyze" class="btn-primary"/>
+                    <button name="action_print_sheet" type="object" string="Print Monthly Sheet"/>
+                    <button special="cancel" string="Cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_biometric_status_wizard_action" model="ir.actions.act_window">
+        <field name="name">Attendance Status</field>
+        <field name="res_model">hr.biometric.status.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="hr_biometric_absence_action" model="ir.actions.act_window">
+        <field name="name">Absences</field>
+        <field name="res_model">hr.biometric.status.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_status_filter': 'absent'}</field>
+    </record>
+
+    <record id="hr_biometric_today_action" model="ir.actions.server">
+        <field name="name">Today</field>
+        <field name="model_id" ref="model_hr_biometric_status_wizard"/>
+        <field name="state">code</field>
+        <field name="code">action = model.action_today()</field>
+    </record>
+
+    <record id="hr_biometric_day_view_list" model="ir.ui.view">
+        <field name="name">hr.biometric.day.list</field>
+        <field name="model">hr.biometric.day</field>
+        <field name="arch" type="xml">
+            <tree create="false" delete="false"
+                  decoration-danger="status in ('absent', 'missing_out')"
+                  decoration-warning="status in ('late', 'early', 'late_early')"
+                  decoration-muted="status in ('leave', 'not_started')">
+                <field name="date"/>
+                <field name="employee_id"/>
+                <field name="department_id" optional="show"/>
+                <field name="status" widget="badge"
+                       decoration-success="status in ('on_time', 'working')"
+                       decoration-warning="status in ('late', 'early', 'late_early')"
+                       decoration-danger="status in ('absent', 'missing_out')"
+                       decoration-info="status == 'day_off_worked'"/>
+                <field name="expected_start" optional="show"/>
+                <field name="first_in"/>
+                <field name="expected_end" optional="hide"/>
+                <field name="last_out"/>
+                <field name="late_minutes" optional="show" sum="Total"/>
+                <field name="early_minutes" optional="hide" sum="Total"/>
+                <field name="worked_hours" widget="float_time" sum="Total"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <button name="action_open_attendances" type="object" string="Attendances" class="btn-link"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="hr_biometric_day_view_kanban" model="ir.ui.view">
+        <field name="name">hr.biometric.day.kanban</field>
+        <field name="model">hr.biometric.day</field>
+        <field name="arch" type="xml">
+            <kanban create="false" group_create="false" group_delete="false" records_draggable="false">
+                <field name="status"/>
+                <field name="employee_id"/>
+                <field name="first_in"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click o_kanban_record_has_image_fill">
+                            <div class="o_kanban_image_fill_left d-none d-md-block"
+                                 t-attf-style="background-image: url(#{kanban_image('hr.employee', 'avatar_128', record.employee_id.raw_value)})"/>
+                            <div class="oe_kanban_details">
+                                <strong><field name="employee_id"/></strong>
+                                <div class="text-muted"><field name="department_id"/></div>
+                                <div class="mt-1">
+                                    <span t-attf-class="badge badge-pill #{['on_time', 'working'].includes(record.status.raw_value) ? 'badge-success' : ['late', 'early', 'late_early'].includes(record.status.raw_value) ? 'badge-warning' : ['absent', 'missing_out'].includes(record.status.raw_value) ? 'badge-danger' : 'badge-secondary'}">
+                                        <t t-esc="record.status.value"/>
+                                    </span>
+                                </div>
+                                <div class="text-muted small" t-if="record.first_in.raw_value">
+                                    In <field name="first_in"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="hr_biometric_day_view_pivot" model="ir.ui.view">
+        <field name="name">hr.biometric.day.pivot</field>
+        <field name="model">hr.biometric.day</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="employee_id" type="row"/>
+                <field name="status" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="hr_biometric_day_view_graph" model="ir.ui.view">
+        <field name="name">hr.biometric.day.graph</field>
+        <field name="model">hr.biometric.day</field>
+        <field name="arch" type="xml">
+            <graph type="bar" stacked="True">
+                <field name="date" interval="day"/>
+                <field name="status"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="hr_biometric_day_view_search" model="ir.ui.view">
+        <field name="name">hr.biometric.day.search</field>
+        <field name="model">hr.biometric.day</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <field name="department_id"/>
+                <filter string="Late or Left Early" name="late"
+                        domain="[('status', 'in', ('late', 'early', 'late_early'))]"/>
+                <filter string="Absent" name="absent" domain="[('status', '=', 'absent')]"/>
+                <filter string="Missing Check-Out" name="missing_out" domain="[('status', '=', 'missing_out')]"/>
+                <group>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Employee" name="group_employee" context="{'group_by': 'employee_id'}"/>
+                    <filter string="Department" name="group_department" context="{'group_by': 'department_id'}"/>
+                    <filter string="Date" name="group_date" context="{'group_by': 'date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="paperformat_monthly_sheet" model="report.paperformat">
+        <field name="name">Monthly Attendance Sheet (A4 landscape)</field>
+        <field name="format">A4</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">12</field>
+        <field name="margin_bottom">12</field>
+        <field name="margin_left">7</field>
+        <field name="margin_right">7</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">8</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="action_report_monthly_sheet" model="ir.actions.report">
+        <field name="name">Monthly Attendance Sheet</field>
+        <field name="model">hr.biometric.status.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">om_hr_biometric.report_monthly_sheet</field>
+        <field name="report_file">om_hr_biometric.report_monthly_sheet</field>
+        <field name="print_report_name">'Attendance sheet %s - %s' % (object.date_from, object.date_to)</field>
+        <field name="paperformat_id" ref="paperformat_monthly_sheet"/>
+    </record>
+
+    <template id="report_monthly_sheet">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="wizard">
+                <t t-call="web.external_layout">
+                    <t t-set="sheet" t-value="wizard._sheet()"/>
+                    <div class="page" style="font-size: 9px;">
+                        <h4>Attendance Sheet, <span t-field="wizard.date_from"/> - <span t-field="wizard.date_to"/></h4>
+                        <table class="table table-sm table-bordered text-center" style="table-layout: fixed;">
+                            <thead>
+                                <tr>
+                                    <th class="text-left" style="width: 15%;">Employee</th>
+                                    <th t-foreach="sheet[0]" t-as="day" style="padding: 1px;">
+                                        <t t-out="day.day"/>
+                                    </th>
+                                    <th style="width: 4%;">Days</th>
+                                    <th style="width: 4%;">Absent</th>
+                                    <th style="width: 4%;">Late</th>
+                                    <th style="width: 5%;">Hours</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="sheet[1]" t-as="row">
+                                    <td class="text-left"><t t-out="row[0].name"/></td>
+                                    <td t-foreach="row[1]" t-as="letter" style="padding: 1px;"
+                                        t-att-class="'text-danger font-weight-bold' if letter in ('A', 'M') else 'text-warning' if letter in ('L', 'E', 'LE') else ''">
+                                        <t t-out="letter"/>
+                                    </td>
+                                    <td><t t-out="row[2]['present']"/></td>
+                                    <td><t t-out="row[2]['absent']"/></td>
+                                    <td><t t-out="row[2]['late']"/></td>
+                                    <td><t t-out="'%.1f' % row[2]['hours']"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p class="text-muted">
+                            &#10003; on time &#183; L late &#183; E left early &#183; LE late and left early &#183;
+                            M missing check-out &#183; A absent &#183; T time off or public holiday &#183;
+                            X worked on a day off &#183; W at work
+                        </p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

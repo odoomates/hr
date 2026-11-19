@@ -5,6 +5,7 @@ import pytz
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
+from odoo.tools import format_datetime
 
 from odoo.addons.base.models.res_partner import _tz_get
 
@@ -31,7 +32,7 @@ class HrBiometricDevice(models.Model):
     check-outs, and the users enrolled on it. """
     _name = 'hr.biometric.device'
     _description = 'Biometric Device'
-    _inherit = ['mail.thread']
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'name'
 
     name = fields.Char(required=True, tracking=True)
@@ -64,6 +65,13 @@ class HrBiometricDevice(models.Model):
     status_code_ids = fields.One2many('hr.biometric.status.code', 'device_id', string='Status Codes', copy=True)
     user_ids = fields.One2many('hr.biometric.device.user', 'device_id', string='Device Users')
     last_contact = fields.Datetime(readonly=True, copy=False)
+    responsible_id = fields.Many2one('res.users', default=lambda self: self.env.user,
+                                     domain="[('share', '=', False)]", tracking=True,
+                                     help='Gets an activity when the device goes offline.')
+    offline_alert = fields.Boolean(default=True,
+                                   help='An activity for the responsible when the device stops calling, done by '
+                                        'itself once it is back.')
+    setup_done = fields.Boolean(copy=False, help='The setup checklist is hidden once done.')
     connection_state = fields.Selection([('never', 'Never Connected'), ('online', 'Online'), ('offline', 'Offline')],
                                         compute='_compute_connection_state')
     attlog_stamp = fields.Char(readonly=True, copy=False)
@@ -82,6 +90,9 @@ class HrBiometricDevice(models.Model):
     pending_command_count = fields.Integer(compute='_compute_counts')
     error_count = fields.Integer(string='Punches in Error', compute='_compute_counts')
     failed_command_count = fields.Integer(string='Failed Commands', compute='_compute_counts')
+    linked_user_count = fields.Integer(string='Linked Users', compute='_compute_counts')
+    unlinked_user_count = fields.Integer(string='Users Without Employee', compute='_compute_counts')
+    today_log_count = fields.Integer(string='Punches, Last 24 Hours', compute='_compute_counts')
 
     _sql_constraints = [
         ('serial_number_uniq', 'UNIQUE(serial_number)', 'A device with this serial number already exists.'),
@@ -109,13 +120,17 @@ class HrBiometricDevice(models.Model):
             ('hr.biometric.command', [('state', 'in', ('pending', 'sent'))], 'pending_command_count'),
             ('hr.biometric.log', [('state', '=', 'error')], 'error_count'),
             ('hr.biometric.command', [('state', '=', 'failed')], 'failed_command_count'),
+            ('hr.biometric.device.user', [('employee_id', '!=', False)], 'linked_user_count'),
+            ('hr.biometric.device.user', [('employee_id', '=', False)], 'unlinked_user_count'),
+            ('hr.biometric.log', [('timestamp', '>=', fields.Datetime.now() - timedelta(hours=24))],
+             'today_log_count'),
         ]:
             for group in self.env[model].read_group(domain + [('device_id', 'in', self.ids)], ['device_id'],
                                                     ['device_id']):
                 counts[group['device_id'][0], key] = group['device_id_count']
         for device in self:
             for key in ('log_count', 'unmapped_count', 'user_count', 'pending_command_count', 'error_count',
-                        'failed_command_count'):
+                        'failed_command_count', 'linked_user_count', 'unlinked_user_count', 'today_log_count'):
                 device[key] = counts.get((device.id, key), 0)
 
     @api.constrains('protocol', 'serial_number', 'active')
@@ -206,6 +221,41 @@ class HrBiometricDevice(models.Model):
         vals = {key: value for key, value in vals.items() if self[key] != value}
         if vals:
             self.write(vals)
+        if 'last_contact' in vals:
+            self._close_offline_activity()
+
+    # Offline alert
+
+    def _is_offline(self):
+        """ :return: whether the device stopped calling for longer than the company allows. Hook. """
+        self.ensure_one()
+        delay = timedelta(minutes=self.company_id.biometric_offline_minutes or 30)
+        return bool(self.last_contact) and fields.Datetime.now() - self.last_contact > delay
+
+    def _offline_activities(self):
+        activity_type = self.env.ref('om_hr_biometric.mail_activity_type_device_offline', raise_if_not_found=False)
+        return self.activity_ids.filtered(lambda a: a.activity_type_id == activity_type)
+
+    def _close_offline_activity(self):
+        for device in self:
+            activities = device.sudo()._offline_activities()
+            if activities:
+                activities.action_feedback(feedback=_('Back online.'))
+
+    @api.model
+    def _cron_check_offline(self):
+        """ An activity for the responsible of each device that went offline, one per outage. """
+        for device in self.sudo().search([('offline_alert', '=', True), ('responsible_id', '!=', False)]):
+            if not device._is_offline():
+                continue
+            if device._offline_activities():
+                continue
+            since = device.last_contact and format_datetime(self.env, device.last_contact, tz=device.timezone)
+            device.activity_schedule(
+                'om_hr_biometric.mail_activity_type_device_offline', user_id=device.responsible_id.id,
+                summary=_('Device offline'),
+                note=_('%(device)s has not called Odoo since %(since)s. Check its power, its network and '
+                                'its server settings.', device=device.name, since=since or '-'))
 
     def _info_vals(self, info):
         def number(key):
@@ -385,6 +435,17 @@ class HrBiometricDevice(models.Model):
 
     def action_view_unmapped(self):
         return self._action_open('hr.biometric.log', _('Unmapped Punches'), [('state', '=', 'unmapped')])
+
+    def action_map_employees(self):
+        """ Link the users of the devices without an employee, by biometric ID or by name. """
+        users = self.user_ids.filtered(lambda u: not u.employee_id)
+        users._link_employees()
+        linked = users.filtered('employee_id')
+        return self._notify(_('%(linked)s of %(total)s users linked to an employee.', linked=len(linked),
+                                       total=len(users)))
+
+    def action_setup_done(self):
+        self.setup_done = True
 
     def action_view_errors(self):
         return self._action_open('hr.biometric.log', _('Punches in Error'), [('state', '=', 'error')])
