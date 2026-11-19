@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_biometric_download_view_form" model="ir.ui.view">
+        <field name="name">hr.biometric.download.form</field>
+        <field name="model">hr.biometric.download</field>
+        <field name="arch" type="xml">
+            <form>
+                <p>The devices send the punches of the period at their next contact; those already received are
+                    left out.</p>
+                <group>
+                    <field name="device_ids" widget="many2many_tags"/>
+                    <field name="date_from"/>
+                    <field name="date_to"/>
+                </group>
+                <footer>
+                    <button name="action_download" type="object" string="Download" class="btn-primary"/>
+                    <button special="cancel" string="Cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_biometric_export_view_form" model="ir.ui.view">
+        <field name="name">hr.biometric.export.form</field>
+        <field name="model">hr.biometric.export</field>
+        <field name="arch" type="xml">
+            <form>
+                <p>The employees are enrolled on the devices under their biometric ID, or their name is updated
+                    there. Those without a biometric ID get the next free number. They then enroll their finger or
+                    face on the device.</p>
+                <group>
+                    <field name="device_ids" widget="many2many_tags"/>
+                    <field name="employee_ids" widget="many2many_tags"/>
+                </group>
+                <footer>
+                    <button name="action_export" type="object" string="Send" class="btn-primary"/>
+                    <button special="cancel" string="Cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_biometric_reprocess_view_form" model="ir.ui.view">
+        <field name="name">hr.biometric.reprocess.form</field>
+        <field name="model">hr.biometric.reprocess</field>
+        <field name="arch" type="xml">
+            <form>
+                <p>The attendances the devices created in the period are deleted, then made again from the
+                    punches. Attendances entered by hand are kept.</p>
+                <group>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                    <group>
+                        <field name="device_ids" widget="many2many_tags"/>
+                        <field name="employee_ids" widget="many2many_tags"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_reprocess" type="object" string="Process Again" class="btn-primary"
+                            confirm="Delete and make again the attendances of the devices in this period?"/>
+                    <button special="cancel" string="Cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_biometric_copy_view_form" model="ir.ui.view">
+        <field name="name">hr.biometric.copy.form</field>
+        <field name="model">hr.biometric.copy</field>
+        <field name="arch" type="xml">
+            <form>
+                <p>The user is enrolled on the other devices with its fingerprints: no need to enroll again there.
+                    Faces are enrolled on each device.</p>
+                <group>
+                    <field name="device_user_id" readonly="1"/>
+                    <field name="source_device_id"/>
+                    <field name="company_id" invisible="1"/>
+                    <field name="device_ids" widget="many2many_tags"/>
+                </group>
+                <footer>
+                    <button name="action_copy" type="object" string="Copy" class="btn-primary"/>
+                    <button special="cancel" string="Cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_biometric_enroll_view_form" model="ir.ui.view">
+        <field name="name">hr.biometric.enroll.form</field>
+        <field name="model">hr.biometric.enroll</field>
+        <field name="arch" type="xml">
+            <form>
+                <p>The device asks for the finger: the employee places it three times. The device then sends the
+                    fingerprint to Odoo with its users.</p>
+                <group>
+                    <field name="device_user_id" readonly="1"/>
+                    <field name="finger"/>
+                </group>
+                <footer>
+                    <button name="action_enroll" type="object" string="Enroll" class="btn-primary"/>
+                    <button special="cancel" string="Cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_biometric_absence_wizard_view_form" model="ir.ui.view">
+        <field name="name">hr.biometric.absence.wizard.form</field>
+        <field name="model">hr.biometric.absence.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <p>The working days of the employees without any attendance: their working schedule, less the time
+                    off and the public holidays. Today is left out.</p>
+                <group>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                    <group>
+                        <field name="department_ids" widget="many2many_tags"/>
+                        <field name="employee_ids" widget="many2many_tags"/>
+                        <field name="biometric_only" attrs="{'invisible': [('employee_ids', '!=', [])]}"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_compute" type="object" string="Show Absences" class="btn-primary"/>
+                    <button special="cancel" string="Cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_biometric_absence_wizard_action" model="ir.actions.act_window">
+        <field name="name">Absences</field>
+        <field name="res_model">hr.biometric.absence.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="hr_biometric_absence_view_list" model="ir.ui.view">
+        <field name="name">hr.biometric.absence.list</field>
+        <field name="model">hr.biometric.absence</field>
+        <field name="arch" type="xml">
+            <tree create="false" delete="false">
+                <field name="date"/>
+                <field name="employee_id"/>
+                <field name="department_id"/>
+                <field name="expected_hours" widget="float_time" sum="Total"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <button name="action_open_attendances" type="object" string="Attendances" class="btn-link"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="hr_biometric_absence_view_pivot" model="ir.ui.view">
+        <field name="name">hr.biometric.absence.pivot</field>
+        <field name="model">hr.biometric.absence</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="employee_id" type="row"/>
+                <field name="date" interval="week" type="col"/>
+                <field name="expected_hours" type="measure" widget="float_time"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="hr_biometric_absence_view_search" model="ir.ui.view">
+        <field name="name">hr.biometric.absence.search</field>
+        <field name="model">hr.biometric.absence</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <field name="department_id"/>
+                <group>
+                    <filter string="Employee" name="group_employee" context="{'group_by': 'employee_id'}"/>
+                    <filter string="Department" name="group_department" context="{'group_by': 'department_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="hr_biometric_reprocess_action" model="ir.actions.act_window">
+        <field name="name">Process Punches Again</field>
+        <field name="res_model">hr.biometric.reprocess</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.form.biometric</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="hr_attendance.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@data-key='hr_attendance']" position="inside">
+                <h2>Biometric Devices</h2>
+                <div class="row mt16 o_settings_container" name="biometric_settings">
+                    <div class="col-12 col-lg-6 o_setting_box">
+                        <div class="o_setting_right_pane">
+                            <label for="biometric_max_shift" string="Maximum Shift"/>
+                            <span class="fa fa-lg fa-building-o" title="Values set here are company-specific."
+                                  role="img" aria-label="Values set here are company-specific."
+                                  groups="base.group_multi_company"/>
+                            <div class="text-muted">
+                                A check-in still open for longer than this is a forgotten check-out: the next punch
+                                starts a new attendance.
+                            </div>
+                            <div class="content-group mt16">
+                                <field name="biometric_max_shift" class="oe_inline"/> Hours
+                            </div>
+                            <div class="mt8">
+                                <button name="%(hr_biometric_device_action)d" type="action" string="Biometric Devices"
+                                        icon="fa-arrow-right" class="btn-link"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6 o_setting_box">
+                        <div class="o_setting_left_pane">
+                            <field name="biometric_store_templates"/>
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="biometric_store_templates"/>
+                            <span class="fa fa-lg fa-building-o" title="Values set here are company-specific."
+                                  role="img" aria-label="Values set here are company-specific."
+                                  groups="base.group_multi_company"/>
+                            <div class="text-muted">
+                                Keep the fingerprint and face templates the devices send, to copy the employees to
+                                other devices over ADMS. They are biometric data: only the attendance managers see
+                                them.
+                            </div>
+                            <div class="mt8" attrs="{'invisible': [('biometric_template_count', '=', 0)]}">
+                                <field name="biometric_template_count" class="oe_inline"/> templates kept.
+                                <button name="action_biometric_purge_templates" type="object" string="Delete Them"
+                                        class="btn-link"
+                                        confirm="Delete the biometric templates kept in Odoo? Those on the devices stay."/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>
