@@ -9,4 +9,33 @@
         <field name="interval_type">minutes</field>
         <field name="numbercall">-1</field>
     </record>
+    <record id="ir_cron_check_offline" model="ir.cron">
+        <field name="name">Biometric Attendance: alert on offline devices</field>
+        <field name="model_id" ref="model_hr_biometric_device"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_check_offline()</field>
+        <field name="interval_number">10</field>
+        <field name="interval_type">minutes</field>
+        <field name="numbercall">-1</field>
+        <field name="doall" eval="False"/>
+    </record>
+
+    <record id="ir_cron_cleanup_commands" model="ir.cron">
+        <field name="name">Biometric Attendance: delete old device commands</field>
+        <field name="model_id" ref="model_hr_biometric_command"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_cleanup()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="doall" eval="False"/>
+    </record>
+
+    <record id="mail_activity_type_device_offline" model="mail.activity.type">
+        <field name="name">Device Offline</field>
+        <field name="summary">Device offline</field>
+        <field name="res_model">hr.biometric.device</field>
+        <field name="icon">fa-warning</field>
+        <field name="delay_count">0</field>
+    </record>
 </odoo>
