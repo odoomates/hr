@@ -1,0 +1,251 @@
+<div style="font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#4B4453;">
+<!-- ================= hero ================= -->
+<div style="background-color:#715782;background-image:linear-gradient(135deg,#71639E 0%,#714B67 100%);border-radius:16px;padding:40px 28px 34px 28px;text-align:center;color:#FFFFFF;margin:8px 0 0 0;">
+<div style="font-size:12px;font-weight:700;letter-spacing:2px;color:#EADFF0;text-transform:uppercase;margin:0 0 10px 0;">Odoo Mates &middot; free and open source</div>
+<h1 style="font-size:44px;font-weight:800;color:#FFFFFF;margin:0 0 8px 0;">Biometric Attendance: TCP</h1>
+<p style="font-size:19px;color:#F6F1F7;max-width:760px;margin:0 auto 20px auto;line-height:1.5;">Odoo reads your ZKTeco and eSSL devices over the network, on port 4370: for the devices without ADMS, or on a network they cannot leave.</p>
+<div style="margin:0 0 22px 0;">
+<span style="display:inline-block;border:1px solid #D9C8E2;border-radius:20px;padding:4px 14px;margin:0 4px 8px 4px;font-size:13px;font-weight:600;color:#FFFFFF;">TCP and UDP</span>
+<span style="display:inline-block;border:1px solid #D9C8E2;border-radius:20px;padding:4px 14px;margin:0 4px 8px 4px;font-size:13px;font-weight:600;color:#FFFFFF;">Communication key</span>
+<span style="display:inline-block;border:1px solid #D9C8E2;border-radius:20px;padding:4px 14px;margin:0 4px 8px 4px;font-size:13px;font-weight:600;color:#FFFFFF;">New punches only</span>
+<span style="display:inline-block;border:1px solid #D9C8E2;border-radius:20px;padding:4px 14px;margin:0 4px 8px 4px;font-size:13px;font-weight:600;color:#FFFFFF;">No external library</span>
+<span style="display:inline-block;border:1px solid #D9C8E2;border-radius:20px;padding:4px 14px;margin:0 4px 8px 4px;font-size:13px;font-weight:600;color:#FFFFFF;">Free, LGPL-3</span>
+</div>
+<a href="#setup" style="display:inline-block;background-color:#FFFFFF;color:#3E2D4F;padding:10px 22px;border-radius:8px;margin:0 6px 8px 6px;font-size:15px;font-weight:700;text-decoration:none;">&#9881;&nbsp; Set up your device</a>
+<a href="#devices" style="display:inline-block;border:1px solid #FFFFFF;color:#FFFFFF;padding:9px 22px;border-radius:8px;margin:0 6px 8px 6px;font-size:15px;font-weight:700;text-decoration:none;">Supported devices &rarr;</a>
+</div>
+<div style="padding:34px 0 4px 0;text-align:center;">
+<h2 style="font-size:28px;font-weight:800;color:#3E2D4F;margin:0 0 8px 0;">Everything at a glance</h2>
+<p style="font-size:15px;color:#4B4453;max-width:760px;margin:0 auto 18px auto;line-height:1.6;">Everything of Biometric Attendance, for devices Odoo reads itself.</p>
+</div>
+<div style="font-size:12px;font-weight:700;letter-spacing:1.3px;color:#71639E;text-transform:uppercase;margin:4px 0 8px 2px;">
+<span style="display:inline-block;width:18px;height:3px;background-color:#71639E;border-radius:2px;vertical-align:middle;margin:0 8px 2px 0;">
+</span>Reading the devices</div>
+<div class="row">
+<div class="col-12 col-md-6 col-lg-3 mb-3">
+<div class="h-100" style="border:1px solid #E8DFEC;border-radius:12px;background-color:#FFFFFF;padding:12px 14px;border-top:3px solid #71639E;">
+<span style="float:left;display:inline-block;width:38px;height:38px;border-radius:10px;background-color:#F6F1F7;color:#71639E;text-align:center;line-height:38px;font-size:17px;">
+<i class="fa fa-sitemap">
+</i>
+</span>
+<div style="margin:0 0 0 50px;">
+<div style="font-size:14px;font-weight:700;color:#3E2D4F;margin:0 0 3px 0;">TCP or UDP</div>
+<div style="font-size:12.5px;color:#4B4453;line-height:1.45;">Port 4370, with the communication key of the device.</div>
+</div>
+</div>
+</div>
+<div class="col-12 col-md-6 col-lg-3 mb-3">
+<div class="h-100" style="border:1px solid #E8DFEC;border-radius:12px;background-color:#FFFFFF;padding:12px 14px;border-top:3px solid #71639E;">
+<span style="float:left;display:inline-block;width:38px;height:38px;border-radius:10px;background-color:#F6F1F7;color:#71639E;text-align:center;line-height:38px;font-size:17px;">
+<i class="fa fa-refresh">
+</i>
+</span>
+<div style="margin:0 0 0 50px;">
+<div style="font-size:14px;font-weight:700;color:#3E2D4F;margin:0 0 3px 0;">Every 10 minutes</div>
+<div style="font-size:12.5px;color:#4B4453;line-height:1.45;">Or Download Now: only the punches not received yet.</div>
+</div>
+</div>
+</div>
+<div class="col-12 col-md-6 col-lg-3 mb-3">
+<div class="h-100" style="border:1px solid #E8DFEC;border-radius:12px;background-color:#FFFFFF;padding:12px 14px;border-top:3px solid #71639E;">
+<span style="float:left;display:inline-block;width:38px;height:38px;border-radius:10px;background-color:#F6F1F7;color:#71639E;text-align:center;line-height:38px;font-size:17px;">
+<i class="fa fa-plug">
+</i>
+</span>
+<div style="margin:0 0 0 50px;">
+<div style="font-size:14px;font-weight:700;color:#3E2D4F;margin:0 0 3px 0;">Test Connection</div>
+<div style="font-size:12.5px;color:#4B4453;line-height:1.45;">Reads the model, serial number and firmware.</div>
+</div>
+</div>
+</div>
+<div class="col-12 col-md-6 col-lg-3 mb-3">
+<div class="h-100" style="border:1px solid #E8DFEC;border-radius:12px;background-color:#FFFFFF;padding:12px 14px;border-top:3px solid #71639E;">
+<span style="float:left;display:inline-block;width:38px;height:38px;border-radius:10px;background-color:#F6F1F7;color:#71639E;text-align:center;line-height:38px;font-size:17px;">
+<i class="fa fa-puzzle-piece">
+</i>
+</span>
+<div style="margin:0 0 0 50px;">
+<div style="font-size:14px;font-weight:700;color:#3E2D4F;margin:0 0 3px 0;">No library</div>
+<div style="font-size:12.5px;color:#4B4453;line-height:1.45;">Our own client, on the Python standard library.</div>
+</div>
+</div>
+</div>
+</div>
+<div style="font-size:12px;font-weight:700;letter-spacing:1.3px;color:#71639E;text-transform:uppercase;margin:4px 0 8px 2px;">
+<span style="display:inline-block;width:18px;height:3px;background-color:#71639E;border-radius:2px;vertical-align:middle;margin:0 8px 2px 0;">
+</span>Users and safety</div>
+<div class="row">
+<div class="col-12 col-md-6 col-lg-3 mb-3">
+<div class="h-100" style="border:1px solid #E8DFEC;border-radius:12px;background-color:#FFFFFF;padding:12px 14px;border-top:3px solid #71639E;">
+<span style="float:left;display:inline-block;width:38px;height:38px;border-radius:10px;background-color:#F6F1F7;color:#71639E;text-align:center;line-height:38px;font-size:17px;">
+<i class="fa fa-users">
+</i>
+</span>
+<div style="margin:0 0 0 50px;">
+<div style="font-size:14px;font-weight:700;color:#3E2D4F;margin:0 0 3px 0;">Users both ways</div>
+<div style="font-size:12.5px;color:#4B4453;line-height:1.45;">Download users; send employees or remove them at once.</div>
+</div>
+</div>
+</div>
+<div class="col-12 col-md-6 col-lg-3 mb-3">
+<div class="h-100" style="border:1px solid #E8DFEC;border-radius:12px;background-color:#FFFFFF;padding:12px 14px;border-top:3px solid #71639E;">
+<span style="float:left;display:inline-block;width:38px;height:38px;border-radius:10px;background-color:#F6F1F7;color:#71639E;text-align:center;line-height:38px;font-size:17px;">
+<i class="fa fa-hand-paper-o">
+</i>
+</span>
+<div style="margin:0 0 0 50px;">
+<div style="font-size:14px;font-weight:700;color:#3E2D4F;margin:0 0 3px 0;">Fingerprints</div>
+<div style="font-size:12.5px;color:#4B4453;line-height:1.45;">Read from the device to copy a user, never stored for it.</div>
+</div>
+</div>
+</div>
+<div class="col-12 col-md-6 col-lg-3 mb-3">
+<div class="h-100" style="border:1px solid #E8DFEC;border-radius:12px;background-color:#FFFFFF;padding:12px 14px;border-top:3px solid #71639E;">
+<span style="float:left;display:inline-block;width:38px;height:38px;border-radius:10px;background-color:#F6F1F7;color:#71639E;text-align:center;line-height:38px;font-size:17px;">
+<i class="fa fa-unlock-alt">
+</i>
+</span>
+<div style="margin:0 0 0 50px;">
+<div style="font-size:14px;font-weight:700;color:#3E2D4F;margin:0 0 3px 0;">Never locked</div>
+<div style="font-size:12.5px;color:#4B4453;line-height:1.45;">Locked only while Odoo writes, always unlocked again.</div>
+</div>
+</div>
+</div>
+<div class="col-12 col-md-6 col-lg-3 mb-3">
+<div class="h-100" style="border:1px solid #E8DFEC;border-radius:12px;background-color:#FFFFFF;padding:12px 14px;border-top:3px solid #71639E;">
+<span style="float:left;display:inline-block;width:38px;height:38px;border-radius:10px;background-color:#F6F1F7;color:#71639E;text-align:center;line-height:38px;font-size:17px;">
+<i class="fa fa-eraser">
+</i>
+</span>
+<div style="margin:0 0 0 50px;">
+<div style="font-size:14px;font-weight:700;color:#3E2D4F;margin:0 0 3px 0;">Safe clearing</div>
+<div style="font-size:12.5px;color:#4B4453;line-height:1.45;">Punches downloaded first, then cleared on that device only.</div>
+</div>
+</div>
+</div>
+</div>
+<div style="background-color:#FAF6FA;border:1px solid #E8DFEC;border-radius:12px;padding:14px 14px 4px 14px;margin:4px 0 0 0;">
+<div style="font-size:14px;font-weight:700;color:#3E2D4F;margin:0 0 10px 4px;">Add-ons of this app<span style="font-weight:400;color:#4B4453;font-size:13px;"> &middot; separate modules, install them when you need them</span>
+</div>
+<div class="row">
+<div class="col-6 col-md-4 col-lg mb-2">
+<a href="https://apps.odoo.com/apps/modules/19.0/om_hr_biometric" target="_blank" rel="noopener" class="h-100" style="display:block;background-color:#FFFFFF;border:1px solid #E8DFEC;border-radius:10px;padding:10px 8px;text-align:center;text-decoration:none;">
+<span style="display:inline-block;width:36px;height:36px;border-radius:8px;background-color:#F6F1F7;color:#71639E;line-height:36px;font-size:17px;margin:0 0 6px 0;"><i class="fa fa-cloud-upload"></i></span>
+<div style="font-size:12.5px;font-weight:700;color:#3E2D4F;line-height:1.3;">Biometric Attendance</div>
+<div style="font-size:10px;font-weight:700;color:#059669;letter-spacing:.5px;margin:3px 0 0 0;">FREE</div>
+</a>
+</div>
+</div>
+</div>
+<div id="devices"></div>
+<div style="padding:40px 0 4px 0;text-align:center;">
+<div style="font-size:12px;font-weight:700;letter-spacing:1.5px;color:#715782;text-transform:uppercase;margin:0 0 6px 0;">Supported devices</div>
+<h2 style="font-size:28px;font-weight:800;color:#3E2D4F;margin:0 0 8px 0;">ZKTeco and eSSL time clocks</h2>
+<p style="font-size:15px;color:#4B4453;max-width:760px;margin:0 auto 18px auto;line-height:1.6;">Pushed to Odoo with ADMS, no fixed IP address needed: look for <b>Menu &rarr; Communication &rarr; Cloud Server Setting</b> on your device. Without it, Odoo reads the device over TCP with the TCP add-on.</p>
+</div>
+<div style="background-color:#F6F1F7;border-radius:16px;padding:16px 14px;">
+<div style="border:1px solid #E8DFEC;border-radius:12px;background-color:#FFFFFF;padding:14px 18px;">
+<div style="font-size:15px;font-weight:800;color:#3E2D4F;margin:0 0 2px 0;"><i class="fa fa-hand-paper-o" style="color:#71639E;"></i>&nbsp; Face, palm, fingerprint and card devices</div>
+<div style="font-size:12px;font-weight:700;color:#715782;margin:0 0 4px 0;">ADMS (push) or TCP (port 4370), depending on the firmware</div>
+<div style="font-size:13px;font-weight:800;color:#3E2D4F;margin:8px 0 6px 0;">ZKTeco <span style="font-weight:600;color:#715782;">&middot; 48 models</span></div>
+<div><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">EFace 10</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">F09</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">F16</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">F18</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">F19</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">F21</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">F22</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">F28</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">FaceDepot 4A</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">FaceDepot 7A</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">FaceDepot 7B</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">FaceDepot 7BL</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">FaceDepot 7C</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">G4</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">iClock 360</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">iClock 680</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">iClock 700</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">iClock 880</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">iFace 990</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">K40</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">K40 Pro</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">K50</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">MA300</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">MB10</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">MB10-VL</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">MB160</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">MB360</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">MB460</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">MiniAC</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">MiniAC Plus</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">MiniTA</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">ProBio</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">ProBio Plus</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">ProFace X</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">SFace 900</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">SpeedFace-M4</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">SpeedFace-V3L</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">SpeedFace-V4L</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">SpeedFace-V5L</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">TX628</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">U160</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">U260</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">UA760</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">uFace 202</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">uFace 302</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">uFace 402</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">uFace 800</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">X628</span></div>
+<div style="font-size:13px;font-weight:800;color:#3E2D4F;margin:8px 0 6px 0;">eSSL <span style="font-weight:600;color:#715782;">&middot; 11 models</span></div>
+<div><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">AiFace Magnum</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">AiFace Mars</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">F22</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">iClock 990</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">K21 Pro</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">K30 Pro</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">K90 Pro</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">MB160</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">MB20</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">uFace 202</span><span style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:3px 10px;margin:0 4px 6px 0;font-size:12.5px;font-weight:600;">X990</span></div>
+</div>
+</div>
+<div style="border:1px solid #E8DFEC;border-radius:12px;background-color:#FFFFFF;padding:20px;margin:14px 0 0 0;border-top:3px solid #71639E;">
+<h3 style="font-size:19px;font-weight:800;color:#3E2D4F;margin:0 0 8px 0;">Your device is not on the list? It will be soon</h3>
+<p style="font-size:14px;color:#4B4453;line-height:1.6;margin:0 0 12px 0;">We have not tested every model yet. The app speaks the standard protocols of the ZKTeco and eSSL devices, ADMS (push) and TCP on port 4370, that the models above share, and most devices of these brands with one of them work the same way.</p>
+<div style="font-size:13.5px;color:#4B4453;line-height:1.55;margin:0 0 8px 0;">
+<span style="display:inline-block;width:22px;height:22px;border-radius:11px;background-color:#715782;color:#FFFFFF;font-size:12px;font-weight:700;text-align:center;line-height:22px;margin:0 8px 0 0;">1</span>Configure your device as shown in <b>Get started</b> below, and punch a few times.</div>
+<div style="font-size:13.5px;color:#4B4453;line-height:1.55;margin:0 0 8px 0;">
+<span style="display:inline-block;width:22px;height:22px;border-radius:11px;background-color:#715782;color:#FFFFFF;font-size:12px;font-weight:700;text-align:center;line-height:22px;margin:0 8px 0 0;">2</span>All good? Leave a review with the model of your device: it tells others it works, and it tells us too.</div>
+<div style="font-size:13.5px;color:#4B4453;line-height:1.55;margin:0 0 8px 0;">
+<span style="display:inline-block;width:22px;height:22px;border-radius:11px;background-color:#715782;color:#FFFFFF;font-size:12px;font-weight:700;text-align:center;line-height:22px;margin:0 8px 0 0;">3</span>Any issue? Tell us the model and the firmware (<b>Menu &rarr; System Info &rarr; Device Info</b>): we fix it and add your device to the supported list.</div>
+<div style="margin:12px 0 0 0;">
+<a href="https://apps.odoo.com/apps/modules/19.0/om_hr_biometric_zk/" target="_blank" rel="noopener" style="display:inline-block;background-color:#715782;background-image:linear-gradient(135deg,#71639E 0%,#714B67 100%);color:#FFFFFF;border-radius:8px;padding:9px 20px;margin:0 8px 8px 0;font-size:14px;font-weight:700;text-decoration:none;">&#9733;&nbsp; It works: leave a review</a>
+<a href="mailto:odoomates@gmail.com?subject=Biometric%20Attendance%20(om_hr_biometric_zk)%20-%20My%20device%3A%20" style="display:inline-block;border:1px solid #715782;color:#3E2D4F;border-radius:8px;padding:8px 20px;margin:0 8px 8px 0;font-size:14px;font-weight:700;text-decoration:none;">&#128027;&nbsp; Something is wrong: tell us</a>
+</div>
+</div>
+<div style="padding:40px 0 4px 0;text-align:center;">
+<div style="font-size:12px;font-weight:700;letter-spacing:1.5px;color:#715782;text-transform:uppercase;margin:0 0 6px 0;">Features</div>
+<h2 style="font-size:28px;font-weight:800;color:#3E2D4F;margin:0 0 8px 0;">A closer look</h2>
+</div>
+<div class="row">
+<div class="col-12 col-lg-6 mb-4">
+<div class="h-100" style="border:1px solid #E8DFEC;border-radius:12px;background-color:#FFFFFF;padding:16px 18px;">
+<div style="font-size:11px;font-weight:700;letter-spacing:1.2px;color:#715782;text-transform:uppercase;margin:0 0 3px 0;">Over the network</div>
+<h3 style="font-size:19px;font-weight:800;color:#3E2D4F;margin:0 0 10px 0;">Odoo reads the device</h3>
+<div style="font-size:13.5px;color:#4B4453;line-height:1.5;margin:0 0 3px 0;">
+<span style="color:#059669;font-weight:700;">&#10003;</span>&nbsp; The new punches processed like the pushed ones: modes, repeated punches, forgotten check-outs.</div>
+<div style="font-size:13.5px;color:#4B4453;line-height:1.5;margin:0 0 3px 0;">
+<span style="color:#059669;font-weight:700;">&#10003;</span>&nbsp; Device users, clock, restart and enrollment, through one connection.</div>
+<div style="font-size:13.5px;color:#4B4453;line-height:1.5;margin:0 0 3px 0;">
+<span style="color:#059669;font-weight:700;">&#10003;</span>&nbsp; A device that cannot be reached shows its last error and is Offline; the others go on.</div>
+</div>
+</div>
+<div class="col-12 col-lg-6 mb-4">
+<div class="h-100" style="border:1px solid #E8DFEC;border-radius:12px;background-color:#FFFFFF;padding:16px 18px;">
+<div style="font-size:11px;font-weight:700;letter-spacing:1.2px;color:#715782;text-transform:uppercase;margin:0 0 3px 0;">Peace of mind</div>
+<h3 style="font-size:19px;font-weight:800;color:#3E2D4F;margin:0 0 10px 0;">Never in the way</h3>
+<div style="font-size:13.5px;color:#4B4453;line-height:1.5;margin:0 0 3px 0;">
+<span style="color:#059669;font-weight:700;">&#10003;</span>&nbsp; The device keeps taking punches while Odoo reads it.</div>
+<div style="font-size:13.5px;color:#4B4453;line-height:1.5;margin:0 0 3px 0;">
+<span style="color:#059669;font-weight:700;">&#10003;</span>&nbsp; Clear Punches on Device for the attendance managers, after a full download.</div>
+<div style="font-size:13.5px;color:#4B4453;line-height:1.5;margin:0 0 3px 0;">
+<span style="color:#059669;font-weight:700;">&#10003;</span>&nbsp; Uninstall at any time: the devices are archived, their punches stay.</div>
+</div>
+</div>
+</div>
+<div id="setup" style="padding:44px 0 4px 0;text-align:center;">
+<div style="font-size:12px;font-weight:700;letter-spacing:1.5px;color:#715782;text-transform:uppercase;margin:0 0 6px 0;">Guide and install</div>
+<h2 style="font-size:28px;font-weight:800;color:#3E2D4F;margin:0 0 8px 0;">Get started</h2>
+</div>
+<div class="row">
+<div class="col-12 col-lg-6 mb-3">
+<div class="h-100" style="background-color:#715782;background-image:linear-gradient(135deg,#71639E 0%,#714B67 100%);border-radius:12px;padding:20px;">
+<h3 style="font-size:21px;font-weight:800;color:#FFFFFF;margin:0 0 8px 0;">Set up your device</h3>
+<p style="font-size:14px;color:#F6F1F7;line-height:1.55;margin:0 0 12px 0;">Five minutes, over TCP.</p>
+<div style="font-size:13.5px;color:#FFFFFF;line-height:1.55;margin:0 0 8px 0;">
+<span style="display:inline-block;width:22px;height:22px;border-radius:11px;background-color:#FFFFFF;color:#715782;font-size:12px;font-weight:700;text-align:center;line-height:22px;margin:0 8px 0 0;">1</span>On the device, a fixed IP address (<b>Menu &rarr; Communication &rarr; Ethernet</b>) and the communication key (<b>Menu &rarr; Communication &rarr; PC Connection</b>, 0 when none).</div>
+<div style="font-size:13.5px;color:#FFFFFF;line-height:1.55;margin:0 0 8px 0;">
+<span style="display:inline-block;width:22px;height:22px;border-radius:11px;background-color:#FFFFFF;color:#715782;font-size:12px;font-weight:700;text-align:center;line-height:22px;margin:0 8px 0 0;">2</span>Odoo must reach the device on port <code style="background-color:#F6F1F7;color:#3E2D4F;border-radius:4px;padding:1px 5px;font-size:12.5px;">4370</code>: same network, VPN or a port forwarded by the router.</div>
+<div style="font-size:13.5px;color:#FFFFFF;line-height:1.55;margin:0 0 8px 0;">
+<span style="display:inline-block;width:22px;height:22px;border-radius:11px;background-color:#FFFFFF;color:#715782;font-size:12px;font-weight:700;text-align:center;line-height:22px;margin:0 8px 0 0;">3</span>In Odoo, a device with the <b>TCP (Pull)</b> protocol, its IP address, port and key, then <b>Test Connection</b>.</div>
+<div style="font-size:13.5px;color:#FFFFFF;line-height:1.55;margin:0 0 8px 0;">
+<span style="display:inline-block;width:22px;height:22px;border-radius:11px;background-color:#FFFFFF;color:#715782;font-size:12px;font-weight:700;text-align:center;line-height:22px;margin:0 8px 0 0;">4</span><b>Download Now</b>, or wait: Odoo reads the new punches every 10 minutes.</div>
+<div style="font-size:12.5px;color:#EADFF0;line-height:1.5;margin:10px 0 0 0;">For punches in real time, or a device Odoo cannot reach, use ADMS (in Biometric Attendance).</div>
+</div>
+</div>
+<div class="col-12 col-lg-6 mb-3">
+<div class="h-100" style="border:1px solid #E8DFEC;border-radius:12px;background-color:#FFFFFF;padding:20px;">
+<h3 style="font-size:21px;font-weight:800;color:#3E2D4F;margin:0 0 12px 0;">How to install it</h3>
+<div style="font-size:13.5px;color:#4B4453;line-height:1.55;margin:0 0 8px 0;">
+<span style="display:inline-block;width:22px;height:22px;border-radius:11px;background-color:#715782;color:#FFFFFF;font-size:12px;font-weight:700;text-align:center;line-height:22px;margin:0 8px 0 0;">1</span>Copy the module to a folder of your own modules, e.g. <code style="background-color:#F6F1F7;color:#3E2D4F;border-radius:4px;padding:1px 5px;font-size:12.5px;">/opt/odoo/custom-addons</code>, and add that folder to <code style="background-color:#F6F1F7;color:#3E2D4F;border-radius:4px;padding:1px 5px;font-size:12.5px;">addons_path</code> in <code style="background-color:#F6F1F7;color:#3E2D4F;border-radius:4px;padding:1px 5px;font-size:12.5px;">odoo.conf</code>.</div>
+<div style="font-size:13.5px;color:#4B4453;line-height:1.55;margin:0 0 8px 0;">
+<span style="display:inline-block;width:22px;height:22px;border-radius:11px;background-color:#715782;color:#FFFFFF;font-size:12px;font-weight:700;text-align:center;line-height:22px;margin:0 8px 0 0;">2</span>Restart Odoo.</div>
+<div style="font-size:13.5px;color:#4B4453;line-height:1.55;margin:0 0 8px 0;">
+<span style="display:inline-block;width:22px;height:22px;border-radius:11px;background-color:#715782;color:#FFFFFF;font-size:12px;font-weight:700;text-align:center;line-height:22px;margin:0 8px 0 0;">3</span>Activate the developer mode, then <b>Apps &rarr; Update Apps List</b>.</div>
+<div style="font-size:13.5px;color:#4B4453;line-height:1.55;margin:0 0 8px 0;">
+<span style="display:inline-block;width:22px;height:22px;border-radius:11px;background-color:#715782;color:#FFFFFF;font-size:12px;font-weight:700;text-align:center;line-height:22px;margin:0 8px 0 0;">4</span>Clear the Apps filter, search <b>Biometric Attendance: TCP</b> and install it.</div>
+<div style="background-color:#FEF3C7;border:1px solid #F59E0B;border-radius:8px;padding:9px 12px;margin:10px 0 0 0;font-size:13px;color:#78350F;line-height:1.5;">
+<b>Do not use Apps &rarr; Import Module.</b> It is meant for data modules without Python, and leaves these modules half loaded, ending on a missing field or view error.</div>
+<div style="font-size:13px;color:#4B4453;margin:10px 0 0 0;">Still failing? Write to <a href="mailto:odoomates@gmail.com" style="color:#715782;font-weight:700;">odoomates@gmail.com</a> with your Odoo version and the error.</div>
+</div>
+</div>
+</div>
+<div style="background-color:#F6F1F7;border-radius:16px;padding:24px 20px 16px 20px;text-align:center;margin:18px 0 0 0;">
+<h2 style="font-size:22px;font-weight:800;color:#3E2D4F;margin:0 0 6px 0;">How is the app working for you?</h2>
+<p style="font-size:14px;color:#4B4453;margin:0 0 12px 0;">Your review, with the model of your device, helps others find a device that works; your requests and pull requests decide what comes next.</p>
+<a href="https://apps.odoo.com/apps/modules/19.0/om_hr_biometric_zk/" target="_blank" rel="noopener" style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:6px 14px;margin:0 4px 8px 4px;font-size:13px;font-weight:600;text-decoration:none;">&#9733;&nbsp; Rate us on Odoo Apps</a>
+<a href="mailto:odoomates@gmail.com?subject=Biometric%20Attendance%3A%20TCP%20(om_hr_biometric_zk)%20-%20Feature%20request" target="_blank" rel="noopener" style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:6px 14px;margin:0 4px 8px 4px;font-size:13px;font-weight:600;text-decoration:none;">&#128161;&nbsp; Request a feature</a>
+<a href="https://github.com/odoomates/hr/issues/new/choose" target="_blank" rel="noopener" style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:6px 14px;margin:0 4px 8px 4px;font-size:13px;font-weight:600;text-decoration:none;">&#128027;&nbsp; Report an issue</a>
+<a href="https://github.com/odoomates/hr" target="_blank" rel="noopener" style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:6px 14px;margin:0 4px 8px 4px;font-size:13px;font-weight:600;text-decoration:none;">&#9733;&nbsp; Star us on GitHub</a>
+<a href="https://github.com/odoomates/hr/blob/20.0/CONTRIBUTING.md" target="_blank" rel="noopener" style="display:inline-block;border:1px solid #E8DFEC;background-color:#FFFFFF;color:#3E2D4F;border-radius:20px;padding:6px 14px;margin:0 4px 8px 4px;font-size:13px;font-weight:600;text-decoration:none;">&#128221;&nbsp; How to contribute</a>
+</div>
+<div style="margin:18px 0 10px 0;text-align:center;">
+<img src="https://apps.odoocdn.com/apps/assets/20.0/om_account_accountant/odoo_mates.png" alt="Odoo Mates" style="height:44px;margin:0 0 4px 0;"/>
+<div style="font-size:13px;color:#4B4453;">Email: <a href="mailto:odoomates@gmail.com" style="color:#715782;font-weight:700;">odoomates@gmail.com</a>
+</div>
+</div>
+</div>
