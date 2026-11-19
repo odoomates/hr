@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="device_demo_entrance" model="hr.biometric.device">
+        <field name="name">Main Entrance</field>
+        <field name="serial_number">DEMO0000000001</field>
+        <field name="timezone">Europe/Brussels</field>
+        <field name="attendance_mode">alternate</field>
+    </record>
+</odoo>

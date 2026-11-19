@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_biometric_device_view_form" model="ir.ui.view">
+        <field name="name">hr.biometric.device.form.zk</field>
+        <field name="model">hr.biometric.device</field>
+        <field name="inherit_id" ref="om_hr_biometric.hr_biometric_device_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_open_download']" position="before">
+                <button name="action_zk_download" type="object" string="Download Now" class="btn-primary" attrs="{'invisible': [('protocol', '!=', 'zk')]}"
+                       />
+                <button name="action_zk_test" type="object" string="Test Connection" attrs="{'invisible': [('protocol', '!=', 'zk')]}"/>
+            </xpath>
+            <xpath expr="//button[@name='action_open_download']" position="attributes">
+                <attribute name="class" separator=" " remove="btn-primary"/>
+            </xpath>
+            <xpath expr="//button[@name='action_reboot']" position="after">
+                <button name="action_zk_clear_log" type="object" string="Clear Punches on Device"
+                        groups="hr_attendance.group_hr_attendance_manager"
+                        confirm="The punches are downloaded first, then deleted from the device (never from Odoo). Continue?" attrs="{'invisible': [('protocol', '!=', 'zk')]}"/>
+            </xpath>
+            <xpath expr="//field[@name='ip_address']" position="attributes">
+                <attribute name="attrs">{'required': [('protocol', '=', 'zk')]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='comm_key']" position="after">
+                <field name="zk_udp" attrs="{'invisible': [('protocol', '!=', 'zk')]}"/>
+                <field name="zk_timeout" attrs="{'invisible': [('protocol', '!=', 'zk')]}"/>
+            </xpath>
+            <xpath expr="//field[@name='last_contact']" position="after">
+                <field name="zk_auto_download" attrs="{'invisible': [('protocol', '!=', 'zk')]}"/>
+                <field name="zk_last_log_time" attrs="{'invisible': [('protocol', '!=', 'zk')]}"/>
+                <field name="zk_error" class="text-danger" attrs="{'invisible': [('zk_error', '=', False)]}"/>
+            </xpath>
+            <xpath expr="//page[@name='adms_setup']" position="after">
+                <page string="TCP Setup" name="zk_setup" attrs="{'invisible': [('protocol', '!=', 'zk')]}">
+                    <p>On the device, in Menu &gt; Communication &gt; Ethernet: a fixed IP address. Odoo must
+                        reach it on port 4370 (TCP, or UDP for the older devices): on the same network, or through
+                        a VPN or a port forwarded by the router.</p>
+                    <p>The communication key is the one in Menu &gt; Communication &gt; PC Connection (0 when none).
+                        Odoo downloads the new punches every 10 minutes; for punches in real time, use ADMS.</p>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
