@@ -1,0 +1,118 @@
+name: Tests
+
+on:
+  push:
+    branches: ['19.0']
+  pull_request:
+    branches: ['19.0']
+  workflow_dispatch:
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      - run: pip install ruff pylint-odoo
+      - name: ruff
+        run: ruff check .
+      - name: pylint-odoo
+        run: pylint --rcfile=.pylintrc om_*
+
+  tests:
+    name: tests (${{ matrix.name }})
+    needs: lint
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: with accounting
+            modules: om_hr_payroll,om_hr_payroll_account
+          - name: without accounting
+            modules: om_hr_payroll
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: odoo
+          POSTGRES_PASSWORD: odoo
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      PGHOST: localhost
+      PGUSER: odoo
+      PGPASSWORD: odoo
+      ODOO_PATH: ${{ github.workspace }}/odoo
+      LOG_DIR: ${{ github.workspace }}/logs
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          path: hr
+      - uses: ./hr/.github/actions/setup-odoo
+      - name: Install and test
+        run: hr/.github/scripts/run_odoo_tests.sh test_suite "${{ matrix.modules }}"
+      - name: Log
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: log-${{ strategy.job-index }}
+          path: logs/
+
+  upgrade:
+    # the users of the version before this change upgrade without an error or a warning
+    name: upgrade
+    needs: lint
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: odoo
+          POSTGRES_PASSWORD: odoo
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      PGHOST: localhost
+      PGUSER: odoo
+      PGPASSWORD: odoo
+      ODOO_PATH: ${{ github.workspace }}/odoo
+      LOG_DIR: ${{ github.workspace }}/logs
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          path: hr
+          fetch-depth: 0
+      - name: Version before the change
+        id: base
+        run: |
+          base=${{ github.event.pull_request.base.sha || github.event.before }}
+          if [ -z "$base" ] || ! git -C hr cat-file -e "$base^{commit}" 2>/dev/null; then
+            base=$(git -C hr rev-parse HEAD~1)
+          fi
+          echo "sha=$base" >> "$GITHUB_OUTPUT"
+          git -C hr worktree add --detach ../before "$base"
+      - uses: ./hr/.github/actions/setup-odoo
+      - name: Install the version before, upgrade to this one
+        run: hr/.github/scripts/run_odoo_upgrade.sh test_upgrade before om_hr_payroll,om_hr_payroll_account
+      - name: Log
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: log-upgrade
+          path: logs/
