@@ -1,0 +1,15 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_device_manager,hr.biometric.device.manager,model_hr_biometric_device,hr_attendance.group_hr_attendance_manager,1,1,1,1
+access_status_code_manager,hr.biometric.status.code.manager,model_hr_biometric_status_code,hr_attendance.group_hr_attendance_manager,1,1,1,1
+access_device_user_manager,hr.biometric.device.user.manager,model_hr_biometric_device_user,hr_attendance.group_hr_attendance_manager,1,1,1,1
+access_log_manager,hr.biometric.log.manager,model_hr_biometric_log,hr_attendance.group_hr_attendance_manager,1,1,1,1
+access_command_manager,hr.biometric.command.manager,model_hr_biometric_command,hr_attendance.group_hr_attendance_manager,1,1,1,1
+access_daily_manager,hr.biometric.daily.manager,model_hr_biometric_daily,hr_attendance.group_hr_attendance_manager,1,0,0,0
+access_template_manager,hr.biometric.template.manager,model_hr_biometric_template,hr_attendance.group_hr_attendance_manager,1,1,1,1
+access_download_manager,hr.biometric.download.manager,model_hr_biometric_download,hr_attendance.group_hr_attendance_manager,1,1,1,1
+access_export_manager,hr.biometric.export.manager,model_hr_biometric_export,hr_attendance.group_hr_attendance_manager,1,1,1,1
+access_reprocess_manager,hr.biometric.reprocess.manager,model_hr_biometric_reprocess,hr_attendance.group_hr_attendance_manager,1,1,1,1
+access_copy_manager,hr.biometric.copy.manager,model_hr_biometric_copy,hr_attendance.group_hr_attendance_manager,1,1,1,1
+access_enroll_manager,hr.biometric.enroll.manager,model_hr_biometric_enroll,hr_attendance.group_hr_attendance_manager,1,1,1,1
+access_absence_wizard_manager,hr.biometric.absence.wizard.manager,model_hr_biometric_absence_wizard,hr_attendance.group_hr_attendance_manager,1,1,1,1
+access_absence_manager,hr.biometric.absence.manager,model_hr_biometric_absence,hr_attendance.group_hr_attendance_manager,1,1,1,1

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_biometric_log_view_list" model="ir.ui.view">
+        <field name="name">hr.biometric.log.list</field>
+        <field name="model">hr.biometric.log</field>
+        <field name="arch" type="xml">
+            <tree create="false" decoration-danger="state == 'error'" decoration-warning="state == 'unmapped'"
+                  decoration-muted="state == 'ignored'">
+                <header>
+                    <button name="action_process" type="object" string="Process"/>
+                </header>
+                <field name="timestamp"/>
+                <field name="local_time" optional="hide"/>
+                <field name="device_id"/>
+                <field name="user_code"/>
+                <field name="employee_id"/>
+                <field name="punch"/>
+                <field name="status" optional="hide"/>
+                <field name="verify_type" optional="show"/>
+                <field name="state" widget="badge" decoration-success="state == 'done'"
+                       decoration-danger="state == 'error'" decoration-warning="state == 'unmapped'"/>
+                <field name="message" optional="show"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="hr_biometric_log_view_form" model="ir.ui.view">
+        <field name="name">hr.biometric.log.form</field>
+        <field name="model">hr.biometric.log</field>
+        <field name="arch" type="xml">
+            <form create="false" edit="false">
+                <header>
+                    <button name="action_process" type="object" string="Process" attrs="{'invisible': [('state', 'not in', ['new', 'unmapped', 'error'])]}"
+                           />
+                    <field name="state" widget="statusbar" statusbar_visible="new,done"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="timestamp"/>
+                            <field name="local_time"/>
+                            <field name="device_id"/>
+                            <field name="user_code"/>
+                            <field name="device_user_id"/>
+                            <field name="employee_id"/>
+                        </group>
+                        <group>
+                            <field name="punch"/>
+                            <field name="status"/>
+                            <field name="verify_type"/>
+                            <field name="work_code"/>
+                            <field name="source"/>
+                            <field name="attendance_id"/>
+                            <field name="message"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_biometric_log_view_search" model="ir.ui.view">
+        <field name="name">hr.biometric.log.search</field>
+        <field name="model">hr.biometric.log</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <field name="user_code"/>
+                <field name="device_id"/>
+                <filter string="To Process" name="new" domain="[('state', '=', 'new')]"/>
+                <filter string="Unknown Users" name="unmapped" domain="[('state', '=', 'unmapped')]"/>
+                <filter string="Errors" name="error" domain="[('state', '=', 'error')]"/>
+                <separator/>
+                <filter string="Time" name="filter_timestamp" date="timestamp"/>
+                <group>
+                    <filter string="Employee" name="group_employee" context="{'group_by': 'employee_id'}"/>
+                    <filter string="Device" name="group_device" context="{'group_by': 'device_id'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Verification" name="group_verify" context="{'group_by': 'verify_type'}"/>
+                    <filter string="Day" name="group_day" context="{'group_by': 'timestamp:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="hr_biometric_log_view_pivot" model="ir.ui.view">
+        <field name="name">hr.biometric.log.pivot</field>
+        <field name="model">hr.biometric.log</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="device_id" type="row"/>
+                <field name="timestamp" interval="day" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="hr_biometric_log_view_graph" model="ir.ui.view">
+        <field name="name">hr.biometric.log.graph</field>
+        <field name="model">hr.biometric.log</field>
+        <field name="arch" type="xml">
+            <graph type="bar">
+                <field name="timestamp" interval="day"/>
+                <field name="verify_type"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="hr_biometric_log_action" model="ir.actions.act_window">
+        <field name="name">Biometric Punches</field>
+        <field name="res_model">hr.biometric.log</field>
+        <field name="view_mode">list,pivot,graph,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No punch yet</p>
+            <p>The punches arrive as the devices send them.</p>
+        </field>
+    </record>
+</odoo>
