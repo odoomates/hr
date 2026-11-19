@@ -1,0 +1,27 @@
+{
+    'name': 'Biometric Attendance',
+    'version': '17.0.1.0.0',
+    'category': 'Human Resources/Attendances',
+    'summary': 'ZKTeco and eSSL biometric devices: punches pushed to Odoo (ADMS), check-in and check-out modes, '
+               'device users, fingerprints, daily and absence reports',
+    'author': 'Odoo Mates',
+    'maintainer': 'Odoo Mates',
+    'support': 'odoomates@gmail.com',
+    'license': 'LGPL-3',
+    'depends': ['hr_attendance'],
+    'data': [
+        'security/ir.model.access.csv',
+        'security/om_hr_biometric_security.xml',
+        'data/om_hr_biometric_data.xml',
+        'views/hr_biometric_device_views.xml',
+        'views/hr_biometric_log_views.xml',
+        'views/hr_biometric_daily_views.xml',
+        'views/hr_employee_views.xml',
+        'views/hr_attendance_views.xml',
+        'views/res_config_settings_views.xml',
+        'wizard/hr_biometric_wizard_views.xml',
+        'views/om_hr_biometric_menus.xml',
+    ],
+    'demo': ['demo/om_hr_biometric_demo.xml'],
+    'images': ['static/description/banner.gif'],
+}
