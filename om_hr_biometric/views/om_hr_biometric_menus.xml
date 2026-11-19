@@ -10,10 +10,14 @@
     <menuitem id="menu_biometric_reprocess" name="Process Again" parent="menu_biometric_root"
               action="hr_biometric_reprocess_action" sequence="3"/>
     <menuitem id="menu_biometric_reporting" name="Reporting" parent="menu_biometric_root" sequence="10"/>
-    <menuitem id="menu_biometric_daily" name="Daily Biometric Attendance" parent="menu_biometric_reporting"
-              action="hr_biometric_daily_action" sequence="1"/>
+    <menuitem id="menu_biometric_today" name="Today" parent="menu_biometric_reporting"
+              action="hr_biometric_today_action" sequence="1"/>
+    <menuitem id="menu_biometric_status" name="Attendance Status" parent="menu_biometric_reporting"
+              action="hr_biometric_status_wizard_action" sequence="2"/>
     <menuitem id="menu_biometric_absence" name="Absences" parent="menu_biometric_reporting"
-              action="hr_biometric_absence_wizard_action" sequence="2"/>
+              action="hr_biometric_absence_action" sequence="3"/>
+    <menuitem id="menu_biometric_daily" name="Daily Biometric Attendance" parent="menu_biometric_reporting"
+              action="hr_biometric_daily_action" sequence="4"/>
     <menuitem id="menu_biometric_device_health" name="Device Health" parent="menu_biometric_reporting"
               action="hr_biometric_device_action_health" sequence="3"/>
     <menuitem id="menu_biometric_configuration" name="Configuration" parent="menu_biometric_root" sequence="20"

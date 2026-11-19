@@ -16,5 +16,5 @@ access_reprocess_user,hr.biometric.reprocess,model_hr_biometric_reprocess,hr_att
 access_template_manager,hr.biometric.template.manager,model_hr_biometric_template,hr_attendance.group_hr_attendance_manager,1,1,1,1
 access_copy_user,hr.biometric.copy,model_hr_biometric_copy,hr_attendance.group_hr_attendance_user,1,1,1,1
 access_enroll_user,hr.biometric.enroll,model_hr_biometric_enroll,hr_attendance.group_hr_attendance_user,1,1,1,1
-access_absence_wizard_user,hr.biometric.absence.wizard,model_hr_biometric_absence_wizard,hr_attendance.group_hr_attendance_user,1,1,1,1
-access_absence_user,hr.biometric.absence,model_hr_biometric_absence,hr_attendance.group_hr_attendance_user,1,1,1,1
+access_status_wizard_user,hr.biometric.status.wizard,model_hr_biometric_status_wizard,hr_attendance.group_hr_attendance_user,1,1,1,1
+access_day_user,hr.biometric.day,model_hr_biometric_day,hr_attendance.group_hr_attendance_user,1,1,1,1
