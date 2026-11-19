@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or help with a module
+    url: mailto:odoomates@gmail.com
+    about: How to install, configure or use a module. Write to odoomates@gmail.com, we are happy to guide you.
+  - name: Security vulnerability
+    url: https://github.com/odoomates/hr/blob/20.0/SECURITY.md
+    about: Never in a public issue. Report it privately by email, as explained in the security policy.
+  - name: Support and customisation
+    url: https://github.com/odoomates/hr/blob/20.0/SUPPORT.md
+    about: Support, customisation or a new module. Write to odoomates@gmail.com.
