@@ -124,12 +124,12 @@ What it installs:
   hours; published shifts are the working schedule of the employees.
 * ``om_hr_shift_payroll`` Shift Allowances in Payroll: the allowance of each
   published shift paid on the payslips, e.g. a night shift allowance.
-* ``om_hr_biometric`` Biometric Attendance: the punches of the ZKTeco and
+* ``om_hr_biometric`` Biometric Attendance Machine: the punches of the ZKTeco and
   eSSL devices pushed to Odoo (ADMS) become the check-ins and check-outs, with
   modes per device, device users, fingerprints and daily and absence reports.
-* ``om_hr_biometric_zk`` Biometric Attendance: TCP: the same devices read by
+* ``om_hr_biometric_zk`` Biometric Attendance Machine - TCP/UDP: the same devices read by
   Odoo over the network, for devices without ADMS.
-* ``om_hr_biometric_shift`` Biometric Attendance with Shifts: the punches read
+* ``om_hr_biometric_shift`` Biometric Attendance Machine - Shifts: the punches read
   against the published shifts; installs by itself with Shifts.
 * ``om_hr_reminder`` HR Reminders: birthdays, work anniversaries and probation
   ends through the Automation Rules, and the celebrations of the month in

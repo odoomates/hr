@@ -1,5 +1,5 @@
 {
-    'name': 'Biometric Attendance with Shifts',
+    'name': 'Biometric Attendance Machine - Shifts',
     'version': '20.0.1.0.0',
     'category': 'Human Resources/Attendances',
     'summary': 'Punches read against the published shifts: a missed punch no longer turns the check-ins and '
