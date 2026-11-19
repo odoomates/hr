@@ -1,13 +1,13 @@
-==============================
-Biometric Attendance Dashboard
-==============================
+========================================
+Biometric Attendance Machine - Dashboard
+========================================
 
 Part of `Odoo Mates HR <https://github.com/odoomates/hr>`_, the HR suite of Odoo Mates for Odoo 20
 Community.
 
 A dashboard of the biometric devices in the Dashboards app, next to the Time
 Off and Attendance one. It installs by itself with the Dashboards app and
-*Biometric Attendance*.
+*Biometric Attendance Machine - ZKTeco, eSSL, Fingerprint, Face*.
 
 Features
 ========
@@ -30,7 +30,7 @@ Dependencies
 ============
 
 * ``spreadsheet_dashboard``
-* ``om_hr_biometric`` (Biometric Attendance)
+* ``om_hr_biometric`` (Biometric Attendance Machine)
 
 Support
 =======
