@@ -1,0 +1,22 @@
+name: Mergebot
+
+# The mergebot: merge on a comment of a maintainer, version bump, forward-port. It lives in odoomates/mergebot,
+# whose README lists its commands and secrets.
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_target:
+    types: [closed]
+
+permissions: {}
+
+jobs:
+  mergebot:
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      checks: read
+    uses: odoomates/mergebot/.github/workflows/mergebot.yml@main
+    secrets: inherit
