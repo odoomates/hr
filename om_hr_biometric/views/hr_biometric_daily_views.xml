@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_biometric_daily_view_list" model="ir.ui.view">
+        <field name="name">hr.biometric.daily.list</field>
+        <field name="model">hr.biometric.daily</field>
+        <field name="arch" type="xml">
+            <tree create="false" delete="false">
+                <field name="date"/>
+                <field name="employee_id"/>
+                <field name="first_punch"/>
+                <field name="last_punch"/>
+                <field name="span_hours" widget="float_time"/>
+                <field name="punch_count"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="hr_biometric_daily_view_pivot" model="ir.ui.view">
+        <field name="name">hr.biometric.daily.pivot</field>
+        <field name="model">hr.biometric.daily</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="employee_id" type="row"/>
+                <field name="date" interval="week" type="col"/>
+                <field name="span_hours" type="measure" widget="float_time"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="hr_biometric_daily_view_search" model="ir.ui.view">
+        <field name="name">hr.biometric.daily.search</field>
+        <field name="model">hr.biometric.daily</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <filter string="Date" name="filter_date" date="date"/>
+                <group>
+                    <filter string="Employee" name="group_employee" context="{'group_by': 'employee_id'}"/>
+                    <filter string="Date" name="group_date" context="{'group_by': 'date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="hr_biometric_daily_action" model="ir.actions.act_window">
+        <field name="name">Daily Biometric Attendance</field>
+        <field name="res_model">hr.biometric.daily</field>
+        <field name="view_mode">tree,pivot</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No punch yet</p>
+            <p>The first and last punch of each employee, day by day.</p>
+        </field>
+    </record>
+</odoo>

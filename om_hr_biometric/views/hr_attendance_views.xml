@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_attendance_view_form" model="ir.ui.view">
+        <field name="name">hr.attendance.form.biometric</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.hr_attendance_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='in_mode']" position="after">
+                <field name="in_device_id" invisible="not in_device_id"/>
+            </xpath>
+            <xpath expr="//field[@name='out_mode']" position="after">
+                <field name="out_device_id" invisible="not out_device_id"/>
+            </xpath>
+            <xpath expr="//sheet" position="before">
+                <field name="biometric_review" invisible="1"/>
+                <div class="alert alert-warning mb-0" role="alert" invisible="not biometric_review">
+                    No check-out was punched: this attendance was closed at its check-in. Correct the check-out,
+                    then
+                    <button name="action_biometric_reviewed" type="object" string="mark it as reviewed"
+                            class="btn btn-link p-0 align-baseline"/>.
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_attendance_view_list" model="ir.ui.view">
+        <field name="name">hr.attendance.list.biometric</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.view_attendance_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='out_mode']" position="after">
+                <field name="in_device_id" optional="hidden"/>
+                <field name="out_device_id" optional="hidden"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_attendance_view_search" model="ir.ui.view">
+        <field name="name">hr.attendance.search.biometric</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.hr_attendance_view_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='errors']" position="after">
+                <filter string="Biometric Devices" name="biometric"
+                        domain="['|', ('in_mode', '=', 'biometric'), ('out_mode', '=', 'biometric')]"/>
+                <filter string="Biometric: To Review" name="biometric_review"
+                        domain="[('biometric_review', '=', True)]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
