@@ -59,6 +59,8 @@
         'om_hr_portal_shift',
         'om_hr_shift_payroll',
         'om_hr_overtime_request',
+        'om_hr_biometric',
+        'om_hr_biometric_zk',
         'om_hr_announcement',
         'om_hr_portal_announcement',
         'om_hr_sign',

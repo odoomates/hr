@@ -1,0 +1,27 @@
+id,name,model_id,group_id/id,operation,domain
+access_device_user,hr.biometric.device.user,hr.biometric.device,hr_attendance.group_hr_attendance_user,r,
+access_device_manager,hr.biometric.device.manager,hr.biometric.device,hr_attendance.group_hr_attendance_manager,crud,
+device_company_rule,Biometric devices: multi-company,hr.biometric.device,,crud,"[('company_id', 'in', company_ids)]"
+access_status_code_user,hr.biometric.status.code.user,hr.biometric.status.code,hr_attendance.group_hr_attendance_user,r,
+access_status_code_manager,hr.biometric.status.code.manager,hr.biometric.status.code,hr_attendance.group_hr_attendance_manager,crud,
+status_code_company_rule,Biometric status codes: multi-company,hr.biometric.status.code,,crud,"[('device_id.company_id', 'in', company_ids)]"
+access_device_user_user,hr.biometric.device.user.user,hr.biometric.device.user,hr_attendance.group_hr_attendance_user,cru,
+access_device_user_manager,hr.biometric.device.user.manager,hr.biometric.device.user,hr_attendance.group_hr_attendance_manager,crud,
+device_user_company_rule,Biometric device users: multi-company,hr.biometric.device.user,,crud,"[('company_id', 'in', company_ids)]"
+access_log_user,hr.biometric.log.user,hr.biometric.log,hr_attendance.group_hr_attendance_user,ru,
+access_log_manager,hr.biometric.log.manager,hr.biometric.log,hr_attendance.group_hr_attendance_manager,crud,
+log_company_rule,Biometric punches: multi-company,hr.biometric.log,,crud,"[('company_id', 'in', company_ids)]"
+access_command_user,hr.biometric.command.user,hr.biometric.command,hr_attendance.group_hr_attendance_user,cru,
+access_command_manager,hr.biometric.command.manager,hr.biometric.command,hr_attendance.group_hr_attendance_manager,crud,
+command_company_rule,Biometric commands: multi-company,hr.biometric.command,,crud,"[('company_id', 'in', company_ids)]"
+access_daily_user,hr.biometric.daily.user,hr.biometric.daily,hr_attendance.group_hr_attendance_user,r,
+daily_company_rule,Daily biometric attendance: multi-company,hr.biometric.daily,,r,"[('company_id', 'in', company_ids)]"
+access_download_user,hr.biometric.download,hr.biometric.download,hr_attendance.group_hr_attendance_user,crud,
+access_export_user,hr.biometric.export,hr.biometric.export,hr_attendance.group_hr_attendance_user,crud,
+access_reprocess_user,hr.biometric.reprocess,hr.biometric.reprocess,hr_attendance.group_hr_attendance_user,crud,
+access_template_manager,hr.biometric.template.manager,hr.biometric.template,hr_attendance.group_hr_attendance_manager,crud,
+template_company_rule,Biometric templates: multi-company,hr.biometric.template,,crud,"[('company_id', 'in', company_ids)]"
+access_copy_user,hr.biometric.copy,hr.biometric.copy,hr_attendance.group_hr_attendance_user,crud,
+access_enroll_user,hr.biometric.enroll,hr.biometric.enroll,hr_attendance.group_hr_attendance_user,crud,
+access_absence_wizard_user,hr.biometric.absence.wizard,hr.biometric.absence.wizard,hr_attendance.group_hr_attendance_user,crud,
+access_absence_user,hr.biometric.absence,hr.biometric.absence,hr_attendance.group_hr_attendance_user,crud,

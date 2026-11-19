@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_biometric_device_view_list" model="ir.ui.view">
+        <field name="name">hr.biometric.device.list</field>
+        <field name="model">hr.biometric.device</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="serial_number"/>
+                <field name="protocol"/>
+                <field name="attendance_mode"/>
+                <field name="connection_state" widget="badge"
+                       decoration-success="connection_state == 'online'"
+                       decoration-danger="connection_state == 'offline'"/>
+                <field name="last_contact"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hr_biometric_device_view_form" model="ir.ui.view">
+        <field name="name">hr.biometric.device.form</field>
+        <field name="model">hr.biometric.device</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_open_download" type="object" string="Download Punches" class="btn-primary"/>
+                    <button name="action_open_export" type="object" string="Send Employees"/>
+                    <button name="action_query_users" type="object" string="Download Users"/>
+                    <button name="action_query_info" type="object" string="Device Information"/>
+                    <button name="action_set_time" type="object" string="Set Time"
+                            groups="hr_attendance.group_hr_attendance_manager"/>
+                    <button name="action_reboot" type="object" string="Restart"
+                            groups="hr_attendance.group_hr_attendance_manager"
+                            confirm="Restart the device at its next contact?"/>
+                    <field name="connection_state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_logs" type="object" class="oe_stat_button" icon="history">
+                            <field name="log_count" widget="statinfo" string="Punches"/>
+                        </button>
+                        <button name="action_view_unmapped" type="object" class="oe_stat_button" icon="warning"
+                                invisible="not unmapped_count">
+                            <field name="unmapped_count" widget="statinfo" string="Unknown Users"/>
+                        </button>
+                        <button name="action_view_errors" type="object" class="oe_stat_button" icon="warning"
+                                invisible="not error_count">
+                            <field name="error_count" widget="statinfo" string="Errors"/>
+                        </button>
+                        <button name="action_view_users" type="object" class="oe_stat_button" icon="group">
+                            <field name="user_count" widget="statinfo" string="Users"/>
+                        </button>
+                        <button name="action_view_commands" type="object" class="oe_stat_button" icon="send">
+                            <field name="pending_command_count" widget="statinfo" string="Pending Commands"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Main Entrance"/></h1>
+                    </div>
+                    <group>
+                        <group name="connection">
+                            <field name="protocol"/>
+                            <field name="serial_number" required="protocol == 'adms'"/>
+                            <field name="ip_address"/>
+                            <field name="port" invisible="protocol == 'adms'"/>
+                            <field name="comm_key" password="True" invisible="protocol == 'adms'"/>
+                            <field name="allowed_ips" invisible="protocol != 'adms'"/>
+                            <field name="timezone"/>
+                        </group>
+                        <group name="punches">
+                            <field name="attendance_mode"/>
+                            <field name="duplicate_window"/>
+                            <field name="last_contact"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Status Codes" name="status_codes" invisible="attendance_mode != 'status_code'">
+                            <field name="status_code_ids">
+                                <list editable="bottom">
+                                    <field name="code"/>
+                                    <field name="action"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Device Information" name="info">
+                            <group>
+                                <group>
+                                    <field name="device_model"/>
+                                    <field name="firmware_version"/>
+                                    <field name="platform"/>
+                                    <field name="mac_address"/>
+                                </group>
+                                <group>
+                                    <field name="device_user_count"/>
+                                    <field name="device_fingerprint_count"/>
+                                    <field name="device_face_count"/>
+                                    <field name="device_log_count"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="ADMS Setup" name="adms_setup" invisible="protocol != 'adms'">
+                            <p>On the device, in Menu &gt; Communication &gt; Cloud Server Setting (ADMS):</p>
+                            <ul>
+                                <li>Server Address: the domain name of this Odoo (or its IP address on the local
+                                    network).</li>
+                                <li>Server Port: 443 with HTTPS, 8069 for an Odoo on the local network.</li>
+                                <li>Enable Domain Name when the address is a domain name, and HTTPS when the port
+                                    is 443.</li>
+                            </ul>
+                            <p>The device is online within a minute. With several databases on this server, the
+                                domain name must select this database (dbfilter): the device cannot choose it.</p>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_biometric_device_view_list_health" model="ir.ui.view">
+        <field name="name">hr.biometric.device.list.health</field>
+        <field name="model">hr.biometric.device</field>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <list create="false" decoration-danger="connection_state == 'offline' or failed_command_count"
+                  decoration-warning="unmapped_count or error_count">
+                <field name="name"/>
+                <field name="protocol"/>
+                <field name="connection_state" widget="badge"
+                       decoration-success="connection_state == 'online'"
+                       decoration-danger="connection_state == 'offline'"/>
+                <field name="last_contact"/>
+                <field name="unmapped_count" string="Unknown Users"/>
+                <field name="error_count"/>
+                <field name="pending_command_count" string="Pending Commands"/>
+                <field name="failed_command_count"/>
+                <field name="device_log_count" optional="show"/>
+                <field name="firmware_version" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hr_biometric_device_action_health" model="ir.actions.act_window">
+        <field name="name">Device Health</field>
+        <field name="res_model">hr.biometric.device</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="hr_biometric_device_view_list_health"/>
+    </record>
+
+    <record id="hr_biometric_device_view_search" model="ir.ui.view">
+        <field name="name">hr.biometric.device.search</field>
+        <field name="model">hr.biometric.device</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="serial_number"/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="hr_biometric_device_action" model="ir.actions.act_window">
+        <field name="name">Biometric Devices</field>
+        <field name="res_model">hr.biometric.device</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Add a biometric device</p>
+            <p>Its punches become the check-ins and check-outs of the employees.</p>
+        </field>
+    </record>
+
+    <record id="hr_biometric_device_user_view_list" model="ir.ui.view">
+        <field name="name">hr.biometric.device.user.list</field>
+        <field name="model">hr.biometric.device.user</field>
+        <field name="arch" type="xml">
+            <list editable="bottom" create="false">
+                <header>
+                    <button name="action_push" type="object" string="Send to Device"/>
+                    <button name="action_remove_from_device" type="object" string="Remove from Device"
+                            confirm="Remove these users from their devices?"/>
+                </header>
+                <field name="device_id" readonly="1"/>
+                <field name="user_code" readonly="1"/>
+                <field name="name" readonly="1"/>
+                <field name="employee_id"/>
+                <field name="privilege" readonly="1"/>
+                <field name="card" readonly="1" optional="hide"/>
+                <field name="fingerprint_count" optional="show"/>
+                <field name="face_count" optional="show"/>
+                <field name="state" widget="badge" decoration-info="state == 'to_push'"
+                       decoration-warning="state == 'to_delete'"/>
+                <button name="action_open_enroll" type="object" string="Enroll Finger" class="btn-link"/>
+                <button name="action_open_copy" type="object" string="Copy" class="btn-link"
+                        invisible="not employee_id"/>
+                <field name="company_id" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hr_biometric_device_user_view_search" model="ir.ui.view">
+        <field name="name">hr.biometric.device.user.search</field>
+        <field name="model">hr.biometric.device.user</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="user_code"/>
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="device_id"/>
+                <filter string="Without Employee" name="unlinked" domain="[('employee_id', '=', False)]"/>
+                <filter string="Pending" name="pending" domain="[('state', '!=', 'on_device')]"/>
+                <group>
+                    <filter string="Device" name="group_device" context="{'group_by': 'device_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="hr_biometric_device_user_action" model="ir.actions.act_window">
+        <field name="name">Device Users</field>
+        <field name="res_model">hr.biometric.device.user</field>
+        <field name="view_mode">list</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No device user yet</p>
+            <p>The devices send their users; link those without an employee.</p>
+        </field>
+    </record>
+
+    <record id="hr_biometric_template_view_list" model="ir.ui.view">
+        <field name="name">hr.biometric.template.list</field>
+        <field name="model">hr.biometric.template</field>
+        <field name="arch" type="xml">
+            <list create="false" edit="false">
+                <field name="employee_id"/>
+                <field name="device_user_id"/>
+                <field name="device_id"/>
+                <field name="kind"/>
+                <field name="finger"/>
+                <field name="valid"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hr_biometric_template_action" model="ir.actions.act_window">
+        <field name="name">Biometric Templates</field>
+        <field name="res_model">hr.biometric.template</field>
+        <field name="view_mode">list</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No biometric template kept</p>
+            <p>Odoo keeps the templates the devices send only when the company chooses to, in the Attendance
+                settings.</p>
+        </field>
+    </record>
+
+    <record id="hr_biometric_command_view_list" model="ir.ui.view">
+        <field name="name">hr.biometric.command.list</field>
+        <field name="model">hr.biometric.command</field>
+        <field name="arch" type="xml">
+            <list create="false" decoration-danger="state == 'failed'" decoration-muted="state == 'done'">
+                <header>
+                    <button name="action_retry" type="object" string="Retry"/>
+                    <button name="action_cancel" type="object" string="Cancel"/>
+                </header>
+                <field name="create_date" string="Created"/>
+                <field name="device_id"/>
+                <field name="command"/>
+                <field name="payload" optional="hide"/>
+                <field name="device_user_id" optional="show"/>
+                <field name="tries" optional="hide"/>
+                <field name="done_date" optional="show"/>
+                <field name="return_code" optional="hide"/>
+                <field name="state" widget="badge" decoration-success="state == 'done'"
+                       decoration-info="state in ('pending', 'sent')" decoration-danger="state == 'failed'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hr_biometric_command_view_form" model="ir.ui.view">
+        <field name="name">hr.biometric.command.form</field>
+        <field name="model">hr.biometric.command</field>
+        <field name="arch" type="xml">
+            <form create="false" edit="false">
+                <header>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="device_id"/>
+                            <field name="command"/>
+                            <field name="device_user_id"/>
+                        </group>
+                        <group>
+                            <field name="sent_date"/>
+                            <field name="tries"/>
+                            <field name="done_date"/>
+                            <field name="return_code"/>
+                        </group>
+                    </group>
+                    <field name="payload"/>
+                    <field name="reply"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

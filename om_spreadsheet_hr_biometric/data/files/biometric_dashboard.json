@@ -1,0 +1,697 @@
+{
+    "version": "19.3.10",
+    "sheets": [
+        {
+            "id": "231bd881-bd41-52c5-b7d3-9bb7062615e7",
+            "name": "Dashboard",
+            "colNumber": 20,
+            "rowNumber": 80,
+            "rows": {},
+            "cols": {},
+            "merges": [],
+            "cells": {
+                "A33": "=_t(\"Devices\")",
+                "A34": "=ODOO.LIST(1,20)"
+            },
+            "styles": {
+                "A33": 2
+            },
+            "formats": {},
+            "borders": {},
+            "conditionalFormats": [],
+            "dataValidationRules": [],
+            "figures": [
+                {
+                    "id": "a805db8a-081c-5cc2-b53b-82f4dfd3f993",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 0,
+                        "y": 0
+                    },
+                    "width": 240,
+                    "height": 110,
+                    "tag": "chart",
+                    "data": {
+                        "type": "scorecard",
+                        "title": {
+                            "text": "Punches",
+                            "color": "#01666B",
+                            "bold": true
+                        },
+                        "background": "",
+                        "keyValue": "Data!B1",
+                        "baselineColorDown": "#DC6965",
+                        "baselineColorUp": "#00A04A",
+                        "baselineMode": "percentage",
+                        "humanize": true,
+                        "chartId": "a805db8a-081c-5cc2-b53b-82f4dfd3f993"
+                    }
+                },
+                {
+                    "id": "c85e4ee3-018a-507d-96ff-772e8eb9c0f0",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 250,
+                        "y": 0
+                    },
+                    "width": 240,
+                    "height": 110,
+                    "tag": "chart",
+                    "data": {
+                        "type": "scorecard",
+                        "title": {
+                            "text": "Unknown Users",
+                            "color": "#01666B",
+                            "bold": true
+                        },
+                        "background": "",
+                        "keyValue": "Data!B2",
+                        "baselineColorDown": "#00A04A",
+                        "baselineColorUp": "#DC6965",
+                        "baselineMode": "percentage",
+                        "humanize": true,
+                        "chartId": "c85e4ee3-018a-507d-96ff-772e8eb9c0f0"
+                    }
+                },
+                {
+                    "id": "9de0588f-c939-5958-859a-6255f168237d",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 500,
+                        "y": 0
+                    },
+                    "width": 240,
+                    "height": 110,
+                    "tag": "chart",
+                    "data": {
+                        "type": "scorecard",
+                        "title": {
+                            "text": "Punch Errors",
+                            "color": "#01666B",
+                            "bold": true
+                        },
+                        "background": "",
+                        "keyValue": "Data!B3",
+                        "baselineColorDown": "#00A04A",
+                        "baselineColorUp": "#DC6965",
+                        "baselineMode": "percentage",
+                        "humanize": true,
+                        "chartId": "9de0588f-c939-5958-859a-6255f168237d"
+                    }
+                },
+                {
+                    "id": "7ea0e336-a96e-5842-904c-29f7573443a7",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 750,
+                        "y": 0
+                    },
+                    "width": 240,
+                    "height": 110,
+                    "tag": "chart",
+                    "data": {
+                        "type": "scorecard",
+                        "title": {
+                            "text": "Attendances to Review",
+                            "color": "#01666B",
+                            "bold": true
+                        },
+                        "background": "",
+                        "keyValue": "Data!B4",
+                        "baselineColorDown": "#00A04A",
+                        "baselineColorUp": "#DC6965",
+                        "baselineMode": "percentage",
+                        "humanize": true,
+                        "chartId": "7ea0e336-a96e-5842-904c-29f7573443a7"
+                    }
+                },
+                {
+                    "id": "0f71f51f-e555-5e47-96b5-c2025b227061",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 0,
+                        "y": 130
+                    },
+                    "width": 490,
+                    "height": 280,
+                    "tag": "carousel",
+                    "data": {
+                        "chartDefinitions": {
+                            "f91a3b9a-2bef-5596-bbba-400417eb1fb7": {
+                                "type": "bar",
+                                "title": {},
+                                "legendPosition": "top",
+                                "humanize": true,
+                                "dataSource": {
+                                    "type": "odoo",
+                                    "metaData": {
+                                        "groupBy": [
+                                            "timestamp:day"
+                                        ],
+                                        "measure": "__count",
+                                        "order": null,
+                                        "resModel": "hr.biometric.log",
+                                        "mode": "bar",
+                                        "cumulatedStart": false
+                                    },
+                                    "searchParams": {
+                                        "comparison": null,
+                                        "context": {},
+                                        "domain": [],
+                                        "groupBy": [
+                                            "timestamp:day"
+                                        ],
+                                        "orderBy": []
+                                    },
+                                    "actionXmlId": "om_hr_biometric.hr_biometric_log_action"
+                                },
+                                "dataSetStyles": {},
+                                "stacked": false
+                            }
+                        },
+                        "title": {
+                            "text": "Punches by Day",
+                            "fontSize": 16,
+                            "bold": true,
+                            "color": "#01666B"
+                        },
+                        "items": [
+                            {
+                                "type": "chart",
+                                "chartId": "f91a3b9a-2bef-5596-bbba-400417eb1fb7"
+                            }
+                        ],
+                        "fieldMatching": {
+                            "f91a3b9a-2bef-5596-bbba-400417eb1fb7": {
+                                "0cf15cb1-dabc-54d9-bdd5-e3504b6b506a": {
+                                    "chain": "timestamp",
+                                    "type": "datetime"
+                                },
+                                "a68fda30-e691-5958-a0d9-9786090c4306": {
+                                    "chain": "device_id",
+                                    "type": "many2one"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "id": "f2273280-0f2b-53cc-b587-7111b59f86c9",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 500,
+                        "y": 130
+                    },
+                    "width": 490,
+                    "height": 280,
+                    "tag": "carousel",
+                    "data": {
+                        "chartDefinitions": {
+                            "d32eaa7c-14cb-5000-b257-0a6ef8bf1228": {
+                                "type": "pie",
+                                "title": {},
+                                "legendPosition": "top",
+                                "humanize": true,
+                                "dataSource": {
+                                    "type": "odoo",
+                                    "metaData": {
+                                        "groupBy": [
+                                            "device_id"
+                                        ],
+                                        "measure": "__count",
+                                        "order": null,
+                                        "resModel": "hr.biometric.log",
+                                        "mode": "pie",
+                                        "cumulatedStart": false
+                                    },
+                                    "searchParams": {
+                                        "comparison": null,
+                                        "context": {},
+                                        "domain": [],
+                                        "groupBy": [
+                                            "device_id"
+                                        ],
+                                        "orderBy": []
+                                    },
+                                    "actionXmlId": "om_hr_biometric.hr_biometric_log_action"
+                                },
+                                "dataSetStyles": {}
+                            }
+                        },
+                        "title": {
+                            "text": "Punches by Device",
+                            "fontSize": 16,
+                            "bold": true,
+                            "color": "#01666B"
+                        },
+                        "items": [
+                            {
+                                "type": "chart",
+                                "chartId": "d32eaa7c-14cb-5000-b257-0a6ef8bf1228"
+                            }
+                        ],
+                        "fieldMatching": {
+                            "d32eaa7c-14cb-5000-b257-0a6ef8bf1228": {
+                                "0cf15cb1-dabc-54d9-bdd5-e3504b6b506a": {
+                                    "chain": "timestamp",
+                                    "type": "datetime"
+                                },
+                                "a68fda30-e691-5958-a0d9-9786090c4306": {
+                                    "chain": "device_id",
+                                    "type": "many2one"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "id": "e72cf1ad-0418-5b2a-a98f-709ccbcf17fb",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 0,
+                        "y": 420
+                    },
+                    "width": 490,
+                    "height": 280,
+                    "tag": "carousel",
+                    "data": {
+                        "chartDefinitions": {
+                            "4cac0ee6-0497-5ecf-b5ef-97637ce79233": {
+                                "type": "pie",
+                                "title": {},
+                                "legendPosition": "top",
+                                "humanize": true,
+                                "dataSource": {
+                                    "type": "odoo",
+                                    "metaData": {
+                                        "groupBy": [
+                                            "verify_type"
+                                        ],
+                                        "measure": "__count",
+                                        "order": null,
+                                        "resModel": "hr.biometric.log",
+                                        "mode": "pie",
+                                        "cumulatedStart": false
+                                    },
+                                    "searchParams": {
+                                        "comparison": null,
+                                        "context": {},
+                                        "domain": [
+                                            [
+                                                "state",
+                                                "=",
+                                                "done"
+                                            ]
+                                        ],
+                                        "groupBy": [
+                                            "verify_type"
+                                        ],
+                                        "orderBy": []
+                                    },
+                                    "actionXmlId": "om_hr_biometric.hr_biometric_log_action"
+                                },
+                                "dataSetStyles": {}
+                            }
+                        },
+                        "title": {
+                            "text": "Punches by Verification",
+                            "fontSize": 16,
+                            "bold": true,
+                            "color": "#01666B"
+                        },
+                        "items": [
+                            {
+                                "type": "chart",
+                                "chartId": "4cac0ee6-0497-5ecf-b5ef-97637ce79233"
+                            }
+                        ],
+                        "fieldMatching": {
+                            "4cac0ee6-0497-5ecf-b5ef-97637ce79233": {
+                                "0cf15cb1-dabc-54d9-bdd5-e3504b6b506a": {
+                                    "chain": "timestamp",
+                                    "type": "datetime"
+                                },
+                                "a68fda30-e691-5958-a0d9-9786090c4306": {
+                                    "chain": "device_id",
+                                    "type": "many2one"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "id": "956dce50-f2ed-5641-8546-80f360109838",
+                    "col": 0,
+                    "row": 0,
+                    "offset": {
+                        "x": 500,
+                        "y": 420
+                    },
+                    "width": 490,
+                    "height": 280,
+                    "tag": "carousel",
+                    "data": {
+                        "chartDefinitions": {
+                            "0c5ebd0d-aa92-5965-a68b-a200671a088e": {
+                                "type": "bar",
+                                "title": {},
+                                "legendPosition": "top",
+                                "humanize": true,
+                                "dataSource": {
+                                    "type": "odoo",
+                                    "metaData": {
+                                        "groupBy": [
+                                            "state"
+                                        ],
+                                        "measure": "__count",
+                                        "order": null,
+                                        "resModel": "hr.biometric.log",
+                                        "mode": "bar",
+                                        "cumulatedStart": false
+                                    },
+                                    "searchParams": {
+                                        "comparison": null,
+                                        "context": {},
+                                        "domain": [],
+                                        "groupBy": [
+                                            "state"
+                                        ],
+                                        "orderBy": []
+                                    },
+                                    "actionXmlId": "om_hr_biometric.hr_biometric_log_action"
+                                },
+                                "dataSetStyles": {},
+                                "stacked": false
+                            }
+                        },
+                        "title": {
+                            "text": "Punches by Status",
+                            "fontSize": 16,
+                            "bold": true,
+                            "color": "#01666B"
+                        },
+                        "items": [
+                            {
+                                "type": "chart",
+                                "chartId": "0c5ebd0d-aa92-5965-a68b-a200671a088e"
+                            }
+                        ],
+                        "fieldMatching": {
+                            "0c5ebd0d-aa92-5965-a68b-a200671a088e": {
+                                "0cf15cb1-dabc-54d9-bdd5-e3504b6b506a": {
+                                    "chain": "timestamp",
+                                    "type": "datetime"
+                                },
+                                "a68fda30-e691-5958-a0d9-9786090c4306": {
+                                    "chain": "device_id",
+                                    "type": "many2one"
+                                }
+                            }
+                        }
+                    }
+                }
+            ],
+            "tables": [],
+            "areGridLinesVisible": false,
+            "isVisible": true,
+            "headerGroups": {
+                "ROW": [],
+                "COL": []
+            },
+            "comments": {},
+            "backgroundColor": "#F9FAFB"
+        },
+        {
+            "id": "c3608b22-630b-556c-8a04-65310768dbcc",
+            "name": "Data",
+            "colNumber": 26,
+            "rowNumber": 100,
+            "rows": {},
+            "cols": {
+                "0": {
+                    "size": 220
+                },
+                "1": {
+                    "size": 120
+                }
+            },
+            "merges": [],
+            "cells": {
+                "A1": "=_t(\"Punches\")",
+                "B1": "=0+PIVOT.VALUE(1,\"__count\")",
+                "A2": "=_t(\"Punches of unknown users\")",
+                "B2": "=0+PIVOT.VALUE(2,\"__count\")",
+                "A3": "=_t(\"Punches in error\")",
+                "B3": "=0+PIVOT.VALUE(3,\"__count\")",
+                "A4": "=_t(\"Attendances to review\")",
+                "B4": "=0+PIVOT.VALUE(4,\"__count\")"
+            },
+            "styles": {
+                "A1": 1,
+                "A2": 1,
+                "A3": 1,
+                "A4": 1
+            },
+            "formats": {
+                "B1": 1,
+                "B2": 1,
+                "B3": 1,
+                "B4": 1
+            },
+            "borders": {},
+            "conditionalFormats": [],
+            "dataValidationRules": [],
+            "figures": [],
+            "tables": [],
+            "areGridLinesVisible": true,
+            "isVisible": true,
+            "headerGroups": {
+                "ROW": [],
+                "COL": []
+            },
+            "comments": {}
+        }
+    ],
+    "styles": {
+        "1": {
+            "textColor": "#434343"
+        },
+        "2": {
+            "textColor": "#434343",
+            "bold": true,
+            "fontSize": 11,
+            "fillColor": "#E7F2F2"
+        }
+    },
+    "formats": {
+        "1": "#,##0"
+    },
+    "borders": {},
+    "revisionId": "START_REVISION",
+    "uniqueFigureIds": true,
+    "settings": {
+        "locale": {
+            "name": "English (US)",
+            "code": "en_US",
+            "thousandsSeparator": ",",
+            "decimalSeparator": ".",
+            "dateFormat": "mm/dd/yyyy",
+            "timeFormat": "hh:mm:ss",
+            "formulaArgSeparator": ",",
+            "weekStart": 7
+        }
+    },
+    "pivots": {
+        "1": {
+            "type": "ODOO",
+            "id": "1",
+            "formulaId": "1",
+            "name": "Punches",
+            "model": "hr.biometric.log",
+            "domain": [],
+            "context": {},
+            "measures": [
+                {
+                    "id": "__count",
+                    "fieldName": "__count"
+                }
+            ],
+            "rows": [],
+            "columns": [],
+            "fieldMatching": {
+                "0cf15cb1-dabc-54d9-bdd5-e3504b6b506a": {
+                    "chain": "timestamp",
+                    "type": "datetime"
+                },
+                "a68fda30-e691-5958-a0d9-9786090c4306": {
+                    "chain": "device_id",
+                    "type": "many2one"
+                }
+            }
+        },
+        "2": {
+            "type": "ODOO",
+            "id": "2",
+            "formulaId": "2",
+            "name": "Unknown Users",
+            "model": "hr.biometric.log",
+            "domain": [
+                [
+                    "state",
+                    "=",
+                    "unmapped"
+                ]
+            ],
+            "context": {},
+            "measures": [
+                {
+                    "id": "__count",
+                    "fieldName": "__count"
+                }
+            ],
+            "rows": [],
+            "columns": [],
+            "fieldMatching": {
+                "0cf15cb1-dabc-54d9-bdd5-e3504b6b506a": {
+                    "chain": "timestamp",
+                    "type": "datetime"
+                },
+                "a68fda30-e691-5958-a0d9-9786090c4306": {
+                    "chain": "device_id",
+                    "type": "many2one"
+                }
+            }
+        },
+        "3": {
+            "type": "ODOO",
+            "id": "3",
+            "formulaId": "3",
+            "name": "Punch Errors",
+            "model": "hr.biometric.log",
+            "domain": [
+                [
+                    "state",
+                    "=",
+                    "error"
+                ]
+            ],
+            "context": {},
+            "measures": [
+                {
+                    "id": "__count",
+                    "fieldName": "__count"
+                }
+            ],
+            "rows": [],
+            "columns": [],
+            "fieldMatching": {
+                "0cf15cb1-dabc-54d9-bdd5-e3504b6b506a": {
+                    "chain": "timestamp",
+                    "type": "datetime"
+                },
+                "a68fda30-e691-5958-a0d9-9786090c4306": {
+                    "chain": "device_id",
+                    "type": "many2one"
+                }
+            }
+        },
+        "4": {
+            "type": "ODOO",
+            "id": "4",
+            "formulaId": "4",
+            "name": "To Review",
+            "model": "hr.attendance",
+            "domain": [
+                [
+                    "biometric_review",
+                    "=",
+                    true
+                ]
+            ],
+            "context": {},
+            "measures": [
+                {
+                    "id": "__count",
+                    "fieldName": "__count"
+                }
+            ],
+            "rows": [],
+            "columns": [],
+            "fieldMatching": {
+                "0cf15cb1-dabc-54d9-bdd5-e3504b6b506a": {
+                    "chain": "check_in",
+                    "type": "datetime"
+                },
+                "a68fda30-e691-5958-a0d9-9786090c4306": {
+                    "chain": "in_device_id",
+                    "type": "many2one"
+                }
+            }
+        }
+    },
+    "pivotNextId": 5,
+    "customTableStyles": {},
+    "namedRanges": [],
+    "globalFilters": [
+        {
+            "id": "0cf15cb1-dabc-54d9-bdd5-e3504b6b506a",
+            "type": "date",
+            "label": "Period",
+            "defaultValue": "this_month"
+        },
+        {
+            "id": "a68fda30-e691-5958-a0d9-9786090c4306",
+            "type": "relation",
+            "label": "Device",
+            "modelName": "hr.biometric.device",
+            "defaultValueDisplayNames": []
+        }
+    ],
+    "lists": {
+        "1": {
+            "id": "1",
+            "name": "Devices",
+            "model": "hr.biometric.device",
+            "domain": [],
+            "context": {},
+            "columns": [
+                {
+                    "name": "name",
+                    "string": "Device"
+                },
+                {
+                    "name": "protocol",
+                    "string": "Protocol"
+                },
+                {
+                    "name": "last_contact",
+                    "string": "Last Contact"
+                },
+                {
+                    "name": "device_log_count",
+                    "string": "Punches on Device"
+                },
+                {
+                    "name": "firmware_version",
+                    "string": "Firmware"
+                }
+            ],
+            "orderBy": [
+                {
+                    "name": "last_contact",
+                    "asc": false
+                }
+            ],
+            "fieldMatching": {}
+        }
+    },
+    "listNextId": 2,
+    "odooLinkReferences": {}
+}
