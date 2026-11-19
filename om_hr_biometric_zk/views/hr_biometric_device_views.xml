@@ -27,6 +27,7 @@
             </xpath>
             <xpath expr="//field[@name='last_contact']" position="after">
                 <field name="zk_auto_download" invisible="protocol != 'zk'"/>
+                <field name="zk_clear_above" invisible="protocol != 'zk'"/>
                 <field name="zk_last_log_time" invisible="protocol != 'zk'"/>
                 <field name="zk_error" invisible="not zk_error" class="text-danger"/>
             </xpath>

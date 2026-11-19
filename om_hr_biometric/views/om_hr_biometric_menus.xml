@@ -12,8 +12,14 @@
     <menuitem id="menu_biometric_daily" name="Daily Attendance"
               parent="menu_biometric_management" action="hr_biometric_daily_action" sequence="20"
               groups="hr_attendance.group_hr_attendance_user"/>
+    <menuitem id="menu_biometric_today" name="Today"
+              parent="menu_biometric_management" action="hr_biometric_today_action"
+              sequence="19" groups="hr_attendance.group_hr_attendance_user"/>
+    <menuitem id="menu_biometric_status" name="Attendance Status"
+              parent="menu_biometric_management" action="hr_biometric_status_wizard_action"
+              sequence="20" groups="hr_attendance.group_hr_attendance_user"/>
     <menuitem id="menu_biometric_absence" name="Absences"
-              parent="menu_biometric_management" action="hr_biometric_absence_wizard_action"
+              parent="menu_biometric_management" action="hr_biometric_absence_action"
               sequence="21" groups="hr_attendance.group_hr_attendance_user"/>
     <menuitem id="menu_biometric_device_health" name="Device Health"
               parent="menu_biometric_management" action="hr_biometric_device_action_health"

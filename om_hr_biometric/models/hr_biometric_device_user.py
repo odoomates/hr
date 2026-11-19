@@ -1,3 +1,5 @@
+import unicodedata
+
 from odoo import api, fields, models
 from odoo.exceptions import UserError
 
@@ -50,13 +52,41 @@ class HrBiometricDeviceUser(models.Model):
         return result
 
     def _link_employees(self):
-        """ Link the users to the employee of their company with the same biometric ID. """
-        for user in self:
-            employee = self.env['hr.employee'].sudo().search([
-                ('biometric_code', '=', user.user_code), ('company_id', 'in', (user.company_id.id, False)),
-            ], limit=1)
-            if employee:
+        """ Link the users to an employee of their company: the one with their biometric ID, else the only one with
+            their name, the same without accents, or starting with it (a device keeps 24 characters of a name). An
+            employee found by name and without a biometric ID gets the user ID of the device. """
+        Employee = self.env['hr.employee'].sudo()
+        for company, users in self.grouped('company_id').items():
+            employees = Employee.search([('company_id', 'in', (company.id, False))])
+            by_code = {employee.biometric_code: employee for employee in employees if employee.biometric_code}
+            for user in users:
+                employee = by_code.get(user.user_code) or self._employee_by_name(user.name, employees)
+                if not employee:
+                    continue
                 user.employee_id = employee
+                if not employee.biometric_code and user.user_code not in by_code:
+                    employee.biometric_code = user.user_code
+                    by_code[user.user_code] = employee
+
+    @staticmethod
+    def _employee_by_name(name, employees):
+        """ :return: the only employee whose name is `name`, compared exactly, then without accents and case, then as
+            the start of the name; nothing when several match """
+        def plain(text):
+            text = unicodedata.normalize('NFKD', text or '')
+            return ' '.join(''.join(c for c in text if not unicodedata.combining(c)).casefold().split())
+        name = ' '.join((name or '').split())
+        if len(name) < 3:
+            return employees.browse()
+        for match in (lambda e: ' '.join(e.name.split()) == name,
+                      lambda e: plain(e.name) == plain(name),
+                      lambda e: plain(e.name).startswith(plain(name))):
+            found = employees.filtered(match)
+            if len(found) == 1:
+                return found
+            if len(found) > 1:
+                return employees.browse()
+        return employees.browse()
 
     def _process_unmapped(self):
         """ Process the punches that waited for these users to have an employee. """
