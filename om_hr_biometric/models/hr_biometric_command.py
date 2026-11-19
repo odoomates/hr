@@ -18,6 +18,8 @@ COMMANDS = [
 # a command sent without reply is sent again after this delay, up to MAX_TRIES times
 RETRY_DELAY = timedelta(minutes=10)
 MAX_TRIES = 3
+# commands done or failed are deleted after
+KEEP_COMMANDS = timedelta(days=180)
 
 
 class HrBiometricCommand(models.Model):
@@ -74,6 +76,12 @@ class HrBiometricCommand(models.Model):
             user.unlink()
         elif self.command == 'info' and data:
             self.device_id._touch(adms.parse_info(data))
+
+    @api.model
+    def _cron_cleanup(self):
+        """ Delete the commands done or failed long ago. """
+        limit = fields.Datetime.now() - KEEP_COMMANDS
+        self.sudo().search([('state', 'in', ('done', 'failed')), ('create_date', '<', limit)]).unlink()
 
     def action_retry(self):
         self.filtered(lambda c: c.state == 'failed').write({'state': 'pending', 'tries': 0})

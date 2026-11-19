@@ -1,11 +1,11 @@
-=========================
-Biometric Attendance: TCP
-=========================
+======================================
+Biometric Attendance Machine - TCP/UDP
+======================================
 
 Part of `Odoo Mates HR <https://github.com/odoomates/hr>`_, the HR suite of Odoo Mates for Odoo 18
 Community.
 
-Adds to *Biometric Attendance* the devices Odoo reads over the network, for
+Adds to *Biometric Attendance Machine - ZKTeco, eSSL, Fingerprint, Face* the devices Odoo reads over the network, for
 the ZKTeco and eSSL devices without ADMS, or on a network the device cannot
 leave.
 
@@ -27,7 +27,12 @@ Features
 * The device is locked only while Odoo writes to it, and always unlocked again;
   it never stops taking punches during a download.
 * *Clear Punches on Device* (attendance managers): the punches are downloaded
-  first, then deleted from that device only, never from Odoo.
+  first, then deleted from that device only, never from Odoo. With *Clear
+  Punches Above*, the scheduled download does it by itself once the device
+  holds more punches than that, the device locked from the reading to the
+  clearing so that no punch is lost.
+* A TCP device that cannot be reached raises the offline alert of its
+  responsible, like an ADMS device that stops calling.
 * A device that cannot be reached shows its last error and is *Offline*; the
   other devices go on.
 
@@ -43,12 +48,12 @@ Configuration
    Connection*.
 
 For punches in real time, or a device Odoo cannot reach, use ADMS (in
-*Biometric Attendance*).
+*Biometric Attendance Machine - ZKTeco, eSSL, Fingerprint, Face*).
 
 Dependencies
 ============
 
-* ``om_hr_biometric`` (Biometric Attendance)
+* ``om_hr_biometric`` (Biometric Attendance Machine)
 
 Support
 =======

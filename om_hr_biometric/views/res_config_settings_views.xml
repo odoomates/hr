@@ -16,6 +16,19 @@
                                     icon="fa-arrow-right" class="btn-link"/>
                         </div>
                     </setting>
+                    <setting string="Attendance Status" company_dependent="1"
+                             help="The tolerance of the daily status and the monthly sheet, and when a device is offline.">
+                        <div class="mt-2">
+                            <span class="me-2">Tolerance</span>
+                            <field name="biometric_tolerance" class="text-center w-25"/>
+                            <span class="ms-2">minutes</span>
+                        </div>
+                        <div class="mt-2">
+                            <span class="me-2">Offline after</span>
+                            <field name="biometric_offline_minutes" class="text-center w-25"/>
+                            <span class="ms-2">minutes without contact</span>
+                        </div>
+                    </setting>
                     <setting string="Keep Biometric Templates" company_dependent="1"
                              help="Keep the fingerprint and face templates the devices send, to copy the employees to other devices over ADMS. They are biometric data: only the attendance managers see them.">
                         <field name="biometric_store_templates"/>
