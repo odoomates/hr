@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_biometric_management" name="Biometric"
+              parent="hr_attendance.menu_hr_attendance_view_attendances_management" sequence="20"
+              groups="hr_attendance.group_hr_attendance_user"/>
+    <menuitem id="menu_biometric_log" name="Punches" parent="menu_biometric_management"
+              action="hr_biometric_log_action" sequence="1"/>
+    <menuitem id="menu_biometric_device_user" name="Device Users" parent="menu_biometric_management"
+              action="hr_biometric_device_user_action" sequence="2"/>
+    <menuitem id="menu_biometric_reprocess" name="Process Again" parent="menu_biometric_management"
+              action="hr_biometric_reprocess_action" sequence="3"/>
+    <menuitem id="menu_biometric_daily" name="Daily Biometric Attendance"
+              parent="hr_attendance.menu_hr_attendance_reporting" action="hr_biometric_daily_action" sequence="20"
+              groups="hr_attendance.group_hr_attendance_user"/>
+    <menuitem id="menu_biometric_absence" name="Absences"
+              parent="hr_attendance.menu_hr_attendance_reporting" action="hr_biometric_absence_wizard_action"
+              sequence="21" groups="hr_attendance.group_hr_attendance_user"/>
+    <menuitem id="menu_biometric_device_health" name="Biometric Device Health"
+              parent="hr_attendance.menu_hr_attendance_reporting" action="hr_biometric_device_action_health"
+              sequence="22" groups="hr_attendance.group_hr_attendance_user"/>
+    <menuitem id="menu_biometric_device" name="Biometric Devices"
+              parent="hr_attendance.menu_hr_attendance_configuration" action="hr_biometric_device_action"
+              sequence="30" groups="hr_attendance.group_hr_attendance_manager"/>
+    <menuitem id="menu_biometric_template" name="Biometric Templates"
+              parent="hr_attendance.menu_hr_attendance_configuration" action="hr_biometric_template_action"
+              sequence="31" groups="hr_attendance.group_hr_attendance_manager"/>
+</odoo>

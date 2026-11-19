@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_employee_view_form" model="ir.ui.view">
+        <field name="name">hr.employee.form.biometric</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='identification_group']" position="inside">
+                <label for="biometric_code" groups="hr_attendance.group_hr_attendance_user"/>
+                <div class="o_row" groups="hr_attendance.group_hr_attendance_user">
+                    <field name="biometric_code"/>
+                    <button name="action_biometric_send" type="object" string="Send to Devices" class="btn btn-link"/>
+                    <button name="action_biometric_remove" type="object" string="Remove from Devices"
+                            class="btn btn-link" invisible="not biometric_user_ids"
+                            confirm="Remove this employee from all the biometric devices?"/>
+                </div>
+                <field name="biometric_user_ids" widget="many2many_tags" readonly="1" string="On Devices"
+                       invisible="not biometric_user_ids" groups="hr_attendance.group_hr_attendance_user"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_employee_action_biometric_send" model="ir.actions.act_window">
+        <field name="name">Send to Biometric Devices</field>
+        <field name="res_model">hr.biometric.export</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_employee_ids': active_ids}</field>
+        <field name="binding_model_id" ref="hr.model_hr_employee"/>
+        <field name="binding_view_types">list</field>
+        <field name="group_ids" eval="[(4, ref('hr_attendance.group_hr_attendance_user'))]"/>
+    </record>
+</odoo>
