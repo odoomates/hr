@@ -18,8 +18,7 @@ class OmPlanningRequest(models.Model):
     target_slot_id = fields.Many2one(
         'om.planning.slot', string='Shift Taken', ondelete='cascade', index='btree_not_null',
         help='In a swap, the shift of the colleague the employee takes in exchange.')
-    employee_id = fields.Many2one('hr.employee', compute='_compute_employees', store=True, index='btree_not_null',
-                                  string='Employee')
+    employee_id = fields.Many2one('hr.employee', compute='_compute_employees', store=True, index='btree_not_null')
     target_employee_id = fields.Many2one('hr.employee', compute='_compute_employees', store=True,
                                          index='btree_not_null', string='Colleague')
     can_accept = fields.Boolean(compute='_compute_can_accept')
@@ -37,12 +36,13 @@ class OmPlanningRequest(models.Model):
     def _compute_approval_request(self):
         """ Along the approval flow; a request without one (asked before the shifts used the planning) as the
             planning decides. """
-        super()._compute_approval_request()
+        result = super()._compute_approval_request()
         for request in self:
             if request.approval_state == 'draft':
                 request.can_approve = request.state == 'pending' and self.env.user in request._planning_approvers()
             else:
                 request.can_approve = request.can_approve and request.state == 'pending'
+        return result
 
     @api.depends('state', 'target_resource_id')
     @api.depends_context('uid')
@@ -53,11 +53,12 @@ class OmPlanningRequest(models.Model):
 
     @api.depends('request_type', 'resource_id', 'slot_id', 'target_slot_id')
     def _compute_name(self):
-        super()._compute_name()
+        result = super()._compute_name()
         for request in self.filtered('target_slot_id'):
             request.name = self.env._('Swap %(mine)s with %(theirs)s',
                                       mine=request.slot_id._planning_short_label(request.resource_id),
                                       theirs=request.target_slot_id._planning_short_label(request.target_resource_id))
+        return result
 
     @api.constrains('request_type', 'target_resource_id', 'slot_id', 'resource_id')
     def _check_request(self):

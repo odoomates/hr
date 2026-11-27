@@ -7,7 +7,6 @@ import logging
 from datetime import UTC, datetime, time, timedelta
 from zoneinfo import ZoneInfo
 
-from odoo import api, models
 from odoo.fields import Command
 from odoo.tools import SQL, sql
 
@@ -15,7 +14,9 @@ _logger = logging.getLogger(__name__)
 
 DONE = 'om_hr_shift.planning_migration'
 LEGACY_TABLES = ('hr_shift', 'hr_shift_template', 'hr_shift_rotation', 'hr_shift_rotation_line', 'hr_shift_request',
-                 'hr_shift_unavailability', 'hr_shift_resource_calendar_attendance_rel',
+                 'hr_shift_unavailability', 'hr_shift_resource_calendar_attendance_rel', 'hr_shift_publish_wizard',
+                 'hr_shift_hr_shift_publish_wizard_rel', 'hr_shift_rotation_wizard',
+                 'hr_employee_public_hr_shift_rotation_wizard_rel',
                  'hr_department_hr_shift_template_rel', 'hr_job_hr_shift_template_rel')
 REQUEST_STATES = {'draft': 'draft', 'to_accept': 'to_accept', 'to_approve': 'pending', 'approved': 'approved',
                   'refused': 'refused', 'cancel': 'cancelled'}
@@ -71,7 +72,7 @@ def repoint_xmlids(env, model, new_model, mapping):
 
 def migrate_templates(env):
     cr = env.cr
-    Template = env['om.planning.template'].with_context(CONTEXT)
+    Template = env['om.planning.template'].with_context(**CONTEXT)
     departments, jobs = {}, {}
     for row in fetch(cr, "SELECT * FROM hr_department_hr_shift_template_rel"):
         departments.setdefault(row['hr_shift_template_id'], []).append(row['hr_department_id'])
@@ -104,7 +105,7 @@ def migrate_templates(env):
 
 def migrate_rotations(env, templates):
     cr = env.cr
-    Rotation = env['om.planning.rotation'].with_context(CONTEXT)
+    Rotation = env['om.planning.rotation'].with_context(**CONTEXT)
     mapping = {}
     for old in fetch(cr, "SELECT * FROM hr_shift_rotation ORDER BY id"):
         lines = fetch(cr, "SELECT * FROM hr_shift_rotation_line WHERE rotation_id = %s ORDER BY sequence, id",
@@ -129,7 +130,7 @@ def migrate_shifts(env, templates):
     """ Each shift becomes a slot of the resource of its employee, at the same moments: the start and end the
         former shift had computed from its day and hours in the timezone of the employee. """
     cr = env.cr
-    Slot = env['om.planning.slot'].with_context(CONTEXT)
+    Slot = env['om.planning.slot'].with_context(**CONTEXT)
     employees = {employee.id: employee for employee in env['hr.employee'].with_context(active_test=False).search([])}
     mapping = {}
     olds = fetch(cr, "SELECT * FROM hr_shift ORDER BY id")
@@ -188,7 +189,7 @@ def migrate_shifts(env, templates):
 
 def migrate_requests(env, slots):
     cr = env.cr
-    Request = env['om.planning.request'].with_context(CONTEXT)
+    Request = env['om.planning.request'].with_context(**CONTEXT)
     resources = {employee.id: employee.resource_id
                  for employee in env['hr.employee'].with_context(active_test=False).search([])}
     mapping = {}
@@ -240,7 +241,7 @@ def migrate_unavailability(env):
     """ The days an employee cannot work become time off of their resource, from the start of the first day to the
         end of the last one in their timezone. """
     cr = env.cr
-    Leave = env['resource.calendar.leaves'].with_context(CONTEXT)
+    Leave = env['resource.calendar.leaves'].with_context(**CONTEXT)
     employees = {employee.id: employee for employee in env['hr.employee'].with_context(active_test=False).search([])}
     mapping = {}
     for old in fetch(cr, "SELECT * FROM hr_shift_unavailability ORDER BY id"):
@@ -328,27 +329,20 @@ def release_legacy_tables(cr):
                            SQL.identifier(name)))
 
 
-class OmPlanningSlot(models.Model):
-    _inherit = 'om.planning.slot'
-
-    @api.model
-    def _shift_migrate_legacy(self):
-        """ Run on each update of the module, before its data: once, when the tables of the former shifts are
-            there. """
-        cr = self.env.cr
-        env = self.sudo().env
-        if not sql.table_exists(cr, 'hr_shift') or env['ir.config_parameter'].get_bool(DONE):
-            return
-        templates = migrate_templates(env)
-        rotations = migrate_rotations(env, templates)
-        slots = migrate_shifts(env, templates)
-        requests = migrate_requests(env, slots)
-        unavailability = migrate_unavailability(env)
-        migrate_settings(env)
-        migrate_groups(env)
-        migrate_approvals(env)
-        release_legacy_tables(cr)
-        env['ir.config_parameter'].set_bool(DONE, True)
-        _logger.info('Shifts moved to the planning: %s templates, %s rotations, %s shifts, %s requests, '
-                     '%s unavailability', len(templates), len(rotations), len(slots), len(requests),
-                     len(unavailability))
+def migrate_legacy(env):
+    """ Once, when the tables of the former shifts are there. """
+    cr = env.cr
+    if not sql.table_exists(cr, 'hr_shift') or env['ir.config_parameter'].get_bool(DONE):
+        return
+    templates = migrate_templates(env)
+    rotations = migrate_rotations(env, templates)
+    slots = migrate_shifts(env, templates)
+    requests = migrate_requests(env, slots)
+    unavailability = migrate_unavailability(env)
+    migrate_settings(env)
+    migrate_groups(env)
+    migrate_approvals(env)
+    release_legacy_tables(cr)
+    env['ir.config_parameter'].set_bool(DONE, True)
+    _logger.info('Shifts moved to the planning: %s templates, %s rotations, %s shifts, %s requests, '
+                 '%s unavailability', len(templates), len(rotations), len(slots), len(requests), len(unavailability))

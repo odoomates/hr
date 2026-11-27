@@ -8,6 +8,7 @@ from odoo.exceptions import UserError
 from odoo.tools.intervals import Intervals
 
 from .om_planning_template import shift_segments
+from .shift_migration import migrate_legacy
 
 # the changes of a published slot written again on the roster schedule of its employees
 ROSTER_FIELDS = {'start_datetime', 'end_datetime', 'resource_ids', 'break_hours', 'break_from', 'template_id',
@@ -20,14 +21,13 @@ class OmPlanningSlot(models.Model):
     _inherit = 'om.planning.slot'
 
     employee_id = fields.Many2one('hr.employee', compute='_compute_employee_id', store=True, index='btree_not_null',
-                                  string='Employee', help='The first employee of the slot.')
+                                  help='The first employee of the slot.')
     template_id = fields.Many2one(check_company=True)
     # an open shift keeps the department it is planned for: the employees of that department claim it
     department_id = fields.Many2one(readonly=False)
     shift_date = fields.Date(compute='_compute_shift_date', store=True, index=True, string='Day',
                              help='The day the shift starts, in the timezone of its employee.')
-    break_from = fields.Float(string='Break From',
-                              help='The hour the unpaid break starts; outside the shift, the break is in its middle.')
+    break_from = fields.Float(help='The hour the unpaid break starts; outside the shift, the break is in its middle.')
     roster_attendance_ids = fields.Many2many(
         'resource.calendar.attendance', 'om_planning_slot_roster_attendance_rel', 'slot_id', 'attendance_id',
         string='Schedule Lines', copy=False, readonly=True)
@@ -51,11 +51,12 @@ class OmPlanningSlot(models.Model):
 
     @api.depends('template_id')
     def _compute_display_name(self):
-        super()._compute_display_name()
+        result = super()._compute_display_name()
         # a shift without title nor role is named after its template
         if self.env.context.get('om_planning_label') == 'role':
             for slot in self.filtered(lambda s: s.template_id and not s.name and not s.role_id):
                 slot.display_name = slot.template_id.name
+        return result
 
     def _shift_tz(self, resource=None):
         self.ensure_one()
@@ -124,6 +125,12 @@ class OmPlanningSlot(models.Model):
     @api.ondelete(at_uninstall=False)
     def _unlink_shift_roster(self):
         self.sudo().roster_attendance_ids.unlink()
+
+    @api.model
+    def _shift_migrate_legacy(self):
+        """ Run on each update of the module, before its data: the shifts of the former versions move to the
+            planning. """
+        migrate_legacy(self.sudo().env)
 
     def _check_shift_planner(self):
         if not self.env.user.has_group('om_hr_shift.group_shift_planner'):

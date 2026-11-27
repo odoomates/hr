@@ -35,8 +35,7 @@ def shift_segments(start, stop, break_from=0.0, break_hours=0.0):
 class OmPlanningTemplate(models.Model):
     _inherit = 'om.planning.template'
 
-    break_from = fields.Float(string='Break From',
-                              help='The hour the unpaid break starts; outside the shift, the break is in its middle.')
+    break_from = fields.Float(help='The hour the unpaid break starts; outside the shift, the break is in its middle.')
     department_ids = fields.Many2many('hr.department', string='Departments',
                                       help='The departments planning this shift; empty for all.')
     job_ids = fields.Many2many('hr.job', string='Job Positions',
