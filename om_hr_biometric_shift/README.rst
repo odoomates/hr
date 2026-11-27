@@ -5,7 +5,8 @@ Biometric Attendance Machine - Shifts
 Part of `Odoo Mates HR <https://github.com/odoomates/hr>`_, the HR suite of Odoo Mates for Odoo 20
 Community.
 
-The punches of the biometric devices read against the published shifts. It
+The punches of the biometric devices read against the published shifts (the
+published planning slots of the employee). It
 installs by itself with *Biometric Attendance Machine - ZKTeco, eSSL, Fingerprint, Face* and *Shifts*.
 
 Features

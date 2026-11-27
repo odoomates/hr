@@ -1,5 +1,6 @@
-from datetime import date
+from datetime import datetime
 
+from odoo import Command
 from odoo.tests import tagged
 
 from odoo.addons.om_hr_biometric.tests.common import BiometricCase
@@ -9,9 +10,10 @@ from odoo.addons.om_hr_biometric.tests.common import BiometricCase
 class TestBiometricShift(BiometricCase):
 
     def shift(self, day, hour_from, hour_to):
-        return self.env['hr.shift'].create({
-            'employee_id': self.employee.id, 'date': date(2026, 9, day), 'hour_from': hour_from,
-            'hour_to': hour_to, 'state': 'published'})
+        return self.env['om.planning.slot'].create({
+            'resource_ids': [Command.set(self.employee.resource_id.ids)],
+            'start_datetime': datetime(2026, 9, day, hour_from), 'end_datetime': datetime(2026, 9, day, hour_to),
+            'break_hours': 0.0, 'state': 'published'})
 
     def test_missed_check_in(self):
         """ Without shifts, a missed check-in turns the next days around; with them, it stays a missed check-in. """
