@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- the allowances paid on the shifts of the former versions stay paid, once -->
+    <function model="om.planning.slot" name="_shift_migrate_legacy_payslips"/>
+
+</odoo>

@@ -2,43 +2,43 @@
 <odoo>
     <data noupdate="1">
 
-        <record id="template_morning" model="hr.shift.template">
+        <record id="template_morning" model="om.planning.template">
             <field name="name">Morning</field>
             <field name="code">M</field>
             <field name="sequence">10</field>
-            <field name="hour_from">6</field>
-            <field name="hour_to">14</field>
+            <field name="start_time">6</field>
+            <field name="end_time">14</field>
             <field name="break_from">10</field>
-            <field name="break_to">10.5</field>
+            <field name="break_hours">0.5</field>
             <field name="color">10</field>
             <field name="company_id" eval="False"/>
         </record>
 
-        <record id="template_evening" model="hr.shift.template">
+        <record id="template_evening" model="om.planning.template">
             <field name="name">Evening</field>
             <field name="code">E</field>
             <field name="sequence">20</field>
-            <field name="hour_from">14</field>
-            <field name="hour_to">22</field>
+            <field name="start_time">14</field>
+            <field name="end_time">22</field>
             <field name="break_from">18</field>
-            <field name="break_to">18.5</field>
+            <field name="break_hours">0.5</field>
             <field name="color">3</field>
             <field name="company_id" eval="False"/>
         </record>
 
-        <record id="template_night" model="hr.shift.template">
+        <record id="template_night" model="om.planning.template">
             <field name="name">Night</field>
             <field name="code">N</field>
             <field name="sequence">30</field>
-            <field name="hour_from">22</field>
-            <field name="hour_to">6</field>
+            <field name="start_time">22</field>
+            <field name="end_time">6</field>
             <field name="break_from">2</field>
-            <field name="break_to">2.5</field>
+            <field name="break_hours">0.5</field>
             <field name="color">4</field>
             <field name="company_id" eval="False"/>
         </record>
 
-        <record id="rotation_two_two_two" model="hr.shift.rotation">
+        <record id="rotation_two_two_two" model="om.planning.rotation">
             <field name="name">2 Mornings, 2 Nights, 2 Off</field>
             <field name="company_id" eval="False"/>
             <field name="line_ids" eval="[
@@ -53,7 +53,7 @@
 
         <record id="flow_shift_request" model="approval.rule">
             <field name="name">Shift Requests</field>
-            <field name="model_id" ref="om_hr_shift.model_hr_shift_request"/>
+            <field name="model_id" ref="om_planning.model_om_planning_request"/>
             <field name="fallback_group_id" ref="om_hr_shift.group_shift_planner"/>
             <field name="self_approve" eval="False"/>
         </record>

@@ -43,7 +43,7 @@ from the payslips, install by themselves once both sides are there.
 
 | Module | What it does |
 |---|---|
-| `om_hr_shift` | Shift templates, a roster board, rotations, open shifts, shift swaps and availability, with checks for time off, rest and weekly hours; published shifts become the working schedule |
+| `om_hr_shift` | Shift templates, a roster on the planning Gantt chart, rotations, open shifts, shift swaps and availability, with checks for time off, rest and weekly hours; published shifts become the working schedule |
 | `om_hr_lateness` | Late arrivals and early departures against the schedule, grace minutes, a penalty matrix, warnings and excuses |
 | `om_hr_overtime_request` | Overtime authorised in advance; beyond it, the manager accepts or rejects it |
 | `om_hr_biometric` | ZKTeco and eSSL biometric devices: punches pushed to Odoo (ADMS), check-in and check-out modes, device users, fingerprints, daily and absence reports |

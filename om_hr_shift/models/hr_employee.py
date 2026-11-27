@@ -1,5 +1,6 @@
 from odoo import SUPERUSER_ID, api, fields, models
 from odoo.exceptions import UserError
+from odoo.fields import Command
 
 
 class HrEmployee(models.Model):
@@ -9,7 +10,7 @@ class HrEmployee(models.Model):
         'resource.calendar', string='Roster Schedule', readonly=True, copy=False, groups='hr.group_hr_user',
         help='The variable working schedule of the employee, written by the published shifts.', check_company=True)
     roster_date_start = fields.Date(string='Rostered Since', readonly=True, copy=False, groups='hr.group_hr_user')
-    shift_ids = fields.One2many('hr.shift', 'employee_id', string='Shifts')
+    shift_ids = fields.One2many('om.planning.slot', 'employee_id', string='Shifts')
 
     @api.model
     def _company_checked_fields(self):
@@ -44,7 +45,12 @@ class HrEmployee(models.Model):
         for employee in self.sudo():
             if not employee.roster_calendar_id:
                 raise UserError(self.env._('%s is not rostered.', employee.name))
-            employee.shift_ids.filtered(lambda shift: shift.date >= date).unlink()
+            shifts = self.env['om.planning.slot'].sudo().search([
+                ('resource_ids', 'in', employee.resource_id.ids), ('shift_date', '>=', date),
+                ('source_ref', '=', False)])
+            alone = shifts.filtered(lambda shift: shift.resource_ids == employee.resource_id)
+            (shifts - alone).write({'resource_ids': [Command.unlink(employee.resource_id.id)]})
+            alone.unlink()
             version = employee._get_version(date) or employee.version_id
             employee._set_schedule_from(date, version, calendar)
             employee.write({'roster_calendar_id': False, 'roster_date_start': False})

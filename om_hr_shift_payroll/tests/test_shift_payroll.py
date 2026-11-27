@@ -34,9 +34,9 @@ class TestShiftPayroll(TransactionCase):
             'name': 'Night Worker', 'tz': 'UTC', 'date_version': date(2026, 1, 1),
             'contract_date_start': date(2026, 1, 1), 'wage': 3000.0, 'struct_id': cls.structure.id})
         cls.employee._start_rostering(date(2026, 9, 1))
-        cls.shifts = cls.env['hr.shift'].create([
-            dict(cls.night._shift_values(), employee_id=cls.employee.id, date=date(2026, 9, day)) for day in (7, 8, 9)])
-        cls.shifts.with_context(om_shift_override=True).action_publish()
+        cls.shifts = cls.env['om.planning.slot'].create([
+            cls.night._shift_values(date(2026, 9, day), cls.employee) for day in (7, 8, 9)])
+        cls.shifts.action_publish()
 
     def payslip(self, month):
         with Form(self.env['hr.payslip']) as form:

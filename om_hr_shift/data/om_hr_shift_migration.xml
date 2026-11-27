@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- the shifts of the former versions move to the planning, once, before the data below -->
+    <function model="om.planning.slot" name="_shift_migrate_legacy"/>
+
+</odoo>

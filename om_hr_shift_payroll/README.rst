@@ -25,6 +25,10 @@ Features
   it.
 * The base salary structure gets the rule, so the structures created from it
   pay the allowances.
+* A shift planned for several employees pays its allowance once, to its first
+  employee.
+* On the update from the former Shifts, the shifts already paid keep their
+  payslip, so they are never paid twice.
 
 Configuration
 =============

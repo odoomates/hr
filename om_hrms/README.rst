@@ -119,9 +119,9 @@ What it installs:
   occurrence in the month, warnings and excuses.
 * ``om_hr_lateness_payroll`` HR Lateness Payroll: the penalties of a month
   taken off the payslips as payroll adjustments.
-* ``om_hr_shift`` Shifts: shift templates, a roster board, rotations, open
-  shifts, swaps and availability, with warnings on time off, rest and weekly
-  hours; published shifts are the working schedule of the employees.
+* ``om_hr_shift`` Shifts: shift templates, a roster on the planning Gantt chart,
+  rotations, open shifts, swaps and availability, with conflicts on time off,
+  rest and hours; published shifts are the working schedule of the employees.
 * ``om_hr_shift_payroll`` Shift Allowances in Payroll: the allowance of each
   published shift paid on the payslips, e.g. a night shift allowance.
 * ``om_hr_biometric`` Biometric Attendance Machine: the punches of the ZKTeco and

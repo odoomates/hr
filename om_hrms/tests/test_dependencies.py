@@ -17,8 +17,10 @@ class TestDependencies(TransactionCase):
         Module = self.env['ir.module.module']
         installed = {module.name: module for module in Module.search([('state', '=', 'installed')])}
         problems = []
+        # the modules of the suite: those next to this one, not the Odoo Mates apps of other repositories
+        suite = os.path.dirname(get_module_path('om_hrms'))
         for name, module in installed.items():
-            if not name.startswith('om_'):
+            if not name.startswith('om_') or os.path.dirname(get_module_path(name)) != suite:
                 continue
             direct = set(get_manifest(name).get('depends', []))
             closure, todo = set(), [module]

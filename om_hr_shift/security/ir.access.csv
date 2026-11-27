@@ -1,23 +1,9 @@
 id,name,model_id,group_id/id,operation,domain
-access_template_user,hr.shift.template.user,hr.shift.template,base.group_user,r,
-access_template_manager,hr.shift.template.manager,hr.shift.template,om_hr_shift.group_shift_manager,crud,
-template_company_rule,Shift templates: multi-company,hr.shift.template,,crud,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"
-access_rotation_planner,hr.shift.rotation.planner,hr.shift.rotation,om_hr_shift.group_shift_planner,r,
-access_rotation_manager,hr.shift.rotation.manager,hr.shift.rotation,om_hr_shift.group_shift_manager,crud,
-rotation_company_rule,Shift rotations: multi-company,hr.shift.rotation,,crud,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"
-access_rotation_line_planner,hr.shift.rotation.line.planner,hr.shift.rotation.line,om_hr_shift.group_shift_planner,r,
-access_rotation_line_manager,hr.shift.rotation.line.manager,hr.shift.rotation.line,om_hr_shift.group_shift_manager,crud,
-access_shift_own,hr.shift.own,hr.shift,base.group_user,r,"[('state', '=', 'published'), '|', ('employee_id.user_id', '=', user.id), ('employee_id', '=', False)]"
-access_shift_planner,hr.shift.planner,hr.shift,om_hr_shift.group_shift_planner,crud,
-shift_company_rule,Shifts: multi-company,hr.shift,,crud,"[('company_id', 'in', company_ids)]"
-access_unavailability_own,hr.shift.unavailability.own,hr.shift.unavailability,base.group_user,crud,"[('employee_id.user_id', '=', user.id)]"
-access_unavailability_planner,hr.shift.unavailability.planner,hr.shift.unavailability,om_hr_shift.group_shift_planner,r,
-access_unavailability_manager,hr.shift.unavailability.manager,hr.shift.unavailability,om_hr_shift.group_shift_manager,crud,
-unavailability_company_rule,Unavailability: multi-company,hr.shift.unavailability,,crud,"[('company_id', 'in', company_ids)]"
-access_request_read,hr.shift.request.read,hr.shift.request,base.group_user,r,"['|', '|', ('employee_id.user_id', '=', user.id), ('target_employee_id.user_id', '=', user.id), ('approval_request_ids.line_ids.approver_user_ids', 'in', user.id)]"
-access_request_own_draft,hr.shift.request.own.draft,hr.shift.request,base.group_user,cud,"[('employee_id.user_id', '=', user.id), ('state', '=', 'draft')]"
-access_request_planner,hr.shift.request.planner,hr.shift.request,om_hr_shift.group_shift_planner,crud,
-request_company_rule,Shift requests: multi-company,hr.shift.request,,crud,"[('company_id', 'in', company_ids)]"
+access_template_user,om.planning.template.shift.user,om.planning.template,base.group_user,r,
+access_role_user,om.planning.role.shift.user,om.planning.role,base.group_user,r,
+access_recurrence_user,om.planning.recurrence.shift.user,om.planning.recurrence,base.group_user,r,
+access_slot_own,om.planning.slot.shift.own,om.planning.slot,base.group_user,r,"[('state', '=', 'published'), '|', ('resource_ids', '=', False), ('resource_ids.user_id', '=', user.id)]"
+access_request_read,om.planning.request.shift.read,om.planning.request,base.group_user,r,"['|', '|', '|', '|', '|', ('create_uid', '=', user.id), ('resource_id.user_id', '=', user.id), ('target_resource_id.user_id', '=', user.id), ('employee_id.parent_id.user_id', '=', user.id), ('employee_id.department_id.manager_id.user_id', '=', user.id), ('approval_request_ids.line_ids.approver_user_ids', 'in', user.id)]"
+access_request_own_create,om.planning.request.shift.own.create,om.planning.request,base.group_user,c,"['|', ('create_uid', '=', user.id), ('resource_id.user_id', '=', user.id)]"
+access_request_own_draft,om.planning.request.shift.own.draft,om.planning.request,base.group_user,ud,"[('resource_id.user_id', '=', user.id), ('state', '=', 'draft')]"
 access_rostering_wizard,hr.shift.rostering.wizard,hr.shift.rostering.wizard,om_hr_shift.group_shift_planner,crud,
-access_rotation_wizard,hr.shift.rotation.wizard,hr.shift.rotation.wizard,om_hr_shift.group_shift_planner,crud,
-access_publish_wizard,hr.shift.publish.wizard,hr.shift.publish.wizard,om_hr_shift.group_shift_planner,crud,

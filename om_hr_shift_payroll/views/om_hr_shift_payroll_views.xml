@@ -10,9 +10,9 @@
                 <page string="Shift Allowances" name="om_shifts" invisible="not shift_ids">
                     <field name="shift_ids" readonly="1">
                         <list>
-                            <field name="date"/>
+                            <field name="shift_date"/>
                             <field name="template_id"/>
-                            <field name="hours" widget="float_time"/>
+                            <field name="allocated_hours" widget="float_time"/>
                             <field name="currency_id" column_invisible="1"/>
                             <field name="allowance" sum="Total"/>
                         </list>
@@ -22,12 +22,12 @@
         </field>
     </record>
 
-    <record id="om_hr_shift_view_form_payroll" model="ir.ui.view">
-        <field name="name">hr.shift.view.form.payroll</field>
-        <field name="model">hr.shift</field>
-        <field name="inherit_id" ref="om_hr_shift.om_hr_shift_view_form"/>
+    <record id="om_planning_slot_view_form_shift_payroll" model="ir.ui.view">
+        <field name="name">om.planning.slot.form.shift.payroll</field>
+        <field name="model">om.planning.slot</field>
+        <field name="inherit_id" ref="om_planning.om_planning_slot_view_form"/>
         <field name="arch" type="xml">
-            <field name="hours" position="after">
+            <field name="allocated_hours" position="after">
                 <field name="currency_id" invisible="1"/>
                 <field name="allowance" invisible="not allowance"/>
                 <field name="payslip_id" invisible="not payslip_id"

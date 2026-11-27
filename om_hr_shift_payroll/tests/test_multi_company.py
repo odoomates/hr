@@ -32,9 +32,9 @@ class TestShiftPayrollMultiCompany(TransactionCase):
             'name': name, 'company_id': company.id, 'tz': 'UTC', 'date_version': date(2026, 1, 1),
             'contract_date_start': date(2026, 1, 1), 'wage': 3000.0, 'struct_id': cls.structure.id})
         employee.with_company(company)._start_rostering(date(2026, 9, 1))
-        shifts = cls.env['hr.shift'].with_company(company).create([
-            dict(cls.night._shift_values(), employee_id=employee.id, date=date(2026, 9, day)) for day in (7, 8, 9)])
-        shifts.with_context(om_shift_override=True).action_publish()
+        shifts = cls.env['om.planning.slot'].with_company(company).create([
+            cls.night._shift_values(date(2026, 9, day), employee) for day in (7, 8, 9)])
+        shifts.action_publish()
         return employee
 
     def payslip(self, employee):
@@ -54,6 +54,6 @@ class TestShiftPayrollMultiCompany(TransactionCase):
 
     def test_no_shift_on_a_payslip_of_another_company(self):
         payslip_b = self.payslip(self.employee_b)
-        shift_a = self.env['hr.shift'].search([('employee_id', '=', self.employee_a.id)], limit=1)
+        shift_a = self.env['om.planning.slot'].search([('employee_id', '=', self.employee_a.id)], limit=1)
         with self.assertRaises(UserError):
             shift_a.sudo().payslip_id = payslip_b

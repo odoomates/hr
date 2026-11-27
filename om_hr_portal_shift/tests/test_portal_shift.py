@@ -16,16 +16,14 @@ class TestPortalShift(HrPortalCase):
         (cls.employee | cls.colleague).write({'department_id': department.id, 'tz': 'UTC'})
         morning = cls.env.ref('om_hr_shift.template_morning')
         evening = cls.env.ref('om_hr_shift.template_evening')
-        Shift = cls.env['hr.shift'].with_context(om_shift_override=True)
+        Shift = cls.env['om.planning.slot']
         # the open shifts already there, e.g. of the demo data, are not those of the test
-        Shift.search([('employee_id', '=', False)]).unlink()
-        cls.mine = Shift.create(dict(morning._shift_values(), employee_id=cls.employee.id, date=cls.day))
-        cls.theirs = Shift.create(dict(evening._shift_values(), employee_id=cls.colleague.id,
-                                       date=cls.day + timedelta(days=1)))
-        cls.open_shift = Shift.create(dict(evening._shift_values(), date=cls.day + timedelta(days=2),
+        Shift.search([('is_open', '=', True)]).unlink()
+        cls.mine = Shift.create(morning._shift_values(cls.day, cls.employee))
+        cls.theirs = Shift.create(evening._shift_values(cls.day + timedelta(days=1), cls.colleague))
+        cls.open_shift = Shift.create(dict(evening._shift_values(cls.day + timedelta(days=2)),
                                            department_id=department.id))
-        cls.draft = Shift.create(dict(evening._shift_values(), employee_id=cls.employee.id,
-                                      date=cls.day + timedelta(days=3)))
+        cls.draft = Shift.create(evening._shift_values(cls.day + timedelta(days=3), cls.employee))
         (cls.mine | cls.theirs | cls.open_shift).action_publish()
 
     def test_my_shifts(self):
@@ -38,19 +36,21 @@ class TestPortalShift(HrPortalCase):
     def test_claim_and_swap(self):
         self.login_employee()
         self.url_open('/my/hr/shifts/claim', data={'csrf_token': self.csrf_token(), 'shift_id': self.open_shift.id})
-        claim = self.env['hr.shift.request'].search([('kind', '=', 'claim'), ('employee_id', '=', self.employee.id)])
-        self.assertEqual((claim.shift_id, claim.state), (self.open_shift, 'to_approve'))
+        Request = self.env['om.planning.request']
+        claim = Request.search([('request_type', '=', 'claim'), ('employee_id', '=', self.employee.id)])
+        self.assertEqual((claim.slot_id, claim.state, claim.approval_state), (self.open_shift, 'pending', 'to_approve'))
         self.url_open('/my/hr/shifts/swap', data={'csrf_token': self.csrf_token(), 'shift_id': self.mine.id,
                                                   'target_shift_id': self.theirs.id})
-        swap = self.env['hr.shift.request'].search([('kind', '=', 'swap'), ('employee_id', '=', self.employee.id)])
-        self.assertEqual((swap.target_shift_id, swap.state), (self.theirs, 'to_accept'))
+        swap = Request.search([('request_type', '=', 'switch'), ('employee_id', '=', self.employee.id)])
+        self.assertEqual((swap.target_slot_id, swap.state), (self.theirs, 'to_accept'))
         # the employee cannot answer for the colleague
         self.assertEqual(self.url_open('/my/hr/shifts/requests/%s/accept' % swap.id,
                                        data={'csrf_token': self.csrf_token()}).status_code, 404)
         self.authenticate(self.colleague_user.login, self.colleague_user.login)
         self.assertIn('Swaps Asked of You', self.get('/my/hr/shifts').text)
         self.url_open('/my/hr/shifts/requests/%s/accept' % swap.id, data={'csrf_token': self.csrf_token()})
-        self.assertEqual(swap.state, 'to_approve', 'accepted: the manager approves now')
+        self.assertEqual((swap.state, swap.approval_state), ('pending', 'to_approve'),
+                         'accepted: the manager approves now')
 
     def test_no_swap_of_someone_else_s_shift(self):
         self.login_employee()
@@ -62,11 +62,13 @@ class TestPortalShift(HrPortalCase):
         self.login_employee()
         self.url_open('/my/hr/shifts/unavailable', data={
             'csrf_token': self.csrf_token(), 'date_from': str(self.day), 'reason': 'Wedding'})
-        unavailable = self.env['hr.shift.unavailability'].search([('employee_id', '=', self.employee.id)])
-        self.assertEqual((unavailable.date_to, unavailable.reason), (self.day, 'Wedding'))
-        self.assertIn('Wedding', self.mine.warning)
-        other = self.env['hr.shift.unavailability'].create({'employee_id': self.colleague.id,
-                                                               'date_from': self.day, 'date_to': self.day})
+        Leave = self.env['resource.calendar.leaves']
+        unavailable = Leave.search([('resource_id', '=', self.employee.resource_id.id),
+                                    ('shift_unavailability', '=', True)])
+        self.assertEqual((unavailable.date_to.date(), unavailable.name), (self.day, 'Wedding'))
+        self.assertIn('Wedding', self.mine.conflict_info)
+        other = Leave.create({'resource_id': self.colleague.resource_id.id, 'shift_unavailability': True,
+                              'date_from': unavailable.date_from, 'date_to': unavailable.date_to})
         response = self.url_open('/my/hr/shifts/unavailable/%s/delete' % other.id,
                                  data={'csrf_token': self.csrf_token()})
         self.assertEqual(response.status_code, 404)

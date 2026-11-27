@@ -12,20 +12,21 @@ class HrBiometricLog(models.Model):
     def _shift(self):
         """ :return: the published shift of the employee the punch belongs to, the nearest one """
         self.ensure_one()
-        shifts = self.env['hr.shift'].sudo().search([
-            ('employee_id', '=', self.employee_id.id), ('state', '=', 'published'),
-            ('start', '<=', self.timestamp + MARGIN), ('stop', '>=', self.timestamp - MARGIN),
+        shifts = self.env['om.planning.slot'].sudo().search([
+            ('resource_ids', 'in', self.employee_id.resource_id.ids), ('state', '=', 'published'),
+            ('start_datetime', '<=', self.timestamp + MARGIN), ('end_datetime', '>=', self.timestamp - MARGIN),
         ])
-        return min(shifts, key=lambda shift: min(abs(self.timestamp - shift.start), abs(self.timestamp - shift.stop)),
+        return min(shifts, key=lambda shift: min(abs(self.timestamp - shift.start_datetime),
+                                                 abs(self.timestamp - shift.end_datetime)),
                    default=shifts)
 
     def _near_start(self, shift):
-        return abs(self.timestamp - shift.start) <= abs(self.timestamp - shift.stop)
+        return abs(self.timestamp - shift.start_datetime) <= abs(self.timestamp - shift.end_datetime)
 
     def _is_forgotten(self, attendance):
         """ An attendance opened before the shift of this punch, punched near its start, was never checked out. """
         shift = self._shift()
-        if shift and attendance.check_in < shift.start - MARGIN and self._near_start(shift):
+        if shift and attendance.check_in < shift.start_datetime - MARGIN and self._near_start(shift):
             return True
         return super()._is_forgotten(attendance)
 

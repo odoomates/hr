@@ -21,22 +21,21 @@ class TestShiftMultiCompany(TransactionCase):
         cls.employee_a = Employee.create({'name': 'Shift Worker A', 'tz': 'UTC'})
         cls.employee_b = Employee.with_company(cls.company_b).create({'name': 'Shift Worker B', 'tz': 'UTC',
                                                                        'company_id': cls.company_b.id})
-        cls.template_b = cls.env['hr.shift.template'].create({'name': 'Late B', 'code': 'LB', 'hour_from': 14.0,
-                                                              'hour_to': 22.0, 'company_id': cls.company_b.id})
+        cls.template_b = cls.env['om.planning.template'].create({'name': 'Late B', 'code': 'LB', 'start_time': 14.0,
+                                                                 'end_time': 22.0, 'company_id': cls.company_b.id})
         cls.morning = cls.env.ref('om_hr_shift.template_morning')
         cls.day = date.today() + timedelta(days=30)
 
     def shift(self, template, employee):
-        Shift = self.env['hr.shift'].with_context(om_shift_override=True)
-        return Shift.create(dict(template._shift_values(), employee_id=employee.id, date=self.day))
+        return self.env['om.planning.slot'].create(template._shift_values(self.day, employee))
 
     def test_other_company_hidden(self):
         shift_a, shift_b = self.shift(self.morning, self.employee_a), self.shift(self.morning, self.employee_b)
         self.assertEqual((shift_a.company_id, shift_b.company_id), (self.company_a, self.company_b))
-        Shift = self.env['hr.shift'].with_user(self.planner)
+        Shift = self.env['om.planning.slot'].with_user(self.planner)
         self.assertEqual(Shift.search([('id', 'in', (shift_a | shift_b).ids)]), shift_a)
         with self.assertRaises(AccessError):
-            shift_b.with_user(self.planner).read(['date'])
+            shift_b.with_user(self.planner).read(['start_datetime'])
 
     def test_no_link_across_companies(self):
         with self.assertRaises(UserError):
