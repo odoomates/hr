@@ -2,9 +2,9 @@ from datetime import UTC, date, datetime, time, timedelta
 
 from odoo import Command
 from odoo.exceptions import AccessError, UserError
-from odoo.tests import HttpCase, TransactionCase, new_test_user, tagged
+from odoo.tests import TransactionCase, new_test_user, tagged
 
-from odoo.addons.om_hr_shift.models.hr_shift_template import shift_segments
+from odoo.addons.om_hr_shift.models.om_planning_template import shift_segments
 
 MONDAY = date(2026, 9, 7)
 UTC = UTC
@@ -31,11 +31,13 @@ class TestShift(TransactionCase):
         cls.morning = cls.env.ref('om_hr_shift.template_morning')
         cls.evening = cls.env.ref('om_hr_shift.template_evening')
         cls.night = cls.env.ref('om_hr_shift.template_night')
-        cls.Shift = cls.env['hr.shift'].with_user(cls.planner)
+        cls.Shift = cls.env['om.planning.slot'].with_user(cls.planner)
+        cls.Request = cls.env['om.planning.request']
 
     def shift(self, template, day=MONDAY, employee=None, **values):
         employee = self.employee_a if employee is None else employee
-        return self.Shift.create(dict(template._shift_values(), employee_id=employee.id or False, date=day, **values))
+        # an open shift in the timezone of the employees of the test
+        return self.Shift.create(dict(template.with_context(tz='UTC')._shift_values(day, employee or None), **values))
 
     def work(self, employee, day):
         """ :return: the work intervals of the employee on the day, as (from, to) in hours """
@@ -48,10 +50,16 @@ class TestShift(TransactionCase):
         return [(hours(begin), hours(end)) for begin, end, _meta in intervals]
 
     def test_segments(self):
-        self.assertEqual(shift_segments(6, 14, 10, 10.5), [(0, 6, 10), (0, 10.5, 14)])
-        self.assertEqual(shift_segments(22, 6, 2, 2.5), [(0, 22, 24), (1, 0, 2), (1, 2.5, 6)])
-        self.assertEqual(shift_segments(22, 6), [(0, 22, 24), (1, 0, 6)])
-        self.assertEqual((self.morning.hours, self.night.hours), (7.5, 7.5))
+        monday, tuesday = MONDAY, MONDAY + timedelta(days=1)
+        self.assertEqual(shift_segments(datetime(2026, 9, 7, 6), datetime(2026, 9, 7, 14), 10, 0.5),
+                         [(monday, 6, 10), (monday, 10.5, 14)])
+        self.assertEqual(shift_segments(datetime(2026, 9, 7, 22), datetime(2026, 9, 8, 6), 2, 0.5),
+                         [(monday, 22, 24), (tuesday, 0, 2), (tuesday, 2.5, 6)])
+        self.assertEqual(shift_segments(datetime(2026, 9, 7, 22), datetime(2026, 9, 8, 6)),
+                         [(monday, 22, 24), (tuesday, 0, 6)])
+        self.assertEqual(shift_segments(datetime(2026, 9, 7, 8), datetime(2026, 9, 7, 16), 0, 1),
+                         [(monday, 8, 11.5), (monday, 12.5, 16)], 'a break outside the shift: in its middle')
+        self.assertEqual((self.morning.duration, self.night.duration), (7.5, 7.5))
 
     def test_start_rostering_keeps_the_past(self):
         before = self.employee_a.version_id.resource_calendar_id
@@ -69,64 +77,66 @@ class TestShift(TransactionCase):
         shift.action_publish()
         self.assertEqual(shift.state, 'published')
         self.assertEqual(self.work(self.employee_a, MONDAY), [(6.0, 10.0), (10.5, 14.0)])
-        self.assertEqual(len(shift.attendance_ids), 2)
-        shift.write({'hour_to': 15})
+        self.assertEqual(len(shift.roster_attendance_ids), 2)
+        shift.write({'end_datetime': datetime(2026, 9, 7, 15)})
         self.assertEqual(self.work(self.employee_a, MONDAY), [(6.0, 10.0), (10.5, 15.0)], 'an edit follows')
-        shift.employee_id = self.employee_b
+        shift.resource_ids = self.employee_b.resource_id
         self.assertEqual(self.work(self.employee_a, MONDAY), [])
         self.assertTrue(self.employee_b.roster_calendar_id, 'rostered when given a published shift')
         self.assertEqual(self.work(self.employee_b, MONDAY), [(6.0, 10.0), (10.5, 15.0)])
+        shift.action_unpublish()
+        self.assertEqual(self.work(self.employee_b, MONDAY), [], 'back to draft: not worked')
+        shift.action_publish()
         shift.unlink()
         self.assertEqual(self.work(self.employee_b, MONDAY), [])
 
     def test_night_shift(self):
         self.employee_a._start_rostering(date(2026, 9, 1))
-        self.shift(self.night).action_publish()
+        night = self.shift(self.night)
+        night.action_publish()
+        self.assertEqual(night.shift_date, MONDAY)
         self.assertEqual(self.work(self.employee_a, MONDAY), [(22.0, 24.0)])
         self.assertEqual(self.work(self.employee_a, date(2026, 9, 8)), [(0.0, 2.0), (2.5, 6.0)])
 
-    def test_checks_and_override(self):
-        self.employee_a._start_rostering(date(2026, 9, 1))
+    def test_checks(self):
+        (self.employee_a | self.employee_b)._start_rostering(date(2026, 9, 1))
+        self.employee_a.company_id.write({'planning_min_rest_hours': 11, 'planning_max_hours_week': 48})
         self.env['resource.calendar.leaves'].create({
             'name': 'Holiday Trip', 'resource_id': self.employee_a.resource_id.id,
             'date_from': datetime(2026, 9, 9, 0, 0), 'date_to': datetime(2026, 9, 9, 23, 59)})
-        self.env['hr.shift.unavailability'].create({'employee_id': self.employee_a.id, 'date_from': date(2026, 9, 10),
-                                                       'date_to': date(2026, 9, 10), 'reason': 'Exam'})
+        self.env['resource.calendar.leaves'].create({
+            'name': 'Exam', 'resource_id': self.employee_a.resource_id.id, 'shift_unavailability': True,
+            'date_from': datetime(2026, 9, 10, 0, 0), 'date_to': datetime(2026, 9, 10, 23, 59)})
         evening = self.shift(self.evening)
         morning = self.shift(self.morning, day=date(2026, 9, 8))
         trip = self.shift(self.morning, day=date(2026, 9, 9))
         exam = self.shift(self.morning, day=date(2026, 9, 10))
         overlap = self.shift(self.morning, day=date(2026, 9, 10))
-        self.assertFalse(self.shift(self.morning, day=date(2026, 9, 14), employee=self.employee_b).warning)
-        self.assertIn('rest', evening.warning)
-        self.assertIn('rest', morning.warning, '8 hours between 22:00 and 06:00')
-        self.assertIn('Holiday Trip', trip.warning)
-        self.assertIn('Exam', exam.warning)
-        self.assertIn('Overlaps', overlap.warning)
-        self.employee_a.company_id.shift_max_week_hours = 20
-        exam.invalidate_recordset(['warning'])
-        self.assertIn('hours in the week', exam.warning)
-        action = trip.action_publish()
-        self.assertEqual(action['res_model'], 'hr.shift.publish.wizard')
-        self.assertEqual(trip.state, 'draft', 'not without the planner confirming')
-        wizard = self.env['hr.shift.publish.wizard'].with_user(self.planner).create(
-            {'shift_ids': [Command.set(trip.ids)], 'reason': 'Trip moved'})
-        self.assertIn('Holiday Trip', wizard.warnings)
-        wizard.action_publish()
-        self.assertEqual(trip.state, 'published')
-        self.assertIn('Trip moved', trip.message_ids[0].body)
+        self.assertFalse(self.shift(self.morning, day=date(2026, 9, 14), employee=self.employee_b).conflict_info,
+                         'a rostered employee works their shifts: never outside their schedule')
+        self.assertIn('rest', evening.conflict_info)
+        self.assertIn('rest', morning.conflict_info, '8 hours between 22:00 and 06:00')
+        self.assertIn('Holiday Trip', trip.conflict_info)
+        self.assertIn('Exam', exam.conflict_info)
+        self.assertIn('already planned', overlap.conflict_info)
+        self.employee_a.company_id.planning_max_hours_week = 20
+        exam.invalidate_recordset(['conflict_info'])
+        self.assertIn('planned in week', exam.conflict_info)
+        trip.action_publish()
+        self.assertEqual(trip.state, 'published', 'the planner publishes despite the conflicts they see')
 
     def test_rotation(self):
         rotation = self.env.ref('om_hr_shift.rotation_two_two_two')
         self.assertEqual(rotation.pattern, 'M M N N - -')
-        wizard = self.env['hr.shift.rotation.wizard'].with_user(self.planner).create({
-            'rotation_id': rotation.id, 'employee_ids': [Command.set((self.employee_a | self.employee_b).ids)],
-            'date_from': MONDAY, 'date_to': date(2026, 9, 12), 'stagger': True})
+        wizard = self.env['om.planning.rotation.apply'].with_user(self.planner).create({
+            'rotation_id': rotation.id,
+            'resource_ids': [Command.set((self.employee_a | self.employee_b).resource_id.ids)],
+            'date_from': MONDAY, 'date_to': date(2026, 9, 12), 'stagger': True, 'skip_leaves': False})
         wizard.action_apply()
 
         def pattern(employee):
-            shifts = self.env['hr.shift'].search([('employee_id', '=', employee.id)])
-            by_day = {shift.date: shift.template_id.code for shift in shifts}
+            shifts = self.env['om.planning.slot'].search([('resource_ids', 'in', employee.resource_id.ids)])
+            by_day = {shift.shift_date: shift.template_id.code for shift in shifts}
             return ''.join(by_day.get(date(2026, 9, day), '-') for day in range(7, 13))
         self.assertEqual(pattern(self.employee_a), 'MMNN--')
         self.assertEqual(pattern(self.employee_b), 'MNN--M', 'one day further in the cycle')
@@ -135,31 +145,38 @@ class TestShift(TransactionCase):
         self.shift(self.morning, day=date(2026, 8, 31))
         self.shift(self.evening, day=date(2026, 9, 1), employee=self.employee_b)
         self.shift(self.night, day=MONDAY)
-        count = self.Shift.roster_copy_previous(MONDAY, 7)
-        self.assertEqual(count, 1, 'the employee planned on that day already is left as is')
-        copied = self.env['hr.shift'].search(
-            [('employee_id', '=', self.employee_b.id), ('date', '=', date(2026, 9, 8))])
+        resources = (self.employee_a | self.employee_b).resource_id
+        count = self.Shift.action_copy_previous('2026-09-07 00:00:00', '2026-09-14 00:00:00', 'week',
+                                                [('resource_ids', 'in', resources.ids)])
+        self.assertEqual(count, 2)
+        copied = self.env['om.planning.slot'].search(
+            [('resource_ids', 'in', self.employee_b.resource_id.ids), ('shift_date', '=', date(2026, 9, 8))])
         self.assertEqual((copied.template_id, copied.state), (self.evening, 'draft'))
 
-    def test_roster_data(self):
+    def test_roster_gantt(self):
+        """ The days of a rostered employee are not greyed until planned, only their time off. """
         self.employee_a._start_rostering(date(2026, 9, 1))
-        self.shift(self.morning)
-        self.shift(self.night, employee=self.env['hr.employee'], department_id=self.department.id)
-        data = self.Shift.roster_data('2026-09-07', 7, self.department.id)
-        self.assertEqual(len(data['dates']), 7)
-        self.assertIn(self.employee_a.id, [employee['id'] for employee in data['employees']])
-        self.assertEqual({shift['employee_id'] for shift in data['shifts']}, {self.employee_a.id, False})
-        self.assertTrue(data['can_edit'])
-        self.assertFalse(self.env['hr.shift'].with_user(self.user_a).roster_data('2026-09-07', 7)['can_edit'])
+        self.env['resource.calendar.leaves'].create({
+            'name': 'Exam', 'resource_id': self.employee_a.resource_id.id, 'shift_unavailability': True,
+            'date_from': datetime(2026, 9, 10, 0, 0), 'date_to': datetime(2026, 9, 10, 23, 59)})
+        rows = [{'groupedBy': ['resource_ids'], 'resId': employee.resource_id.id}
+                for employee in (self.employee_a | self.employee_b)]
+        rows = self.Shift.gantt_unavailability('2026-09-07 00:00:00', '2026-09-14 00:00:00', 'week',
+                                               ['resource_ids'], rows)
+        self.assertEqual([(period['start'].date(), period['stop'].date()) for period in rows[0]['unavailabilities']],
+                         [(date(2026, 9, 10), date(2026, 9, 10))])
+        self.assertTrue(len(rows[1]['unavailabilities']) > 1, 'not rostered: outside the working schedule')
 
     def test_claim_open_shift(self):
         open_shift = self.shift(self.morning, employee=self.env['hr.employee'], department_id=self.department.id)
         open_shift.action_publish()
-        request = self.env['hr.shift.request'].with_user(self.user_a).create(
-            {'kind': 'claim', 'employee_id': self.employee_a.id, 'shift_id': open_shift.id})
-        request.action_submit()
-        self.assertEqual((request.state, request.approver_user_ids), ('to_approve', self.manager_user))
-        request.with_user(self.manager_user).action_approval_approve()
+        self.assertEqual(open_shift.department_id, self.department)
+        request = self.Request.with_user(self.user_a).create(
+            {'request_type': 'claim', 'resource_id': self.employee_a.resource_id.id, 'slot_id': open_shift.id})
+        self.assertEqual((request.state, request.approval_state, request.approver_user_ids),
+                         ('pending', 'to_approve', self.manager_user))
+        self.assertEqual(request.with_user(self.manager_user).can_approve, True)
+        request.with_user(self.manager_user).action_approve()
         self.assertEqual((request.state, open_shift.employee_id), ('approved', self.employee_a))
         self.assertEqual(self.work(self.employee_a, MONDAY), [(6.0, 10.0), (10.5, 14.0)])
 
@@ -167,16 +184,16 @@ class TestShift(TransactionCase):
         mine = self.shift(self.morning)
         theirs = self.shift(self.evening, day=date(2026, 9, 8), employee=self.employee_b)
         (mine | theirs).action_publish()
-        request = self.env['hr.shift.request'].with_user(self.user_a).create(
-            {'kind': 'swap', 'employee_id': self.employee_a.id, 'shift_id': mine.id, 'target_shift_id': theirs.id})
-        request.action_submit()
+        request = self.Request.with_user(self.user_a).create(
+            {'resource_id': self.employee_a.resource_id.id, 'slot_id': mine.id, 'target_slot_id': theirs.id})
         self.assertEqual((request.state, request.with_user(self.user_b).can_accept), ('to_accept', True),
                          'the colleague accepts first')
         with self.assertRaises(UserError):
             request.with_user(self.manager_user).action_accept()
         request.with_user(self.user_b).action_accept()
-        self.assertEqual((request.state, request.approver_user_ids), ('to_approve', self.manager_user))
+        self.assertEqual((request.state, request.approver_user_ids), ('pending', self.manager_user))
         request.with_user(self.manager_user).action_approval_approve()
+        self.assertEqual(request.state, 'approved')
         self.assertEqual((mine.employee_id, theirs.employee_id), (self.employee_b, self.employee_a))
         self.assertEqual(self.work(self.employee_a, date(2026, 9, 8)), [(14.0, 18.0), (18.5, 22.0)])
 
@@ -184,9 +201,8 @@ class TestShift(TransactionCase):
         mine = self.shift(self.morning)
         theirs = self.shift(self.evening, day=date(2026, 9, 8), employee=self.employee_b)
         (mine | theirs).action_publish()
-        request = self.env['hr.shift.request'].with_user(self.user_a).create(
-            {'kind': 'swap', 'employee_id': self.employee_a.id, 'shift_id': mine.id, 'target_shift_id': theirs.id})
-        request.action_submit()
+        request = self.Request.with_user(self.user_a).create(
+            {'resource_id': self.employee_a.resource_id.id, 'slot_id': mine.id, 'target_slot_id': theirs.id})
         request.with_user(self.user_b).action_decline()
         self.assertEqual(request.state, 'refused')
         self.assertEqual((mine.employee_id, theirs.employee_id), (self.employee_a, self.employee_b))
@@ -195,10 +211,9 @@ class TestShift(TransactionCase):
         other = self.env['hr.department'].create({'name': 'Elsewhere'})
         open_shift = self.shift(self.morning, employee=self.env['hr.employee'], department_id=other.id)
         open_shift.action_publish()
-        request = self.env['hr.shift.request'].with_user(self.user_a).create(
-            {'kind': 'claim', 'employee_id': self.employee_a.id, 'shift_id': open_shift.id})
         with self.assertRaises(UserError):
-            request.action_submit()
+            self.Request.with_user(self.user_a).create(
+                {'request_type': 'claim', 'resource_id': self.employee_a.resource_id.id, 'slot_id': open_shift.id})
 
     def test_access(self):
         published = self.shift(self.morning)
@@ -210,13 +225,13 @@ class TestShift(TransactionCase):
         open_shift.action_publish()
         # among the shifts of the test: the database may hold others, e.g. the open shifts of the demo
         mine = published | draft | theirs | open_shift
-        seen = self.env['hr.shift'].with_user(self.user_a).search([('id', 'in', mine.ids)])
+        seen = self.env['om.planning.slot'].with_user(self.user_a).search([('id', 'in', mine.ids)])
         self.assertEqual(seen, published | open_shift)
         with self.assertRaises(AccessError):
-            draft.with_user(self.user_a).read(['date'])
-        with self.assertRaises((AccessError, UserError)):
-            self.env['hr.shift'].with_user(self.user_a).roster_assign(self.employee_a.id, '2026-09-09',
-                                                                             self.morning.id)
+            draft.with_user(self.user_a).read(['start_datetime'])
+        with self.assertRaises(AccessError):
+            self.env['om.planning.slot'].with_user(self.user_a).create(
+                self.morning._shift_values(date(2026, 9, 9), self.employee_a))
 
     def test_lateness_against_the_shift(self):
         if 'hr.lateness' not in self.env:
@@ -229,22 +244,3 @@ class TestShift(TransactionCase):
                                           'check_out': datetime(2026, 9, 7, 22, 0)})
         late = self.env['hr.lateness'].search([('employee_id', '=', self.employee_a.id)])
         self.assertEqual((late.kind, late.minutes), ('late_in', 30), 'late against the 14:00 shift')
-
-
-@tagged('post_install', '-at_install')
-class TestRosterBoard(HttpCase):
-
-    def test_roster_board(self):
-        monday = date.today() - timedelta(days=date.today().weekday())
-        employee = self.env['hr.employee'].create({'name': 'Roster Tour', 'tz': 'UTC',
-                                                   'date_version': monday - timedelta(days=30),
-                                                   'contract_date_start': monday - timedelta(days=30)})
-        employee._start_rostering(monday)
-        # nothing to warn of: the tour publishes straight away
-        employee.company_id.write({'shift_min_rest': 0, 'shift_max_week_hours': 0})
-        self.env['resource.calendar.leaves'].search([
-            ('date_from', '<', datetime.combine(monday + timedelta(days=1), time.min)),
-            ('date_to', '>', datetime.combine(monday, time.min))]).unlink()
-        self.start_tour('/odoo/action-om_hr_shift.om_hr_shift_action_roster', 'om_hr_shift_roster', login='admin')
-        shift = self.env['hr.shift'].search([('employee_id', '=', employee.id)])
-        self.assertEqual((shift.date, shift.state, len(shift.attendance_ids)), (monday, 'published', 2))
