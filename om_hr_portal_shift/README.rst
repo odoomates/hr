@@ -17,10 +17,13 @@ Features
 * **Swap a Shift**: one of their shifts against a published shift of a colleague of the same
   department, with a word for the colleague; the request goes to the colleague.
 * **Swaps Asked of You**: the colleague asked accepts or declines the swap.
-* **Days I Cannot Work**: add or remove the days the employee is not available.
+* **Days I Cannot Work**: add or remove the days the employee is not available; they show on the roster
+  of the planners.
 * The last 20 requests made by or asked of the employee, with whom they wait for and their status.
 * Each employee sees only their own records: changing an id in the address gives a page not found,
   not someone else's record.
+
+The addresses of the pages and forms are the same as with the former Shifts.
 
 Usage
 =====

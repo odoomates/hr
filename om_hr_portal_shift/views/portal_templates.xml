@@ -12,9 +12,7 @@
     </template>
 
     <template id="shift_time" name="Shift Time">
-        <t t-out="shift.date.strftime('%a %d %b')"/>,
-        <t t-out="'%02d:%02d' % divmod(round(shift.hour_from * 60), 60)"/>-<t t-out="'%02d:%02d' % divmod(round(shift.hour_to * 60), 60)"/>
-        <span t-if="shift.template_id" class="text-muted" t-out="shift.template_id.name"/>
+        <t t-out="shift_label(shift)"/>
     </template>
 
     <template id="portal_my_shifts" name="My Shifts">
@@ -28,7 +26,7 @@
                     <li t-foreach="to_accept" t-as="rec"
                         class="list-group-item d-flex justify-content-between align-items-center o_om_portal_swap">
                         <span><t t-out="rec.employee_id.name"/>: <t t-out="rec.display_name"/>
-                            <div t-if="rec.note" class="small text-muted" t-out="rec.note"/></span>
+                            <div t-if="rec.reason" class="small text-muted" t-out="rec.reason"/></span>
                         <span class="d-flex gap-2">
                             <form t-attf-action="/my/hr/shifts/requests/#{rec.id}/accept" method="post">
                                 <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
@@ -130,8 +128,9 @@
                     <ul class="list-group">
                         <li t-foreach="unavailable" t-as="day"
                             class="list-group-item d-flex justify-content-between align-items-center">
-                            <span><span t-field="day.date_from"/> - <span t-field="day.date_to"/>
-                                <span class="text-muted" t-out="day.reason"/></span>
+                            <span><span t-field="day.date_from" t-options="{'widget': 'date'}"/> -
+                                <span t-field="day.date_to" t-options="{'widget': 'date'}"/>
+                                <span class="text-muted" t-out="day.name"/></span>
                             <form t-attf-action="/my/hr/shifts/unavailable/#{day.id}/delete" method="post">
                                 <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                                 <button type="submit" class="btn btn-sm btn-link text-danger">Remove</button>
@@ -146,8 +145,8 @@
                 <tbody>
                     <tr t-foreach="shift_requests" t-as="rec">
                         <td t-out="rec.display_name"/>
-                        <td t-out="rec.approval_step if rec.state == 'to_approve' else rec.target_employee_id.name if rec.state == 'to_accept' else ''"/>
-                        <td><span t-attf-class="badge #{'text-bg-success' if rec.state == 'approved' else 'text-bg-danger' if rec.state in ('refused', 'cancel') else 'text-bg-info'}" t-field="rec.state"/></td>
+                        <td t-out="rec.target_employee_id.name if rec.state == 'to_accept' else ''"/>
+                        <td><span t-attf-class="badge #{'text-bg-success' if rec.state == 'approved' else 'text-bg-danger' if rec.state in ('refused', 'cancelled') else 'text-bg-info'}" t-field="rec.state"/></td>
                     </tr>
                 </tbody>
             </t>
