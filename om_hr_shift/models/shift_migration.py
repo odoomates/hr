@@ -9,7 +9,7 @@ from zoneinfo import ZoneInfo
 
 from odoo import api, models
 from odoo.fields import Command
-from odoo.tools import sql
+from odoo.tools import SQL, sql
 
 _logger = logging.getLogger(__name__)
 
@@ -49,11 +49,11 @@ def fetch(cr, query, params=None):
 def keep_dates(cr, table, mapping, old_table):
     """ The new records keep who created and changed the former ones, and when. """
     for old_id, new_id in mapping.items():
-        cr.execute(f"""
-            UPDATE {table} t SET create_uid = o.create_uid, create_date = o.create_date,
-                                 write_uid = o.write_uid, write_date = o.write_date
-              FROM {old_table} o WHERE o.id = %s AND t.id = %s
-        """, (old_id, new_id))  # noqa: S608
+        cr.execute(SQL("""
+            UPDATE %s t SET create_uid = o.create_uid, create_date = o.create_date,
+                            write_uid = o.write_uid, write_date = o.write_date
+              FROM %s o WHERE o.id = %s AND t.id = %s
+        """, SQL.identifier(table), SQL.identifier(old_table), old_id, new_id))
 
 
 def repoint_xmlids(env, model, new_model, mapping):
@@ -324,7 +324,8 @@ def release_legacy_tables(cr):
             SELECT conname FROM pg_constraint WHERE contype = 'f' AND conrelid = %s::regclass
         """, (table,))
         for (name,) in cr.fetchall():
-            cr.execute(f'ALTER TABLE "{table}" DROP CONSTRAINT IF EXISTS "{name}"')
+            cr.execute(SQL('ALTER TABLE %s DROP CONSTRAINT IF EXISTS %s', SQL.identifier(table),
+                           SQL.identifier(name)))
 
 
 class OmPlanningSlot(models.Model):
