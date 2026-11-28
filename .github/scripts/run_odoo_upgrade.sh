@@ -4,7 +4,8 @@
 #
 #   run_odoo_upgrade.sh <database> <older checkout> <modules to install>
 #
-# Environment as run_odoo_tests.sh: ODOO_PATH, PYTHON, PGHOST, PGPORT, PGUSER, PGPASSWORD, LOG_DIR, EXTRA_ADDONS.
+# Environment as run_odoo_tests.sh: ODOO_PATH, PYTHON, PGHOST, PGPORT, PGUSER, PGPASSWORD, LOG_DIR, EXTRA_ADDONS;
+# EXTRA_ADDONS_BEFORE, when set, replaces EXTRA_ADDONS for the older install.
 set -uo pipefail
 
 db=${1:?database}
@@ -18,11 +19,13 @@ if [ -z "${EXTRA_ADDONS+x}" ] && [ -d "$repo/../odooapps" ]; then
     EXTRA_ADDONS=$(cd "$repo/../odooapps" && pwd)
 fi
 # only when it holds modules: Odoo refuses an addons directory without any
-if [ -n "${EXTRA_ADDONS:-}" ] && compgen -G "$EXTRA_ADDONS/*/__manifest__.py" >/dev/null; then
-    extra=",$EXTRA_ADDONS"
-else
-    extra=
-fi
+addons() {
+    if [ -n "$1" ] && compgen -G "$1/*/__manifest__.py" >/dev/null; then
+        echo ",$1"
+    fi
+}
+extra=$(addons "${EXTRA_ADDONS:-}")
+extra_before=$(addons "${EXTRA_ADDONS_BEFORE:-${EXTRA_ADDONS:-}}")
 mkdir -p "$log_dir"
 
 conf() {
@@ -30,7 +33,7 @@ conf() {
     file=$(mktemp)
     cat > "$file" <<CONF
 [options]
-addons_path = $odoo/addons,$odoo/odoo/addons,$1$extra
+addons_path = $odoo/addons,$odoo/odoo/addons,$1$2
 db_host = ${PGHOST:-localhost}
 db_port = ${PGPORT:-5432}
 db_user = ${PGUSER:-odoo}
@@ -41,8 +44,8 @@ CONF
 }
 
 data_dir=$(mktemp -d)
-old_conf=$(conf "$old")
-new_conf=$(conf "$repo")
+old_conf=$(conf "$old" "$extra_before")
+new_conf=$(conf "$repo" "$extra")
 drop() { dropdb --if-exists "$db" >/dev/null 2>&1; rm -f "$old_conf" "$new_conf"; }
 trap drop EXIT
 dropdb --if-exists "$db" >/dev/null 2>&1
