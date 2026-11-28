@@ -26,7 +26,8 @@ Journal entries
 * Confirming a payslip creates the journal entry and posts it: one debit and one credit line per salary
   rule category line, with the analytic distribution and the tax of the rule.
 * The partner of a journal item is taken from the contribution register of the salary rule, and is also
-  set when the account of the rule is a receivable or payable account. The net salary credited is set
+  set when the account of the rule is a receivable, a payable or a reconcilable account (Allow
+  Reconciliation), e.g. a salary advance recovered on a current asset account. The net salary credited is set
   on the employee, so that its payment can be matched with it.
 * When the debits and the credits do not match, an adjustment line is added on the default account of
   the salary journal; the entry is refused when that journal has no default account.
