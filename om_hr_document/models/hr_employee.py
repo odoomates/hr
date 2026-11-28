@@ -5,7 +5,7 @@ class HrEmployee(models.Model):
     _name = 'hr.employee'
     _inherit = ['hr.employee', 'om.documents.expiry.mixin']
 
-    documents_folder_id = fields.Many2one('om.documents.folder', string='Documents Folder', copy=False,
+    documents_folder_id = fields.Many2one('om.documents.folder', copy=False,
                                           groups='hr.group_hr_user', ondelete='set null')
 
     def _get_documents_folder(self):
