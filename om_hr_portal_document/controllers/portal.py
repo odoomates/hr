@@ -8,18 +8,27 @@ from odoo.addons.om_hr_portal.controllers.portal import HrPortal
 
 class HrPortalDocument(HrPortal):
 
+    @classmethod
+    def _own_document(cls, document_id):
+        """ :return: the document of the employee of the user with a document type, as the super user: the other
+                     files of the employee in Documents stay with HR """
+        document = cls._own('om.documents.document', document_id)
+        if not document.type_id:
+            raise request.not_found()
+        return document
+
     @http.route('/my/hr/documents', type='http', auth='user', website=True)
     def hr_documents(self, uploaded=None, **kwargs):
         employee = self._employee()
-        documents = request.env['document.document'].sudo().search([('employee_id', '=', employee.id)],
-                                                              order='date_expiry, id')
+        documents = request.env['om.documents.document'].sudo().search(
+            [('employee_id', '=', employee.id), ('type_id', '!=', False)], order='date_expiry, id')
         return request.render('om_hr_portal_document.portal_my_documents', self._values(
             'hr_documents', documents=documents, uploaded=uploaded, om_section='Documents'))
 
     @http.route('/my/hr/documents/<int:document_id>/files/<int:attachment_id>', type='http', auth='user')
     def hr_document_file(self, document_id, attachment_id, **kwargs):
-        document = self._own('document.document', document_id)
-        attachment = document.attachment_ids.filtered(lambda a: a.id == attachment_id)
+        document = self._own_document(document_id)
+        attachment = (document.attachment_id | document.extra_attachment_ids).filtered(lambda a: a.id == attachment_id)
         if not attachment:
             raise request.not_found()
         return request.env['ir.binary']._get_stream_from(attachment.sudo()).get_response(as_attachment=True)
@@ -29,12 +38,12 @@ class HrPortalDocument(HrPortal):
     def hr_document_upload(self, document_id, **post):
         """ The employee sends the renewed passport or permit: the file is added to the document, and HR checks
             it and updates the dates. """
-        document = self._own('document.document', document_id)
+        document = self._own_document(document_id)
         upload = post.get('file')
         if upload and getattr(upload, 'filename', None):
             data = upload.read()
             if data:
-                request.env['document.document'].sudo().board_upload(
+                request.env['om.documents.document'].sudo().expiry_board_upload(
                     document.res_model, document.res_id, False, document.id,
                     [{'name': upload.filename, 'mimetype': upload.content_type, 'data': base64.b64encode(data)}])
                 document.sudo().message_post(body=request.env._('%s sent a new file from the portal.',
