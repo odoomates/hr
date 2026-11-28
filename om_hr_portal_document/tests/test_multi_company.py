@@ -8,9 +8,9 @@ class TestPortalDocumentMultiCompany(HrPortalMultiCompanyCase):
 
     def test_documents_of_the_other_company(self):
         passport = self.env.ref('om_hr_document.document_type_passport')
-        document_a = self.env['document.document'].create({
+        document_a = self.env['om.documents.document'].create({
             'res_model': 'hr.employee', 'res_id': self.employee.id, 'type_id': passport.id, 'number': 'P-MC-A'})
-        document_b = self.env['document.document'].create({
+        document_b = self.env['om.documents.document'].create({
             'res_model': 'hr.employee', 'res_id': self.employee_b.id, 'type_id': passport.id, 'number': 'P-MC-B'})
         self.assertEqual(document_b.company_id, self.company_b)
         self.login_employee_b()

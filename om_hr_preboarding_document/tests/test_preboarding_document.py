@@ -1,3 +1,4 @@
+import base64
 from datetime import timedelta
 
 from odoo import fields
@@ -28,6 +29,6 @@ class TestPreboardingDocument(TransactionCase):
             line._submit()
         line.preboarding_id._refresh()
         self.assertEqual(line.state, 'todo')
-        document.attachment_ids = [(0, 0, {'name': 'passport.pdf', 'raw': b'%PDF-1.4'})]
+        document._expiry_add_files([{'name': 'passport.pdf', 'data': base64.b64encode(b'%PDF-1.4')}])
         self.env['hr.preboarding']._cron_follow_up()
         self.assertEqual((line.state, line.preboarding_id.state), ('done', 'done'))

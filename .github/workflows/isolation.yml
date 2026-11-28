@@ -45,7 +45,7 @@ jobs:
       PGPASSWORD: odoo
       ODOO_PATH: ${{ github.workspace }}/odoo
       LOG_DIR: ${{ github.workspace }}/logs
-      # the modules of other repositories the HR modules depend on: Approvals, Document Expiry, File Layouts,
+      # the modules of other repositories the HR modules depend on: Approvals, Documents, File Layouts,
       # Print Templates, Sign and Planning, from the Odoo Mates apps
       EXTRA_ADDONS: ${{ github.workspace }}/odooapps
     steps:
@@ -100,7 +100,7 @@ jobs:
       PGPASSWORD: odoo
       ODOO_PATH: ${{ github.workspace }}/odoo
       LOG_DIR: ${{ github.workspace }}/logs
-      # the modules of other repositories the HR modules depend on: Approvals, Document Expiry, File Layouts,
+      # the modules of other repositories the HR modules depend on: Approvals, Documents, File Layouts,
       # Print Templates, Sign and Planning, from the Odoo Mates apps
       EXTRA_ADDONS: ${{ github.workspace }}/odooapps
     steps:

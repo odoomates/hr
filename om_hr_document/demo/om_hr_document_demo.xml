@@ -2,7 +2,7 @@
 <odoo>
 
     <!-- a passport expiring soon, a residence permit expired, the others valid -->
-    <record id="demo_document_passport_admin" model="document.document">
+    <record id="demo_document_passport_admin" model="om.documents.document">
         <field name="res_model">hr.employee</field>
         <field name="res_id" ref="hr.employee_admin"/>
         <field name="type_id" ref="document_type_passport"/>
@@ -11,7 +11,7 @@
         <field name="date_expiry" eval="(DateTime.today() + relativedelta(days=20)).strftime('%Y-%m-%d')"/>
     </record>
 
-    <record id="demo_document_national_id_demo" model="document.document">
+    <record id="demo_document_national_id_demo" model="om.documents.document">
         <field name="res_model">hr.employee</field>
         <field name="res_id" ref="hr.employee_qdp"/>
         <field name="type_id" ref="document_type_national_id"/>
@@ -20,17 +20,17 @@
         <field name="date_expiry" eval="(DateTime.today() + relativedelta(years=3)).strftime('%Y-%m-%d')"/>
     </record>
 
-    <record id="demo_document_residence_al" model="document.document">
+    <record id="demo_document_residence_al" model="om.documents.document">
         <field name="res_model">hr.employee</field>
         <field name="res_id" ref="hr.employee_al"/>
         <field name="type_id" ref="document_type_residence"/>
         <field name="number">R-772910</field>
         <field name="date_issue" eval="(DateTime.today() - relativedelta(years=2, days=10)).strftime('%Y-%m-%d')"/>
         <field name="date_expiry" eval="(DateTime.today() - relativedelta(days=10)).strftime('%Y-%m-%d')"/>
-        <field name="note">Renewal requested from the immigration office.</field>
+        <field name="description">Renewal requested from the immigration office.</field>
     </record>
 
-    <record id="demo_document_work_permit_jod" model="document.document">
+    <record id="demo_document_work_permit_jod" model="om.documents.document">
         <field name="res_model">hr.employee</field>
         <field name="res_id" ref="hr.employee_jod"/>
         <field name="type_id" ref="document_type_work_permit"/>
@@ -39,7 +39,7 @@
         <field name="date_expiry" eval="(DateTime.today() + relativedelta(months=2)).strftime('%Y-%m-%d')"/>
     </record>
 
-    <record id="demo_document_driving_license_vad" model="document.document">
+    <record id="demo_document_driving_license_vad" model="om.documents.document">
         <field name="res_model">hr.employee</field>
         <field name="res_id" ref="hr.employee_vad"/>
         <field name="type_id" ref="document_type_driving_license"/>

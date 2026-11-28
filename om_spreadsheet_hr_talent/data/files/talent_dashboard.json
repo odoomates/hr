@@ -438,7 +438,7 @@
                                         ],
                                         "measure": "__count",
                                         "order": null,
-                                        "resModel": "document.document",
+                                        "resModel": "om.documents.document",
                                         "mode": "bar",
                                         "cumulatedStart": false
                                     },
@@ -452,7 +452,12 @@
                                                 "hr.employee"
                                             ],
                                             [
-                                                "state",
+                                                "type_id",
+                                                "!=",
+                                                false
+                                            ],
+                                            [
+                                                "expiry_state",
                                                 "in",
                                                 [
                                                     "expiring",
@@ -665,7 +670,7 @@
             "id": "3",
             "formulaId": "3",
             "name": "Documents Expiring",
-            "model": "document.document",
+            "model": "om.documents.document",
             "domain": [
                 [
                     "res_model",
@@ -673,7 +678,12 @@
                     "hr.employee"
                 ],
                 [
-                    "state",
+                    "type_id",
+                    "!=",
+                    false
+                ],
+                [
+                    "expiry_state",
                     "in",
                     [
                         "expiring"
@@ -701,7 +711,7 @@
             "id": "4",
             "formulaId": "4",
             "name": "Documents Expired",
-            "model": "document.document",
+            "model": "om.documents.document",
             "domain": [
                 [
                     "res_model",
@@ -709,7 +719,12 @@
                     "hr.employee"
                 ],
                 [
-                    "state",
+                    "type_id",
+                    "!=",
+                    false
+                ],
+                [
+                    "expiry_state",
                     "in",
                     [
                         "expired"
@@ -811,7 +826,7 @@
         "1": {
             "id": "1",
             "name": "Documents to Renew",
-            "model": "document.document",
+            "model": "om.documents.document",
             "domain": [
                 [
                     "res_model",
@@ -819,7 +834,12 @@
                     "hr.employee"
                 ],
                 [
-                    "state",
+                    "type_id",
+                    "!=",
+                    false
+                ],
+                [
+                    "expiry_state",
                     "in",
                     [
                         "expiring",

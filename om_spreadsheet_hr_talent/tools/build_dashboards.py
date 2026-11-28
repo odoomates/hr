@@ -25,8 +25,8 @@ HALF_WIDTH = (FULL_WIDTH - GAP) // 2
 
 OPEN_APPRAISALS = [['state', 'in', ['new', 'self', 'review']]]
 DONE_APPRAISALS = [['state', '=', 'done']]
-EMPLOYEE_DOCUMENTS = [['res_model', '=', 'hr.employee']]
-TO_RENEW = EMPLOYEE_DOCUMENTS + [['state', 'in', ['expiring', 'expired']]]
+EMPLOYEE_DOCUMENTS = [['res_model', '=', 'hr.employee'], ['type_id', '!=', False]]
+TO_RENEW = EMPLOYEE_DOCUMENTS + [['expiry_state', 'in', ['expiring', 'expired']]]
 OPEN_EXITS = [['state', 'in', ['to_approve', 'approved']]]
 ASSIGNED_ASSETS = [['asset_state', '=', 'assigned']]
 
@@ -44,11 +44,11 @@ def build_talent():
                                           field_matching=by_department),
         'done_appraisals': workbook.pivot('Appraisals Done', 'hr.appraisal', DONE_APPRAISALS, ['__count'],
                                           field_matching={period: ('date_done', 'date'), **by_department}),
-        'expiring': workbook.pivot('Documents Expiring', 'document.document',
-                                   EMPLOYEE_DOCUMENTS + [['state', 'in', ['expiring']]], ['__count'],
+        'expiring': workbook.pivot('Documents Expiring', 'om.documents.document',
+                                   EMPLOYEE_DOCUMENTS + [['expiry_state', 'in', ['expiring']]], ['__count'],
                                    field_matching=by_department),
-        'expired': workbook.pivot('Documents Expired', 'document.document',
-                                  EMPLOYEE_DOCUMENTS + [['state', 'in', ['expired']]], ['__count'],
+        'expired': workbook.pivot('Documents Expired', 'om.documents.document',
+                                  EMPLOYEE_DOCUMENTS + [['expiry_state', 'in', ['expired']]], ['__count'],
                                   field_matching=by_department),
         'exits': workbook.pivot('Exits in Progress', 'hr.exit', OPEN_EXITS, ['__count'],
                                 field_matching=by_department),
@@ -83,7 +83,7 @@ def build_talent():
          by_department, 'om_hr_appraisal.om_hr_appraisal_action'),
         ('exit_reasons', 'bar', 'Exits by Reason', 'hr.exit', [['state', 'in', ['approved', 'done']]],
          'departure_reason_id', {period: ('date_notice', 'date'), **by_department}, 'om_hr_exit.om_hr_exit_action'),
-        ('documents', 'bar', 'Documents to Renew by Type', 'document.document', TO_RENEW, 'type_id', by_department,
+        ('documents', 'bar', 'Documents to Renew by Type', 'om.documents.document', TO_RENEW, 'type_id', by_department,
          'om_hr_document.om_document_action_hr'),
     ]
     for index, (key, chart_type, title, model, domain, group_by, matching, action) in enumerate(charts):
@@ -93,7 +93,7 @@ def build_talent():
                              field_matching=matching, action_xmlid=action)
 
     documents = workbook.odoo_list(
-        'Documents to Renew', 'document.document', TO_RENEW,
+        'Documents to Renew', 'om.documents.document', TO_RENEW,
         [('employee_id', 'Employee'), ('type_id', 'Type'), ('number', 'Number'), ('date_expiry', 'Expires On')],
         order_by=[('date_expiry', True)], field_matching=by_department)
     title_row = 37

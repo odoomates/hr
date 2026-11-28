@@ -16,19 +16,19 @@
             <div t-if="not documents" class="alert alert-info" role="status">HR has no document of yours yet.</div>
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
                 <div class="col" t-foreach="documents" t-as="rec">
-                    <div t-attf-class="card h-100 border-top border-4 #{'border-danger' if rec.state == 'expired' else 'border-warning' if rec.state == 'expiring' else 'border-success' if rec.state == 'valid' else ''}">
+                    <div t-attf-class="card h-100 border-top border-4 #{'border-danger' if rec.expiry_state == 'expired' else 'border-warning' if rec.expiry_state == 'expiring' else 'border-success' if rec.expiry_state == 'valid' else ''}">
                         <div class="card-body">
                             <h5 class="card-title mb-1" t-out="rec.type_id.name"/>
                             <div class="text-muted small" t-out="rec.number or ''"/>
                             <div class="mt-2">
-                                <span t-if="rec.date_expiry" t-attf-class="badge #{'text-bg-danger' if rec.state == 'expired' else 'text-bg-warning' if rec.state == 'expiring' else 'text-bg-success'}">
-                                    <t t-if="rec.state == 'expired'">Expired</t><t t-else="">Expires</t>
+                                <span t-if="rec.date_expiry" t-attf-class="badge #{'text-bg-danger' if rec.expiry_state == 'expired' else 'text-bg-warning' if rec.expiry_state == 'expiring' else 'text-bg-success'}">
+                                    <t t-if="rec.expiry_state == 'expired'">Expired</t><t t-else="">Expires</t>
                                     <span t-field="rec.date_expiry"/>
                                 </span>
                                 <span t-else="" class="badge text-bg-light border">No expiry</span>
                             </div>
                             <ul class="list-unstyled small mt-2 mb-0">
-                                <li t-foreach="rec.attachment_ids" t-as="file">
+                                <li t-foreach="rec.attachment_id | rec.extra_attachment_ids" t-as="file">
                                     <a t-attf-href="/my/hr/documents/#{rec.id}/files/#{file.id}"><i class="oi" data-icon="attach_file" title="File"/> <t t-out="file.name"/></a>
                                 </li>
                             </ul>

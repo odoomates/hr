@@ -9,7 +9,7 @@ class TestDocumentBoardTour(HttpCase):
 
     def test_document_board(self):
         employee = self.env['hr.employee'].create({'name': 'Board Holder'})
-        self.env['document.document'].create({
+        self.env['om.documents.document'].create({
             'res_model': 'hr.employee', 'res_id': employee.id, 'number': 'P-1',
             'type_id': self.env.ref('om_hr_document.document_type_passport').id,
             'date_expiry': fields.Date.today() + timedelta(days=20),

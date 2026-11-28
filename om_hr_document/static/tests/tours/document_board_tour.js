@@ -10,19 +10,19 @@ registry.category("web_tour.tours").add("om_hr_document_board", {
         },
         {
             content: "the passport card, expiring",
-            trigger: '.o_om_document_card[data-state="expiring"]:contains("Passport")',
+            trigger: '.o_om_documents_expiry_card[data-state="expiring"]:contains("Passport")',
         },
         {
             content: "a type without document is offered",
-            trigger: '.o_om_document_missing:contains("Work Permit")',
+            trigger: '.o_om_documents_expiry_missing:contains("Work Permit")',
         },
         {
             content: "the expiring document can be renewed",
-            trigger: '.o_om_document_card:contains("Passport") .o_om_document_renew',
+            trigger: '.o_om_documents_expiry_card:contains("Passport") .o_om_documents_expiry_renew',
         },
         {
             content: "add the missing work permit",
-            trigger: '.o_om_document_missing:contains("Work Permit") .card-footer button',
+            trigger: '.o_om_documents_expiry_missing:contains("Work Permit") .card-footer button',
             run: "click",
         },
         {
@@ -41,7 +41,7 @@ registry.category("web_tour.tours").add("om_hr_document_board", {
         },
         {
             content: "the work permit is now a card",
-            trigger: '.o_om_document_card:not(.o_om_document_missing):contains("WP-42")',
+            trigger: '.o_om_documents_expiry_card:not(.o_om_documents_expiry_missing):contains("WP-42")',
         },
     ],
 });

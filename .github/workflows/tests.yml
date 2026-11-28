@@ -57,7 +57,7 @@ jobs:
       PGPASSWORD: odoo
       ODOO_PATH: ${{ github.workspace }}/odoo
       LOG_DIR: ${{ github.workspace }}/logs
-      # the modules of other repositories the HR modules depend on: Approvals, Document Expiry, File Layouts,
+      # the modules of other repositories the HR modules depend on: Approvals, Documents, File Layouts,
       # Print Templates, Sign and Planning, from the Odoo Mates apps
       EXTRA_ADDONS: ${{ github.workspace }}/odooapps
     steps:
@@ -114,7 +114,7 @@ jobs:
       PGPASSWORD: odoo
       ODOO_PATH: ${{ github.workspace }}/odoo
       LOG_DIR: ${{ github.workspace }}/logs
-      # the modules of other repositories the HR modules depend on: Approvals, Document Expiry, File Layouts,
+      # the modules of other repositories the HR modules depend on: Approvals, Documents, File Layouts,
       # Print Templates, Sign and Planning, from the Odoo Mates apps
       EXTRA_ADDONS: ${{ github.workspace }}/odooapps
     steps:
@@ -137,18 +137,13 @@ jobs:
           repository: odoomates/odooapps
           ref: '20.0'
           path: odooapps
-          sparse-checkout: |
-            om_approval
-            om_document
-            om_file_layout
-            om_print_template
-            om_print_template_document
-            om_sign
-            om_sign_print_template
-            om_web_gantt
-            om_planning
-            om_planning_hr
-            om_planning_holidays
+          fetch-depth: 0
+      - name: The Odoo Mates apps of the version before
+        # the apps as they were when the version before was committed, so that it installs as it did then
+        run: |
+          date=$(git -C hr log -1 --format=%cI ${{ steps.base.outputs.sha }})
+          git -C odooapps worktree add --detach ../odooapps-before "$(git -C odooapps rev-list -1 --before="$date" HEAD)"
+          echo "EXTRA_ADDONS_BEFORE=${{ github.workspace }}/odooapps-before" >> "$GITHUB_ENV"
       - uses: ./hr/.github/actions/setup-odoo
       - name: Install the version before, upgrade to this one
         run: hr/.github/scripts/run_odoo_upgrade.sh test_upgrade before om_hrms,om_hr_payroll_account

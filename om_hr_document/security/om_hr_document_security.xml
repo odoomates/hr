@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- the HR officers keep the documents of the employees in Documents -->
+    <record id="hr.group_hr_user" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('om_document.group_documents_user'))]"/>
+    </record>
+
+</odoo>

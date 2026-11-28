@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- a folder per employee inside, for their documents: the HR officers reach them -->
+        <record id="folder_employees" model="om.documents.folder">
+            <field name="name">Employees</field>
+            <field name="sequence">6</field>
+            <field name="owner_id" ref="base.user_admin"/>
+            <field name="access_internal">none</field>
+            <field name="read_group_ids" eval="[(4, ref('hr.group_hr_user'))]"/>
+            <field name="write_group_ids" eval="[(4, ref('hr.group_hr_user'))]"/>
+        </record>
+
+    </data>
+</odoo>
