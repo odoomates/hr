@@ -6,7 +6,7 @@ class HrPreboardingStep(models.Model):
 
     kind = fields.Selection(selection_add=[('document', 'Upload a Document')], ondelete={'document': 'cascade'})
     document_type_id = fields.Many2one(
-        'document.type', domain=[('res_model', '=', 'hr.employee')], check_company=True,
+        'om.documents.type', domain=[('res_model', '=', 'hr.employee')], check_company=True,
         help='The document the new hire uploads, e.g. Passport. The step is done once a file is uploaded.')
 
     @api.model
@@ -20,13 +20,14 @@ class HrPreboardingStep(models.Model):
 class HrPreboardingLine(models.Model):
     _inherit = 'hr.preboarding.line'
 
-    document_type_id = fields.Many2one('document.type')
-    document_id = fields.Many2one('document.document')
+    document_type_id = fields.Many2one('om.documents.type')
+    document_id = fields.Many2one('om.documents.document')
 
     def _on_started(self):
-        """ The document to upload waits in the documents of the employee, as HR would ask for it. """
+        """ The document to upload waits in the documents of the employee, in their folder, as HR would ask for
+        it. """
         result = super()._on_started()
-        Document = self.env['document.document'].sudo()
+        Document = self.env['om.documents.document'].sudo()
         for line in self.filtered(lambda line: line.kind == 'document' and line.document_type_id):
             employee = line.employee_id
             document = Document.search([('res_model', '=', 'hr.employee'), ('res_id', '=', employee.id),
@@ -38,6 +39,6 @@ class HrPreboardingLine(models.Model):
     def _refresh(self):
         result = super()._refresh()
         for line in self.filtered(lambda line: line.kind == 'document' and line.state != 'done'):
-            if line.document_id.sudo().attachment_ids:
+            if line.document_id.sudo().attachment_id:
                 line._mark_done()
         return result
