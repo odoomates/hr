@@ -4,7 +4,7 @@
     'name': 'Odoo 16 HR Payroll Accounting',
     'category': 'Generic Modules/Human Resources',
     'author': 'Odoo Mates, Odoo SA',
-    'version': '16.0.1.0.1',
+    'version': '16.0.1.0.2',
     'sequence': 1,
     'license': 'LGPL-3',
     'live_test_url': 'https://www.youtube.com/watch?v=0kaHMTtn7oY',
