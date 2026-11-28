@@ -59,9 +59,9 @@ What it installs:
   a scheme of days of pay per year of service and reasons of leaving.
 * ``om_hr_exit_payroll`` HR Exit in Payroll: the final settlement payslip,
   with the unused time off paid out, the gratuity and the loans still due.
-* ``om_document`` Document Expiry, from the Odoo Mates apps: documents with an
-  expiry date kept on any record, reminders before they expire, and their
-  renewal.
+* ``om_document`` Documents, from the Odoo Mates apps:
+  documents with an expiry date in Documents, kept on any record, reminders
+  before they expire, and their renewal.
 * ``om_hr_document`` HR Documents: the passports, visas, permits and IDs of
   the employees, on a Documents tab where files are dropped on cards.
 * ``om_print_template`` Print Templates, from the Odoo Mates apps: certificates
@@ -196,7 +196,7 @@ Dependencies
 * Odoo 20.0 Community Edition.
 * No external Python library and no paid Odoo Enterprise module.
 * The Odoo Mates apps (https://github.com/odoomates/odooapps), branch 20.0, in
-  the addons path: Approvals (``om_approval``), Document Expiry
+  the addons path: Approvals (``om_approval``), Documents
   (``om_document``), File Layouts (``om_file_layout``), Print Templates
   (``om_print_template``, ``om_print_template_document``) and Sign
   (``om_sign``, ``om_sign_print_template``).
