@@ -20,8 +20,9 @@ Features
   one credit line per salary rule, dated on the accounting date of the payslip,
   or the end of its period.
 * The partner of a journal item is taken from the contribution register of the
-  salary rule, else it is the employee for the items on a receivable or a
-  payable account.
+  salary rule, else it is the employee for the items on a receivable, a payable
+  or a reconcilable account (Allow Reconciliation), e.g. a salary advance
+  recovered on a current asset account.
 * When the debits and the credits do not match, an adjustment line is added on
   the default account of the salary journal.
 * Confirming a payslip whose salary rules have no debit and credit account is
