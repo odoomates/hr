@@ -1,6 +1,6 @@
 {
     'name': 'Payroll Bank Files',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources',
     'summary': 'Export the salary transfers of the payslips as the file your bank asks for: CSV, fixed width '
                'or Excel',

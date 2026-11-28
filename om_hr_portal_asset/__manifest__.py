@@ -1,6 +1,6 @@
 {
     'name': 'HR Portal: Assets',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources',
     'summary': 'Employees see the laptops, phones and tools in their hands on the website portal',
     'author': 'Odoo Mates',

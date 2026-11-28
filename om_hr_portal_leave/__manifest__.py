@@ -1,6 +1,6 @@
 {
     'name': 'HR Portal: Time Off',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources',
     'summary': 'Employees see their time off balances, ask for time off and withdraw requests on the website portal',
     'author': 'Odoo Mates',

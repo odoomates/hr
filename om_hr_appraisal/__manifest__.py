@@ -1,6 +1,6 @@
 {
     'name': 'HR Appraisals',
-    'version': '20.0.1.1.0',
+    'version': '20.0.1.1.1',
     'category': 'Human Resources',
     'summary': 'Employee appraisals: self assessment, manager review, rating, goals, probation reviews, '
                'review cycles, goal alignment, one-on-ones, 9-box and calibration',

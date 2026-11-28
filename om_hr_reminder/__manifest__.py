@@ -1,6 +1,6 @@
 {
     'name': 'HR Reminders',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources',
     'summary': 'Birthday, work anniversary and probation end reminders for employees, and the celebrations '
                'of the month',

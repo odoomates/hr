@@ -1,6 +1,6 @@
 {
     'name': 'HR Lateness',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources/Attendances',
     'summary': 'Late arrivals and early departures against the working schedule: grace minutes, penalty matrix, '
                'warnings, excuses',

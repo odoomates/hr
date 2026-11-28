@@ -1,6 +1,6 @@
 {
     'name': 'Biometric Attendance Machine - ZKTeco, eSSL, Fingerprint, Face',
-    'version': '20.0.1.0.1',
+    'version': '20.0.1.0.2',
     'category': 'Human Resources/Attendances',
     'summary': 'ZKTeco and eSSL biometric devices: punches pushed to Odoo (ADMS), check-in and check-out modes, '
                'device users, fingerprints, daily and absence reports',

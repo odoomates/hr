@@ -1,6 +1,6 @@
 {
     'name': 'HR Assets in Payroll',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources',
     'summary': 'Deduct from the payslip what an employee is charged for an asset lost or damaged',
     'author': 'Odoo Mates',

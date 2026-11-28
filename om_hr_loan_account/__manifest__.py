@@ -1,6 +1,6 @@
 {
     'name': 'HR Loans in Accounting',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources',
     'summary': 'Pay employee loans out, and take their repayments, as payments on a receivable loan account',
     'author': 'Odoo Mates',

@@ -1,6 +1,6 @@
 {
     'name': 'HR Portal: Documents',
-    'version': '20.0.1.0.1',
+    'version': '20.0.1.0.2',
     'category': 'Human Resources',
     'summary': 'Employees see their passports, visas, permits and IDs and send renewed files on the website portal',
     'author': 'Odoo Mates',

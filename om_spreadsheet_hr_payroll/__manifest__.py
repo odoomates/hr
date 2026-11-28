@@ -1,6 +1,6 @@
 {
     'name': 'Payroll Dashboard',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources',
     'summary': 'Payroll dashboard for Odoo 20 Community: gross and net pay by month, department and rule, '
                'top earners',

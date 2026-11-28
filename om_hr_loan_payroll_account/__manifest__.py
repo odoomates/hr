@@ -1,6 +1,6 @@
 {
     'name': 'HR Loans in Payroll Accounting',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources',
     'summary': 'The loan installments deducted from the payslips repay the loan account of the employee',
     'author': 'Odoo Mates',

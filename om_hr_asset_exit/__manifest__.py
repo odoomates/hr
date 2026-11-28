@@ -1,6 +1,6 @@
 {
     'name': 'HR Assets in Exits',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources',
     'summary': 'Exit clearance of the employee assets: an exit is cleared only once the assets are back',
     'author': 'Odoo Mates',

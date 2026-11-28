@@ -1,6 +1,6 @@
 {
     'name': 'Payroll Adjustments',
-    'version': '20.0.1.0.1',
+    'version': '20.0.1.0.2',
     'category': 'Human Resources/Payroll',
     'summary': 'Payroll bonuses, commissions, fines and deductions: once, monthly or until a total, taken by the '
                'payslips',

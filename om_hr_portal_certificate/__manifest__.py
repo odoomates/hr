@@ -1,6 +1,6 @@
 {
     'name': 'HR Portal: Certificates',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources',
     'summary': 'Employees ask for salary, employment or experience certificates and download them on the website '
                'portal',

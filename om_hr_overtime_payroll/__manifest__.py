@@ -1,6 +1,6 @@
 {
     'name': 'Overtime in Payroll',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources',
     'summary': 'Pay the validated overtime of the Attendances app on the payslips, at the rate of each time rule',
     'author': 'Odoo Mates',

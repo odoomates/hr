@@ -1,6 +1,6 @@
 {
     'name': 'Time Off and Attendance Dashboard',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources',
     'summary': 'Time off and attendance dashboard for Odoo 20 Community: time off, requests to approve, hours '
                'worked, overtime',

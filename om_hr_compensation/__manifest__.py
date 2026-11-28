@@ -1,6 +1,6 @@
 {
     'name': 'HR Compensation',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources',
     'summary': 'Salary grades and bands, compa-ratio, and merit cycles with department budgets turning the raises '
                'into contract versions',

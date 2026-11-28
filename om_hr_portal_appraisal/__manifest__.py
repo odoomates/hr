@@ -1,6 +1,6 @@
 {
     'name': 'HR Portal: Appraisals',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources',
     'summary': 'Employees fill in their self assessment and update the progress of their goals on the website portal',
     'author': 'Odoo Mates',

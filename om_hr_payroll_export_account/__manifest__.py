@@ -1,6 +1,6 @@
 {
     'name': 'Payroll Bank Files: Payments',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources',
     'summary': 'Register the salary payments in Accounting when exporting the bank file of the payslips',
     'author': 'Odoo Mates',

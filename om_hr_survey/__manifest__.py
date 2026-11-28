@@ -1,6 +1,6 @@
 {
     'name': 'HR Pulse Surveys',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources',
     'summary': 'Anonymous pulse surveys and eNPS: one-time links that never tell who answered, results per '
                'department from five answers',

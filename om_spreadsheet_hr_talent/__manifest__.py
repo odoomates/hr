@@ -1,6 +1,6 @@
 {
     'name': 'Talent and Compliance Dashboard',
-    'version': '20.0.1.0.1',
+    'version': '20.0.1.0.2',
     'category': 'Human Resources',
     'summary': 'HR dashboard for Odoo 20 Community: appraisals, employee documents to renew, exits, employee '
                'assets',

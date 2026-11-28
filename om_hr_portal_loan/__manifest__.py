@@ -1,6 +1,6 @@
 {
     'name': 'HR Portal: Loans',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources',
     'summary': 'Employees ask for loans and salary advances and follow their repayment on the website portal',
     'author': 'Odoo Mates',

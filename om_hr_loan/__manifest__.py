@@ -1,6 +1,6 @@
 {
     'name': 'HR Loans',
-    'version': '20.0.1.0.1',
+    'version': '20.0.1.0.2',
     'category': 'Human Resources',
     'summary': 'Employee loans and salary advances: request, approval flow, monthly installments, repayment',
     'author': 'Odoo Mates',

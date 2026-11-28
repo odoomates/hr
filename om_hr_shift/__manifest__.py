@@ -1,6 +1,6 @@
 {
     'name': 'Shifts',
-    'version': '20.0.1.0.2',
+    'version': '20.0.1.0.3',
     'category': 'Human Resources/Shifts',
     'summary': 'Shift planning and rosters on the planning Gantt: shift templates, rotations, open shifts, '
                'shift swaps, unavailability, rest checks',

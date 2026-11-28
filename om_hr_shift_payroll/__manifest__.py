@@ -1,6 +1,6 @@
 {
     'name': 'Shift Allowances in Payroll',
-    'version': '20.0.1.0.1',
+    'version': '20.0.1.0.2',
     'category': 'Human Resources/Payroll',
     'summary': 'Pay the allowance of each published shift on the payslips, e.g. a night shift allowance',
     'author': 'Odoo Mates',

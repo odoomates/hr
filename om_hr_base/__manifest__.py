@@ -1,6 +1,6 @@
 {
     'name': 'HR Base',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources',
     'summary': 'Shared base of the Odoo Mates HR modules: the My HR menu and the employee category of the contract',
     'author': 'Odoo Mates',

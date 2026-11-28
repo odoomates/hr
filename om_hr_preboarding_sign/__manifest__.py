@@ -1,6 +1,6 @@
 {
     'name': 'HR Pre-boarding: Sign',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources',
     'summary': 'New hires agree to the policies and sign their documents as steps of their pre-boarding',
     'author': 'Odoo Mates',

@@ -1,6 +1,6 @@
 {
     'name': 'HR Announcements',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources',
     'summary': 'Company, department and job position announcements, read and acknowledged by the employees',
     'author': 'Odoo Mates',

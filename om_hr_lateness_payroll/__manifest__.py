@@ -1,6 +1,6 @@
 {
     'name': 'HR Lateness Payroll',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources/Payroll',
     'summary': 'The lateness penalties of a month taken off the payslips, as payroll adjustments',
     'author': 'Odoo Mates',

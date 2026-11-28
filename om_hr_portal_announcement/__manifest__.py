@@ -1,6 +1,6 @@
 {
     'name': 'HR Portal: Announcements',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources',
     'summary': 'Employees read and acknowledge the announcements addressed to them on the website portal',
     'author': 'Odoo Mates',

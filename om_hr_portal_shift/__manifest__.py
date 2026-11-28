@@ -1,6 +1,6 @@
 {
     'name': 'HR Portal: Shifts',
-    'version': '20.0.1.0.1',
+    'version': '20.0.1.0.2',
     'category': 'Human Resources',
     'summary': 'Employees see their shifts, claim open shifts, swap shifts and give the days they cannot work on the '
                'portal',

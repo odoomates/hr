@@ -1,6 +1,6 @@
 {
     'name': 'HR Dashboards',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources',
     'summary': 'HR dashboard for Odoo 20 Community: headcount, joiners, leavers, turnover, service, contracts '
                'ending',

@@ -1,6 +1,6 @@
 {
     'name': 'HR Portal: Policies',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources',
     'summary': 'Employees read and agree to the company policies, or sign them, on the website portal',
     'author': 'Odoo Mates',

@@ -1,6 +1,6 @@
 {
     'name': 'HR Gratuity',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources',
     'summary': 'End of service gratuity: days of pay per year of service, by band, reduced by reason of leaving',
     'author': 'Odoo Mates',

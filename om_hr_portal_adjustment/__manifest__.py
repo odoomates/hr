@@ -1,6 +1,6 @@
 {
     'name': 'HR Portal: Pay Adjustments',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources',
     'summary': 'Employees follow the bonuses, commissions and deductions of their pay on the website portal',
     'author': 'Odoo Mates',

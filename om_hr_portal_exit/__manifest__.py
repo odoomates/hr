@@ -1,6 +1,6 @@
 {
     'name': 'HR Portal: Resignation',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources',
     'summary': 'Employees hand in their resignation and follow their exit and its clearance on the website portal',
     'author': 'Odoo Mates',

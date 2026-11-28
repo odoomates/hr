@@ -1,6 +1,6 @@
 {
     'name': 'HR Pre-boarding',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources',
     'summary': 'New hires get ready before their first day: their details for HR, reviewed, and what to know',
     'author': 'Odoo Mates',

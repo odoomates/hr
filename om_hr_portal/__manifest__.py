@@ -1,6 +1,6 @@
 {
     'name': 'HR Portal',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources',
     'summary': 'Employee self-service portal: profile, payslips, time off, loans, certificates, documents and more on '
                'the website',

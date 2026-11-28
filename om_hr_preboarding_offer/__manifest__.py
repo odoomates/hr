@@ -1,6 +1,6 @@
 {
     'name': 'HR Pre-boarding: Job Offers',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources',
     'summary': 'The pre-boarding starts by itself when the employee is created from an accepted job offer',
     'author': 'Odoo Mates',

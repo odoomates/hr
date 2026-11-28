@@ -1,6 +1,6 @@
 {
     'name': 'HR Compensation: Appraisals',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources',
     'summary': 'The merit cycles show the last rating of each employee and suggest their raise from a merit matrix',
     'author': 'Odoo Mates',

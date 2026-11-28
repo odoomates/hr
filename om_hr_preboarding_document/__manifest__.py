@@ -1,6 +1,6 @@
 {
     'name': 'HR Pre-boarding: Documents',
-    'version': '20.0.1.0.1',
+    'version': '20.0.1.0.2',
     'category': 'Human Resources',
     'summary': 'New hires upload their passport, ID or permits as steps of their pre-boarding',
     'author': 'Odoo Mates',
