@@ -1,6 +1,6 @@
 {
     'name': 'HR Documents',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources',
     'summary': 'Employee documents: passports, visas, work permits and IDs, with reminders before they expire',
     'author': 'Odoo Mates',
