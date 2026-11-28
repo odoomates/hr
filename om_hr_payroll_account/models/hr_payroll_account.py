@@ -17,8 +17,9 @@ class HrPayslipLine(models.Model):
         if register_partner_id:
             return register_partner_id.id
         account = self.salary_rule_id.account_credit if credit_account else self.salary_rule_id.account_debit
-        # the employee for what they are owed or owe: the net salary, the items on a receivable or a payable account
-        if (credit_account and self.category_id.code == 'NET') or \
+        # the employee for what they are owed or owe: the net salary, the items on a reconcilable account, e.g. a
+        # salary advance recovered
+        if (credit_account and self.category_id.code == 'NET') or account.reconcile or \
                 account.account_type in ('asset_receivable', 'liability_payable'):
             return self.slip_id.employee_id.work_contact_id.id
         return False
