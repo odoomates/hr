@@ -34,14 +34,14 @@ class HrPayslipLine(models.Model):
 
     def _get_partner_id(self, credit_account):
         """ :return: the partner of the journal item of the line: the partner of the contribution register of its
-        rule, else the employee for what they are owed or owe: the net salary, and the items on a receivable or a
-        payable account, e.g. a salary advance recovered, so they are reconciled per employee. """
+        rule, else the employee for what they are owed or owe: the net salary, and the items on a reconcilable
+        account, e.g. a salary advance recovered, so they are reconciled per employee. """
         register_partner = self.salary_rule_id.register_id.partner_id
         if register_partner:
             return register_partner.id
         rule = self.salary_rule_id
         account = rule.account_credit if credit_account else rule.account_debit
-        if (credit_account and self.category_id.code == 'NET') \
+        if (credit_account and self.category_id.code == 'NET') or account.reconcile \
                 or account.account_type in ('asset_receivable', 'liability_payable'):
             return self.slip_id.employee_id.sudo().work_contact_id.id
         return False
