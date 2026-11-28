@@ -26,15 +26,16 @@ class TestHrDocument(TransactionCase):
         cls.national_id_type = cls.env.ref('om_hr_document.document_type_national_id')
 
     def new_document(self, doc_type=None, employee=None, user=None, **values):
-        return self.env['document.document'].with_user(user or self.hr_user).create({
+        return self.env['om.documents.document'].with_user(user or self.hr_user).create({
             'res_model': 'hr.employee', 'res_id': (employee or self.employee).id,
             'type_id': (doc_type or self.passport_type).id, **values})
 
     def test_access(self):
         mine = self.new_document(number='P1', date_expiry=date(2030, 1, 1))
         theirs = self.new_document(employee=self.other, number='P2')
-        Document = self.env['document.document']
+        Document = self.env['om.documents.document']
         self.assertEqual(mine.employee_id, self.employee)
+        self.assertEqual(mine.folder_id, self.employee.documents_folder_id, 'in the folder of the employee')
         self.assertEqual(Document.with_user(self.employee_user).search([]), mine, 'employees read their own')
         with self.assertRaises(AccessError):
             theirs.with_user(self.employee_user).read(['number'])
@@ -47,7 +48,7 @@ class TestHrDocument(TransactionCase):
     def test_reminder_goes_to_the_hr_responsible(self):
         self.employee.version_id.hr_responsible_id = self.hr_responsible
         document = self.new_document(number='P1', date_expiry=date(2026, 6, 20))
-        self.env['document.document']._cron_send_reminders()
+        self.env['om.documents.document']._cron_send_expiry_reminders()
         self.assertEqual(document.activity_ids.user_id, self.hr_responsible)
 
     def test_reminder_without_responsible_goes_to_hr_managers(self):
@@ -68,7 +69,7 @@ class TestHrDocument(TransactionCase):
 
     def test_board_and_counts(self):
         self.new_document(number='P1', date_expiry=date(2026, 6, 10))
-        data = self.env['document.document'].with_user(self.hr_user).board_data('hr.employee', self.employee.id)
+        data = self.env['om.documents.document'].with_user(self.hr_user).expiry_board_data('hr.employee', self.employee.id)
         self.assertEqual(len(data['documents']), 1)
         self.assertIn(self.env.ref('om_hr_document.document_type_work_permit').id,
                       [missing['id'] for missing in data['missing']])

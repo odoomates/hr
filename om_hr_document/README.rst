@@ -7,7 +7,8 @@ Community.
 
 The documents of the employees, such as passports, visas, work permits and
 IDs, with their number, their dates and their files, and reminders before they
-expire. Built on Document Expiry (``om_document``).
+expire. Built on Documents (``om_document``): the documents
+are kept in Documents, in a folder per employee inside the Employees folder.
 
 Features
 ========
@@ -25,7 +26,10 @@ Features
 * The number of a Passport or a National ID also fills the matching field of
   the employee.
 * Employees see their own documents in My HR > My Documents; HR officers
-  manage all the documents of the employees.
+  manage all the documents of the employees, and are Documents users.
+* Each employee has a folder in Documents > Employees, reached by the HR
+  officers only: the documents of the employee, and the files attached to the
+  employee, are kept there.
 * Employees > Documents > Expiring and Expired list what needs renewing; All
   Documents lists them all, with filters and groups by employee and
   department.
@@ -49,7 +53,7 @@ Usage
 Dependencies
 ============
 
-* Document Expiry (``om_document``)
+* Documents (``om_document``)
 * HR Base (``om_hr_base``)
 
 Support

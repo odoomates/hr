@@ -1,4 +1,4 @@
 id,name,model_id,group_id/id,operation,domain
-access_om_document_employee_own,document.document.employee.own,document.document,base.group_user,r,"[('employee_id.user_id', '=', user.id)]"
-access_om_document_hr,document.document.hr,document.document,hr.group_hr_user,crud,"[('res_model', '=', 'hr.employee')]"
-access_om_document_type_hr_manager,document.type.hr.manager,document.type,hr.group_hr_manager,crud,"[('res_model', '=', 'hr.employee')]"
+access_om_document_employee_own,om.documents.document.employee.own,om.documents.document,base.group_user,r,"[('employee_id.user_id', '=', user.id), ('type_id', '!=', False)]"
+access_om_document_hr,om.documents.document.hr,om.documents.document,hr.group_hr_user,crud,"[('res_model', '=', 'hr.employee')]"
+access_om_document_type_hr_manager,om.documents.type.hr.manager,om.documents.type,hr.group_hr_manager,crud,"[('res_model', '=', 'hr.employee')]"

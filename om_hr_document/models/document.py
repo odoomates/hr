@@ -7,8 +7,8 @@ EMPLOYEE_NUMBER_FIELDS = {
 }
 
 
-class Document(models.Model):
-    _inherit = 'document.document'
+class DocumentsDocument(models.Model):
+    _inherit = 'om.documents.document'
 
     employee_id = fields.Many2one(
         'hr.employee', compute='_compute_employee_id', store=True, index='btree_not_null',
@@ -34,7 +34,7 @@ class Document(models.Model):
 
     def _hr_sync_employee_numbers(self):
         """ The number of a National ID or a passport is also set on the employee, where core HR shows it. """
-        for document in self.filtered(lambda d: d.active and d.employee_id and d.number):
+        for document in self.filtered(lambda d: d.active and d.employee_id and d.type_id and d.number):
             field = EMPLOYEE_NUMBER_FIELDS.get(document.type_id.code)
             if field and document.employee_id.sudo()[field] != document.number:
                 document.employee_id.sudo()[field] = document.number

@@ -17,7 +17,7 @@
                     <div class="alert alert-warning py-2" role="alert" invisible="not document_alert_count">
                         <field name="document_alert_count" class="fw-bold"/> document(s) expiring or expired.
                     </div>
-                    <field name="document_ids" widget="om_document_board" nolabel="1"/>
+                    <field name="document_ids" widget="om_documents_expiry_board" nolabel="1"/>
                 </page>
             </xpath>
         </field>

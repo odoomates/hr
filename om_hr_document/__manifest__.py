@@ -9,10 +9,12 @@
     'license': 'LGPL-3',
     'depends': ['om_document', 'om_hr_base'],
     'data': [
+        'security/om_hr_document_security.xml',
         'security/ir.access.csv',
+        'data/om_hr_document_data.xml',
         'data/om_document_type_data.xml',
         'views/hr_employee_views.xml',
-        'views/om_document_views.xml',
+        'views/om_documents_document_views.xml',
         'views/menu.xml',
     ],
     'demo': ['demo/om_hr_document_demo.xml'],

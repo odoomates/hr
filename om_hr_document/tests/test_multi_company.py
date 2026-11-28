@@ -18,20 +18,20 @@ class TestDocumentMultiCompany(TransactionCase):
         cls.employee_a = Employee.create({'name': 'Holder A'})
         cls.employee_b = Employee.with_company(cls.company_b).create({'name': 'Holder B',
                                                                        'company_id': cls.company_b.id})
-        cls.type_b = cls.env['document.type'].create({
+        cls.type_b = cls.env['om.documents.type'].create({
             'name': 'Permit B', 'model_id': cls.env['ir.model']._get_id('hr.employee'),
             'company_id': cls.company_b.id})
         cls.passport = cls.env.ref('om_hr_document.document_type_passport')
 
     def document(self, employee, document_type):
-        return self.env['document.document'].create({'res_model': 'hr.employee', 'res_id': employee.id,
+        return self.env['om.documents.document'].create({'res_model': 'hr.employee', 'res_id': employee.id,
                                                      'type_id': document_type.id})
 
     def test_other_company_hidden(self):
         document_a, document_b = self.document(self.employee_a, self.passport), \
             self.document(self.employee_b, self.passport)
         self.assertEqual((document_a.company_id, document_b.company_id), (self.company_a, self.company_b))
-        Document = self.env['document.document'].with_user(self.hr_user)
+        Document = self.env['om.documents.document'].with_user(self.hr_user)
         self.assertEqual(Document.search([('id', 'in', (document_a | document_b).ids)]), document_a)
         with self.assertRaises(AccessError):
             document_b.with_user(self.hr_user).read(['name'])
