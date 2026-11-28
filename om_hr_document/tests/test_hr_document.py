@@ -69,7 +69,8 @@ class TestHrDocument(TransactionCase):
 
     def test_board_and_counts(self):
         self.new_document(number='P1', date_expiry=date(2026, 6, 10))
-        data = self.env['om.documents.document'].with_user(self.hr_user).expiry_board_data('hr.employee', self.employee.id)
+        documents = self.env['om.documents.document'].with_user(self.hr_user)
+        data = documents.expiry_board_data('hr.employee', self.employee.id)
         self.assertEqual(len(data['documents']), 1)
         self.assertIn(self.env.ref('om_hr_document.document_type_work_permit').id,
                       [missing['id'] for missing in data['missing']])
